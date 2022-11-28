@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,WAAW,CAAC;EACR,UAAU,EAAE,GAAG;CAChB;;AAEH,AAAA,eAAe,CAAC;EACd,UAAU,EAAE,IAAI;CACjB;;AAED,AAAA,MAAM,CAAC;EACL,MAAM,EAAE,IAAI;CACb;;AAED,AAAA,QAAQ,CAAA;EACN,MAAM,EAAE,KAAK;CACd;;AAED,AAAA,eAAe,CAAC;EACd,MAAM,EAAE,GAAG,CAAC,KAAK,CAAC,OAAkB;CACrC",
+    "sources": [
+        "signup-lab.component.scss"
+    ],
+    "names": [],
+    "file": "signup-lab.component.css"
+}

@@ -1,0 +1,60 @@
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+    <!--#region LEFT -->
+    <div fxFlex="" class="brand">
+        <a [routerLink]="['/']">
+            <mat-icon>eco</mat-icon>
+        </a>
+        <a fxShow fxHide.lt-sm [routerLink]="['/']" routerLinkActive="router-link-active">
+            Hallboard
+        </a>
+    </div>
+    <!-- #endregion -->
+
+    <!--#region RIGHT -->
+
+    <!-- test logged-in or not -->
+    <button id="profileCard" *ngIf="user$ | async as user; else login" [mat-menu-trigger-for]="appMenu">
+        <mat-card style="display: none;"></mat-card>
+        <img mat-card-avatar src="{{user.profilePhotoUrl}}">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+
+    <!-- login -->
+    <ng-template #login>
+        <button [routerLink]="[ '/signup' ]" mat-button>
+            Sign Up
+        </button>
+        <button mat-button [routerLink]="['/login']" routerLinkActive="router-link-active">Login</button>
+    </ng-template>
+
+    <!-- menu if logged-in -->
+    <mat-menu #appMenu>
+        <div id="userInfo" *ngIf="user$ | async as user" flexLayout="column" flexLayoutAlign="center center">
+            <p style="font-size: larger;" fxFlex>{{user.name}}</p>
+            <p fxFlex class="email">{{user.email}}</p>
+            <mat-divider fxFlexFill></mat-divider>
+        </div>
+        <div id="matList">
+            <mat-list fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="0px">
+                <mat-list-item fxFlex fxHide fxShow.lt-sm>
+                    <mat-icon>shopping_basket</mat-icon>
+                    Orders
+                </mat-list-item>
+                <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active" fxFlex>
+                    <mat-icon>flaky</mat-icon>
+                    Manage Orders
+                </mat-list-item>
+                <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active" fxFlex>
+                    <mat-icon>assignment_returned</mat-icon>
+                    Manage Products
+                </mat-list-item>
+            </mat-list>
+
+            <div id="logout" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="1em">
+                <mat-divider fxFlexFill></mat-divider>
+                <button mat-raised-button (click)="logout()" fxFlex>Logout</button>
+            </div>
+        </div>
+    </mat-menu>
+    <!-- #endregion -->
+</mat-toolbar>

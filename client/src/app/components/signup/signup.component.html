@@ -1,0 +1,95 @@
+<div fxLayout="row" fxLayoutAlign="center">
+    <mat-stepper [linear]="stepperCond" [orientation]="(stepperOrientation | async)!" fxFlex.lt-sm="100" fxFlex.lt-lg="80" fxFlex.gt-md="65">
+
+        <!-- #region Uni's info -->
+        <mat-step [stepControl]="uniInfoFG" label="Select Your University">
+            <!-- <app-register-university></app-register-university> -->
+        </mat-step>
+        <!-- #endregion -->
+        
+        <!-- #region Create Account -->
+        <mat-step [stepControl]="contactInfoFG" label="Create Account">
+            <div fxLayout="row" fxLayoutAlign="center">
+                <form [formGroup]="contactInfoFG" fxLayout="column" fxFlex="80" fxFlex.lt-sm="100">
+                    <!-- code & Phone Number -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Uni's Official Phone Number</mat-label>
+                        <span *ngIf="PhoneCountryCodeCtrl.value" matPrefix>
+                            +{{PhoneCountryCodeCtrl.value}}&nbsp;&nbsp;
+                        </span>
+                        <input formControlName="phoneNumberCtrl" matInput placeholder="858-707-1234" required>
+                        <mat-hint>The official phone number only.</mat-hint>
+                        <mat-error *ngIf="PhoneNumberCtrl.hasError('required')">Uni's official phone number is
+                            required.
+                        </mat-error>
+                        <mat-error *ngIf="PhoneNumberCtrl.hasError('pattern')">Enter numbers only without space.
+                        </mat-error>
+                        <mat-error *ngIf="PhoneNumberCtrl.hasError('minlength')">The number is too short.
+                        </mat-error>
+                        <mat-error *ngIf="PhoneNumberCtrl.hasError('maxlength')">The number is Too long.
+                        </mat-error>
+                    </mat-form-field>
+                    <!-- Street address -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Street Address</mat-label>
+                        <textarea formControlName="streetCtrl" matInput placeholder="Ex. Main St" required></textarea>
+                        <mat-hint>Expandable field by Enter key.</mat-hint>
+                        <mat-error>This field is required.</mat-error>
+                        <button *ngIf="this.StreetCtrlCtrl.dirty" matSuffix mat-icon-button aria-label="Clear"
+                            (click)="clearStreet()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <!-- Unit / Apt# -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Unit / Apt#</mat-label>
+                        <input formControlName="unitCtrl" matInput placeholder="Ex. 253">
+                        <mat-hint>Optional field.</mat-hint>
+                    </mat-form-field>
+                    <!-- City & State -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>City</mat-label>
+                        <input formControlName="cityCtrl" matInput placeholder="Ex. San Diego" required>
+                        <mat-error>This field is required.</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>State</mat-label>
+                        <input formControlName="stateCtrl" matInput placeholder="Ex. California" required>
+                        <mat-error>This field is required.</mat-error>
+                    </mat-form-field>
+                    <!-- Zip -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Zip/Postal code</mat-label>
+                        <input formControlName="zipCtrl" matInput placeholder="Ex. 92125" required>
+                        <mat-error>This field is required.</mat-error>
+                    </mat-form-field>
+                    <!-- Additional instruction for address -->
+                    <mat-form-field appearance="outline">
+                        <mat-label>Do we need additional instructions?</mat-label>
+                        <textarea formControlName="additionalInfoCtrl" matInput placeholder="Ex. Main St"></textarea>
+                        <mat-hint>Obtional field.</mat-hint>
+                        <button *ngIf="this.StreetCtrlCtrl.dirty" matSuffix mat-icon-button aria-label="Clear"
+                            (click)="clearStreet()">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-form-field>
+                    <!-- #region buttons -->
+                    <div fxLayout="row" fxLayoutAlign="end center">
+                        <button fxFlex mat-raised-button color="primary" matStepperPrevious fxFlex="30"
+                            fxFlex.lt-md="50">Back
+                        </button>
+                        <button [disabled]="uniInfoFG.invalid" fxFlex mat-raised-button color="primary" matStepperNext
+                            fxFlex="30" fxFlex.lt-md="50">Next
+                        </button>
+                    </div>
+                    <!-- #endregion -->
+
+                    <button (click)="checkStatus()">Check</button>
+                    <p>{{contactInfoFG.value | json}}</p>
+                </form>
+            </div>
+        </mat-step>
+        <!-- #endregion -->
+
+    </mat-stepper>
+</div>
