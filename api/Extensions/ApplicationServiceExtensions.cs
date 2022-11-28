@@ -17,6 +17,7 @@ public static class ApplicationServiceExtensions {
         #endregion MongoDbSettings
 
         #region Others
+        // with ssl 
         services.AddCors(options => {
             options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
                 .AllowAnyMethod().WithOrigins("https://localhost:4200"));
