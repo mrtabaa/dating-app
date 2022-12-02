@@ -1,33 +1,56 @@
 $buttonHoverColor: rgb(228, 227, 227);
 
-.spacer{
-    flex: 1;
-}
-.brand{
-    a{
+mat-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    a {
         color: white;
         text-decoration: none;
     }
+
+    .brand {
+        // background: green;
+    }
+
+    .menu {
+        // background: red;
+        place-items: center;
+
+        button {
+            color: white;
+        }
+    }
 }
-#profileCard{
+
+.profileCard {
     cursor: pointer;
 }
 
-#matList{
-    mat-list{
+.matList {
+    mat-list {
         padding: 0;
     }
-    mat-list-item:hover{
+
+    mat-list-item:hover {
         background-color: $buttonHoverColor;
         cursor: pointer;
     }
-    mat-icon{
+
+    mat-icon {
         margin-right: 5px;
     }
 }
 
-#logout{
-    button:hover{
+.logout {
+    button:hover {
         background-color: $buttonHoverColor;
+    }
+}
+
+@media only screen and (min-width: 40rem) {
+    mat-toolbar {
+        background: green !important;
     }
 }

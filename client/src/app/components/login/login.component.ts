@@ -13,7 +13,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 export class LoginComponent implements OnInit {
 
 
-  userCredInput: UserLogin = { email: null, password: null };
+  userLoginInput: UserLogin = { email: null, password: null };
   user$!: Observable<void>;
   currentUser$!: Observable<UserProfile | null>;
 
@@ -40,9 +40,9 @@ export class LoginComponent implements OnInit {
   }
 
   loginEmail(): void {
-    this.userCredInput.email = this.EmailCtrl.value;
-    this.userCredInput.password = this.PasswordCtrl.value;
-    this.user$ = this.authService.login(this.userCredInput);
+    this.userLoginInput.email = this.EmailCtrl.value;
+    this.userLoginInput.password = this.PasswordCtrl.value;
+    this.user$ = this.authService.login(this.userLoginInput);
     console.log(this.emailLoginFg);
   }
 

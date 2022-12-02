@@ -1,6 +1,5 @@
-<div fxLayout="row" fxLayoutAlign="center">
-    <form [formGroup]="emailLoginFg" (ngSubmit)="emailLoginFg.value" action="" fxLayout="column" fxFlex="30"
-        fxFlex.lt-sm="100">
+<div>
+    <form [formGroup]="emailLoginFg" (ngSubmit)="emailLoginFg.value" action="">
         <mat-form-field appearaance="outline">
             <mat-label>Username</mat-label>
             <input formControlName="emailCtrl" dirAutofocus placeholder="Email address" matInput>
