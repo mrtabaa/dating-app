@@ -8,14 +8,14 @@ import { UserProfile } from '../_models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  baseUrl: string = 'https://localhost:7129/api/account/login/';
+  baseUrl = 'https://localhost:5001/api/account/';
   private currentUserSource = new ReplaySubject<UserProfile | null>(1);
   currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient) { }
 
   login(userInput: UserLogin): Observable<void> {
-    return this.http.post<UserProfile>(this.baseUrl, userInput).pipe(
+    return this.http.post<UserProfile>(this.baseUrl + 'login', userInput).pipe(
       map((response: UserProfile) => {
         const user = response;
         if (user) {
