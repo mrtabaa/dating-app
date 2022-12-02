@@ -3,15 +3,15 @@ public class UserRepository : IUserRepository {
 
     #region Db and Token Settings
     const string _collectionName = "Users";
-    private readonly IMongoCollection<AppUser>? _collection;
+    private readonly IMongoCollection<AppUser> _collection;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly CancellationToken _cancellationToken;
 
-
-    // constructor - dependency injection
+    // constructor - dependency injections
     public UserRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService) {
-        var database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = database.GetCollection<AppUser>(_collectionName);
+        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        _collection = dbName.GetCollection<AppUser>(_collectionName);
+// 
         _tokenService = tokenService;
         _cancellationToken = new CancellationToken();
     }
@@ -21,11 +21,8 @@ public class UserRepository : IUserRepository {
     public async Task<UserDto?> GetUser(string userId) {
         var user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
         return user == null ? null : new UserDto {
-            Verified = user.Verified,
-            Power = user.Power,
-            PhotoUrls = user.PhotoUrls,
-            ProfilePhotoUrl = user.ProfilePhotoUrl,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            Email = user.Email
         };
     }
 
@@ -41,11 +38,7 @@ public class UserRepository : IUserRepository {
         var updatedUser = Builders<AppUser>.Update
         .Set(e => e.Email, userIn.Email)
         .Set(ph => ph.PasswordHash, hmac.ComputeHash(Encoding.UTF8.GetBytes(userIn.Password!)))
-        .Set(ps => ps.PasswordSalt, hmac.Key)
-        .Set(v => v.Verified, false)
-        .Set(n => n.Name, userIn.Name)
-        .Set(pu => pu.PhotoUrls, userIn.PhotoUrls)
-        .Set(ppu => ppu.ProfilePhotoUrl, userIn.ProfilePhotoUrl);
+        .Set(ps => ps.PasswordSalt, hmac.Key);
 
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, _cancellationToken);
     }

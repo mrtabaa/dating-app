@@ -6,9 +6,10 @@ public class TokenService : ITokenService {
     public TokenService(IConfiguration config) {
         string? tokenValue = config[TokenKey];
 
-        if (tokenValue != null) {
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue));
-        }
+        // throw exception if tokenValue is null
+        _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
+
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue!));
     }
 
     public string CreateToken(AppUser user) {
@@ -16,8 +17,6 @@ public class TokenService : ITokenService {
 
         var claims = new List<Claim> {
             new Claim(JwtRegisteredClaimNames.NameId, user.Id!),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim(JwtRegisteredClaimNames.Name, user.Name!),
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);

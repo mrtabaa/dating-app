@@ -1,3 +1,6 @@
+using System.Data.Common;
+using ZstdSharp;
+
 namespace api.Repositories;
 public class AccountRepository : IAccountRepository {
 
@@ -18,62 +21,52 @@ public class AccountRepository : IAccountRepository {
     #endregion
 
     #region CRUD
-    public async Task<LoginSuccessDto?> Create(UserRegisterDto userIn) {
-        if (await CheckEmailExist(userIn!))
+    public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput) {
+        if (await CheckEmailExist(userInput!))
             return null;
 
         // prevent ComputeHash exception
         using var hmac = new HMACSHA512();
+
         var user = new AppUser {
             Schema = 0,
-            Email = userIn.Email,
-            Power = 0,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userIn.Password!)),
+            Email = userInput.Email,
+            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
             PasswordSalt = hmac.Key,
-            Verified = false,
-            Name = userIn.Name,
-            PhotoUrls = userIn.PhotoUrls,
-            ProfilePhotoUrl = userIn.ProfilePhotoUrl,
         };
 
         // if insertion successful OR throw an exception
-        try {
-            await _collection!.InsertOneAsync(user); // mark ! after _collection! tells compiler it's NOT null
+        await _collection!.InsertOneAsync(user); // mark ! after _collection! tells compiler it's nullable
 
-            return new LoginSuccessDto {
-                Verified = user.Verified,
-                PhotoUrls = user.PhotoUrls,
-                Token = _tokenService.CreateToken(user)
-            };
-        } catch (System.Exception error) {
-            throw error;
-        }
+        return new LoginSuccessDto {
+            Token = _tokenService.CreateToken(user),
+            Email = user.Email
+        };
+
     }
 
-    public async Task<LoginSuccessDto?> Login(LoginDto userIn) {
-        var user = await _collection.Find<AppUser>(user => user.Email == userIn.Email).FirstOrDefaultAsync(_cancellationToken);
+    public async Task<LoginSuccessDto?> Login(LoginDto userInput) {
+        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email).FirstOrDefaultAsync(_cancellationToken);
 
         if (user == null)
             return null;
 
         using var hmac = new HMACSHA512(user.PasswordSalt!);
-        var ComputeHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userIn.Password!));
-        if (user.PasswordHash!.SequenceEqual(ComputeHash))
+
+        var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
+        if (user.PasswordHash != null && user.PasswordHash.SequenceEqual(ComputedHash))
             return new LoginSuccessDto {
-                Verified = user.Verified,
-                PhotoUrls = user.PhotoUrls,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                Email = user.Email
             };
 
+        _ = user ?? throw new ArgumentException("valid userInput but user was not created", nameof(user));
         return null;
     }
     #endregion CRUD
 
     #region Helper methods
     private async Task<bool> CheckEmailExist(UserRegisterDto userIn) {
-        if (string.IsNullOrEmpty(userIn.Email))
-            return false;
-
         return null != await _collection.Find<AppUser>(user => user.Email == userIn.Email).FirstOrDefaultAsync()
             ? true : false;
     }
