@@ -1,10 +1,8 @@
 namespace api.Extensions;
 
 public static class IdentityServiceExtensions {
-    const string TokenKey = "TokenKey";
-
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config) {
-        string? tokenValue = config[TokenKey];
+        string? tokenValue = config[ConstStringValues.TokenKey];
 
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
 

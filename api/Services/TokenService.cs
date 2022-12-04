@@ -1,10 +1,9 @@
 namespace api.Services;
 public class TokenService : ITokenService {
     private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
-    const string TokenKey = "TokenKey";
 
     public TokenService(IConfiguration config) {
-        string? tokenValue = config[TokenKey];
+        string? tokenValue = config[ConstStringValues.TokenKey];
 
         // throw exception if tokenValue is null
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
@@ -16,7 +15,7 @@ public class TokenService : ITokenService {
         _ = _key ?? throw new ArgumentNullException("_key cannot be null", nameof(_key));
 
         var claims = new List<Claim> {
-            new Claim(JwtRegisteredClaimNames.NameId, user.Id!),
+            new Claim(JwtRegisteredClaimNames.NameId, user.Email!),
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
