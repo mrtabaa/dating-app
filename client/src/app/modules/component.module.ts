@@ -11,8 +11,8 @@ import { ShortenStringPipe } from '../_pipes/shorten-string.pipe';
 
 // components
 import { HomeComponent } from '../components/home/home.component';
-import { SignupComponent } from '../components/signup/signup.component';
-import { LoginComponent } from '../components/login/login.component';
+import { RegisterComponent } from '../components/account/register/register.component';
+import { LoginComponent } from '../components/account/login/login.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { NoAccessComponent } from '../components/no-access/no-access.component';
 import { NotFoundComponent } from '../components/not-found/not-found.component';
@@ -20,12 +20,12 @@ import { DirectiveModule } from './directive.module';
 
 const components = [
   HomeComponent,
-  SignupComponent,
+  RegisterComponent,
   LoginComponent,
   NavbarComponent,
   NoAccessComponent,
   NotFoundComponent,
-  
+
   ShortenStringPipe
 ]
 
