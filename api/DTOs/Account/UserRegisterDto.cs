@@ -4,6 +4,6 @@ public class UserRegisterDto {
     [EmailAddress]
     public required string Email { get; set; }
 
-    [MinLength(7)]
+    [MinLength(7), MaxLength(20)]
     public required string Password { get; set; }
 }

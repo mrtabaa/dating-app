@@ -22,10 +22,10 @@ public class AccountRepository : IAccountRepository {
 
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput) {
-        if (await CheckEmailExist(userInput!))
+        if (await CheckEmailExist(userInput.Email.ToLower()))
             return null;
 
-        // prevent ComputeHash exception
+        // manually dispose HMACSHA512 after being done
         using var hmac = new HMACSHA512();
 
         var user = new AppUser {
@@ -46,7 +46,7 @@ public class AccountRepository : IAccountRepository {
     }
 
     public async Task<LoginSuccessDto?> Login(LoginDto userInput) {
-        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email).FirstOrDefaultAsync(_cancellationToken);
+        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower()).FirstOrDefaultAsync(_cancellationToken);
 
         if (user == null)
             return null;
@@ -66,8 +66,8 @@ public class AccountRepository : IAccountRepository {
     #endregion CRUD
 
     #region Helper methods
-    private async Task<bool> CheckEmailExist(UserRegisterDto userIn) {
-        return null != await _collection.Find<AppUser>(user => user.Email == userIn.Email).FirstOrDefaultAsync()
+    private async Task<bool> CheckEmailExist(string email) {
+        return null != await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync()
             ? true : false;
     }
     #endregion Helper methods
