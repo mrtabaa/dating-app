@@ -1,4 +1,5 @@
 using System.Data.Common;
+using System.Text.RegularExpressions;
 using ZstdSharp;
 
 namespace api.Repositories;
@@ -22,7 +23,13 @@ public class AccountRepository : IAccountRepository {
 
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput) {
-        if (await CheckEmailExist(userInput.Email.ToLower()))
+        
+        if (!validateEmailPattern(userInput.Email))
+            return new LoginSuccessDto { BadEmailPattern = true };
+
+        string lowercaseEmail = userInput.Email.ToLower();
+
+        if (await CheckEmailExist(lowercaseEmail))
             return null;
 
         // manually dispose HMACSHA512 after being done
@@ -30,7 +37,7 @@ public class AccountRepository : IAccountRepository {
 
         var user = new AppUser {
             Schema = 0,
-            Email = userInput.Email,
+            Email = lowercaseEmail,
             PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
             PasswordSalt = hmac.Key,
         };
@@ -66,9 +73,30 @@ public class AccountRepository : IAccountRepository {
     #endregion CRUD
 
     #region Helper methods
-    private async Task<bool> CheckEmailExist(string email) {
-        return null != await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync()
-            ? true : false;
+    private async Task<bool> CheckEmailExist(string email) =>
+        null != await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync()
+        ? true : false;
+
+/// <summary>
+/// * TLD support from 2 to 5 chars (modify the values as you want)
+/// * Supports: abc@gmail.com.us
+/// * Non-sensitive case 
+/// * Stops operation if takes longer than 250ms and throw a detailed exception
+/// </summary>
+/// <param name="email"></param>
+/// <returns>success: true | fail: false </returns>
+/// <exception cref="ArgumentException"></exception>
+    private bool validateEmailPattern(string email) {
+        try {
+            return Regex.IsMatch(email,
+                @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$",
+                RegexOptions.None, TimeSpan.FromMilliseconds(250));
+        } catch (RegexMatchTimeoutException) {
+            // throw an exception explaining the task was failed 
+            _ = email ?? throw new ArgumentException("email, Timeout/failed regexr processing.", nameof(email));
+            return false;
+        }
     }
+
     #endregion Helper methods
 }
