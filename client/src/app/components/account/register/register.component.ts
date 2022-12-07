@@ -20,10 +20,13 @@ export class RegisterComponent implements OnInit {
 
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    emailCtrl: ['', [
-      // Validators.required,
-      // Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
-    ]],
+    emailCtrl: ['', {
+      validators: [
+        Validators.required,
+        Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)
+      ],
+      validatorsAsync: []
+    }, { updateOn: "blur" }],
     // passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
     passwordCtrl: ['', []]
   });
@@ -31,10 +34,10 @@ export class RegisterComponent implements OnInit {
 
   //#region Forms Properties
   // Lab's Info
-  get EmailCtrl(): AbstractControl {
+  get EmailCtrl(): FormControl {
     return this.registerFg.get('emailCtrl') as FormControl;
   }
-  get PasswordCtrl(): AbstractControl {
+  get PasswordCtrl(): FormControl {
     return this.registerFg.get('passwordCtrl') as FormControl;
   }
   //#endregion
@@ -52,7 +55,7 @@ export class RegisterComponent implements OnInit {
 
   // other methods
   checkStatus(): void {
-    console.log(this.registerFg.value);
+    console.log(this.EmailCtrl);
   }
   //#endregion
 }

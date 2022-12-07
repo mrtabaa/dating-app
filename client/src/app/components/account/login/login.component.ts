@@ -12,9 +12,7 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class LoginComponent implements OnInit {
 
-
-  userLoginInput: UserLogin = { email: null, password: null };
-  user$!: Observable<void>;
+  user$!: Observable<UserProfile>;
   currentUser$!: Observable<UserProfile | null>;
 
   constructor(private authService: AccountService, private fb: FormBuilder) {
@@ -22,12 +20,13 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.currentUser$ = this.authService.currentUser$;
+    this.loginFg;
+    // this.currentUser$ = this.authService.currentUser$;
   }
 
 
   loginFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
+    emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     passwordCtrl: ['', Validators.required]
   });
 
@@ -40,10 +39,14 @@ export class LoginComponent implements OnInit {
   }
 
   loginEmail(): void {
-    this.userLoginInput.email = this.EmailCtrl.value;
-    this.userLoginInput.password = this.PasswordCtrl.value;
-    this.user$ = this.authService.login(this.userLoginInput);
-    console.log(this.loginFg);
+    let userLoginInput: UserLogin = {
+      email: this.EmailCtrl.value,
+      password: this.PasswordCtrl.value
+    };
+
+    this.user$ = this.authService.login(userLoginInput);
+
+    this.user$.subscribe(res => console.log(res.email));
   }
 
   logout(): void {

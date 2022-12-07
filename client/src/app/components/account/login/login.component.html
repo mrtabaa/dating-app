@@ -1,17 +1,21 @@
-<form [formGroup]="loginFg" (ngSubmit)="loginFg.value" action="">
-    <mat-form-field appearaance="outline">
-        <mat-label>Username</mat-label>
-        <input formControlName="emailCtrl" dirAutofocus placeholder="Email address" matInput>
-        <mat-hint>Your registered email</mat-hint>
-        <mat-error *ngIf="EmailCtrl.hasError('required')">Email field is required.</mat-error>
-        <mat-error *ngIf="EmailCtrl.hasError('pattern')">Enter a valid email format.</mat-error>
-    </mat-form-field>
-    <mat-form-field appearaance="outline">
-        <mat-label>Password</mat-label>
-        <input formControlName="passwordCtrl" type="password" placeholder="Your password" matInput>
-        <mat-error *ngIf="PasswordCtrl.hasError('required')">Password field is required.</mat-error>
-    </mat-form-field>
-    <button (click)="loginEmail()" id="submit" mat-raised-button color="primary">Sign in</button>
+<form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
+    <div class="container">
+        <h2 class="title">Login</h2>
+        <mat-form-field appearance="outline">
+            <mat-label>Username</mat-label>
+            <input formControlName="emailCtrl" dirAutofocus placeholder="Email address" matInput>
+            <mat-hint>Your registered email</mat-hint>
+            <mat-error *ngIf="EmailCtrl.hasError('required')">Email field is required.</mat-error>
+            <mat-error *ngIf="EmailCtrl.hasError('pattern')">Enter a valid email format.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearaance="outline">
+            <mat-label>Password</mat-label>
+            <input formControlName="passwordCtrl" type="text" placeholder="Your password" matInput>
+            <mat-hint>7 to 20 characters.</mat-hint>
+            <mat-error *ngIf="PasswordCtrl.hasError('required')">Password field is required.</mat-error>
+        </mat-form-field>
+        <button (click)="loginEmail()" class="submitBtn" mat-raised-button color="primary">Sign in</button>
+    </div>
 </form>
 
 <div *ngIf="(user$ | async) as user">

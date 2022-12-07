@@ -1,21 +1,24 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerUser()">
     <div class="container">
+        <h2 class="title">Create Account</h2>
         <mat-form-field appearance="outline">
             <mat-label>Username Email</mat-label>
-            <input type="email" formControlName="emailCtrl" placeholder="Enter your email" matInput>
+            <input type="email" formControlName="emailCtrl" dirAutofocus placeholder="Enter your email" matInput>
             <mat-hint>Your email is your username.</mat-hint>
             <mat-error *ngIf="EmailCtrl.hasError('required')">This field is required.</mat-error>
-            <!-- <mat-error *ngIf="EmailCtrl.hasError('pattern')">Enter a valid email address.</mat-error> -->
+            <mat-error *ngIf="EmailCtrl.hasError('pattern')">Enter a valid email address.</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input type="password" formControlName="passwordCtrl" placeholder="Enter your password" matInput>
-            <mat-hint>Must be between 7 to 20 characters.</mat-hint>
+            <mat-hint>7 to 20 characters.</mat-hint>
             <mat-error *ngIf="PasswordCtrl.hasError('required')">This field is required.</mat-error>
             <!-- <mat-error *ngIf="PasswordCtrl.hasError('minLength')">Password must be between 7 to 20 characters.</mat-error> -->
         </mat-form-field>
 
         <button type="submit" mat-raised-button color="primary" class="submitBtn">Register</button>
+        <!-- <button type="button" mat-raised-button (click)="checkStatus()">check</button> -->
+        <p>{{registerFg.value | json}}</p>
     </div>
 </form>

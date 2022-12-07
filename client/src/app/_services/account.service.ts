@@ -16,22 +16,14 @@ export class AccountService {
 
   constructor(private http: HttpClient) { }
 
-  register(userInput: UserRegister) {
+  register(userInput: UserRegister): void {
     let test: Observable<UserRegister> = this.http.post<UserRegister>(this.baseUrl + 'register', userInput);
 
     test.subscribe(res => console.log(res));
   }
 
-  login(userInput: UserLogin): Observable<void> {
-    return this.http.post<UserProfile>(this.baseUrl + 'login', userInput).pipe(
-      map((response: UserProfile) => {
-        const user = response;
-        if (user) {
-          localStorage.setItem('user', JSON.stringify(user));
-          this.currentUserSource.next(user);
-        }
-      })
-    );
+  login(userInput: UserLogin): Observable<UserProfile> {
+    return this.http.post<UserProfile>(this.baseUrl + 'login', userInput);
   }
 
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
