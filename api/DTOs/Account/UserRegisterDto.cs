@@ -1,7 +1,7 @@
 namespace api.DTOs;
 public class UserRegisterDto {
 
-    [EmailAddress]
+    [EmailAddress, MaxLength(50)]
     public required string Email { get; set; }
 
     [MinLength(7), MaxLength(20)]
