@@ -10,7 +10,7 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor(private authService: AccountService) { }
+  constructor(private accountService: AccountService) { }
 
   user$!: Observable<UserProfile | null>;
 
@@ -19,10 +19,10 @@ export class NavbarComponent implements OnInit {
   }
 
   getCurrentUser() {
-    this.user$ = this.authService.currentUser$;
+    this.user$ = this.accountService.currentUser$;
   }
 
   logout() {
-    this.authService.logout();
+    this.accountService.logout();
   }
 }
