@@ -10,8 +10,8 @@ public class AccountController : BaseApiController {
     [HttpPost("register")]
     public async Task<ActionResult<LoginSuccessDto>> Register(UserRegisterDto userIn) {
         LoginSuccessDto? user = await _accountRepository.Create(userIn);
-        
-        if(user != null && user.BadEmailPattern)
+
+        if (user != null && user.BadEmailPattern)
             return BadRequest("Invalid email format.");
 
         return user == null ? BadRequest("Email is already registered.") : user;
