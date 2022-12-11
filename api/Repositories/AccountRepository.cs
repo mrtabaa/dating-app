@@ -1,6 +1,4 @@
-using System.Data.Common;
 using System.Text.RegularExpressions;
-using ZstdSharp;
 
 namespace api.Repositories;
 public class AccountRepository : IAccountRepository {
@@ -23,9 +21,12 @@ public class AccountRepository : IAccountRepository {
 
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput) {
-        
+
         if (!validateEmailPattern(userInput.Email))
-            return new LoginSuccessDto { BadEmailPattern = true };
+            return new LoginSuccessDto(
+                Token: null,
+                Email: null,
+                BadEmailPattern: true);
 
         string lowercaseEmail = userInput.Email.ToLower();
 
@@ -35,20 +36,22 @@ public class AccountRepository : IAccountRepository {
         // manually dispose HMACSHA512 after being done
         using var hmac = new HMACSHA512();
 
-        var user = new AppUser {
-            Schema = 0,
-            Email = lowercaseEmail,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
-            PasswordSalt = hmac.Key,
-        };
+        var user = new AppUser(
+            Schema: 0,
+            Id: null,
+            Email: lowercaseEmail,
+            PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
+            PasswordSalt: hmac.Key
+        );
 
         // if insertion successful OR throw an exception
         await _collection!.InsertOneAsync(user); // mark ! after _collection! tells compiler it's nullable
 
-        return new LoginSuccessDto {
-            Token = _tokenService.CreateToken(user),
-            Email = user.Email
-        };
+        return new LoginSuccessDto(
+            Token: _tokenService.CreateToken(user),
+            Email: user.Email,
+            BadEmailPattern: false
+        );
 
     }
 
@@ -62,10 +65,11 @@ public class AccountRepository : IAccountRepository {
 
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
         if (user.PasswordHash != null && user.PasswordHash.SequenceEqual(ComputedHash))
-            return new LoginSuccessDto {
-                Token = _tokenService.CreateToken(user),
-                Email = user.Email
-            };
+            return new LoginSuccessDto(
+                Token: _tokenService.CreateToken(user),
+                Email: user.Email,
+                BadEmailPattern: false
+            );
 
         _ = user ?? throw new ArgumentException("valid userInput but user was not created", nameof(user));
         return null;
@@ -77,15 +81,15 @@ public class AccountRepository : IAccountRepository {
         null != await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync()
         ? true : false;
 
-/// <summary>
-/// * TLD support from 2 to 5 chars (modify the values as you want)
-/// * Supports: abc@gmail.com.us
-/// * Non-sensitive case 
-/// * Stops operation if takes longer than 250ms and throw a detailed exception
-/// </summary>
-/// <param name="email"></param>
-/// <returns>success: true | fail: false </returns>
-/// <exception cref="ArgumentException"></exception>
+    /// <summary>
+    /// * TLD support from 2 to 5 chars (modify the values as you want)
+    /// * Supports: abc@gmail.com.us
+    /// * Non-sensitive case 
+    /// * Stops operation if takes longer than 250ms and throw a detailed exception
+    /// </summary>
+    /// <param name="email"></param>
+    /// <returns>success: true | fail: false </returns>
+    /// <exception cref="ArgumentException"></exception>
     private bool validateEmailPattern(string email) {
         try {
             return Regex.IsMatch(email,
@@ -93,7 +97,7 @@ public class AccountRepository : IAccountRepository {
                 RegexOptions.None, TimeSpan.FromMilliseconds(250));
         } catch (RegexMatchTimeoutException) {
             // throw an exception explaining the task was failed 
-            _ = email ?? throw new ArgumentException("email, Timeout/failed regexr processing.", nameof(email));
+            _ = email ?? throw new ArgumentException("email, Timeout regexr processing.", nameof(email));
             return false;
         }
     }

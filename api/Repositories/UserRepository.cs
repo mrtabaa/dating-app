@@ -20,10 +20,10 @@ public class UserRepository : IUserRepository {
     #region CRUD
     public async Task<UserDto?> GetUser(string userId) {
         var user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
-        return user == null ? null : new UserDto {
-            Token = _tokenService.CreateToken(user),
-            Email = user.Email
-        };
+        return user == null ? null : new UserDto (
+            Id: user.Id,
+            Email: user.Email
+        );
     }
 
     public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn) {
