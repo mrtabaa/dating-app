@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { UserProfile } from 'src/app/_models/user.model';
+import { User } from 'src/app/_models/user.model';
 import { AccountService } from 'src/app/_services/account.service';
 
 @Component({
@@ -10,19 +10,19 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor(private accountService: AccountService) { }
+  constructor(private authService: AccountService) { }
 
-  user$!: Observable<UserProfile | null>;
+  user$!: Observable<User | null>;
 
   ngOnInit(): void {
     this.getCurrentUser();
   }
 
   getCurrentUser() {
-    this.user$ = this.accountService.currentUser$;
+    this.user$ = this.authService.currentUser$;
   }
 
   logout() {
-    this.accountService.logout();
+    this.authService.logout();
   }
 }

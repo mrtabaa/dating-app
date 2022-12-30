@@ -1,9 +1,1 @@
-{
-    "version": 3,
-    "mappings": "",
-    "sources": [
-        "no-access.component.scss"
-    ],
-    "names": [],
-    "file": "no-access.component.css"
-}
+{"version":3,"sources":[],"names":[],"mappings":"","file":"no-access.component.css"}

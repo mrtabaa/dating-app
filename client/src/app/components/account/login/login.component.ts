@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { UserLogin } from 'src/app/_models/account/user-login.model';
-import { UserProfile } from 'src/app/_models/user.model';
+import { User } from 'src/app/_models/user.model';
 import { AccountService } from 'src/app/_services/account.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class LoginComponent implements OnInit, OnDestroy {
 
-  user$!: Observable<UserProfile | null>;
+  user$!: Observable<User | null>;
   subscrition!: Subscription;
 
   constructor(private authService: AccountService, private fb: FormBuilder, private router: Router) { }
@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         error: err => console.log('Login error:', err),
         complete: () => console.log('Login successful.')
       });
-    
+
     this.loginFg.markAllAsTouched();
   }
 }
