@@ -1,28 +1,40 @@
-.spacer {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+mat-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-
-.brand a {
+mat-toolbar a {
   color: white;
   text-decoration: none;
 }
-
-#matList mat-list {
-  padding: 0;
+mat-toolbar .menu {
+  place-items: center;
+}
+mat-toolbar .menu button {
+  color: white;
 }
 
-#matList mat-list-item:hover {
-  background-color: #e4e3e3;
+.profileCard {
   cursor: pointer;
 }
 
-#matList mat-icon {
+.matList mat-list {
+  padding: 0;
+}
+.matList mat-list-item:hover {
+  background-color: rgb(228, 227, 227);
+  cursor: pointer;
+}
+.matList mat-icon {
   margin-right: 5px;
 }
 
-#logout button:hover {
-  background-color: #e4e3e3;
+.logout button:hover {
+  background-color: rgb(228, 227, 227);
 }
-/*# sourceMappingURL=navbar.component.css.map */
+
+@media only screen and (min-width: 40rem) {
+  mat-toolbar {
+    background: green !important;
+  }
+}/*# sourceMappingURL=navbar.component.css.map */

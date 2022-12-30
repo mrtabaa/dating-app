@@ -1,9 +1,1 @@
-{
-    "version": 3,
-    "mappings": "AAAA,AAAA,WAAW,CAAC;EACR,UAAU,EAAE,GAAG;CAChB;;AAEH,AAAA,eAAe,CAAC;EACd,UAAU,EAAE,IAAI;CACjB;;AAED,AAAA,MAAM,CAAC;EACL,MAAM,EAAE,IAAI;CACb;;AAED,AAAA,QAAQ,CAAA;EACN,MAAM,EAAE,KAAK;CACd;;AAED,AAAA,eAAe,CAAC;EACd,MAAM,EAAE,GAAG,CAAC,KAAK,CAAC,OAAkB;CACrC",
-    "sources": [
-        "signup-lab.component.scss"
-    ],
-    "names": [],
-    "file": "signup-lab.component.css"
-}
+{"version":3,"sources":["register.component.scss","register.component.css"],"names":[],"mappings":"AAAA;EACI,aAAA;EACA,sBAAA;EACA,mBAAA;EACA,WAAA;EACA,wBAAA;EACA,gBAAA;ACCJ;ADCI;EACI,WAAA;ACCR;ADEI;EACI,oBAAA;EACA,WAAA;EACA,WAAA;EACA,mBAAA;ACAR;ADGI;EACI,UAAA;ACDR;;ADKA;EACI;IACI,oCAAA;IACA,iBAAA;ECFN;AACF","file":"register.component.css"}

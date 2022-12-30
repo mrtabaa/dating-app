@@ -1,9 +1,1 @@
-{
-    "version": 3,
-    "mappings": "",
-    "sources": [
-        "login.component.scss"
-    ],
-    "names": [],
-    "file": "login.component.css"
-}
+{"version":3,"sources":["login.component.scss","login.component.css"],"names":[],"mappings":"AAAA;EACI,aAAA;EACA,sBAAA;EACA,mBAAA;EACA,WAAA;EACA,wBAAA;EACA,gBAAA;ACCJ;ADCI;EACI,WAAA;ACCR;ADEI;EACI,oBAAA;EACA,WAAA;EACA,WAAA;EACA,mBAAA;ACAR;ADGI;EACI,UAAA;ACDR;;ADKA;EACI;IACI,oCAAA;IACA,iBAAA;ECFN;AACF","file":"login.component.css"}

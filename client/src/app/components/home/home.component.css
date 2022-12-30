@@ -1,1 +1,10 @@
-/* No CSS *//*# sourceMappingURL=home.component.css.map */
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3rem;
+  align-items: center;
+}
+.container .buttons {
+  display: flex;
+  gap: 1rem;
+}/*# sourceMappingURL=home.component.css.map */
