@@ -2,50 +2,57 @@ $buttonHoverColor: rgb(228, 227, 227);
 
 mat-toolbar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
 
-    a {
-        color: white;
-        text-decoration: none;
+    .left {
+        display: flex;
+        gap: 2rem;
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            // background: red;
+            // padding: 0.5rem;
+        }
     }
 
-    .brand {
-        // background: green;
-    }
-
-    .menu {
+    .right {
         // background: red;
         place-items: center;
 
         button {
             color: white;
         }
-    }
-}
 
-.profileCard {
-    cursor: pointer;
-}
+        .profileCard {
+            cursor: pointer;
+        }
 
-.matList {
-    mat-list {
-        padding: 0;
-    }
+        .matList {
+            mat-list {
+                padding: 0;
+            }
 
-    mat-list-item:hover {
-        background-color: $buttonHoverColor;
-        cursor: pointer;
-    }
+            mat-list-item:hover {
+                background-color: $buttonHoverColor;
+                cursor: pointer;
+            }
 
-    mat-icon {
-        margin-right: 5px;
-    }
-}
+            mat-icon {
+                margin-right: 5px;
+            }
+        }
 
-.logout {
-    button:hover {
-        background-color: $buttonHoverColor;
+        .logout {
+            button:hover {
+                background-color: $buttonHoverColor;
+            }
+        }
     }
 }
 
