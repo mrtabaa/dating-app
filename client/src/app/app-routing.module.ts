@@ -4,12 +4,20 @@ import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/account/login/login.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { RegisterComponent } from './components/account/register/register.component';
+import { MemberListComponent } from './components/members/member-list/member-list.component';
+import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
+import { MessagesComponent } from './components/messages/messages.component';
+import { ListsComponent } from './components/lists/lists.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: '**', component: NotFoundComponent }
+  { path: 'members', component: MemberListComponent },
+  { path: 'members/:id', component: MemberDetailComponent },
+  { path: 'lists', component: ListsComponent },
+  { path: 'messages', component: MessagesComponent },
+  { path: '**', component: NotFoundComponent, pathMatch: 'full' }
 ];
 
 @NgModule({
