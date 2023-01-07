@@ -10,21 +10,29 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ShortenStringPipe } from '../_pipes/shorten-string.pipe';
 
 // components
+import { NoAccessComponent } from '../components/no-access/no-access.component';
+import { NotFoundComponent } from '../components/not-found/not-found.component';
 import { HomeComponent } from '../components/home/home.component';
 import { RegisterComponent } from '../components/account/register/register.component';
 import { LoginComponent } from '../components/account/login/login.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
-import { NoAccessComponent } from '../components/no-access/no-access.component';
-import { NotFoundComponent } from '../components/not-found/not-found.component';
 import { DirectiveModule } from './directive.module';
+import { ListsComponent } from '../components/lists/lists.component';
+import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
+import { MemberListComponent } from '../components/members/member-list/member-list.component';
+import { MessagesComponent } from '../components/messages/messages.component';
 
 const components = [
+  NoAccessComponent,
+  NotFoundComponent,
   HomeComponent,
   RegisterComponent,
   LoginComponent,
   NavbarComponent,
-  NoAccessComponent,
-  NotFoundComponent,
+  MemberListComponent,
+  MemberDetailComponent,
+  ListsComponent,
+  MessagesComponent,
 
   ShortenStringPipe
 ]
