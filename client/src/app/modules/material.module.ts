@@ -13,7 +13,8 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatTableModule} from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 
 
 const material: any[] = [
@@ -32,6 +33,7 @@ const material: any[] = [
   MatProgressSpinnerModule,
   MatCheckboxModule,
   MatTableModule,
+  MatTabsModule
 ]
 
 @NgModule({

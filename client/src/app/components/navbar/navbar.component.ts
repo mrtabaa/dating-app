@@ -13,6 +13,8 @@ export class NavbarComponent implements OnInit {
   constructor(private authService: AccountService) { }
 
   user$!: Observable<User | null>;
+  links = ['members', 'lists', 'messages'];
+  activeLink = this.links[0];
 
   ngOnInit(): void {
     this.getCurrentUser();
