@@ -15,6 +15,7 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 const material: any[] = [
@@ -33,7 +34,8 @@ const material: any[] = [
   MatProgressSpinnerModule,
   MatCheckboxModule,
   MatTableModule,
-  MatTabsModule
+  MatTabsModule,
+  MatSnackBarModule
 ]
 
 @NgModule({
