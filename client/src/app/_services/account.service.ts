@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 import { UserLogin } from '../_models/account/user-login.model';
 import { UserRegister } from '../_models/account/user-register.model';
 import { User } from '../_models/user.model';
@@ -12,7 +12,7 @@ import { User } from '../_models/user.model';
 export class AccountService {
   private baseUrl = 'https://localhost:5001/account/';
 
-  private currentUserSource = new ReplaySubject<User | null>(1);
+  private currentUserSource = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient, private router: Router) { }
@@ -38,6 +38,11 @@ export class AccountService {
           if (user) {
             this.currentUserSource.next(user);
             localStorage.setItem('user', JSON.stringify(user));
+
+            let returnUrl = localStorage.getItem('returnUrl');
+            if (returnUrl)
+              this.router.navigate([returnUrl]);
+              
             return user;
           }
           return null;
