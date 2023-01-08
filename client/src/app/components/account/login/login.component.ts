@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { UserLogin } from 'src/app/_models/account/user-login.model';
@@ -16,7 +17,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   user$!: Observable<User | null>;
   subscrition!: Subscription;
 
-  constructor(private authService: AccountService, private fb: FormBuilder, private router: Router) { }
+  constructor(
+    private authService: AccountService,
+    private fb: FormBuilder,
+    private router: Router,
+    private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
     this.loginFg;
@@ -50,11 +55,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.subscrition = this.authService.login(userLoginInput)
       .subscribe({
         next: res => {
-          this.router.navigate(['/'])
+          // this.router.navigate(['/'])
           console.log('User:', res)
         },
-        error: err => console.log('Login error:', err),
-        complete: () => console.log('Login successful.')
+        error: err => this.snackBar.open(err.error, "Close", {
+          horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000
+        }),
+        // complete: () => console.log('Login successful.')
       });
 
     this.loginFg.markAllAsTouched();
