@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { UserLogin } from 'src/app/_models/account/user-login.model';
 import { User } from 'src/app/_models/user.model';
@@ -20,7 +19,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AccountService,
     private fb: FormBuilder,
-    private router: Router,
     private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
@@ -55,7 +53,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.subscrition = this.authService.login(userLoginInput)
       .subscribe({
         next: res => {
-          // this.router.navigate(['/'])
           console.log('User:', res)
         },
         error: err => this.snackBar.open(err.error, "Close", {
