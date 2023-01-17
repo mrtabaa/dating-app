@@ -5,16 +5,20 @@
             <mat-icon>eco</mat-icon>
             Banana
         </a>
-        <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
-            <a *ngFor="let link of links" mat-tab-link [routerLink]="[link]" (click)="activeLink = link"
-                [active]="activeLink == link">
-                {{link | titlecase}}
-            </a>
-        </nav>
-        <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+
+        <!-- #region NavLinks -->
+        <ng-container *ngIf="user$ | async">
+<nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
+    <a *ngFor="let link of links" mat-tab-link [routerLink]="['/' + link]" (click)="removeReturnUrl()" routerLinkActive
+        #rla="routerLinkActive" [active]="rla.isActive">
+        {{link | titlecase}}
+    </a>
+</nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+        </ng-container>
+        <!-- #endregion -->
     </section>
     <!-- #endregion -->
-    
 
     <!--#region RIGHT -->
     <section class="right">
@@ -25,7 +29,6 @@
             <img mat-card-avatar src="{{user.profilePhotoUrl}}">
             <mat-icon>more_vert</mat-icon>
         </button>
-
         <!-- signup/login -->
         <ng-template #signupLogin>
             <button mat-button [routerLink]="[ '/register' ]">
@@ -33,7 +36,6 @@
             </button>
             <button mat-button [routerLink]="['/login']" routerLinkActive="router-link-active">Login</button>
         </ng-template>
-
         <!-- menu if logged-in -->
         <mat-menu #appMenu>
             <div *ngIf="user$ | async as user" class="userInfo">

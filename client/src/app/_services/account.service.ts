@@ -39,10 +39,8 @@ export class AccountService {
             this.currentUserSource.next(user);
             localStorage.setItem('user', JSON.stringify(user));
 
-            let returnUrl = localStorage.getItem('returnUrl');
-            if (returnUrl)
-              this.router.navigate([returnUrl]);
-              
+            this.setGetReturnUrl();
+            
             return user;
           }
           return null;
@@ -50,15 +48,24 @@ export class AccountService {
       );
   }
 
+  logout(): void {
+    localStorage.removeItem('user');
+    localStorage.removeItem('returnUrl');
+    this.currentUserSource.next(null);
+    this.router.navigate(['/login'])
+  }
+
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
-  // now user can refresh the page or relaunch the browser without losing authentication
+  // now user can refresh the page or relaunch the browser without losing authentication or returnUrl
   setCurrentUser(user: User): void {
     this.currentUserSource.next(user);
   }
 
-  logout(): void {
-    localStorage.removeItem('user');
-    this.currentUserSource.next(null);
-    this.router.navigate(['/login'])
+  setGetReturnUrl(): void {
+    const returnUrl: string | null = localStorage.getItem('returnUrl');
+    if (returnUrl)
+      this.router.navigate([returnUrl]);
+    else
+      this.router.navigate(['members']);
   }
 }

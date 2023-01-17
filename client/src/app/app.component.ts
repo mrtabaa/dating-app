@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from './_models/user.model';
 import { AccountService } from './_services/account.service';
 
@@ -10,17 +11,22 @@ import { AccountService } from './_services/account.service';
 export class AppComponent implements OnInit {
   title = 'Dating App';
 
-  constructor(private accountService: AccountService) { }
+  constructor(private accountService: AccountService, private router: Router) { }
 
   ngOnInit(): void {
-    this.setCurrentUser();
+    this.setLocalStorageCurrentValues();
   }
 
-  setCurrentUser() {
+  setLocalStorageCurrentValues() {
     const userString = localStorage.getItem('user');
-    if (!userString) return;
+    if (userString) {
+      const user: User = JSON.parse(userString);
+      this.accountService.setCurrentUser(user);
+    }
 
-    const user: User = JSON.parse(userString);
-    this.accountService.setCurrentUser(user);
+    const returnUrl = localStorage.getItem('returnUrl');
+    if (returnUrl) {
+      this.router.navigate([returnUrl]);
+    }
   }
 }

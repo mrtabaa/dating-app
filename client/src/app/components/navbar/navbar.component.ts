@@ -10,21 +10,23 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor(private authService: AccountService) { }
+  constructor(public accountService: AccountService) { }
 
   user$!: Observable<User | null>;
+
   links = ['members', 'lists', 'messages'];
   activeLink = this.links[0];
 
   ngOnInit(): void {
-    this.getCurrentUser();
+    this.user$ = this.accountService.currentUser$;
   }
 
-  getCurrentUser() {
-    this.user$ = this.authService.currentUser$;
+  // prevent changing tab if user refreshes the page. 
+  removeReturnUrl() {
+    localStorage.removeItem('returnUrl');
   }
 
   logout() {
-    this.authService.logout();
+    this.accountService.logout();
   }
 }
