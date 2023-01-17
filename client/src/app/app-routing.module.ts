@@ -12,12 +12,19 @@ import { AuthGuard } from './_guards/auth.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
+  {
+    path: '',
+    runGuardsAndResolvers: 'always',
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'members', component: MemberListComponent },
+      { path: 'members/:id', component: MemberDetailComponent },
+      { path: 'lists', component: ListsComponent },
+      { path: 'messages', component: MessagesComponent },
+    ]
+  },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'members', component: MemberListComponent, canActivate: [AuthGuard] },
-  { path: 'members/:id', component: MemberDetailComponent, canActivate: [AuthGuard] },
-  { path: 'lists', component: ListsComponent },
-  { path: 'messages', component: MessagesComponent, canActivate: [AuthGuard] },
   { path: '**', component: NotFoundComponent, pathMatch: 'full' }
 ];
 
