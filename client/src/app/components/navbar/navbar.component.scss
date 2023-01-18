@@ -22,37 +22,61 @@ mat-toolbar {
     }
 
     .right {
-        // background: red;
-        place-items: center;
+        display: flex;
+        gap: 1rem;
 
         button {
-            color: white;
-        }
-
-        .profileCard {
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
             cursor: pointer;
+            border: 5px solid rgba($color: purple, $alpha: 0.1);
+            font-weight: bold;
+        }
+    }
+}
+
+// mat-menu style cannot be nested scss and is usign an Angular directive Input to apply class
+::ng-deep .mat-menu {
+    // padding: 0;
+
+    .userInfo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 2rem;
+
+        * {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
         }
 
-        .matList {
-            mat-list {
-                padding: 0;
-            }
-
-            mat-list-item:hover {
-                background-color: $buttonHoverColor;
-                cursor: pointer;
-            }
-
-            mat-icon {
-                margin-right: 5px;
-            }
+        .profileImage {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            width: 5rem;
+            height: 5rem;
+            background-color: rgb(172, 6, 172);
+            color: white;
+            font-size: 3rem;
+            border-radius: 50%;
         }
 
-        .logout {
-            button:hover {
-                background-color: $buttonHoverColor;
-            }
+        .email {
+            color: gray;
         }
+    }
+
+    .logout {
+        padding: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 
