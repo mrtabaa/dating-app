@@ -8,13 +8,13 @@
 
         <!-- #region NavLinks -->
         <ng-container *ngIf="user$ | async">
-<nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
-    <a *ngFor="let link of links" mat-tab-link [routerLink]="['/' + link]" (click)="removeReturnUrl()" routerLinkActive
-        #rla="routerLinkActive" [active]="rla.isActive">
-        {{link | titlecase}}
-    </a>
-</nav>
-<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+            <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
+                <a *ngFor="let link of links" mat-tab-link [routerLink]="['/' + link]" routerLinkActive
+                    #rla="routerLinkActive" [active]="rla.isActive">
+                    {{link | titlecase}}
+                </a>
+            </nav>
+            <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
         </ng-container>
         <!-- #endregion -->
     </section>
@@ -24,45 +24,55 @@
     <section class="right">
         <!-- if logged-in: show appMeny
             else: show signup/login -->
-        <button [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin" class="profileCard">
-            <mat-card style="display: none;"></mat-card>
-            <img mat-card-avatar src="{{user.profilePhotoUrl}}">
-            <mat-icon>more_vert</mat-icon>
+        <button [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin">
+            <!-- <mat-card style="display: none;"></mat-card> -->
+            <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{user.profilePhotoUrl}}">
+            <ng-template #username>{{user.name[0] | titlecase}}</ng-template>
         </button>
         <!-- signup/login -->
         <ng-template #signupLogin>
             <button mat-button [routerLink]="[ '/register' ]">
                 Sign Up
             </button>
-            <button mat-button [routerLink]="['/login']" routerLinkActive="router-link-active">Login</button>
+            <button mat-button [routerLink]="['/login']" routerLinkActive="router-link-active">
+                Login
+            </button>
         </ng-template>
         <!-- menu if logged-in -->
-        <mat-menu #appMenu>
+        <mat-menu #appMenu [class]="'mat-menu'">
+            <!-- profile -->
             <div *ngIf="user$ | async as user" class="userInfo">
-                <p style="font-size: larger;" fxFlex>{{user.name}}</p>
-                <p fxFlex class="email">{{user.email}}</p>
-                <mat-divider></mat-divider>
-            </div>
-            <div class="matList">
-                <mat-list>
-                    <mat-list-item fxFlex fxHide fxShow.lt-sm>
-                        <mat-icon>shopping_basket</mat-icon>
-                        Orders
-                    </mat-list-item>
-                    <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active">
-                        <mat-icon>flaky</mat-icon>
-                        Manage Orders
-                    </mat-list-item>
-                    <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active">
-                        <mat-icon>assignment_returned</mat-icon>
-                        Manage Products
-                    </mat-list-item>
-                </mat-list>
-
-                <div class="logout">
-                    <mat-divider></mat-divider>
-                    <button mat-raised-button (click)="logout()">Logout</button>
+                <div class="profileImage">
+                    <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{user.profilePhotoUrl}}">
+                    <ng-template #username>
+                        {{user.name[0] | titlecase}}
+                    </ng-template>
                 </div>
+                <div>
+                    <p>{{user.name | titlecase}}</p>
+                    <p class="email">{{user.email}}</p>
+                </div>
+            </div>
+            <!-- navigation -->
+            <mat-divider></mat-divider>
+            <mat-list>
+                <mat-list-item>
+                    <mat-icon>shopping_basket</mat-icon>
+                    Orders
+                </mat-list-item>
+                <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active">
+                    <mat-icon>flaky</mat-icon>
+                    Manage Orders
+                </mat-list-item>
+                <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active">
+                    <mat-icon>assignment_returned</mat-icon>
+                    Manage Products
+                </mat-list-item>
+            </mat-list>
+
+            <mat-divider></mat-divider>
+            <div class="logout">
+                <button mat-raised-button (click)="logout()">Logout</button>
             </div>
         </mat-menu>
     </section>

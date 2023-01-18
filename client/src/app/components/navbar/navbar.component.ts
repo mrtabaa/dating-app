@@ -15,15 +15,9 @@ export class NavbarComponent implements OnInit {
   user$!: Observable<User | null>;
 
   links = ['members', 'lists', 'messages'];
-  activeLink = this.links[0];
 
   ngOnInit(): void {
     this.user$ = this.accountService.currentUser$;
-  }
-
-  // prevent changing tab if user refreshes the page. 
-  removeReturnUrl() {
-    localStorage.removeItem('returnUrl');
   }
 
   logout() {

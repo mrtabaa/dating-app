@@ -40,7 +40,7 @@ export class AccountService {
             localStorage.setItem('user', JSON.stringify(user));
 
             this.setGetReturnUrl();
-            
+
             return user;
           }
           return null;
@@ -50,7 +50,6 @@ export class AccountService {
 
   logout(): void {
     localStorage.removeItem('user');
-    localStorage.removeItem('returnUrl');
     this.currentUserSource.next(null);
     this.router.navigate(['/login'])
   }
@@ -63,9 +62,11 @@ export class AccountService {
 
   setGetReturnUrl(): void {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
-    if (returnUrl)
-      this.router.navigate([returnUrl]);
-    else
-      this.router.navigate(['members']);
+
+    returnUrl
+      ? this.router.navigate([returnUrl])
+      : this.router.navigate(['members']);
+
+    localStorage.removeItem('returnUrl');
   }
 }

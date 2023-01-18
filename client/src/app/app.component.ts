@@ -23,10 +23,5 @@ export class AppComponent implements OnInit {
       const user: User = JSON.parse(userString);
       this.accountService.setCurrentUser(user);
     }
-
-    const returnUrl = localStorage.getItem('returnUrl');
-    if (returnUrl) {
-      this.router.navigate([returnUrl]);
-    }
   }
 }
