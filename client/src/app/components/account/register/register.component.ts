@@ -29,6 +29,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Group/controler
   registerFg = this.fb.group({
+    nameCtrl: ['', Validators.required, Validators.minLength(7), Validators.maxLength(20)],
     emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
   });
@@ -36,6 +37,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Properties
   // Lab's Info
+  get NameCtrl(): FormControl {
+    return this.registerFg.get('nameCtrl') as FormControl;
+  }
   get EmailCtrl(): FormControl {
     return this.registerFg.get('emailCtrl') as FormControl;
   }
@@ -48,6 +52,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   //#region Methods
   registerUser() {
     let userRegisterInput: UserRegister = {
+      name: this.NameCtrl.value,
       email: this.EmailCtrl.value,
       password: this.PasswordCtrl.value
     };

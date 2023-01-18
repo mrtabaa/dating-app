@@ -22,6 +22,7 @@ public class UserRepository : IUserRepository {
         var user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
         return user == null ? null : new UserDto (
             Id: user.Id,
+            Name: user.Name,
             Email: user.Email
         );
     }
@@ -36,6 +37,7 @@ public class UserRepository : IUserRepository {
         //     _cancellationToken.ThrowIfCancellationRequested();
 
         var updatedUser = Builders<AppUser>.Update
+        .Set(e => e.Name, userIn.Name)
         .Set(e => e.Email, userIn.Email)
         .Set(ph => ph.PasswordHash, hmac.ComputeHash(Encoding.UTF8.GetBytes(userIn.Password!)))
         .Set(ps => ps.PasswordSalt, hmac.Key);

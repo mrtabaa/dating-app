@@ -25,9 +25,11 @@ public class AccountRepository : IAccountRepository {
         if (!validateEmailPattern(userInput.Email))
             return new LoginSuccessDto(
                 Token: null,
+                Name: null,
                 Email: null,
                 BadEmailPattern: true);
 
+        string lowercaseName = userInput.Name.ToLower();
         string lowercaseEmail = userInput.Email.ToLower();
 
         if (await CheckEmailExist(lowercaseEmail))
@@ -39,6 +41,7 @@ public class AccountRepository : IAccountRepository {
         var user = new AppUser(
             Schema: 0,
             Id: null,
+            Name: lowercaseName,
             Email: lowercaseEmail,
             PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
             PasswordSalt: hmac.Key
@@ -49,6 +52,7 @@ public class AccountRepository : IAccountRepository {
 
         return new LoginSuccessDto(
             Token: _tokenService.CreateToken(user),
+            Name: user.Name,
             Email: user.Email,
             BadEmailPattern: false
         );
@@ -67,6 +71,7 @@ public class AccountRepository : IAccountRepository {
         if (user.PasswordHash != null && user.PasswordHash.SequenceEqual(ComputedHash))
             return new LoginSuccessDto(
                 Token: _tokenService.CreateToken(user),
+                Name: user.Name,
                 Email: user.Email,
                 BadEmailPattern: false
             );
@@ -84,7 +89,7 @@ public class AccountRepository : IAccountRepository {
     /// <summary>
     /// * TLD support from 2 to 5 chars (modify the values as you want)
     /// * Supports: abc@gmail.com.us
-    /// * Non-sensitive case 
+    /// * Not case-sensitive
     /// * Stops operation if takes longer than 250ms and throw a detailed exception
     /// </summary>
     /// <param name="email"></param>

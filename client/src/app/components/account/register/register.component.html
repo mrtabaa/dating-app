@@ -2,13 +2,17 @@
     <div class="container">
         <h2 class="title">Create Account</h2>
         <mat-form-field appearance="outline">
+            <mat-label>Full name</mat-label>
+            <input type="text" formControlName="nameCtrl" dirAutofocus placeholder="Enter your name" matInput>
+            <mat-error *ngIf="NameCtrl.touched && NameCtrl.hasError('required')">This field is required.</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
             <mat-label>Username Email</mat-label>
             <input type="email" formControlName="emailCtrl" dirAutofocus placeholder="Enter your email" matInput>
             <mat-hint>Your email is your username.</mat-hint>
             <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('required')">This field is required.</mat-error>
             <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('pattern')">Enter a valid email address.</mat-error>
         </mat-form-field>
-
         <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
             <input type="password" formControlName="passwordCtrl" placeholder="Enter your password" matInput>

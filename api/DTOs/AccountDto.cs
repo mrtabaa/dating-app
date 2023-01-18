@@ -7,11 +7,13 @@ public record LoginDto(
 
 public record LoginSuccessDto(
     string? Token,
+    string? Name,
     [EmailAddress] string? Email,
     bool BadEmailPattern
 );
 
 public record UserRegisterDto(
+    [MinLength(7), MaxLength(20)] string Name,
     [EmailAddress, MaxLength(50)] string Email,
     [MinLength(7), MaxLength(20)] string Password
 );
