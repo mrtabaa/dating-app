@@ -9,6 +9,7 @@ import { MemberDetailComponent } from './components/members/member-detail/member
 import { MessagesComponent } from './components/messages/messages.component';
 import { ListsComponent } from './components/lists/lists.component';
 import { AuthGuard } from './_guards/auth.guard';
+import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,8 +24,15 @@ const routes: Routes = [
       { path: 'messages', component: MessagesComponent },
     ]
   },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  {
+    path: '',
+    runGuardsAndResolvers: 'always',
+    canActivate: [AuthLoggedInGuard],
+    children: [
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
+    ]
+  },
   { path: '**', component: NotFoundComponent, pathMatch: 'full' }
 ];
 
