@@ -34,7 +34,7 @@
         {
             "name": "Angular Client",
             "request": "launch",
-            "type": "chrome",
+            "type": "firefox",
             "url": "https://localhost:4200",
             "webRoot": "${workspaceFolder}/client"
         }
