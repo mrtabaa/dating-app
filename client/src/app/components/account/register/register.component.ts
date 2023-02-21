@@ -12,7 +12,7 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class RegisterComponent implements OnInit, OnDestroy {
 
-  subscription!: Subscription;
+  subscriptionRegisterUser!: Subscription;
 
   //#region Base
   constructor(private fb: FormBuilder, private accountService: AccountService, private router: Router) { }
@@ -22,8 +22,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscription)
-      this.subscription.unsubscribe();
+    if (this.subscriptionRegisterUser)
+      this.subscriptionRegisterUser.unsubscribe();
   }
   //#endregion
 
@@ -57,10 +57,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: this.PasswordCtrl.value
     };
 
-    this.subscription = this.accountService.register(userRegisterInput)
+    this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
       .subscribe({
         next: res => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/members']);
           console.log(res);
         },
         error: err => console.log('Register error:', err),
