@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ICountry } from '../_models/Icountry';
+import { Country } from '../_models/country.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ export class CountryListService {
   constructor() { }
 
   // filter the list based on the user's input chars
-  public filterCountries(value: string): ICountry[] {
+  public filterCountries(value: string): Country[] {
     const filterValue = value?.toLowerCase();
 
     return this.countries.filter(country => country.name?.toLowerCase().includes(filterValue));
