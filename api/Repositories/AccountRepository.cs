@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 
 namespace api.Repositories;
+
 public class AccountRepository : IAccountRepository {
 
     #region Db and Token Settings
