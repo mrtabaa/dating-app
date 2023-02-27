@@ -16,12 +16,11 @@ public static class ApplicationServiceExtensions {
 
         // get connectionString to the db
         services.AddSingleton<IMongoClient>(serviceProvider => {
-            MongoDbSettings? uri = serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-
-            _ = uri ?? throw new ArgumentNullException("MongoDbSettings uri cannot be null", nameof(uri));
+            MongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value;
 
             return new MongoClient(uri.ConnectionString);
         });
+
         #endregion MongoDbSettings
 
         #region Others
