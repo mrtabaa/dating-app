@@ -1,6 +1,7 @@
 
 #region Add services to the container.
 using api.Extensions;
+using api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +17,8 @@ builder.Services.AddRepositoryServices(builder.Configuration);
 #region Configure the HTTP request pipeline.
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) {
-
-}
+// created a customized ExceptionMiddleware
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
