@@ -1,6 +1,7 @@
 namespace api.Controllers;
 
 [AllowAnonymous] // never use this if you have [Authorize] on the mothods. [Authorize] gets ignored
+[Produces("application/json")]
 public class AccountController : BaseApiController {
     private readonly IAccountRepository _accountRepository;
     public AccountController(IAccountRepository accountRepository) {

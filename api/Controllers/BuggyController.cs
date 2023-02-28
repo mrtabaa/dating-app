@@ -1,6 +1,6 @@
 namespace api.Controllers;
 
-
+[Produces("application/json")]
 public class BuggyController : BaseApiController {
 
     const string _collectionName = "Users";
