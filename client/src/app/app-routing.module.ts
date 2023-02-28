@@ -8,7 +8,7 @@ import { MemberListComponent } from './components/members/member-list/member-lis
 import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { ListsComponent } from './components/lists/lists.component';
-import { AuthGuard } from './_guards/auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
 
 const routes: Routes = [

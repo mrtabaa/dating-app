@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, map, Observable } from 'rxjs';
-import { UserLogin } from '../_models/account/user-login.model';
-import { UserRegister } from '../_models/account/user-register.model';
-import { User } from '../_models/user.model';
+import { UserLogin } from '../models/account/user-login.model';
+import { UserRegister } from '../models/account/user-register.model';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'

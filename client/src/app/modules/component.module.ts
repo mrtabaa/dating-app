@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 
 //pipes
-import { ShortenStringPipe } from '../_pipes/shorten-string.pipe';
+import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
 
 // components
 import { NoAccessComponent } from '../components/no-access/no-access.component';

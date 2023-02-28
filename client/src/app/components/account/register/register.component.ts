@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { UserRegister } from 'src/app/_models/account/user-register.model';
-import { AccountService } from 'src/app/_services/account.service';
+import { UserRegister } from 'src/app/models/account/user-register.model';
+import { AccountService } from 'src/app/services/account.service';
 
 @Component({
   selector: 'app-register',

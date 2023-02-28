@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription } from 'rxjs';
-import { UserLogin } from 'src/app/_models/account/user-login.model';
-import { User } from 'src/app/_models/user.model';
-import { AccountService } from 'src/app/_services/account.service';
+import { UserLogin } from 'src/app/models/account/user-login.model';
+import { User } from 'src/app/models/user.model';
+import { AccountService } from 'src/app/services/account.service';
 
 @Component({
   selector: 'app-login',
