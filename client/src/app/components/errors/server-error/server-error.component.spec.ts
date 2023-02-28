@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TestErrorComponent } from './test-error.component';
+import { ServerErrorComponent } from './server-error.component';
 
-describe('TestErrorComponent', () => {
-  let component: TestErrorComponent;
-  let fixture: ComponentFixture<TestErrorComponent>;
+describe('ServerErrorComponent', () => {
+  let component: ServerErrorComponent;
+  let fixture: ComponentFixture<ServerErrorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TestErrorComponent ]
+      declarations: [ ServerErrorComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(TestErrorComponent);
+    fixture = TestBed.createComponent(ServerErrorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

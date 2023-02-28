@@ -10,8 +10,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
 
 // components
-import { NoAccessComponent } from '../components/no-access/no-access.component';
-import { NotFoundComponent } from '../components/not-found/not-found.component';
+import { NoAccessComponent } from '../components/errors/no-access/no-access.component';
+import { NotFoundComponent } from '../components/errors/not-found/not-found.component';
+import { TestErrorComponent } from '../components/errors/test-error/test-error.component';
+import { ServerErrorComponent } from '../components/errors/server-error/server-error.component';
+
 import { HomeComponent } from '../components/home/home.component';
 import { RegisterComponent } from '../components/account/register/register.component';
 import { LoginComponent } from '../components/account/login/login.component';
@@ -21,11 +24,13 @@ import { ListsComponent } from '../components/lists/lists.component';
 import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
 import { MessagesComponent } from '../components/messages/messages.component';
-import { TestErrorComponent } from '../components/test-error/test-error.component';
 
 const components = [
   NoAccessComponent,
   NotFoundComponent,
+  TestErrorComponent,
+  ServerErrorComponent,
+  
   HomeComponent,
   RegisterComponent,
   LoginComponent,
@@ -34,7 +39,6 @@ const components = [
   MemberDetailComponent,
   ListsComponent,
   MessagesComponent,
-  TestErrorComponent,
 
   ShortenStringPipe
 ]
