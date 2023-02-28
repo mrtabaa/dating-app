@@ -1,5 +1,6 @@
 namespace api.Controllers;
 
+
 public class BuggyController : BaseApiController {
 
     const string _collectionName = "Users";
@@ -13,24 +14,27 @@ public class BuggyController : BaseApiController {
     [Authorize]
     [HttpGet("auth")]
     public ActionResult<string> GetSecret() {
-        return "Secret Text";
+        return "Secret Text"; // doen't return the value due to auth
     }
 
     [HttpGet("not-found")]
-    public ActionResult<string> GetNotFound() {
+    public ActionResult<AppUser> GetNotFound() {
         AppUser thing = _collection.Find<AppUser>(user => user.Email == "no email").FirstOrDefault();
-        return thing == null ? "User not found" : "Found user, no error.";
+        if (thing == null) {
+            return NotFound(); // return 404
+        }
+        return thing;
     }
 
     [HttpGet("server-error")]
     public ActionResult<string> GetServerError() {
         AppUser thing = _collection.Find<AppUser>(user => user.Email == "no email").FirstOrDefault();
 
-        return thing.Email.ToUpper();
+        return thing.Email.ToUpper(); //return 500
     }
 
     [HttpGet("bad-request")]
     public ActionResult<string> GetBadRequest() {
-        return BadRequest("This was a bad request.");
+        return BadRequest("This was a bad request."); // return 400
     }
 }
