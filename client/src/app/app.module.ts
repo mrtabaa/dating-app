@@ -7,12 +7,10 @@ import { ComponentModule } from './modules/component.module';
 import { CountryListService } from './services/country-list.service';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { DefaultErrorStateMatcher } from './extensions/validators/default-error-state.matcher';
-import { TestErrorComponent } from './components/test-error/test-error.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    TestErrorComponent,
   ],
   imports: [
     BrowserModule,

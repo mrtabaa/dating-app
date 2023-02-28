@@ -17,9 +17,9 @@ public class BuggyController : BaseApiController {
     }
 
     [HttpGet("not-found")]
-    public ActionResult<AppUser> GetNotFound() {
+    public ActionResult<string> GetNotFound() {
         AppUser thing = _collection.Find<AppUser>(user => user.Email == "no email").FirstOrDefault();
-        return thing;
+        return thing == null ? "User not found" : "Found user, no error.";
     }
 
     [HttpGet("server-error")]

@@ -21,6 +21,7 @@ import { ListsComponent } from '../components/lists/lists.component';
 import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
 import { MessagesComponent } from '../components/messages/messages.component';
+import { TestErrorComponent } from '../components/test-error/test-error.component';
 
 const components = [
   NoAccessComponent,
@@ -33,6 +34,7 @@ const components = [
   MemberDetailComponent,
   ListsComponent,
   MessagesComponent,
+  TestErrorComponent,
 
   ShortenStringPipe
 ]

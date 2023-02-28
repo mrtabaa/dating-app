@@ -10,6 +10,7 @@ import { MessagesComponent } from './components/messages/messages.component';
 import { ListsComponent } from './components/lists/lists.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
+import { TestErrorComponent } from './components/test-error/test-error.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -33,6 +34,7 @@ const routes: Routes = [
       { path: 'register', component: RegisterComponent },
     ]
   },
+  { path: 'errors', component: TestErrorComponent },
   { path: '**', component: NotFoundComponent, pathMatch: 'full' }
 ];
 
