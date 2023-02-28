@@ -27,12 +27,9 @@ export class ErrorInterceptor implements HttpInterceptor {
                   if (err.error.errors)
                     modelStateErrors.push(err.error.errors[key]);
                 }
-                console.log("1", err.error);
                 throw modelStateErrors;
               }
               else {
-                console.log("2", err.error);
-
                 this.snack.open(err.status.toString() + ': ' + err.error , 'Close', {duration: 7000});
               }
               break;

@@ -6,3 +6,6 @@
     <button (click)="get400RegisterValidationErrors()" mat-raised-button color="accent">400 register validation</button>
     <button (click)="get400LoginValidationErrors()" mat-raised-button color="accent">400 login validation</button>
 </div>
+<ul>
+    <li *ngFor="let err of validationErrors">{{err}}</li>
+</ul>

@@ -8,6 +8,7 @@ import { Component } from '@angular/core';
 })
 export class TestErrorComponent {
   private baseUrl = 'https://localhost:5001/';
+  validationErrors: string[] =[];
 
   constructor(private http: HttpClient) { }
 
@@ -42,14 +43,18 @@ export class TestErrorComponent {
   get400RegisterValidationErrors(): void {
     this.http.post(this.baseUrl + 'account/register', {}).subscribe({
       next: res => console.log(res),
-      error: err => console.log(err)
+      error: err => {
+        this.validationErrors = err;
+      }
     });
   }
 
   get400LoginValidationErrors(): void {
     this.http.post(this.baseUrl + 'account/login', {}).subscribe({
       next: res => console.log(res),
-      error: err => console.log(err)
+      error: err => {
+        this.validationErrors = err;
+      }
     });
   }
 }
