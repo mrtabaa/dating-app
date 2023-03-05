@@ -30,11 +30,11 @@ export class ErrorInterceptor implements HttpInterceptor {
                 throw modelStateErrors;
               }
               else {
-                this.snack.open(err.status.toString() + ': ' + err.error , 'Close', {duration: 7000});
+                this.snack.open(err.status.toString() + ': ' + err.error, 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
               }
               break;
             case 401:
-              this.snack.open('Unuthorized', 'Close', { duration: 7000 });
+              this.snack.open('Unuthorized', 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
               break;
             case 404:
               this.router.navigate(['/not-found']);
@@ -44,7 +44,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               this.router.navigate(['/server-error'], navigationExtras);
               break;
             default:
-              this.snack.open('Something unexpected went wrong.', 'Close' , { duration: 7000 });
+              this.snack.open('Something unexpected went wrong.', 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
               console.log(err);
               break;
           }
