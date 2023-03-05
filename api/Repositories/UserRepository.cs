@@ -1,5 +1,6 @@
 namespace api.Repositories;
-public class UserRepository : IUserRepository {
+public class UserRepository : IUserRepository
+{
 
     #region Db and Token Settings
     const string _collectionName = "Users";
@@ -8,26 +9,29 @@ public class UserRepository : IUserRepository {
     private readonly CancellationToken _cancellationToken;
 
     // constructor - dependency injections
-    public UserRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService) {
+    public UserRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
+    {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(_collectionName);
-// 
+        // 
         _tokenService = tokenService;
         _cancellationToken = new CancellationToken();
     }
     #endregion
 
     #region CRUD
-    public async Task<UserDto?> GetUser(string userId) {
+    public async Task<UserDto?> GetUser(string userId)
+    {
         var user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
-        return user == null ? null : new UserDto (
+        return user == null ? null : new UserDto(
             Id: user.Id,
             Name: user.Name,
             Email: user.Email
         );
     }
 
-    public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn) {
+    public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn)
+    {
         if (await CheckEmailExist(userIn))
             return null;
 
@@ -51,7 +55,8 @@ public class UserRepository : IUserRepository {
     #endregion CRUD
 
     #region Helper methods
-    private async Task<bool> CheckEmailExist(UserRegisterDto userIn) {
+    private async Task<bool> CheckEmailExist(UserRegisterDto userIn)
+    {
         if (string.IsNullOrEmpty(userIn.Email))
             return false;
 

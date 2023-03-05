@@ -2,14 +2,17 @@ namespace api.Controllers;
 
 [AllowAnonymous] // never use this if you have [Authorize] on the mothods. [Authorize] gets ignored
 [Produces("application/json")]
-public class AccountController : BaseApiController {
+public class AccountController : BaseApiController
+{
     private readonly IAccountRepository _accountRepository;
-    public AccountController(IAccountRepository accountRepository) {
+    public AccountController(IAccountRepository accountRepository)
+    {
         _accountRepository = accountRepository;
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<LoginSuccessDto>> Register(UserRegisterDto userIn) {
+    public async Task<ActionResult<LoginSuccessDto>> Register(UserRegisterDto userIn)
+    {
         LoginSuccessDto? user = await _accountRepository.Create(userIn);
 
         if (user != null && user.BadEmailPattern)
@@ -19,7 +22,8 @@ public class AccountController : BaseApiController {
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginSuccessDto>> Login(LoginDto userInput) {
+    public async Task<ActionResult<LoginSuccessDto>> Login(LoginDto userInput)
+    {
         LoginSuccessDto? user = await _accountRepository.Login(userInput);
         return user == null ? BadRequest("Invalid username or password.") : user;
     }

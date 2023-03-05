@@ -1,9 +1,11 @@
 
 namespace api.Extensions;
 
-public static class ApplicationServiceExtensions {
+public static class ApplicationServiceExtensions
+{
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config) {
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
+    {
 
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
@@ -15,7 +17,8 @@ public static class ApplicationServiceExtensions {
         serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
 
         // get connectionString to the db
-        services.AddSingleton<IMongoClient>(serviceProvider => {
+        services.AddSingleton<IMongoClient>(serviceProvider =>
+        {
             MongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value;
 
             return new MongoClient(uri.ConnectionString);
@@ -25,7 +28,8 @@ public static class ApplicationServiceExtensions {
 
         #region Others
         // with ssl 
-        services.AddCors(options => {
+        services.AddCors(options =>
+        {
             options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
                 .AllowAnyMethod().WithOrigins("https://localhost:4200"));
         });

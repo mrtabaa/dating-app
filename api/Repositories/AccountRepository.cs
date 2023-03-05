@@ -2,7 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace api.Repositories;
 
-public class AccountRepository : IAccountRepository {
+public class AccountRepository : IAccountRepository
+{
 
     #region Db and Token Settings
     const string _collectionName = "Users";
@@ -12,7 +13,8 @@ public class AccountRepository : IAccountRepository {
 
 
     // constructor - dependency injection
-    public AccountRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService) {
+    public AccountRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
+    {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(_collectionName);
         _tokenService = tokenService;
@@ -21,7 +23,8 @@ public class AccountRepository : IAccountRepository {
     #endregion
 
     #region CRUD
-    public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput) {
+    public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
+    {
 
         if (!validateEmailPattern(userInput.Email))
             return new LoginSuccessDto(
@@ -60,7 +63,8 @@ public class AccountRepository : IAccountRepository {
 
     }
 
-    public async Task<LoginSuccessDto?> Login(LoginDto userInput) {
+    public async Task<LoginSuccessDto?> Login(LoginDto userInput)
+    {
         var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower()).FirstOrDefaultAsync(_cancellationToken);
 
         if (user == null)
@@ -96,12 +100,16 @@ public class AccountRepository : IAccountRepository {
     /// <param name="email"></param>
     /// <returns>success: true | fail: false </returns>
     /// <exception cref="ArgumentException"></exception>
-    private bool validateEmailPattern(string email) {
-        try {
+    private bool validateEmailPattern(string email)
+    {
+        try
+        {
             return Regex.IsMatch(email,
                 @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$",
                 RegexOptions.None, TimeSpan.FromMilliseconds(250));
-        } catch (RegexMatchTimeoutException) {
+        }
+        catch (RegexMatchTimeoutException)
+        {
             // throw an exception explaining the task was failed 
             _ = email ?? throw new ArgumentException("email, Timeout regexr processing.", nameof(email));
             return false;
