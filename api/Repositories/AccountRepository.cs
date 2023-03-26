@@ -33,7 +33,6 @@ public class AccountRepository : IAccountRepository
                 Email: null,
                 BadEmailPattern: true);
 
-        string lowercaseName = userInput.Name.ToLower();
         string lowercaseEmail = userInput.Email.ToLower();
 
         if (await CheckEmailExist(lowercaseEmail))
@@ -45,7 +44,7 @@ public class AccountRepository : IAccountRepository
         var user = new AppUser(
             Schema: 0,
             Id: null,
-            Name: lowercaseName,
+            Name: userInput.Name,
             Email: lowercaseEmail,
             PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
             PasswordSalt: hmac.Key
