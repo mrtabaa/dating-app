@@ -20,14 +20,25 @@ public class UserRepository : IUserRepository
     #endregion
 
     #region CRUD
-    public async Task<UserDto?> GetUser(string userId)
+    public async Task<MemberDto?> GetUserById(string userId)
     {
-        var user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
-        return user == null ? null : new UserDto(
-            Id: user.Id,
-            Name: user.Name,
-            Email: user.Email
-        );
+        AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
+
+        return user == null ? null : Mappers.MemberDto(user);
+    }
+
+    public async Task<MemberDto?> GetUserByEmail(string email)
+    {
+        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync(_cancellationToken);
+
+        return user == null ? null : Mappers.MemberDto(user);
+    }
+
+    public async Task<List<MemberDto>> GetUsers()
+    {
+        var users = await _collection.Find("user", null).ToListAsync(_cancellationToken);
+
+        return users;
     }
 
     public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn)
