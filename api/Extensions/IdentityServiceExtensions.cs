@@ -4,7 +4,7 @@ public static class IdentityServiceExtensions
 {
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
-        string? tokenValue = config[ConstStringValues.TokenKey];
+        string? tokenValue = config[AppVariablesExtensions.TokenKey];
 
         if (tokenValue != null)
         {

@@ -5,7 +5,7 @@ public class TokenService : ITokenService
 
     public TokenService(IConfiguration config)
     {
-        string? tokenValue = config[ConstStringValues.TokenKey];
+        string? tokenValue = config[AppVariablesExtensions.TokenKey];
 
         // throw exception if tokenValue is null
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
