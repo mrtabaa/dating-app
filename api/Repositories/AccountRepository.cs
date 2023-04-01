@@ -26,37 +26,28 @@ public class AccountRepository : IAccountRepository
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
 
+        // email format validation
         if (!validateEmailPattern(userInput.Email))
             return new LoginSuccessDto(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: null,
                 Name: null,
                 Email: null,
                 BadEmailPattern: true);
 
-        string lowercaseEmail = userInput.Email.ToLower();
-
-        if (await CheckEmailExist(lowercaseEmail))
+        if (await CheckEmailExist(userInput.Email.ToLower()))
             return null;
 
-        // manually dispose HMACSHA512 after being done
-        using var hmac = new HMACSHA512();
-
-        var user = new AppUser(
-            Schema: 0,
-            Id: null,
-            Name: userInput.Name,
-            Email: lowercaseEmail,
-            PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
-            PasswordSalt: hmac.Key
-        );
+        AppUser appUser = Mappers.AppUser(userInput);
 
         // if insertion successful OR throw an exception
-        await _collection!.InsertOneAsync(user); // mark ! after _collection! tells compiler it's nullable
+        await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
 
         return new LoginSuccessDto(
-            Token: _tokenService.CreateToken(user),
-            Name: user.Name,
-            Email: user.Email,
+            Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+            Token: _tokenService.CreateToken(appUser),
+            Name: appUser.Name,
+            Email: appUser.Email,
             BadEmailPattern: false
         );
 
@@ -74,6 +65,7 @@ public class AccountRepository : IAccountRepository
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
         if (user.PasswordHash != null && user.PasswordHash.SequenceEqual(ComputedHash))
             return new LoginSuccessDto(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: _tokenService.CreateToken(user),
                 Name: user.Name,
                 Email: user.Email,
