@@ -1,6 +1,7 @@
 namespace api.Controllers;
 
 [Authorize]
+// [Produces("application/json")]
 public class UserController : BaseApiController
 {
     private readonly IUserRepository _userRepository;
@@ -10,7 +11,13 @@ public class UserController : BaseApiController
         _userRepository = userRepository;
     }
 
-    [HttpPost("by-id")]
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers()
+    {
+        return await _userRepository.GetUsers();
+    }
+
+    [HttpPost("id")]
     public async Task<ActionResult<MemberDto>> GetUserById(string id)
     {
         MemberDto? user = await _userRepository.GetUserById(id);
@@ -18,7 +25,7 @@ public class UserController : BaseApiController
         return user == null ? BadRequest("No user found by this ID.") : user;
     }
 
-    [HttpPost("by-email")]
+    [HttpPost("email")]
     public async Task<ActionResult<MemberDto>> GetUserByEmail(string email)
     {
         MemberDto? user = await _userRepository.GetUserByEmail(email);

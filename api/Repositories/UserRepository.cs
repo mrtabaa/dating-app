@@ -20,6 +20,23 @@ public class UserRepository : IUserRepository
     #endregion
 
     #region CRUD
+        public async Task<List<MemberDto?>> GetUsers()
+    {
+        List<MemberDto?> memberDtos = new();
+
+        // For small lists
+        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(_cancellationToken);
+
+        // For large lists
+        await _collection.Find<AppUser>(new BsonDocument())
+        .ForEachAsync( appUser =>
+        {
+            memberDtos.Add(Mappers.MemberDto(appUser));
+        });
+
+        return memberDtos;
+    }
+
     public async Task<MemberDto?> GetUserById(string userId)
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
@@ -29,16 +46,9 @@ public class UserRepository : IUserRepository
 
     public async Task<MemberDto?> GetUserByEmail(string email)
     {
-        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync(_cancellationToken);
+        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync();
 
         return user == null ? null : Mappers.MemberDto(user);
-    }
-
-    public async Task<List<MemberDto>> GetUsers()
-    {
-        var users = await _collection.Find("user", null).ToListAsync(_cancellationToken);
-
-        return users;
     }
 
     public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn)
