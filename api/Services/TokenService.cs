@@ -1,6 +1,8 @@
 namespace api.Services;
 public class TokenService : ITokenService
 {
+    //TODO: A token authorizes all users. Should each user work with one token only?
+
     private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
 
     public TokenService(IConfiguration config)
