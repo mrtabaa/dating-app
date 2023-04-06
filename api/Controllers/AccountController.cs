@@ -5,6 +5,7 @@ namespace api.Controllers;
 public class AccountController : BaseApiController
 {
     private readonly IAccountRepository _accountRepository;
+    
     public AccountController(IAccountRepository accountRepository)
     {
         _accountRepository = accountRepository;
