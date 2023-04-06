@@ -1,11 +1,13 @@
 namespace api.Services;
 public class TokenService : ITokenService
 {
+    //TODO: A token authorizes all users. Should each user work with one token only?
+
     private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
 
     public TokenService(IConfiguration config)
     {
-        string? tokenValue = config[ConstStringValues.TokenKey];
+        string? tokenValue = config[AppVariablesExtensions.TokenKey];
 
         // throw exception if tokenValue is null
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
