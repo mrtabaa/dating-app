@@ -1,12 +1,13 @@
 namespace api.Models;
 
 public record AppUser(
-    string Schema,
+    string? Schema,
     [property: BsonId, BsonRepresentation(BsonType.ObjectId)] string? Id,
     string Name,
     string Email,
-    byte[] PasswordHash,
-    byte[] PasswordSalt,
+    string Password,
+    byte[]? PasswordHash,
+    byte[]? PasswordSalt,
     DateOnly DateOfBirth,
     string KnownAs,
     DateTime Created,
@@ -17,5 +18,5 @@ public record AppUser(
     string Interests,
     string City,
     string Country,
-    List<Photo> Photos
+    IEnumerable<Photo> Photos
 );

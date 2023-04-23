@@ -20,7 +20,7 @@ public class UserRepository : IUserRepository
     #endregion
 
     #region CRUD
-        public async Task<List<MemberDto?>> GetUsers()
+    public async Task<List<MemberDto?>> GetUsers()
     {
         List<MemberDto?> memberDtos = new();
 
@@ -29,9 +29,9 @@ public class UserRepository : IUserRepository
 
         // For large lists
         await _collection.Find<AppUser>(new BsonDocument())
-        .ForEachAsync( appUser =>
+        .ForEachAsync(appUser =>
         {
-            memberDtos.Add(Mappers.MemberDto(appUser));
+            memberDtos.Add(Mappers.GenerateMemberDto(appUser));
         });
 
         return memberDtos;
@@ -41,14 +41,14 @@ public class UserRepository : IUserRepository
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
 
-        return user == null ? null : Mappers.MemberDto(user);
+        return user == null ? null : Mappers.GenerateMemberDto(user);
     }
 
     public async Task<MemberDto?> GetUserByEmail(string email)
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync();
 
-        return user == null ? null : Mappers.MemberDto(user);
+        return user == null ? null : Mappers.GenerateMemberDto(user);
     }
 
     public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn)

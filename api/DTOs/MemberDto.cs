@@ -15,5 +15,5 @@ public record MemberDto(
     string Interests,
     string City,
     string Country,
-    List<PhotoDto>? Photos
+    IEnumerable<PhotoDto>? Photos
 );

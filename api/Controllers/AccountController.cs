@@ -26,6 +26,7 @@ public class AccountController : BaseApiController
     public async Task<ActionResult<LoginSuccessDto>> Login(LoginDto userInput)
     {
         LoginSuccessDto? user = await _accountRepository.Login(userInput);
+        
         return user == null ? BadRequest("Invalid username or password.") : user;
     }
 }

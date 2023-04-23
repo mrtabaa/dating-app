@@ -1,6 +1,5 @@
 
 #region Add services to the container.
-using api.Extensions;
 using api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);

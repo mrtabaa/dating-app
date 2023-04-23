@@ -25,7 +25,6 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
-
         // email format validation
         if (!validateEmailPattern(userInput.Email))
             return new LoginSuccessDto(
@@ -38,7 +37,7 @@ public class AccountRepository : IAccountRepository
         if (await CheckEmailExist(userInput.Email.ToLower()))
             return null;
 
-        AppUser appUser = Mappers.AppUser(userInput);
+        AppUser appUser = Mappers.GenerateAppUser(userInput);
 
         // if insertion successful OR throw an exception
         await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
@@ -50,7 +49,6 @@ public class AccountRepository : IAccountRepository
             Email: appUser.Email,
             BadEmailPattern: false
         );
-
     }
 
     public async Task<LoginSuccessDto?> Login(LoginDto userInput)
