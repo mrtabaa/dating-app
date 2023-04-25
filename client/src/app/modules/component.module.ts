@@ -23,6 +23,7 @@ import { DirectiveModule } from './directive.module';
 import { ListsComponent } from '../components/lists/lists.component';
 import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
+import { MemberCardComponent } from '../components/members/member-card/member-card.component';
 import { MessagesComponent } from '../components/messages/messages.component';
 
 const components = [
@@ -38,6 +39,7 @@ const components = [
   MemberListComponent,
   MemberDetailComponent,
   ListsComponent,
+  MemberCardComponent,
   MessagesComponent,
 
   ShortenStringPipe

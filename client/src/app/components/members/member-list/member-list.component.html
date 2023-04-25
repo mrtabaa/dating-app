@@ -1,1 +1,3 @@
-<p>member-list works!</p>
+<div>
+    <app-member-card *ngFor="let member of members$ | async" [memberInput]="member"></app-member-card>
+</div>

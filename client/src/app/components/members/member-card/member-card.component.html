@@ -1,0 +1,30 @@
+<mat-card *ngIf="member" class="card">
+    <div class="card-img-wrapper">
+        <img mat-card-image [src]="mainUrl" alt="{{member.knownAs}}">
+        <ul class="member-icons">
+            <li>
+                <button mat-mini-fab color="warn">
+                    <mat-icon>person_add</mat-icon>
+                </button>
+            </li>
+            <li>
+                <button mat-mini-fab color="warn">
+                    <mat-icon>favorite</mat-icon>
+                </button>
+            </li>
+            <li>
+                <button mat-mini-fab color="warn">
+                    <mat-icon>mail</mat-icon>
+                </button>
+            </li>
+        </ul>
+    </div>
+    <mat-card-header>
+        <div class="title">
+            <mat-icon *ngIf="member.gender === 'male'" color="primary">boy</mat-icon>
+            <mat-icon *ngIf="member.gender === 'female'" color="primary">girl</mat-icon>
+            <mat-card-title>{{member.knownAs}}</mat-card-title>
+        </div>
+        <mat-card-subtitle>{{member.city}}</mat-card-subtitle>
+    </mat-card-header>
+</mat-card>
