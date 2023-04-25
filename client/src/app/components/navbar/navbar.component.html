@@ -57,16 +57,22 @@
             <mat-divider></mat-divider>
             <mat-list>
                 <mat-list-item>
-                    <mat-icon>shopping_basket</mat-icon>
-                    Orders
+                    <div class="menu-items">
+                        <mat-icon>shopping_basket</mat-icon>
+                        Orders
+                    </div>
                 </mat-list-item>
                 <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active">
-                    <mat-icon>flaky</mat-icon>
-                    Manage Orders
+                    <div class="menu-items">
+                        <mat-icon>flaky</mat-icon>
+                        Manage Orders
+                    </div>
                 </mat-list-item>
                 <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active">
-                    <mat-icon>assignment_returned</mat-icon>
-                    Manage Products
+                    <div class="menu-items">
+                        <mat-icon>assignment_returned</mat-icon>
+                        Manage Products
+                    </div>
                 </mat-list-item>
             </mat-list>
 
