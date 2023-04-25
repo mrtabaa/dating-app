@@ -17,7 +17,7 @@ public record UserRegisterDto(
 );
 
 public record LoginDto(
-    string Schema,
+    string? Schema,
     [EmailAddress, MaxLength(50)] string Email,
     [MinLength(7), MaxLength(20)] string Password
 );
