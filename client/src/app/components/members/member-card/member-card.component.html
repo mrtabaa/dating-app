@@ -1,6 +1,6 @@
 <mat-card *ngIf="member" class="card">
     <div class="card-img-wrapper">
-        <img mat-card-image [src]="mainUrl" alt="{{member.knownAs}}">
+        <img mat-card-image src="{{mainUrl || './assets/images/defaults/user.png'}}" alt="{{member.knownAs}}">
         <ul class="member-icons">
             <li>
                 <button [routerLink]="['/members/' + member.email]" mat-mini-fab color="warn">

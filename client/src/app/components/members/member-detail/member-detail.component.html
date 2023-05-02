@@ -1,3 +1,53 @@
-<div *ngIf="member$ | async as member">
-    <h1>{{member.name}}</h1>
-</div>
+<main *ngIf="member$ | async as member">
+    <mat-card>
+        <img mat-card-image src="{{mainUrl || './assets/images/defaults/user.png'}}" alt="Photo of {{member.knownAs}}">
+        <mat-card-content>
+            <div>
+                <strong>Location</strong>
+                <p>{{member.city}}, {{member.country}}</p>
+            </div>
+            <div>
+                <strong>Age</strong>
+                <p>{{member.age}}</p>
+            </div>
+            <div>
+                <strong>Last Active</strong>
+                <p>{{member.lastActive | date}}</p>
+            </div>
+            <div>
+                <strong>Member Since</strong>
+                <p>{{member.created | date}}</p>
+            </div>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-raised-button color="primary">LIKE</button>
+            <button mat-raised-button color="accent">MESSAGES</button>
+        </mat-card-actions>
+    </mat-card>
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+        <mat-tab label="About {{member.knownAs}}">
+            <div class="tab-contents">
+                <h4>Discription</h4>
+                <p>{{member.introduction}}</p>
+                <h4>Looking For</h4>
+                <p>{{member.lookingFor}}</p>
+            </div>
+        </mat-tab>
+        <mat-tab label="Interests">
+            <div class="tab-contents">
+                <h4>Interests</h4>
+                <p>{{member.interests}}</p>
+            </div>
+        </mat-tab>
+        <mat-tab label="Photos">
+            <div class="tab-contents">
+                <ngx-gallery [options]="galleryOptions" [images]="galleryImages" class="ngx-gallery"></ngx-gallery>
+            </div>
+        </mat-tab>
+        <mat-tab label="Messages">
+            <div class="tab-contents">
+                Messages goes here...
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</main>
