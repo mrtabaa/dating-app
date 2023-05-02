@@ -5,7 +5,7 @@ public record MemberDto(
     string Id,
     [MinLength(2), MaxLength(20)] string Name,
     [EmailAddress] string Email,
-    int Age,
+    [Range(16, 99)] int Age,
     string KnownAs,
     DateTime Created,
     DateTime LastActive,
