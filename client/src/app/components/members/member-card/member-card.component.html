@@ -3,7 +3,7 @@
         <img mat-card-image [src]="mainUrl" alt="{{member.knownAs}}">
         <ul class="member-icons">
             <li>
-                <button mat-mini-fab color="warn">
+                <button [routerLink]="['/members/' + member.email]" mat-mini-fab color="warn">
                     <mat-icon>person_add</mat-icon>
                 </button>
             </li>
