@@ -17,7 +17,7 @@ public class UserController : BaseApiController
         return await _userRepository.GetUsers();
     }
 
-    [HttpPost("id")]
+    [HttpGet("id/{id}")]
     public async Task<ActionResult<MemberDto>> GetUserById(string id)
     {
         MemberDto? user = await _userRepository.GetUserById(id);
@@ -25,7 +25,7 @@ public class UserController : BaseApiController
         return user == null ? BadRequest("No user found by this ID.") : user;
     }
 
-    [HttpPost("email")]
+    [HttpGet("email/{email}")]
     public async Task<ActionResult<MemberDto>> GetUserByEmail(string email)
     {
         MemberDto? user = await _userRepository.GetUserByEmail(email);
