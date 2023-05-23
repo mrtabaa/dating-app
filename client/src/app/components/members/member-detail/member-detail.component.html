@@ -1,6 +1,9 @@
 <main *ngIf="member$ | async as member">
     <mat-card>
-        <img mat-card-image src="{{mainUrl || './assets/images/defaults/user.png'}}" alt="Photo of {{member.knownAs}}">
+        <ng-container *ngFor="let photo of member.photos">
+            <img *ngIf="photo.isMain" mat-card-image src="{{photo.url || './assets/images/defaults/user.png'}}"
+                alt="Photo of {{member.knownAs}}">
+        </ng-container>
         <mat-card-content>
             <div>
                 <strong>Location</strong>
@@ -27,7 +30,7 @@
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
         <mat-tab label="About {{member.knownAs}}">
             <div class="tab-contents">
-                <h4>Discription</h4>
+                <h4>Introduction</h4>
                 <p>{{member.introduction}}</p>
                 <h4>Looking For</h4>
                 <p>{{member.lookingFor}}</p>

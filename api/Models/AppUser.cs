@@ -12,7 +12,7 @@ public record AppUser(
     string KnownAs,
     DateTime Created,
     DateTime LastActive,
-    string Gender, 
+    string Gender,
     string Introduction,
     string LookingFor,
     string Interests,

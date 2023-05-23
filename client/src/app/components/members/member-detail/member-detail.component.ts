@@ -27,8 +27,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadMember();
-    this.galleryImages = this.loadImages();
-    this.setMainUrl();
+    this.setGalleryImages();
     this.setGalleryOptions();
   }
 
@@ -44,13 +43,11 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadImages(): NgxItem[] {
-    let imageUrls: NgxItem[] = [];
-
+  setGalleryImages(): void {
     this.subscribed = this.member$?.subscribe(
       ((member: Member) => {
         for (const photo of member.photos) {
-          imageUrls.push(
+          this.galleryImages.push(
             {
               small: photo.url,
               medium: photo.url,
@@ -59,23 +56,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
           );
         }
       })
-    );
-    
-    return imageUrls;
-  }
-
-  setMainUrl(): void {
-    if (this.member$) {
-      this.subscribed = this.member$.subscribe(
-        ((member: Member) => {
-          for (const photo of member.photos) {
-            if (photo.isMain) {
-              this.mainUrl = photo.url;
-            }
-          }
-        })
-      );
-    }
+    ); 
   }
 
   setGalleryOptions(): void {
@@ -90,24 +71,4 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       }
     ];
   }
-
-  // getImages(): any[] {
-  //   let imageUrls: any[] = [];
-
-  //   if (this.member$) {
-  //     this.subscribed = this.member$.subscribe((member: Member) => {
-  //       for (const photo of member.photos) {
-  //         imageUrls.push(
-  //           {
-  //             small: photo.url,
-  //             medium: photo.url,
-  //             big: photo.url
-  //           }
-  //         );
-  //       }
-  //     });
-  //   }
-
-  //   return imageUrls;
-  // }
 }
