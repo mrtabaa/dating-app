@@ -24,21 +24,12 @@ mat-toolbar {
     .right {
         display: flex;
         gap: 1rem;
-
-        button {
-            border-radius: 50%;
-            width: 2.5rem;
-            height: 2.5rem;
-            cursor: pointer;
-            border: 5px solid rgba($color: purple, $alpha: 0.1);
-            font-weight: bold;
-        }
     }
 }
 
 // mat-menu style cannot be nested scss and is usign an Angular directive Input to apply class
 ::ng-deep .mat-menu {
-    // padding: 0;
+    width: auto;
 
     .userInfo {
         display: flex;
@@ -59,12 +50,10 @@ mat-toolbar {
             display: flex;
             flex-direction: row;
             justify-content: center;
-            width: 5rem;
-            height: 5rem;
-            background-color: rgb(172, 6, 172);
-            color: white;
+            // background-color: rgb(172, 6, 172);
+            // color: white;
+            cursor: auto;
             font-size: 3rem;
-            border-radius: 50%;
         }
 
         .email {
@@ -79,14 +68,33 @@ mat-toolbar {
         align-items: center;
     }
 
-    .menu-items {
-        display: flex;
-        gap: 5px;
+    mat-list {
+        padding: 0;
+        margin: 0;
+
+        mat-list-item {
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-items {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            line-height: 47px;
+            padding-left: 1rem;
+            margin: 0;
+
+            &:hover {
+                background-color: rgb(255, 176, 255);
+                cursor: pointer;
+            }
+        }
     }
 }
 
 @media only screen and (min-width: 40rem) {
-    // mat-toolbar {
-    //     background: green !important;
-    // }
+    ::ng-deep .mat-menu {
+        width: 20rem;
+    }
 }

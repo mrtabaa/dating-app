@@ -24,17 +24,17 @@
     <section class="right">
         <!-- if logged-in: show appMeny
             else: show signup/login -->
-        <button [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin">
+        <button mat-mini-fab [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin">
             <!-- <mat-card style="display: none;"></mat-card> -->
             <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{user.profilePhotoUrl}}">
             <ng-template #username>{{user.name[0] | titlecase}}</ng-template>
         </button>
         <!-- signup/login -->
         <ng-template #signupLogin>
-            <button mat-button [routerLink]="[ '/register' ]">
+            <button mat-raised-button color="accent" routerLink="/register">
                 Sign Up
             </button>
-            <button mat-button [routerLink]="['/login']" routerLinkActive="router-link-active">
+            <button mat-raised-button color="accent" routerLink="/login" routerLinkActive="router-link-active">
                 Login
             </button>
         </ng-template>
@@ -42,12 +42,12 @@
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
             <div *ngIf="user$ | async as user" class="userInfo">
-                <div class="profileImage">
+                <button mat-fab color="basic" class="profileImage">
                     <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{user.profilePhotoUrl}}">
                     <ng-template #username>
                         {{user.name[0] | titlecase}}
                     </ng-template>
-                </div>
+                </button>
                 <div>
                     <p>{{user.name | titlecase}}</p>
                     <p class="email">{{user.email}}</p>
@@ -57,9 +57,9 @@
             <mat-divider></mat-divider>
             <mat-list>
                 <mat-list-item>
-                    <div class="menu-items">
-                        <mat-icon>shopping_basket</mat-icon>
-                        Orders
+                    <div routerLink="member/edit" mat-button class="menu-items">
+                        <mat-icon>edit_note</mat-icon>
+                        Edit Profile
                     </div>
                 </mat-list-item>
                 <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active">
