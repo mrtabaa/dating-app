@@ -20,7 +20,7 @@ public class TokenService : ITokenService
         _ = _key ?? throw new ArgumentNullException("_key cannot be null", nameof(_key));
 
         var claims = new List<Claim> {
-            new Claim(JwtRegisteredClaimNames.NameId, user.Email!),
+            new Claim(JwtRegisteredClaimNames.NameId, user.Id!)
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
