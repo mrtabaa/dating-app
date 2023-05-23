@@ -1,0 +1,88 @@
+<div>
+    <section class="head">
+        <h1 class="title">Your Profile</h1>
+        <mat-card class="warning">
+            <mat-card-content *ngIf="memberEditFg.dirty">
+                <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
+            </mat-card-content>
+        </mat-card>
+    </section>
+    <section *ngIf="member$ | async as member" class="content">
+        <mat-card>
+            <ng-container *ngFor="let photo of member.photos">
+                <img *ngIf="photo.isMain" mat-card-image src="{{photo.url || './assets/images/defaults/user.png'}}"
+                    alt="Photo of {{member.knownAs}}">
+            </ng-container>
+            <mat-card-content>
+                <div>
+                    <strong>Location</strong>
+                    <p>{{member.city}}, {{member.country}}</p>
+                </div>
+                <div>
+                    <strong>Age</strong>
+                    <p>{{member.age}}</p>
+                </div>
+                <div>
+                    <strong>Last Active</strong>
+                    <p>{{member.lastActive | date}}</p>
+                </div>
+                <div>
+                    <strong>Member Since</strong>
+                    <p>{{member.created | date}}</p>
+                </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button type="submit" (click)="updateMember()"
+                    [disabled]="memberEditFg.pristine || memberEditFg.invalid" mat-raised-button color="primary">Save
+                    Changes</button>
+            </mat-card-actions>
+        </mat-card>
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+            <mat-tab label="About {{member.knownAs}}">
+                <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="tab-contents">
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Introduction</mat-label>
+                        <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="member.introduction"
+                            placeholder="Enter introduction" matInput required>
+                            {{IntroductionCtrl.value}}
+                        </textarea>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Looking For</mat-label>
+                        <textarea cdkTextareaAutosize formControlName="lookingCtrl"
+                            placeholder="Enter what you're looking for" matInput required>
+                            {{member.lookingFor}}
+                        </textarea>
+                        <mat-error *ngIf="LookingCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Interests</mat-label>
+                        <textarea cdkTextareaAutosize formControlName="interestsCtrl" placeholder="Enter your interests"
+                            matInput required>
+                            {{member.interests}}
+                        </textarea>
+                        <mat-error *ngIf="InterestsCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>City</mat-label>
+                        <input formControlName="cityCtrl" placeholder="Enter what you're looking for" matInput required>
+                        <mat-error *ngIf="CityCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Country</mat-label>
+                        <input cdkTextareaAutosize formControlName="countryCtrl"
+                            placeholder="Enter what you're looking for" matInput required>
+                        <mat-error *ngIf="CountryCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                    </mat-form-field>
+                </form>
+            </mat-tab>
+            <mat-tab label="Edit Photos">
+                <div class="tab-contents">
+                    <p>Photos go here...</p>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </section>
+</div>
+<!-- <p>{{ memberEditFg.value | json }}</p> -->

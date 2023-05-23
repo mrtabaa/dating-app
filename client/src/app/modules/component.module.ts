@@ -26,6 +26,7 @@ import { MemberDetailComponent } from '../components/members/member-detail/membe
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
 import { MemberCardComponent } from '../components/members/member-card/member-card.component';
 import { MessagesComponent } from '../components/messages/messages.component';
+import { MemberEditComponent } from '../members/member-edit/member-edit.component';
 
 const components = [
   NoAccessComponent,
@@ -42,6 +43,7 @@ const components = [
   ListsComponent,
   MemberCardComponent,
   MessagesComponent,
+  MemberEditComponent,
 
   ShortenStringPipe
 ]

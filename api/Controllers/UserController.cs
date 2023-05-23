@@ -32,4 +32,19 @@ public class UserController : BaseApiController
 
         return user == null ? BadRequest("No user found by this Email.") : user;
     }
+
+    [HttpPut("update")]
+    public async Task<ActionResult<UpdateResult?>> UpdateUser(MemberUpdateDto memberUpdateDto, CancellationToken cancellationToken)
+    {
+        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId != null)
+        {
+            MemberDto? user = await _userRepository.GetUserById(userId, cancellationToken);
+
+            return user == null ? NotFound("User not found.") : await _userRepository.UpdateUser(memberUpdateDto, userId, cancellationToken);
+        }
+
+        return BadRequest("Update failed.");
+    }
 }

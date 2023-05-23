@@ -15,6 +15,8 @@ import { MessagesComponent } from './components/messages/messages.component';
 import { ListsComponent } from './components/lists/lists.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
+import { MemberEditComponent } from './members/member-edit/member-edit.component';
+import { PreventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -25,6 +27,7 @@ const routes: Routes = [
     children: [
       { path: 'members', component: MemberListComponent },
       { path: 'members/:email', component: MemberDetailComponent },
+      { path: 'member/edit', component: MemberEditComponent, canDeactivate: [PreventUnsavedChangesGuard] },
       { path: 'lists', component: ListsComponent },
       { path: 'messages', component: MessagesComponent },
     ]
