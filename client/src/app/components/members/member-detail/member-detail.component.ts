@@ -5,11 +5,6 @@ import { Observable, Subscription, map } from 'rxjs';
 import { Member } from 'src/app/models/member.model';
 import { MemberService } from 'src/app/services/member.service';
 
-interface NgxItem {
-  small: string,
-  medium: string,
-  big: string
-}
 @Component({
   selector: 'app-member-detail',
   templateUrl: './member-detail.component.html',
