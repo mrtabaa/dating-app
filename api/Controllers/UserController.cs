@@ -12,23 +12,23 @@ public class UserController : BaseApiController
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers(CancellationToken cancellationToken)
     {
-        return await _userRepository.GetUsers();
+        return await _userRepository.GetUsers(cancellationToken);
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<MemberDto>> GetUserById(string id)
+    public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserById(id);
+        MemberDto? user = await _userRepository.GetUserById(id, cancellationToken);
 
         return user == null ? BadRequest("No user found by this ID.") : user;
     }
 
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<MemberDto>> GetUserByEmail(string email)
+    public async Task<ActionResult<MemberDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserByEmail(email);
+        MemberDto? user = await _userRepository.GetUserByEmail(email, cancellationToken);
 
         return user == null ? BadRequest("No user found by this Email.") : user;
     }

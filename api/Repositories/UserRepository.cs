@@ -5,84 +5,69 @@ public class UserRepository : IUserRepository
     #region Db and Token Settings
     const string _collectionName = "Users";
     private readonly IMongoCollection<AppUser> _collection;
-    private readonly ITokenService _tokenService; // save user credential as a token
-    private readonly CancellationToken _cancellationToken;
+    private readonly ILogger<UserRepository> _logger;
 
     // constructor - dependency injections
-    public UserRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
+    public UserRepository(
+        IMongoClient client, IMongoDbSettings dbSettings, ILogger<UserRepository> logger)
     {
+
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(_collectionName);
-        // 
-        _tokenService = tokenService;
-        _cancellationToken = new CancellationToken();
+
+        _logger = logger;
     }
     #endregion
 
     #region CRUD
-    public async Task<List<MemberDto?>> GetUsers()
+    public async Task<List<MemberDto?>> GetUsers(CancellationToken cancellationToken)
     {
         List<MemberDto?> memberDtos = new();
 
         // For small lists
-        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(_cancellationToken);
+        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
 
         // For large lists
         await _collection.Find<AppUser>(new BsonDocument())
         .ForEachAsync(appUser =>
         {
             memberDtos.Add(Mappers.GenerateMemberDto(appUser));
-        });
+        }, cancellationToken);
+
+        _logger.LogError("GetUsers was canceled.");
 
         return memberDtos;
     }
 
-    public async Task<MemberDto?> GetUserById(string userId)
+    public async Task<MemberDto?> GetUserById(string userId, CancellationToken cancellationToken)
     {
-        AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(_cancellationToken);
+        AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
         return user == null ? null : Mappers.GenerateMemberDto(user);
     }
 
-    public async Task<MemberDto?> GetUserByEmail(string email)
+    public async Task<MemberDto?> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync();
+        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync(cancellationToken);
 
         return user == null ? null : Mappers.GenerateMemberDto(user);
     }
 
-    public async Task<UpdateResult?> UpdateUser(string userId, UserRegisterDto userIn)
+    public async Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string userId, CancellationToken cancellationToken)
     {
-        if (await CheckEmailExist(userIn))
-            return null;
-
-        using var hmac = new HMACSHA512();
-
-        // if(_cancellationToken.IsCancellationRequested)
-        //     _cancellationToken.ThrowIfCancellationRequested();
-
         var updatedUser = Builders<AppUser>.Update
-        .Set(e => e.Name, userIn.Name)
-        .Set(e => e.Email, userIn.Email)
-        .Set(ph => ph.PasswordHash, hmac.ComputeHash(Encoding.UTF8.GetBytes(userIn.Password!)))
-        .Set(ps => ps.PasswordSalt, hmac.Key);
+        .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+        .Set(user => user.Introduction, memberUpdateDto.Introduction)
+        .Set(user => user.LookingFor, memberUpdateDto.LookingFor)
+        .Set(user => user.Interests, memberUpdateDto.Interests)
+        .Set(user => user.City, memberUpdateDto.City)
+        .Set(user => user.Country, memberUpdateDto.Country);
 
-        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, _cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
     }
 
-    public async Task<DeleteResult> DeleteUser(string userId) =>
-        await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, _cancellationToken);
+    public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
+        await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
 
     #endregion CRUD
-
-    #region Helper methods
-    private async Task<bool> CheckEmailExist(UserRegisterDto userIn)
-    {
-        if (string.IsNullOrEmpty(userIn.Email))
-            return false;
-
-        return null != await _collection.Find<AppUser>(user => user.Email == userIn.Email).FirstOrDefaultAsync()
-            ? true : false;
-    }
-    #endregion
 }
