@@ -26,6 +26,10 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   mainUrl: string | undefined;
   form: FormGroup | undefined;
   subscribed: Subscription | undefined;
+  readonly minTextAreaChars: number = 10;
+  readonly maxTextAreaChars: number = 500;
+  readonly minInputChars: number = 3;
+  readonly maxInputChars: number = 30;
 
   constructor(
     accountService: AccountService,
@@ -49,18 +53,18 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   }
 
   memberEditFg: FormGroup = this.fb.group({
-    introductionCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-    lookingCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-    interestsCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-    cityCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]]
+    introductionCtrl: ['', [Validators.required, Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
+    lookingForCtrl: ['', [Validators.required, Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
+    interestsCtrl: ['', [Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
+    cityCtrl: ['', [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
+    countryCtrl: ['', [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
   });
 
   get IntroductionCtrl(): AbstractControl {
     return this.memberEditFg.get('introductionCtrl') as FormControl;
   }
-  get LookingCtrl(): AbstractControl {
-    return this.memberEditFg.get('lookingCtrl') as FormControl;
+  get LookingForCtrl(): AbstractControl {
+    return this.memberEditFg.get('lookingForCtrl') as FormControl;
   }
   get InterestsCtrl(): AbstractControl {
     return this.memberEditFg.get('interestsCtrl') as FormControl;
@@ -76,7 +80,7 @@ export class MemberEditComponent implements OnInit, OnDestroy {
     if (this.member$ && this.IntroductionCtrl.pristine) {
       this.subscribed = this.member$.subscribe((member: Member) => {
         this.IntroductionCtrl.setValue(member.introduction);
-        this.LookingCtrl.setValue(member.lookingFor);
+        this.LookingForCtrl.setValue(member.lookingFor);
         this.InterestsCtrl.setValue(member.interests);
         this.CityCtrl.setValue(member.city);
         this.CountryCtrl.setValue(member.country);
@@ -89,7 +93,7 @@ export class MemberEditComponent implements OnInit, OnDestroy {
     let updatedMember: MemberUpdate = {
       email: this.user?.email,
       introduction: this.IntroductionCtrl.value,
-      lookingFor: this.LookingCtrl.value,
+      lookingFor: this.LookingForCtrl.value,
       interests: this.InterestsCtrl.value,
       city: this.CityCtrl.value,
       country: this.CountryCtrl.value
@@ -118,5 +122,9 @@ export class MemberEditComponent implements OnInit, OnDestroy {
     });
 
     this.memberEditFg.markAsPristine();
+  }
+
+  logForm() {
+    console.log(this.IntroductionCtrl)
   }
 }

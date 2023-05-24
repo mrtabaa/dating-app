@@ -34,29 +34,42 @@
             <mat-card-actions>
                 <button type="submit" (click)="updateMember()"
                     [disabled]="memberEditFg.pristine || memberEditFg.invalid" mat-raised-button color="primary">Save
-                    Changes</button>
+                    Changes
+                </button>
             </mat-card-actions>
         </mat-card>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
             <mat-tab label="About {{member.knownAs}}">
-                <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="tab-contents">
+                <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
                     <mat-form-field appearaance="outline">
                         <mat-label>Introduction</mat-label>
                         <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="member.introduction"
-                            placeholder="Enter introduction" matInput required>
+                            placeholder="Say something about your self" matInput required>
                             {{IntroductionCtrl.value}}
                         </textarea>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field cannot be empty.</mat-error>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('MinLength')">Minimum of 10 characters is requried.</mat-error>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('maxLength')">This field cannot be empty.</mat-error>
+                        <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field is required</mat-error>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('minlength')">
+                            Minimum of {{minTextAreaChars}} characters is requried.
+                        </mat-error>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('maxlength')">
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>Looking For</mat-label>
-                        <textarea cdkTextareaAutosize formControlName="lookingCtrl"
+                        <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
                             placeholder="Enter what you're looking for" matInput required>
                             {{member.lookingFor}}
                         </textarea>
-                        <mat-error *ngIf="LookingCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                        <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        <mat-error *ngIf="LookingForCtrl.hasError('required')">This field is required</mat-error>
+                        <mat-error *ngIf="LookingForCtrl.hasError('minlength')">
+                            Minimum of {{minTextAreaChars}} characters is requried.
+                        </mat-error>
+                        <mat-error *ngIf="LookingForCtrl.hasError('maxlength')">
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>Interests</mat-label>
@@ -64,18 +77,37 @@
                             matInput required>
                             {{member.interests}}
                         </textarea>
-                        <mat-error *ngIf="InterestsCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                        <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        <mat-error *ngIf="InterestsCtrl.hasError('required')">This field is required</mat-error>
+                        <mat-error *ngIf="InterestsCtrl.hasError('minlength')">
+                            Minimum of {{minTextAreaChars}} characters is requried.
+                        </mat-error>
+                        <mat-error *ngIf="InterestsCtrl.hasError('maxlength')">
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>City</mat-label>
-                        <input formControlName="cityCtrl" placeholder="Enter what you're looking for" matInput required>
-                        <mat-error *ngIf="CityCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                        <input formControlName="cityCtrl" placeholder="Enter your city" matInput required>
+                        <mat-error *ngIf="CityCtrl.hasError('required')">This field is required</mat-error>
+                        <mat-error *ngIf="CityCtrl.hasError('minlength')">
+                            Minimum of {{minInputChars}} characters is requried.
+                        </mat-error>
+                        <mat-error *ngIf="CityCtrl.hasError('maxlength')">
+                            Maximum of {{maxInputChars}} characters is reached.
+                        </mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>Country</mat-label>
                         <input cdkTextareaAutosize formControlName="countryCtrl"
-                            placeholder="Enter what you're looking for" matInput required>
-                        <mat-error *ngIf="CountryCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                            placeholder="Enter your country." matInput required>
+                        <mat-error *ngIf="CountryCtrl.hasError('required')">This field is required</mat-error>
+                        <mat-error *ngIf="CountryCtrl.hasError('minlength')">
+                            Minimum of {{minInputChars}} characters is requried.
+                        </mat-error>
+                        <mat-error *ngIf="CountryCtrl.hasError('maxlength')">
+                            Maximum of {{maxInputChars}} characters is reached.
+                        </mat-error>
                     </mat-form-field>
                 </form>
             </mat-tab>
