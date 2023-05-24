@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { User } from './models/user.model';
 import { AccountService } from './services/account.service';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +11,7 @@ import { AccountService } from './services/account.service';
 export class AppComponent implements OnInit {
   title = 'Dating App';
 
-  constructor(private accountService: AccountService, private router: Router) { }
+  constructor(private accountService: AccountService, public loadingService: LoadingService) { }
 
   ngOnInit(): void {
     this.setLocalStorageCurrentValues();

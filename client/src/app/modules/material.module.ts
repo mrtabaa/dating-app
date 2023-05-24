@@ -12,11 +12,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar'; 
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
 
 const material: any[] = [
   MatToolbarModule,
@@ -35,7 +35,8 @@ const material: any[] = [
   MatCheckboxModule,
   MatTableModule,
   MatTabsModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatProgressBarModule
 ]
 
 @NgModule({

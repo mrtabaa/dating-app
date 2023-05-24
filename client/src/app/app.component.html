@@ -1,10 +1,12 @@
 <header>
     <nav>
         <app-navbar></app-navbar>
+        <mat-progress-bar *ngIf="loadingService.isLoading" color="accent" mode="query"></mat-progress-bar>
     </nav>
 </header>
 <main>
     <router-outlet></router-outlet>
+    <mat-spinner *ngIf="loadingService.isLoading;" color="accent"></mat-spinner>
 </main>
 <footer>
     Footer
