@@ -26,14 +26,14 @@ import { MemberDetailComponent } from '../components/members/member-detail/membe
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
 import { MemberCardComponent } from '../components/members/member-card/member-card.component';
 import { MessagesComponent } from '../components/messages/messages.component';
-import { MemberEditComponent } from '../members/member-edit/member-edit.component';
+import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
 
 const components = [
   NoAccessComponent,
   NotFoundComponent,
   TestErrorComponent,
   ServerErrorComponent,
-  
+
   HomeComponent,
   RegisterComponent,
   LoginComponent,
@@ -45,7 +45,7 @@ const components = [
   MessagesComponent,
   MemberEditComponent,
 
-  ShortenStringPipe
+  ShortenStringPipe,
 ]
 
 @NgModule({
