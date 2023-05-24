@@ -33,7 +33,7 @@ public class UserController : BaseApiController
         return user == null ? BadRequest("No user found by this Email.") : user;
     }
 
-    [HttpPut("update")]
+    [HttpPut()]
     public async Task<ActionResult<UpdateResult?>> UpdateUser(MemberUpdateDto memberUpdateDto, CancellationToken cancellationToken)
     {
         string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
