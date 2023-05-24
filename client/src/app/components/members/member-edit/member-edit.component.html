@@ -47,6 +47,8 @@
                             {{IntroductionCtrl.value}}
                         </textarea>
                         <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field cannot be empty.</mat-error>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('MinLength')">Minimum of 10 characters is requried.</mat-error>
+                        <mat-error *ngIf="IntroductionCtrl.hasError('maxLength')">This field cannot be empty.</mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>Looking For</mat-label>
@@ -85,4 +87,4 @@
         </mat-tab-group>
     </section>
 </div>
-<!-- <p>{{ memberEditFg.value | json }}</p> -->
+<p>{{ memberEditFg.value | json }}</p>

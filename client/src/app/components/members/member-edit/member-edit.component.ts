@@ -49,11 +49,11 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   }
 
   memberEditFg: FormGroup = this.fb.group({
-    introductionCtrl: ['', Validators.required],
-    lookingCtrl: [''],
-    interestsCtrl: [''],
-    cityCtrl: ['', Validators.required],
-    countryCtrl: ['', Validators.required]
+    introductionCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+    lookingCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+    interestsCtrl: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
+    cityCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]]
   });
 
   get IntroductionCtrl(): AbstractControl {
@@ -87,6 +87,7 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   updateMember(): void {
 
     let updatedMember: MemberUpdate = {
+      email: this.user?.email,
       introduction: this.IntroductionCtrl.value,
       lookingFor: this.LookingCtrl.value,
       interests: this.InterestsCtrl.value,
@@ -94,7 +95,7 @@ export class MemberEditComponent implements OnInit, OnDestroy {
       country: this.CountryCtrl.value
     }
 
-    this.memberService.updateMember(updatedMember).subscribe({
+    this.subscribed = this.memberService.updateMember(updatedMember).subscribe({
       next: (updateResult: UpdateResult) => {
         if (updateResult.isAcknowledged && updateResult.modifiedCount > 0) {
           this.matSnak.open("Successfully updated.", "Close", {
