@@ -19,7 +19,7 @@ export class LoadingInterceptor implements HttpInterceptor {
       tap({ next: () => this.loadingService.isLoading = true }), // cause side-effect
       delay(500),
       finalize(() => {
-        this.loadingService.isLoading = false; // the obs loading is completed
+        this.loadingService.isLoading = false; 
       })
     );
   }

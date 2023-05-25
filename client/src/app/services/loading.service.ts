@@ -4,9 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LoadingService {
+  isLoading: boolean = true;
 
   constructor() { }
-
-  // getting updated in the LoadingInterceptor
-  isLoading: boolean = true;
 }
