@@ -39,11 +39,16 @@ public class UserRepository : IUserRepository
         return memberDtos;
     }
 
-    public async Task<MemberDto?> GetUserById(string userId, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetUserById(string? userId, CancellationToken cancellationToken)
     {
-        AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        if (userId != null)
+        {
+            AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-        return user == null ? null : Mappers.GenerateMemberDto(user);
+            return user == null ? null : Mappers.GenerateMemberDto(user);
+        }
+
+        return null;
     }
 
     public async Task<MemberDto?> GetUserByEmail(string email, CancellationToken cancellationToken)
@@ -53,17 +58,22 @@ public class UserRepository : IUserRepository
         return user == null ? null : Mappers.GenerateMemberDto(user);
     }
 
-    public async Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
     {
-        var updatedUser = Builders<AppUser>.Update
-        .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-        .Set(user => user.Introduction, memberUpdateDto.Introduction)
-        .Set(user => user.LookingFor, memberUpdateDto.LookingFor)
-        .Set(user => user.Interests, memberUpdateDto.Interests)
-        .Set(user => user.City, memberUpdateDto.City)
-        .Set(user => user.Country, memberUpdateDto.Country);
+        if (userId != null)
+        {
+            var updatedUser = Builders<AppUser>.Update
+            .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+            .Set(user => user.Introduction, memberUpdateDto.Introduction)
+            .Set(user => user.LookingFor, memberUpdateDto.LookingFor)
+            .Set(user => user.Interests, memberUpdateDto.Interests)
+            .Set(user => user.City, memberUpdateDto.City)
+            .Set(user => user.Country, memberUpdateDto.Country);
 
-        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
+            return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
+        }
+
+        return null;
     }
 
     public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
