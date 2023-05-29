@@ -6,7 +6,7 @@ public class AccountRepository : IAccountRepository
 {
 
     #region Db and Token Settings
-    const string _collectionName = "Users";
+    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly CancellationToken _cancellationToken;
