@@ -6,6 +6,9 @@
 #ignore the ssl folder
 ssl/
 
+#wwwroot
+Storage/
+
 # User-specific files
 *.rsuser
 *.suo
