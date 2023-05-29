@@ -36,15 +36,21 @@ public class UserController : BaseApiController
     [HttpPut()]
     public async Task<ActionResult<UpdateResult?>> UpdateUser(MemberUpdateDto memberUpdateDto, CancellationToken cancellationToken)
     {
-        string? userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 
-        if (userId != null)
-        {
-            MemberDto? user = await _userRepository.GetUserById(userId, cancellationToken);
+        return user == null
+            ? BadRequest("Update failed.")
+            : await _userRepository.UpdateUser(memberUpdateDto, User.GetUserId(), cancellationToken);
+    }
 
-            return user == null ? NotFound("User not found.") : await _userRepository.UpdateUser(memberUpdateDto, userId, cancellationToken);
-        }
+    [HttpPost("add-photo")]
+    public async Task<ActionResult<UpdateResult>> AddPhoto(IFormFile file, CancellationToken cancellationToken)
+    {
+        var result = await _userRepository.UploadPhoto(file, User.GetUserId(), cancellationToken);
 
-        return BadRequest("Update failed.");
+        if (result == null)
+            return BadRequest("Update failed. See logger");
+
+        return result;
     }
 }

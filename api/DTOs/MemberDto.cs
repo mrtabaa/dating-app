@@ -15,5 +15,5 @@ public record MemberDto(
     [MinLength(10), MaxLength(500)] string Interests,
     [MinLength(3), MaxLength(20)] string City,
     [MinLength(3), MaxLength(20)] string Country,
-    IEnumerable<PhotoDto>? Photos
+    List<Photo> Photos
 );

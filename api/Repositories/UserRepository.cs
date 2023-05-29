@@ -3,17 +3,19 @@ public class UserRepository : IUserRepository
 {
 
     #region Db and Token Settings
-    const string _collectionName = "Users";
+    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser> _collection;
     private readonly ILogger<UserRepository> _logger;
+    private readonly IPhotoService _photoService;
 
     // constructor - dependency injections
     public UserRepository(
-        IMongoClient client, IMongoDbSettings dbSettings, ILogger<UserRepository> logger)
+        IMongoClient client, IMongoDbSettings dbSettings, ILogger<UserRepository> logger, IPhotoService photoService)
     {
-
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(_collectionName);
+
+        _photoService = photoService;
 
         _logger = logger;
     }
@@ -78,6 +80,56 @@ public class UserRepository : IUserRepository
 
     public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
+
+    public async Task<UpdateResult?> UploadPhoto(IFormFile file, string? userId, CancellationToken cancellationToken)
+    {
+        if (userId == null)
+        {
+            _logger.LogError("userId is Null");
+            return null;
+        }
+
+        var resultUrl = await _photoService.AddPhoto(file, userId);
+        if (resultUrl == null)
+        {
+            _logger.LogError("FilePath/resultUrl is Null");
+            return null;
+        }
+
+        var user = await GetUserById(userId, cancellationToken);
+        if (user == null)
+        {
+            _logger.LogError("user is Null / not found");
+            return null;
+        }
+
+        Photo photo;
+
+        if (!user.Photos.Any())
+        {
+            photo = new Photo(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Url: resultUrl,
+                IsMain: true
+            );
+        }
+        else
+        {
+            photo = new Photo(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Url: resultUrl,
+                IsMain: false
+            );
+        }
+
+        user.Photos.Add(photo);
+
+        var updatedUser = Builders<AppUser>.Update
+        .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+        .Set(doc => doc.Photos, user.Photos);
+
+        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
+    }
 
     #endregion CRUD
 }

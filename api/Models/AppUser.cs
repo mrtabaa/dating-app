@@ -18,5 +18,5 @@ public record AppUser(
     string Interests,
     string City,
     string Country,
-    IEnumerable<Photo> Photos
+    List<Photo> Photos
 );

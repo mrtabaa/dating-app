@@ -13,7 +13,7 @@ public record UserRegisterDto(
     string Interests,
     string City,
     string Country,
-    IEnumerable<Photo> Photos
+    List<Photo> Photos
 );
 
 public record LoginDto(

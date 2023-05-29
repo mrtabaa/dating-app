@@ -48,7 +48,7 @@ namespace api.DTOs
                     Interests: appUser.Interests,
                     City: appUser.City,
                     Country: appUser.Country,
-                    Photos: GeneratePhotoDtos(appUser.Photos)
+                    Photos: appUser.Photos
                 );
 
             return null;
@@ -57,22 +57,7 @@ namespace api.DTOs
         #endregion Generator Methods
 
         #region Helper Functions
-        private static IEnumerable<PhotoDto> GeneratePhotoDtos(IEnumerable<Photo> photos)
-        {
-            List<PhotoDto> photoDtos = new();
-
-            foreach (Photo photo in photos)
-            {
-                photoDtos.Add(new PhotoDto(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url: photo.Url,
-                    IsMain: photo.IsMain
-                ));
-            }
-
-            return photoDtos;
-        }
-
+        // some Functions
         #endregion Helper Functions
     }
 }
