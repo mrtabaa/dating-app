@@ -3,8 +3,11 @@ namespace api.DTOs;
 public record UserRegisterDto(
     string? Schema,
     [MinLength(2), MaxLength(20)] string Name,
-    [EmailAddress, MaxLength(50)] string Email,
-    [MinLength(7), MaxLength(20)] string Password,
+    [
+        MaxLength(50),
+        RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
+    ] string Email,
+    [DataType(DataType.Password), MinLength(7), MaxLength(20)] string Password,
     DateOnly DateOfBirth,
     string KnownAs,
     string Gender,
@@ -26,6 +29,5 @@ public record LoginSuccessDto(
     string Schema,
     string? Token,
     string? Name,
-    [EmailAddress] string? Email,
-    bool BadEmailPattern
+    [EmailAddress] string? Email
 );

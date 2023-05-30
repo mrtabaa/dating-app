@@ -16,9 +16,6 @@ public class AccountController : BaseApiController
     {
         LoginSuccessDto? user = await _accountRepository.Create(userIn);
 
-        if (user != null && user.BadEmailPattern)
-            return BadRequest("Invalid email format.");
-
         return user == null ? BadRequest("Email is already registered.") : user;
     }
 

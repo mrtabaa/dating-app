@@ -25,18 +25,6 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
-        // email format validation
-        if (!validateEmailPattern(userInput.Email))
-            return new LoginSuccessDto(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Token: null,
-                Name: null,
-                Email: null,
-                BadEmailPattern: true);
-
-        if (await CheckEmailExist(userInput.Email.ToLower()))
-            return null;
-
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
         // if insertion successful OR throw an exception
@@ -46,8 +34,7 @@ public class AccountRepository : IAccountRepository
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
             Token: _tokenService.CreateToken(appUser),
             Name: appUser.Name,
-            Email: appUser.Email,
-            BadEmailPattern: false
+            Email: appUser.Email
         );
     }
 
@@ -66,44 +53,11 @@ public class AccountRepository : IAccountRepository
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: _tokenService.CreateToken(user),
                 Name: user.Name,
-                Email: user.Email,
-                BadEmailPattern: false
+                Email: user.Email
             );
 
         _ = user ?? throw new ArgumentException("valid userInput but user was not created", nameof(user));
         return null;
     }
     #endregion CRUD
-
-    #region Helper methods
-    private async Task<bool> CheckEmailExist(string email) =>
-        null != await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync()
-        ? true : false;
-
-    /// <summary>
-    /// * TLD support from 2 to 5 chars (modify the values as you want)
-    /// * Supports: abc@gmail.com.us
-    /// * Not case-sensitive
-    /// * Stops operation if takes longer than 250ms and throw a detailed exception
-    /// </summary>
-    /// <param name="email"></param>
-    /// <returns>success: true | fail: false </returns>
-    /// <exception cref="ArgumentException"></exception>
-    private bool validateEmailPattern(string email)
-    {
-        try
-        {
-            return Regex.IsMatch(email,
-                @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$",
-                RegexOptions.None, TimeSpan.FromMilliseconds(250));
-        }
-        catch (RegexMatchTimeoutException)
-        {
-            // throw an exception explaining the task was failed 
-            _ = email ?? throw new ArgumentException("email, Timeout regexr processing.", nameof(email));
-            return false;
-        }
-    }
-
-    #endregion Helper methods
 }
