@@ -47,7 +47,7 @@ public class UserController : BaseApiController
 
     [RequestSizeLimit(40_000_000)]
     [HttpPost("add-photo")]
-    public async Task<ActionResult<UpdateResult>> AddPhoto([MaxFileSize(5_000_000)] IFormFileCollection files, CancellationToken cancellationToken)
+    public async Task<ActionResult<UpdateResult>> AddPhoto([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFileCollection files, CancellationToken cancellationToken)
     {
         if (!files.Any()) return BadRequest("Please select a file.");
 
