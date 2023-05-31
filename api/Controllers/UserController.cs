@@ -1,3 +1,5 @@
+using api.Extensions.Validations;
+
 namespace api.Controllers;
 
 [Authorize]
@@ -44,9 +46,11 @@ public class UserController : BaseApiController
     }
 
     [HttpPost("add-photo")]
-    public async Task<ActionResult<UpdateResult>> AddPhoto(IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<UpdateResult>> AddPhoto([MaxFileSize(5_000_000)] IEnumerable<IFormFile> files, CancellationToken cancellationToken)
     {
-        var result = await _userRepository.UploadPhoto(file, User.GetUserId(), cancellationToken);
+        if (!files.Any()) return BadRequest("Please select a file.");
+
+        var result = await _userRepository.UploadPhoto(files, User.GetUserId(), cancellationToken);
 
         if (result == null)
             return BadRequest("Update failed. See logger");

@@ -1,3 +1,5 @@
+using api.Extensions.Validations;
+
 namespace api.Services;
 
 public class PhotoService : IPhotoService
@@ -11,24 +13,36 @@ public class PhotoService : IPhotoService
         _logger = logger;
     }
 
-    public async Task<string?> AddPhoto(IFormFile photo, string? userId)
+    public async Task<IEnumerable<PhotoAddResults>> AddPhoto(IEnumerable<IFormFile> files, string? userId)
     {
+        List<PhotoAddResults> photoAddResults = new();
+
+        // find or create folder path
         string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/" + userId + "/");
         if (!Directory.Exists(uploadsFolder))
         {
             Directory.CreateDirectory(uploadsFolder);
         }
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + photo.FileName;
-        string filePath = Path.Combine(uploadsFolder + uniqueFileName);
+        // copy file/s to the folder
+        foreach (IFormFile file in files)
+        {
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+            string filePath = Path.Combine(uploadsFolder + uniqueFileName);
 
-        await photo.CopyToAsync(new FileStream(filePath, FileMode.Create));
+            photoAddResults.Add(new PhotoAddResults(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Url: filePath
+            ));
 
-        return filePath;
+            await file.CopyToAsync(new FileStream(filePath, FileMode.Create));
+        }
+
+        return photoAddResults;
     }
 
-    public async Task<string?> DeletePhoto(string url)
-    {
-        throw new NotImplementedException();
-    }
+    // public async Task<string?> DeletePhoto(string url)
+    // {
+    //     throw new NotImplementedException();
+    // }
 }

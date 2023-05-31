@@ -81,7 +81,7 @@ public class UserRepository : IUserRepository
     public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
 
-    public async Task<UpdateResult?> UploadPhoto(IFormFile file, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UploadPhoto(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
     {
         if (userId == null)
         {
@@ -89,10 +89,11 @@ public class UserRepository : IUserRepository
             return null;
         }
 
-        var resultUrl = await _photoService.AddPhoto(file, userId);
-        if (resultUrl == null)
+        // save file in Storage using PhotoService / userId makes the folder name
+        var photoAddResults = await _photoService.AddPhoto(files, userId);
+        if (!photoAddResults.Any())
         {
-            _logger.LogError("FilePath/resultUrl is Null");
+            _logger.LogError("photoAddResult is Null");
             return null;
         }
 
@@ -105,24 +106,26 @@ public class UserRepository : IUserRepository
 
         Photo photo;
 
-        if (!user.Photos.Any())
+        foreach (var photoAddResult in photoAddResults)
         {
-            photo = new Photo(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Url: resultUrl,
-                IsMain: true
-            );
+            if (!user.Photos.Any())
+            {
+                photo = new Photo(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url: photoAddResult.Url,
+                    IsMain: true
+                );
+            }
+            else
+            {
+                photo = new Photo(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url: photoAddResult.Url,
+                    IsMain: false
+                );
+            }
+            user.Photos.Add(photo);
         }
-        else
-        {
-            photo = new Photo(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Url: resultUrl,
-                IsMain: false
-            );
-        }
-
-        user.Photos.Add(photo);
 
         var updatedUser = Builders<AppUser>.Update
         .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
