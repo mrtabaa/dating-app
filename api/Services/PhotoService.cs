@@ -13,29 +13,35 @@ public class PhotoService : IPhotoService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<PhotoAddResults>> AddPhoto(IEnumerable<IFormFile> files, string? userId)
+    public async Task<IEnumerable<PhotoAddResultsDto>> AddPhoto(IEnumerable<IFormFile> formFiles, string? userId)
     {
-        List<PhotoAddResults> photoAddResults = new();
+        List<PhotoAddResultsDto> photoAddResults = new();
 
-        // find or create folder path
+        // find path OR create folder if doesn't exist by userId
         string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/" + userId + "/");
-        if (!Directory.Exists(uploadsFolder))
+        if (!Directory.Exists(uploadsFolder)) // create folder
         {
             Directory.CreateDirectory(uploadsFolder);
         }
 
         // copy file/s to the folder
-        foreach (IFormFile file in files)
+        foreach (IFormFile formFile in formFiles)
         {
-            string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-            string filePath = Path.Combine(uploadsFolder + uniqueFileName);
+            if (formFile.Length > 0)
+            {
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.FileName;
+                string filePath = Path.Combine(uploadsFolder + uniqueFileName);
 
-            photoAddResults.Add(new PhotoAddResults(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Url: filePath
-            ));
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await formFile.CopyToAsync(stream);
+                }
 
-            await file.CopyToAsync(new FileStream(filePath, FileMode.Create));
+                photoAddResults.Add(new PhotoAddResultsDto(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url: filePath
+                ));
+            }
         }
 
         return photoAddResults;

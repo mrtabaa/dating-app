@@ -1,6 +1,6 @@
 namespace api.DTOs;
 
-public record PhotoAddResults(
+public record PhotoAddResultsDto(
     string Schema,
     string Url
 );
