@@ -1,5 +1,3 @@
-using api.Extensions.Validations;
-
 namespace api.Controllers;
 
 [Authorize]
