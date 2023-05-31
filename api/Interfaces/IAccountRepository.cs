@@ -1,4 +1,5 @@
 namespace api.Interfaces;
+
 public interface IAccountRepository
 {
     public Task<LoginSuccessDto?> Create(UserRegisterDto userIn);
