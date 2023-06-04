@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { map, Observable } from 'rxjs';
 import { AccountService } from '../services/account.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard  {
   constructor(private accountService: AccountService, private router: Router, private snackbar: MatSnackBar) { }
   
   canActivate(
