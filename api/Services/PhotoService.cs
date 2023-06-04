@@ -37,6 +37,15 @@ public class PhotoService : IPhotoService
                     await formFile.CopyToAsync(stream);
                 }
 
+                #region Resize and Create Images
+                // await ResizePhotoExtensions.ResizeCreateImage_128x128(uploadsFolder, filePath, uniqueFileName);
+                await ResizePhotoExtensions.ResizeCreateImage_256x256(uploadsFolder, filePath, uniqueFileName);
+                // await ResizePhotoExtensions.ResizeCreateImage_512x512(uploadsFolder, filePath, uniqueFileName);
+                // await ResizePhotoExtensions.ResizeCreateImage_1024x1024(uploadsFolder, filePath, uniqueFileName);
+
+                await ResizePhotoExtensions.ResizeCreateImageByScale(uploadsFolder, filePath, uniqueFileName, formFile.Length);
+                #endregion Resize and Create Images
+
                 photoAddResults.Add(new PhotoAddResultsDto(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                     Url: filePath
