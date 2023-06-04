@@ -6,7 +6,7 @@ public class SeedUsersController : BaseApiController
 {
     #region Db Settings
     private readonly IMongoDatabase _database;
-    const string _collectionName = "Users";
+    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
 
     public SeedUsersController(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
