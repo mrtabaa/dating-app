@@ -25,6 +25,10 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
+        AppUser userExist = await _collection.Find<AppUser>(user => user.Email == userInput.Email).FirstOrDefaultAsync();
+        
+        if(userExist != null) return (null);
+
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
         // if insertion successful OR throw an exception
@@ -40,7 +44,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoginSuccessDto?> Login(LoginDto userInput)
     {
-        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower()).FirstOrDefaultAsync(_cancellationToken);
+        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
 
         if (user == null)
             return null;
