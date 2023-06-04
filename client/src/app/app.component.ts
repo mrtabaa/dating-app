@@ -10,7 +10,7 @@ import { LoadingService } from './services/loading.service';
 })
 export class AppComponent implements OnInit, AfterContentChecked {
   title = 'Dating App';
-  isLoading: boolean = true;
+  isLoading: boolean = false;
 
   constructor(
     private accountService: AccountService,
