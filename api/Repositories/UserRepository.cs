@@ -55,7 +55,7 @@ public class UserRepository : IUserRepository
 
     public async Task<MemberDto?> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        AppUser user = await _collection.Find<AppUser>(user => user.Email == email).FirstOrDefaultAsync(cancellationToken);
+        AppUser user = await _collection.Find<AppUser>(user => user.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         return user == null ? null : Mappers.GenerateMemberDto(user);
     }
@@ -66,11 +66,11 @@ public class UserRepository : IUserRepository
         {
             var updatedUser = Builders<AppUser>.Update
             .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-            .Set(user => user.Introduction, memberUpdateDto.Introduction)
-            .Set(user => user.LookingFor, memberUpdateDto.LookingFor)
-            .Set(user => user.Interests, memberUpdateDto.Interests)
-            .Set(user => user.City, memberUpdateDto.City)
-            .Set(user => user.Country, memberUpdateDto.Country);
+            .Set(user => user.Introduction, memberUpdateDto.Introduction.Trim())
+            .Set(user => user.LookingFor, memberUpdateDto.LookingFor.Trim())
+            .Set(user => user.Interests, memberUpdateDto.Interests.Trim())
+            .Set(user => user.City, memberUpdateDto.City.Trim())
+            .Set(user => user.Country, memberUpdateDto.Country.Trim());
 
             return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
         }
