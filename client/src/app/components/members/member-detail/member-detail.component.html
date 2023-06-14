@@ -1,7 +1,7 @@
 <main *ngIf="member$ | async as member">
     <mat-card>
         <ng-container *ngFor="let photo of member.photos">
-            <img *ngIf="photo.isMain" mat-card-image src="{{photo.url || './assets/images/defaults/user.png'}}"
+            <img *ngIf="photo.isMain" mat-card-image src="{{photo.url_128 || './assets/images/defaults/user.png'}}"
                 alt="Photo of {{member.knownAs}}">
         </ng-container>
         <mat-card-content>

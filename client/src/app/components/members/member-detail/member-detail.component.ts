@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from '@kolkov/ngx-gallery';
-import { Observable, Subscription, map } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Member } from 'src/app/models/member.model';
 import { MemberService } from 'src/app/services/member.service';
 
@@ -44,9 +44,9 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
         for (const photo of member.photos) {
           this.galleryImages.push(
             {
-              small: photo.url,
-              medium: photo.url,
-              big: photo.url
+              small: photo.url_128,
+              medium: photo.url_512,
+              big: photo.url_1024
             }
           );
         }

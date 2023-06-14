@@ -19,7 +19,7 @@ export class MemberCardComponent implements OnInit {
     if (this.member)
     for (const photo of this.member.photos) {
       if (photo.isMain) {
-        this.mainUrl = photo.url;
+        this.mainUrl = photo.url_128;
       }
     }
   }
