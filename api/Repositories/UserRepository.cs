@@ -89,14 +89,6 @@ public class UserRepository : IUserRepository
             return null;
         }
 
-        // save file in Storage using PhotoService / userId makes the folder name
-        var photoAddResults = await _photoService.AddPhoto(files, userId);
-        if (!photoAddResults.Any())
-        {
-            _logger.LogError("photoAddResult is Null");
-            return null;
-        }
-
         var user = await GetUserById(userId, cancellationToken);
         if (user == null)
         {
@@ -104,27 +96,45 @@ public class UserRepository : IUserRepository
             return null;
         }
 
+        // save file in Storage using PhotoService / userId makes the folder name
+        IEnumerable<PhotoAddResultsDto> photoAddResults = await _photoService.AddPhoto(files, userId);
+        if (!photoAddResults.Any())
+        {
+            _logger.LogError("photoAddResult is Null");
+            return null;
+        }
+
         Photo photo;
 
-        foreach (var photoAddResult in photoAddResults)
+        foreach (PhotoAddResultsDto photoAddResult in photoAddResults)
         {
-            if (!user.Photos.Any())
+            // if conversion fails
+            if (photoAddResult.Url is null)
             {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url: photoAddResult.Url,
-                    IsMain: true
-                );
+                _logger.LogError("Photo addition failed. e.g. Height/Weight input is larger than the original image size.");
+                return null;
             }
             else
             {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url: photoAddResult.Url,
-                    IsMain: false
-                );
+                // if user's album is empty
+                if (!user.Photos.Any())
+                {
+                    photo = new Photo(
+                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                        Url: photoAddResult.Url,
+                        IsMain: true
+                    );
+                }
+                else
+                {
+                    photo = new Photo(
+                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                        Url: photoAddResult.Url,
+                        IsMain: false
+                    );
+                }
+                user.Photos.Add(photo);
             }
-            user.Photos.Add(photo);
         }
 
         var updatedUser = Builders<AppUser>.Update
