@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using SkiaSharp;
 
 namespace api.Services;
@@ -8,13 +7,14 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
 
-    readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop" };
+    readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
     private enum OperationName
     {
         ResizeByScale,
         ResizeByPixel,
         ResizeByPixelSquare,
-        Crop
+        Crop,
+        Original
     }
 
     public PhotoModifySaveService(IWebHostEnvironment webHostEnvironment)
@@ -27,13 +27,15 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
     public async Task<string?> ResizeImageByScale(IFormFile formFile, string userId)
     {
+        // performace
+        if (formFile.Length < 300_000)
+            return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
+
+        // do the job
         float resizeFactor = 0;
 
         switch (formFile.Length)
         {
-            case < 300_000:
-                resizeFactor = 1f;
-                break;
             case < 500_000:
                 resizeFactor = 0.9f;
                 break;
@@ -86,6 +88,11 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
     public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
+        // performace
+        if (widthIn * heightIn <= formFile.Length)
+            return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
+
+        // do the job
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -111,8 +118,9 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         }
     }
 
-    public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int side)
+    public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int sideIn)
     {
+        // performace
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -121,10 +129,18 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            // make width & height equal to crop with square shape
-            int equalSide = Math.Min(skImage.Width, skImage.Height);
+            ///// performance: skip resize
+            if (sideIn * sideIn <= formFile.Length && skImage.Width == skImage.Height)
+                // save original file
+                return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
 
-            int test = Math.Min(100, 100);
+            if (sideIn * sideIn <= formFile.Length)
+                // crop to square and save
+                return await CropAndSave(formFile, userId, sideIn, sideIn);
+            /////
+
+            // get the smaller side to crop with square shape
+            int equalSide = Math.Min(skImage.Width, skImage.Height);
 
             // crop
             SKImage? croppedImage = CropImageForResize(skImage, equalSide, equalSide);
@@ -133,12 +149,12 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             {
                 // resize
                 using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
-                using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(side, side), SKFilterQuality.High);
+                using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
 
                 using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
                 using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
 
-                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, side, side);
+                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
 
                 return filePath;
             }
@@ -197,24 +213,17 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     }
     #endregion Crop Methods
 
-    #region Save Method
-    private async Task<string?> SaveImage(SKData sKData, string userId, string fileName, int operation,
-                                         [Optional] int? width, [Optional] int? height)
+    #region Save Methods
+    private async Task<string?> SaveImage(SKData sKData, string userId, string fileName, int operation, int width, int height)
     {
         string uploadsFolder = string.Empty;
 
-        if (operation == (int)OperationName.ResizeByScale)
-            uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/",
-                                        userId, operations[operation]);
-        else
-            uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/",
-                                        userId, operations[operation],
-                                        Convert.ToString(width) + "x" + Convert.ToString(height));
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation],
+                                    Convert.ToString(width) + "x" + Convert.ToString(height));
+
         // find path OR create folder if doesn't exist by userId
         if (!Directory.Exists(uploadsFolder)) // create folder
-        {
             Directory.CreateDirectory(uploadsFolder);
-        }
 
         string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
 
@@ -231,5 +240,55 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
         return filePath;
     }
-    #endregion Save Method
+
+    private async Task<string?> SaveImage(SKData sKData, string userId, string fileName, int operation)
+    {
+        string uploadsFolder = string.Empty;
+
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation]);
+
+        // find path OR create folder if doesn't exist by userId
+        if (!Directory.Exists(uploadsFolder)) // create folder
+            Directory.CreateDirectory(uploadsFolder);
+
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+
+        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            sKData.AsStream().Seek(0, SeekOrigin.Begin);
+            await sKData.AsStream().CopyToAsync(fileStream);
+
+            fileStream.Flush();
+            fileStream.Close();
+        }
+
+        return filePath;
+    }
+
+    private async Task<string?> SaveImage(IFormFile formFile, string userId, string fileName, int operation)
+    {
+        string uploadsFolder = string.Empty;
+
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation]);
+
+        // find path OR create folder if doesn't exist by userId
+        if (!Directory.Exists(uploadsFolder)) // create folder
+            Directory.CreateDirectory(uploadsFolder);
+
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+
+        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        Path.Combine(uploadsFolder + uniqueFileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await formFile.CopyToAsync(stream);
+        }
+
+        return filePath;
+    }
+    #endregion SaveMethods
 }
