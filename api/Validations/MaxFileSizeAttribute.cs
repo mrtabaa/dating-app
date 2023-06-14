@@ -12,10 +12,10 @@ public class MaxFileSizeAttribute : ValidationAttribute
     {
         var files = values as IEnumerable<IFormFile>;
 
-        if (files != null && files.Any())
+        if (files is not null && files.Any())
             foreach (var file in files)
             {
-                if (file != null && file.Length > _maxFileSize)
+                if (file is not null && file.Length > _maxFileSize)
                 {
                     return new ValidationResult($"One or more of the files is over the maximum size of {_maxFileSize / 1_000_000} megabytes.");
                 }

@@ -26,8 +26,8 @@ public class AccountRepository : IAccountRepository
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
         AppUser userExist = await _collection.Find<AppUser>(user => user.Email == userInput.Email).FirstOrDefaultAsync();
-        
-        if(userExist != null) return (null);
+
+        if (userExist is not null) return (null);
 
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
@@ -46,13 +46,13 @@ public class AccountRepository : IAccountRepository
     {
         var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
 
-        if (user == null)
+        if (user is null)
             return null;
 
         using var hmac = new HMACSHA512(user.PasswordSalt!);
 
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
-        if (user.PasswordHash != null && user.PasswordHash.SequenceEqual(ComputedHash))
+        if (user.PasswordHash is not null && user.PasswordHash.SequenceEqual(ComputedHash))
             return new LoginSuccessDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: _tokenService.CreateToken(user),

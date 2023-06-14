@@ -6,7 +6,7 @@ public static class IdentityServiceExtensions
     {
         string? tokenValue = config[AppVariablesExtensions.TokenKey];
 
-        if (tokenValue != null)
+        if (tokenValue is not null)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

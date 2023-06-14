@@ -32,7 +32,7 @@ namespace api.DTOs
 
         public static MemberDto? GenerateMemberDto(AppUser appUser)
         {
-            if (!(appUser.Id == null || appUser.Schema == null))
+            if (!(appUser.Id is null || appUser.Schema is null))
                 return new MemberDto(
                     Schema: appUser.Schema,
                     Id: appUser.Id,

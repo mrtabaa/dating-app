@@ -5,10 +5,10 @@ public class AllowedFileExtensions : ValidationAttribute
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         var files = value as IEnumerable<IFormFile>;
-        if (files != null && files.Any())
+        if (files is not null && files.Any())
             foreach (IFormFile file in files)
             {
-                if (file != null)
+                if (file is not null)
                 {
                     if (!IsFileValid(file))
                     {

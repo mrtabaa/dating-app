@@ -24,7 +24,7 @@ public class BuggyController : BaseApiController
     public ActionResult<AppUser> GetNotFound()
     {
         AppUser thing = _collection.Find<AppUser>(user => user.Email == "no email").FirstOrDefault();
-        if (thing == null)
+        if (thing is null)
         {
             return NotFound(); // return 404
         }

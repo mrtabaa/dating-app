@@ -43,11 +43,11 @@ public class UserRepository : IUserRepository
 
     public async Task<MemberDto?> GetUserById(string? userId, CancellationToken cancellationToken)
     {
-        if (userId != null)
+        if (userId is not null)
         {
             AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-            return user == null ? null : Mappers.GenerateMemberDto(user);
+            return user is null ? null : Mappers.GenerateMemberDto(user);
         }
 
         return null;
@@ -57,12 +57,12 @@ public class UserRepository : IUserRepository
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
-        return user == null ? null : Mappers.GenerateMemberDto(user);
+        return user is null ? null : Mappers.GenerateMemberDto(user);
     }
 
     public async Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
     {
-        if (userId != null)
+        if (userId is not null)
         {
             var updatedUser = Builders<AppUser>.Update
             .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
@@ -83,14 +83,14 @@ public class UserRepository : IUserRepository
 
     public async Task<UpdateResult?> UploadPhoto(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
     {
-        if (userId == null)
+        if (userId is null)
         {
             _logger.LogError("userId is Null");
             return null;
         }
 
         var user = await GetUserById(userId, cancellationToken);
-        if (user == null)
+        if (user is null)
         {
             _logger.LogError("user is Null / not found");
             return null;

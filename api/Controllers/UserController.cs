@@ -22,7 +22,7 @@ public class UserController : BaseApiController
     {
         MemberDto? user = await _userRepository.GetUserById(id, cancellationToken);
 
-        return user == null ? BadRequest("No user found by this ID.") : user;
+        return user is null ? BadRequest("No user found by this ID.") : user;
     }
 
     [HttpGet("email/{email}")]
@@ -30,7 +30,7 @@ public class UserController : BaseApiController
     {
         MemberDto? user = await _userRepository.GetUserByEmail(email, cancellationToken);
 
-        return user == null ? BadRequest("No user found by this Email.") : user;
+        return user is null ? BadRequest("No user found by this Email.") : user;
     }
 
     [HttpPut()]
@@ -38,7 +38,7 @@ public class UserController : BaseApiController
     {
         MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 
-        return user == null
+        return user is null
             ? BadRequest("Update failed.")
             : await _userRepository.UpdateUser(memberUpdateDto, User.GetUserId(), cancellationToken);
     }
@@ -51,7 +51,7 @@ public class UserController : BaseApiController
 
         var result = await _userRepository.UploadPhoto(files, User.GetUserId(), cancellationToken);
 
-        if (result == null)
+        if (result is null)
             return BadRequest("Update failed. See logger");
 
         return result;
