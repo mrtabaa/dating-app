@@ -1,6 +1,6 @@
 namespace api.Interfaces;
 
-public interface IPhotoModifyService
+public interface IPhotoModifySaveService
 {
     public Task<string?> ResizeImageByScale(IFormFile formFile, string userId);
     public Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn);

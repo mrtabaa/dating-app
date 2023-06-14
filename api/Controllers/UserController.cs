@@ -49,7 +49,7 @@ public class UserController : BaseApiController
     {
         if (!files.Any()) return BadRequest("Please select a file.");
 
-        var result = await _userRepository.UploadPhoto(files, User.GetUserId(), cancellationToken);
+        var result = await _userRepository.UploadPhotos(files, User.GetUserId(), cancellationToken);
 
         if (result is null)
             return BadRequest("Update failed. See logger");

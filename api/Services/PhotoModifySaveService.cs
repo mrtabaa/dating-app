@@ -3,7 +3,7 @@ using SkiaSharp;
 
 namespace api.Services;
 
-public class PhotoModifyService : IPhotoModifyService
+public class PhotoModifySaveService : IPhotoModifySaveService
 {
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -17,7 +17,7 @@ public class PhotoModifyService : IPhotoModifyService
         Crop
     }
 
-    public PhotoModifyService(IWebHostEnvironment webHostEnvironment)
+    public PhotoModifySaveService(IWebHostEnvironment webHostEnvironment)
     {
         _webHostEnvironment = webHostEnvironment;
     }
