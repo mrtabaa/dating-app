@@ -81,7 +81,7 @@ public class UserRepository : IUserRepository
     public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
 
-    public async Task<UpdateResult?> UploadPhoto(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UploadPhotos(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
         {
@@ -97,49 +97,11 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
-        IEnumerable<PhotoAddResultsDto> photoAddResults = await _photoService.AddPhoto(files, userId);
-        if (!photoAddResults.Any())
-        {
-            _logger.LogError("photoAddResult is Null");
-            return null;
-        }
-
-        Photo photo;
-
-        foreach (PhotoAddResultsDto photoAddResult in photoAddResults)
-        {
-            // if conversion fails
-            if (photoAddResult.Url is null)
-            {
-                _logger.LogError("Photo addition failed. e.g. Height/Weight input is larger than the original image size.");
-                return null;
-            }
-            else
-            {
-                // if user's album is empty
-                if (!user.Photos.Any())
-                {
-                    photo = new Photo(
-                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                        Url: photoAddResult.Url,
-                        IsMain: true
-                    );
-                }
-                else
-                {
-                    photo = new Photo(
-                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                        Url: photoAddResult.Url,
-                        IsMain: false
-                    );
-                }
-                user.Photos.Add(photo);
-            }
-        }
+        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotos(files, userId, user.Photos);
 
         var updatedUser = Builders<AppUser>.Update
         .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-        .Set(doc => doc.Photos, user.Photos);
+        .Set(doc => doc.Photos, addedPhotos);
 
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
     }
