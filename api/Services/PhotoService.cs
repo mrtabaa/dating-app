@@ -20,35 +20,28 @@ public class PhotoService : IPhotoService
         {
             if (formFile.Length > 0)
             {
-                #region Resize and Store Images on Disk
-                // filePath_scale = await _photoModifyService.ResizeImageByScale(formFile, userId);
+                #region Resize and/or Store Images to Disk
+                // string? filePath_original = await _photoModifyService.SaveImage(formFile, userId, 4); // 4 is from the service's ENUM
+
+                // string? filePath_scale = await _photoModifyService.ResizeImageByScale(formFile, userId);
 
                 // string? filePath_var = await _photoModifyService.ResizeByPixel(formFile, userId, 500, 1000);
 
                 string? filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
                 // string? filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
                 string? filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
-                // string? filePath_1024_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
+                string? filePath_1024_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
 
-                string? filePath_crop = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
-
-                #region if saving the original file
-                // string filePath = Path.Combine(uploadsFolder + uniqueFileName);
-
-                // using (var stream = new FileStream(filePath, FileMode.Create))
-                // {
-                //     await formFile.CopyToAsync(stream);
-                // }
-                #endregion
+                // string? filePath_crop = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
 
 
                 // if conversion fails
-                if (filePath_128_sq is null || filePath_512_sq is null || filePath_crop is null)
+                if (filePath_128_sq is null || filePath_512_sq is null || filePath_1024_sq is null)
                 {
                     _logger.LogError("Photo addition failed. e.g. Height/Weight input is larger than the original image size.");
                     return null;
                 }
-                #endregion Resize and Create Images on Disk
+                #endregion Resize and Create Images to Disk
 
                 #region Create Photos list to save to db
                 // if user's album is empty
@@ -60,6 +53,7 @@ public class PhotoService : IPhotoService
                         Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                         Url_128: filePath_128_sq,
                         Url_512: filePath_512_sq,
+                        Url_1024: filePath_1024_sq,
                         IsMain: true
                     );
                 }
@@ -69,6 +63,7 @@ public class PhotoService : IPhotoService
                         Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                         Url_128: filePath_128_sq,
                         Url_512: filePath_512_sq,
+                        Url_1024: filePath_1024_sq,
                         IsMain: false
                     );
                 }

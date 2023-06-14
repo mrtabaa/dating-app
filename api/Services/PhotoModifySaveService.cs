@@ -29,7 +29,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     {
         // performace
         if (formFile.Length < 300_000)
-            return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
+            return await SaveImage(formFile, userId, (int)OperationName.Original); // return filePath
 
         // do the job
         float resizeFactor = 0;
@@ -89,8 +89,8 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         // performace
-        if (widthIn * heightIn <= formFile.Length)
-            return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
+        if (widthIn * heightIn >= formFile.Length)
+            return await SaveImage(formFile, userId, (int)OperationName.Original); // return filePath
 
         // do the job
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
@@ -129,12 +129,12 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            ///// performance: skip resize
-            if (sideIn * sideIn <= formFile.Length && skImage.Width == skImage.Height)
+            ///// performance: SKIP RESIZE
+            if (sideIn * sideIn >= formFile.Length && skImage.Width == skImage.Height)
                 // save original file
-                return await SaveImage(formFile, userId, formFile.Name, (int)OperationName.Original); // return filePath
+                return await SaveImage(formFile, userId, (int)OperationName.Original); // return filePath
 
-            if (sideIn * sideIn <= formFile.Length)
+            if (sideIn * sideIn >= formFile.Length)
                 // crop to square and save
                 return await CropAndSave(formFile, userId, sideIn, sideIn);
             /////
@@ -267,7 +267,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         return filePath;
     }
 
-    private async Task<string?> SaveImage(IFormFile formFile, string userId, string fileName, int operation)
+    public async Task<string?> SaveImage(IFormFile formFile, string userId, int operation)
     {
         string uploadsFolder = string.Empty;
 
@@ -277,7 +277,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.Name;
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
