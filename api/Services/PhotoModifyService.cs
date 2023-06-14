@@ -1,18 +1,19 @@
 using System.Runtime.InteropServices;
 using SkiaSharp;
 
-namespace api.Extensions;
+namespace api.Services;
 
 public class PhotoModifyService : IPhotoModifyService
 {
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
 
-    readonly string[] operations = { "resize-scale", "resize-pixel", "crop" };
-    private enum Operation
+    readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop" };
+    private enum OperationName
     {
         ResizeByScale,
         ResizeByPixel,
+        ResizeByPixelSquare,
         Crop
     }
 
@@ -77,13 +78,13 @@ public class PhotoModifyService : IPhotoModifyService
             using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
             using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Jpeg, 100);
 
-            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)Operation.ResizeByScale);
+            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
 
             return filePath;
         }
     }
 
-    public async Task<string?> ResizeImageByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
+    public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
@@ -93,46 +94,59 @@ public class PhotoModifyService : IPhotoModifyService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            if (skImage.Width != skImage.Height)
+            using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
+
+            int width = Math.Min(widthIn, sourceBitmap.Width);
+            int height = Math.Min(heightIn, sourceBitmap.Height);
+
+            // resize
+            using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.High);
+
+            using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
+            using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+
+            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
+
+            return filePath;
+        }
+    }
+
+    public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int side)
+    {
+        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
+        {
+            // get image from formFile
+            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+
+            // convert imageData to SKImage
+            using SKImage skImage = SKImage.FromEncodedData(imageData);
+
+            // make width & height equal to crop with square shape
+            int equalSide = Math.Min(skImage.Width, skImage.Height);
+
+            int test = Math.Min(100, 100);
+
+            // crop
+            SKImage? croppedImage = CropImageForResize(skImage, equalSide, equalSide);
+
+            if (croppedImage is not null)
             {
-                int equalSide = Math.Min(skImage.Width, skImage.Height); // make width & height equal to crop with square shape
-                SKImage? croppedImage = CropImageForResize(skImage, equalSide, equalSide);
-
-                if (croppedImage is not null)
-                {
-                    // resize
-                    using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
-                    using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
-
-                    using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-                    using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
-
-                    string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)Operation.ResizeByPixel, widthIn, heightIn);
-
-                    return filePath;
-                }
-
-                return null;
-            }
-            else
-            {
-                using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
-
-                int width = Math.Min(widthIn, sourceBitmap.Width);
-                int height = Math.Min(heightIn, sourceBitmap.Height);
-
                 // resize
-                using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.High);
+                using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
+                using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(side, side), SKFilterQuality.High);
 
                 using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
                 using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
 
-                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)Operation.ResizeByPixel, widthIn, heightIn);
+                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, side, side);
 
                 return filePath;
             }
+
+            return null;
         }
     }
+
     #endregion Resize Methods 
 
     #region Crop Methods
@@ -149,7 +163,7 @@ public class PhotoModifyService : IPhotoModifyService
         return sKImage.Subset(SKRectI.Create(startX, startY, width, height));
     }
 
-    public async Task<string?> CropImageAndSave(IFormFile formFile, string userId, int widthIn, int heightIn)
+    public async Task<string?> CropAndSave(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
@@ -174,7 +188,7 @@ public class PhotoModifyService : IPhotoModifyService
                 SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
                 using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
 
-                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)Operation.Crop, widthIn, heightIn);
+                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
 
                 return filePath;
             }
@@ -189,7 +203,7 @@ public class PhotoModifyService : IPhotoModifyService
     {
         string uploadsFolder = string.Empty;
 
-        if (operation == (int)Operation.ResizeByScale)
+        if (operation == (int)OperationName.ResizeByScale)
             uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/",
                                         userId, operations[operation]);
         else

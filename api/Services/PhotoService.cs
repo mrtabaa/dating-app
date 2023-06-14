@@ -23,14 +23,16 @@ public class PhotoService : IPhotoService
                 string? filePath = string.Empty;
 
                 #region Resize and Create Images
-                filePath = await _photoModifyService.ResizeImageByScale(formFile, userId);
+                // filePath = await _photoModifyService.ResizeImageByScale(formFile, userId);
 
-                filePath = await _photoModifyService.ResizeImageByPixel(formFile, userId, 128, 128);
-                filePath = await _photoModifyService.ResizeImageByPixel(formFile, userId, 256, 256);
-                filePath = await _photoModifyService.ResizeImageByPixel(formFile, userId, 512, 512);
-                filePath = await _photoModifyService.ResizeImageByPixel(formFile, userId, 1024, 1024);
+                // filePath = await _photoModifyService.ResizeByPixel(formFile, userId, 500, 1000);
 
-                filePath = await _photoModifyService.CropImageAndSave(formFile, userId, 1000, 1200);
+                filePath = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
+                // filePath = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
+                filePath = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
+                // filePath = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
+
+                // filePath = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
                 #endregion Resize and Create Images
 
                 #region if saving the original file
