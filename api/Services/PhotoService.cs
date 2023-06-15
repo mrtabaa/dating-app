@@ -74,4 +74,9 @@ public class PhotoService : IPhotoService
 
         return userPhotos;
     }
+
+    // public async Task<string?> DeleteOnePhoto(string url)
+    // {
+        
+    // }
 }

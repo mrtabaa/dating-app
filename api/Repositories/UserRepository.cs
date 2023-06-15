@@ -106,5 +106,12 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
     }
 
+    public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? urlIn, CancellationToken cancellationToken)
+    {
+        var update = Builders<AppUser>.Update.PullFilter(user => user.Photos, photo => photo.Url_128 == urlIn);
+        
+        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, update, null, cancellationToken);
+    }
+
     #endregion CRUD
 }
