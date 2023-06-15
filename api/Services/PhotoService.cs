@@ -13,7 +13,7 @@ public class PhotoService : IPhotoService
     }
     #endregion
 
-    public async Task<IEnumerable<Photo>?> AddPhotos(IEnumerable<IFormFile> formFiles, string userId, List<Photo> userPhotos)
+    public async Task<IEnumerable<Photo>?> AddPhotosToDisk(IEnumerable<IFormFile> formFiles, string userId, List<Photo> userPhotos)
     {
         // copy file/s to the folder
         foreach (IFormFile formFile in formFiles)
@@ -75,8 +75,19 @@ public class PhotoService : IPhotoService
         return userPhotos;
     }
 
-    // public async Task<string?> DeleteOnePhoto(string url)
-    // {
-        
-    // }
+    public bool DeletePhotoFromDisk(IEnumerable<string> filePaths)
+    {
+        // delete all 3 resolutions
+        foreach (var filePath in filePaths)
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            else
+                return false;
+        }
+
+        return true;
+    }
 }

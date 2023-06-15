@@ -97,7 +97,7 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
-        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotos(files, userId, user.Photos);
+        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotosToDisk(files, userId, user.Photos);
 
         var updatedUser = Builders<AppUser>.Update
         .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
@@ -108,8 +108,32 @@ public class UserRepository : IUserRepository
 
     public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? urlIn, CancellationToken cancellationToken)
     {
+        List<string> photoUrls = new();
+
+        List<Photo>? photos = await _collection.AsQueryable().Where<AppUser>(user => user.Id == userId).Select(elem => elem.Photos).SingleOrDefaultAsync();
+
+        if (photos is null || !photos.Any())
+        {
+            _logger.LogError("Album is empty. No photo to delete.");
+            return null;
+        }
+
+        foreach (Photo photo in photos)
+        {
+            if (photo.Url_128 == urlIn)
+            {
+                photoUrls.Add(photo.Url_128);
+                photoUrls.Add(photo.Url_512);
+                photoUrls.Add(photo.Url_1024);
+            }
+        }
+
+        bool isDeleteSuccess = _photoService.DeletePhotoFromDisk(photoUrls);
+        if (!isDeleteSuccess)
+            _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
+
         var update = Builders<AppUser>.Update.PullFilter(user => user.Photos, photo => photo.Url_128 == urlIn);
-        
+
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, update, null, cancellationToken);
     }
 
