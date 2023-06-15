@@ -36,11 +36,11 @@ public class UserController : BaseApiController
     [HttpPut()]
     public async Task<ActionResult<UpdateResult?>> UpdateUser(MemberUpdateDto memberUpdateDto, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
+        // MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 
-        return user is null
-            ? BadRequest("Update failed.")
-            : await _userRepository.UpdateUser(memberUpdateDto, User.GetUserId(), cancellationToken);
+        var result = await _userRepository.UpdateUser(memberUpdateDto, User.GetUserId(), cancellationToken);
+
+        return result is null ? BadRequest("Update failed. See logger") : result;
     }
 
     [RequestSizeLimit(40_000_000)]
