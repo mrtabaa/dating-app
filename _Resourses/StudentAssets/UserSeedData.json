@@ -1,6 +1,8 @@
 [
     {
-        "UserName": "Lisa",
+        "Name": "Lisa",
+        "Email": "a@a.com",
+        "Password": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1956-07-22",
         "KnownAs": "Lisa",
@@ -13,13 +15,17 @@
         "Country": "Martinique",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/women/54.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/women/54.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/women/54.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/women/54.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Karen",
+        "Name": "Karen",
+        "Email": "a2@a.com",
+        "Password": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1995-10-12",
         "KnownAs": "Karen",
@@ -32,13 +38,17 @@
         "Country": "Grenada",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/women/50.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/women/50.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/women/50.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/women/50.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Margo",
+        "Name": "Margo",
+        "Email": "a3@a.com",
+        "Password": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1959-01-24",
         "KnownAs": "Margo",
@@ -51,13 +61,17 @@
         "Country": "Svalbard and Jan Mayen Islands",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/women/14.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/women/14.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/women/14.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/women/14.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Lois",
+        "Name": "Lois",
+        "Email": "a4@a.com",
+        "Password": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1988-06-22",
         "KnownAs": "Lois",
@@ -70,13 +84,17 @@
         "Country": "Zimbabwe",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/women/11.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/women/11.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/women/11.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/women/11.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Ruthie",
+        "Name": "Ruthie",
+        "Email": "a5@a.com",
+        "Password": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1956-01-12",
         "KnownAs": "Ruthie",
@@ -89,13 +107,17 @@
         "Country": "Antigua and Barbuda",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/women/84.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/women/84.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/women/84.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/women/84.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Todd",
+        "Name": "Todd",
+        "Email": "a6@a.com",
+        "Password": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1950-02-07",
         "KnownAs": "Todd",
@@ -108,13 +130,17 @@
         "Country": "British Indian Ocean Territory",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/men/90.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/men/90.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/men/90.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/men/90.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Porter",
+        "Name": "Porter",
+        "Email": "a7@a.com",
+        "Password": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1967-04-09",
         "KnownAs": "Porter",
@@ -127,13 +153,17 @@
         "Country": "Christmas Island",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/men/87.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/men/87.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/men/87.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/men/87.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Mayo",
+        "Name": "Mayo",
+        "Email": "a8@a.com",
+        "Password": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1990-03-23",
         "KnownAs": "Mayo",
@@ -146,13 +176,17 @@
         "Country": "Burkina Faso",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/men/57.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/men/57.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/men/57.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/men/57.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Skinner",
+        "Name": "Skinner",
+        "Email": "a9@a.com",
+        "Password": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1952-12-01",
         "KnownAs": "Skinner",
@@ -165,13 +199,17 @@
         "Country": "Poland",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/men/11.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/men/11.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/men/11.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/men/11.jpg",
                 "IsMain": true
             }
         ]
     },
     {
-        "UserName": "Davis",
+        "Name": "Davis",
+        "Email": "b@b.com",
+        "Password": "bbbbbbbb",
         "Gender": "male",
         "DateOfBirth": "1978-03-20",
         "KnownAs": "Davis",
@@ -184,7 +222,9 @@
         "Country": "Luxembourg",
         "Photos": [
             {
-                "Url": "https://randomuser.me/api/portraits/men/93.jpg",
+                "Url_128": "https://randomuser.me/api/portraits/men/93.jpg",
+                "Url_512": "https://randomuser.me/api/portraits/men/93.jpg",
+                "Url_1024": "https://randomuser.me/api/portraits/men/93.jpg",
                 "IsMain": true
             }
         ]
