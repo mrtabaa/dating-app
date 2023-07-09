@@ -6,6 +6,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+import { NgOptimizedImage } from '@angular/common'
+
 
 //pipes
 import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
@@ -59,6 +61,7 @@ const components = [
     MaterialModule,
     DirectiveModule,
     NgxGalleryModule,
+    NgOptimizedImage
   ],
   exports: [components]
 })

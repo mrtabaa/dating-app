@@ -10,8 +10,10 @@
     <section *ngIf="member$ | async as member" class="content">
         <mat-card>
             <ng-container *ngFor="let photo of member.photos">
-                <img *ngIf="photo.isMain" mat-card-image src="{{photo.url || './assets/images/defaults/user.png'}}"
+                <img *ngIf="photo.isMain" mat-card-image ngSrc="{{photo.url_128}}" width="128" height="128"
                     alt="Photo of {{member.knownAs}}">
+                <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}"
+                    width="128" height="128" alt="Photo of {{member.knownAs}}">
             </ng-container>
             <mat-card-content>
                 <div>
@@ -99,8 +101,8 @@
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>Country</mat-label>
-                        <input cdkTextareaAutosize formControlName="countryCtrl"
-                            placeholder="Enter your country." matInput required>
+                        <input cdkTextareaAutosize formControlName="countryCtrl" placeholder="Enter your country."
+                            matInput required>
                         <mat-error *ngIf="CountryCtrl.hasError('required')">This field is required</mat-error>
                         <mat-error *ngIf="CountryCtrl.hasError('minlength')">
                             Minimum of {{minInputChars}} characters is requried.
