@@ -11,6 +11,7 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { MaterialModule } from './modules/material.module';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
     HttpClientModule,
 
     ComponentModule,
-    MaterialModule
+    MaterialModule,
+    BrowserAnimationsModule
   ],
   providers: [
     CountryListService,
