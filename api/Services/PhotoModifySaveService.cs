@@ -6,6 +6,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 {
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
+    const string storageAddress = "Storage/Photos/";
 
     readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
     private enum OperationName
@@ -218,7 +219,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     {
         string uploadsFolder = string.Empty;
 
-        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation],
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, storageAddress, userId, operations[operation],
                                     Convert.ToString(width) + "x" + Convert.ToString(height));
 
         // find path OR create folder if doesn't exist by userId
@@ -245,7 +246,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     {
         string uploadsFolder = string.Empty;
 
-        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation]);
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, storageAddress, userId, operations[operation]);
 
         // find path OR create folder if doesn't exist by userId
         if (!Directory.Exists(uploadsFolder)) // create folder
@@ -271,7 +272,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     {
         string uploadsFolder = string.Empty;
 
-        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Storage/Photos/", userId, operations[operation]);
+        uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, storageAddress, userId, operations[operation]);
 
         // find path OR create folder if doesn't exist by userId
         if (!Directory.Exists(uploadsFolder)) // create folder
