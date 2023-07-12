@@ -1,0 +1,15 @@
+.container{
+    display: flex;
+    gap: 1rem;
+
+    
+    div {
+        width: 128px;
+        
+        .buttons {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+    }
+}

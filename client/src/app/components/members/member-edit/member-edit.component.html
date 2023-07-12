@@ -41,84 +41,87 @@
             </mat-card-actions>
         </mat-card>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-            <mat-tab label="About {{member.knownAs}}">
-                <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
-                    <mat-form-field appearaance="outline">
-                        <mat-label>Introduction</mat-label>
-                        <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="member.introduction"
-                            placeholder="Say something about your self" matInput required>
+            <!-- <mat-tab label="About {{member.knownAs}}">
+                <div class="tab-contents">
+                    <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Introduction</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="introductionCtrl"
+                                [value]="member.introduction" placeholder="Say something about your self" matInput
+                                required>
                             {{IntroductionCtrl.value}}
                         </textarea>
-                        <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field is required</mat-error>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('minlength')">
-                            Minimum of {{minTextAreaChars}} characters is requried.
-                        </mat-error>
-                        <mat-error *ngIf="IntroductionCtrl.hasError('maxlength')">
-                            Maximum of {{maxTextAreaChars}} characters is reached.
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field appearaance="outline">
-                        <mat-label>Looking For</mat-label>
-                        <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
-                            placeholder="Enter what you're looking for" matInput required>
+                            <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field is required</mat-error>
+                            <mat-error *ngIf="IntroductionCtrl.hasError('minlength')">
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            <mat-error *ngIf="IntroductionCtrl.hasError('maxlength')">
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Looking For</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
+                                placeholder="Enter what you're looking for" matInput required>
                             {{member.lookingFor}}
                         </textarea>
-                        <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                        <mat-error *ngIf="LookingForCtrl.hasError('required')">This field is required</mat-error>
-                        <mat-error *ngIf="LookingForCtrl.hasError('minlength')">
-                            Minimum of {{minTextAreaChars}} characters is requried.
-                        </mat-error>
-                        <mat-error *ngIf="LookingForCtrl.hasError('maxlength')">
-                            Maximum of {{maxTextAreaChars}} characters is reached.
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field appearaance="outline">
-                        <mat-label>Interests</mat-label>
-                        <textarea cdkTextareaAutosize formControlName="interestsCtrl" placeholder="Enter your interests"
-                            matInput required>
+                            <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            <mat-error *ngIf="LookingForCtrl.hasError('required')">This field is required</mat-error>
+                            <mat-error *ngIf="LookingForCtrl.hasError('minlength')">
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            <mat-error *ngIf="LookingForCtrl.hasError('maxlength')">
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Interests</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="interestsCtrl"
+                                placeholder="Enter your interests" matInput required>
                             {{member.interests}}
                         </textarea>
-                        <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                        <mat-error *ngIf="InterestsCtrl.hasError('required')">This field is required</mat-error>
-                        <mat-error *ngIf="InterestsCtrl.hasError('minlength')">
-                            Minimum of {{minTextAreaChars}} characters is requried.
-                        </mat-error>
-                        <mat-error *ngIf="InterestsCtrl.hasError('maxlength')">
-                            Maximum of {{maxTextAreaChars}} characters is reached.
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field appearaance="outline">
-                        <mat-label>City</mat-label>
-                        <input formControlName="cityCtrl" placeholder="Enter your city" matInput required>
-                        <mat-error *ngIf="CityCtrl.hasError('required')">This field is required</mat-error>
-                        <mat-error *ngIf="CityCtrl.hasError('minlength')">
-                            Minimum of {{minInputChars}} characters is requried.
-                        </mat-error>
-                        <mat-error *ngIf="CityCtrl.hasError('maxlength')">
-                            Maximum of {{maxInputChars}} characters is reached.
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field appearaance="outline">
-                        <mat-label>Country</mat-label>
-                        <input cdkTextareaAutosize formControlName="countryCtrl" placeholder="Enter your country."
-                            matInput required>
-                        <mat-error *ngIf="CountryCtrl.hasError('required')">This field is required</mat-error>
-                        <mat-error *ngIf="CountryCtrl.hasError('minlength')">
-                            Minimum of {{minInputChars}} characters is requried.
-                        </mat-error>
-                        <mat-error *ngIf="CountryCtrl.hasError('maxlength')">
-                            Maximum of {{maxInputChars}} characters is reached.
-                        </mat-error>
-                    </mat-form-field>
-                </form>
-            </mat-tab>
+                            <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            <mat-error *ngIf="InterestsCtrl.hasError('required')">This field is required</mat-error>
+                            <mat-error *ngIf="InterestsCtrl.hasError('minlength')">
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            <mat-error *ngIf="InterestsCtrl.hasError('maxlength')">
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>City</mat-label>
+                            <input formControlName="cityCtrl" placeholder="Enter your city" matInput required>
+                            <mat-error *ngIf="CityCtrl.hasError('required')">This field is required</mat-error>
+                            <mat-error *ngIf="CityCtrl.hasError('minlength')">
+                                Minimum of {{minInputChars}} characters is requried.
+                            </mat-error>
+                            <mat-error *ngIf="CityCtrl.hasError('maxlength')">
+                                Maximum of {{maxInputChars}} characters is reached.
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Country</mat-label>
+                            <input cdkTextareaAutosize formControlName="countryCtrl" placeholder="Enter your country."
+                                matInput required>
+                            <mat-error *ngIf="CountryCtrl.hasError('required')">This field is required</mat-error>
+                            <mat-error *ngIf="CountryCtrl.hasError('minlength')">
+                                Minimum of {{minInputChars}} characters is requried.
+                            </mat-error>
+                            <mat-error *ngIf="CountryCtrl.hasError('maxlength')">
+                                Maximum of {{maxInputChars}} characters is reached.
+                            </mat-error>
+                        </mat-form-field>
+                    </form>
+                </div>
+            </mat-tab> -->
             <mat-tab label="Edit Photos">
                 <div class="tab-contents">
-                    <p>Photos go here...</p>
+                    <app-photo-editor [member]="member"></app-photo-editor>
                 </div>
             </mat-tab>
         </mat-tab-group>
     </section>
 </div>
-<p>{{ memberEditFg.value | json }}</p>
+<!-- <p>{{ memberEditFg.value | json }}</p> -->

@@ -29,6 +29,7 @@ import { MemberListComponent } from '../components/members/member-list/member-li
 import { MemberCardComponent } from '../components/members/member-card/member-card.component';
 import { MessagesComponent } from '../components/messages/messages.component';
 import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
+import { PhotoEditorComponent } from '../components/members/photo-editor/photo-editor.component';
 
 const components = [
   NoAccessComponent,
@@ -46,6 +47,7 @@ const components = [
   MemberCardComponent,
   MessagesComponent,
   MemberEditComponent,
+  PhotoEditorComponent,
 
   ShortenStringPipe,
 ]

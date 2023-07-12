@@ -34,6 +34,10 @@ div {
             padding: 1rem;
             flex-grow: 3;
 
+            .tab-contents {
+                padding: 1rem;
+            }
+
             .about-contents {
                 display: flex;
                 flex-direction: column;
