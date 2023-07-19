@@ -25,9 +25,9 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
     {
-        AppUser userExist = await _collection.Find<AppUser>(user => user.Email == userInput.Email).FirstOrDefaultAsync();
+        bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync();
 
-        if (userExist is not null) return (null);
+        if (userExist) return (null);
 
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
@@ -46,8 +46,7 @@ public class AccountRepository : IAccountRepository
     {
         var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
 
-        if (user is null)
-            return null;
+        if (user is null) return null;
 
         using var hmac = new HMACSHA512(user.PasswordSalt!);
 
