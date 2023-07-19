@@ -61,4 +61,10 @@ public class UserController : BaseApiController
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }
+
+    // [HttpPut("set-main-photo/{photoUrl}")]
+    // public async Task<ActionResult<UpdateResult>> SetMainPhoto(string photoUrl)
+    // {
+
+    // }
 }

@@ -48,4 +48,8 @@ export class MemberService {
       })
     );
   }
+
+  // setMainPhoto(): boolean {
+
+  // }
 }
