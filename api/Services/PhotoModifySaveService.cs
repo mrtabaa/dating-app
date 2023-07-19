@@ -6,7 +6,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 {
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
-    const string storageAddress = "Storage/Photos/";
+    const string storageAddress = "storage/photos/";
 
     readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
     private enum OperationName

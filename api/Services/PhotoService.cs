@@ -2,7 +2,8 @@ namespace api.Services;
 
 public class PhotoService : IPhotoService
 {
-    #region Constructor
+    #region Constructor and variables
+
     private readonly IPhotoModifySaveService _photoModifyService;
     private readonly ILogger<IPhotoModifySaveService> _logger;
 
@@ -43,11 +44,14 @@ public class PhotoService : IPhotoService
                 }
                 #endregion Resize and Create Images to Disk
 
-                #region Create Photos list to save to db
-                // if user's album is empty
+                #region Create Photos list to save their URLs to db
+                // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
+                filePath_128_sq = filePath_128_sq.Split("wwwroot/")[1];
+                filePath_512_sq = filePath_512_sq.Split("wwwroot/")[1];
+                filePath_1024_sq = filePath_1024_sq.Split("wwwroot/")[1];
 
                 Photo photo;
-                if (!userPhotos.Any())
+                if (!userPhotos.Any()) // if user's album is empty set Main: true
                 {
                     photo = new Photo(
                         Schema: AppVariablesExtensions.AppVersions.Last<string>(),
