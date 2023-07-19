@@ -137,33 +137,19 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, update, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> SetMainPhoto(string? userId, Photo unsetPhotoIn, Photo setPhotoIn, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> SetMainPhoto(string? userId, string photoUrlIn, CancellationToken cancellationToken)
     {
-        Photo unsetMainPhoto = new Photo(
-            Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-            Url_128: unsetPhotoIn.Url_128,
-            Url_512: unsetPhotoIn.Url_512,
-            Url_1024: unsetPhotoIn.Url_1024,
-            IsMain: false
-        );
-        
-        Photo setMainPhoto = new Photo(
-            Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-            Url_128: setPhotoIn.Url_128,
-            Url_512: setPhotoIn.Url_512,
-            Url_1024: setPhotoIn.Url_1024,
-            IsMain: true
-        );
+        // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
+        var filterOld = Builders<AppUser>.Filter.Where(user => user.Id == userId 
+                                                    && user.Photos.Any<Photo>(photo => photo.IsMain == true));
+        var updateOld = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, false);
+        await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
 
-        var filter = Builders<AppUser>.Filter.Where(user => user.Id == userId && user.Photos.Any<Photo>(photo => photo.IsMain == true));
-        var update = Builders<AppUser>.Update.Push()
-
-        // var updatedPhotos = Builders<AppUser>.Update
-        // .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-        // .Set(doc => doc.Photos.AsQueryable().Where(ph => ph.IsMain == true), unsetMainPhoto)
-        // .Set(doc => doc.photos.AsQueryable().Where(ph => ph.Url_128 == setPhotoIn.Url_128), setMainPhoto);
-
-        // return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedPhotos, null, cancellationToken);
+        // SET the new main photo: find new photo by its Url_128; update IsMain to True
+        var filterNew = Builders<AppUser>.Filter.Where(user => user.Id == userId
+                                                    && user.Photos.Any<Photo>(photo => photo.Url_128 == photoUrlIn));
+        var updateNew = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, true);
+        return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
     #endregion CRUD

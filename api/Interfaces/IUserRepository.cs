@@ -14,4 +14,7 @@ public interface IUserRepository
     public Task<UpdateResult?> UploadPhotos(IEnumerable<IFormFile> file, string? userId, CancellationToken cancellationToken);
     
     public Task<UpdateResult?> DeleteOnePhoto(string? userId, string? urlIn,  CancellationToken cancellationToken);
+
+    public Task<UpdateResult?> SetMainPhoto(string? userId, string photoUrlIn, CancellationToken cancellationToken);
+
 }
