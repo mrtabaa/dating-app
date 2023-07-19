@@ -4,6 +4,7 @@ import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from '@kolkov
 import { Observable, Subscription } from 'rxjs';
 import { Member } from 'src/app/models/member.model';
 import { MemberService } from 'src/app/services/member.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-member-detail',
@@ -12,7 +13,7 @@ import { MemberService } from 'src/app/services/member.service';
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
   member$: Observable<Member> | undefined;
-  mainUrl: string | undefined;
+  apiPhotoUrl = environment.apiPhotoUrl;
   subscribed: Subscription | undefined;
 
   galleryOptions: NgxGalleryOptions[] = [];
@@ -27,7 +28,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscribed?.unsubscribe();
+      this.subscribed;
   }
 
   loadMember(): void {
@@ -40,18 +41,18 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   setGalleryImages(): void {
     this.subscribed = this.member$?.subscribe(
-      ((member: Member) => {
+      (member: Member) => {
         for (const photo of member.photos) {
           this.galleryImages.push(
             {
-              small: photo.url_128,
-              medium: photo.url_512,
-              big: photo.url_1024
+              small: this.apiPhotoUrl + photo.url_128,
+              medium: this.apiPhotoUrl + photo.url_512,
+              big: this.apiPhotoUrl + photo.url_1024
             }
           );
         }
-      })
-    ); 
+      }
+    );
   }
 
   setGalleryOptions(): void {

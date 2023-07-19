@@ -25,6 +25,10 @@ div {
         mat-card {
             width: 15rem;
 
+            mat-card-content{
+                margin-top: 1rem;
+            }
+
             mat-card-actions button {
                 width: 100%;
             }

@@ -8,6 +8,7 @@ import { Member } from 'src/app/models/member.model';
 import { User } from 'src/app/models/user.model';
 import { AccountService } from 'src/app/services/account.service';
 import { MemberService } from 'src/app/services/member.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-member-edit',
@@ -22,10 +23,10 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   }
 
   member$: Observable<Member> | undefined;
+  apiPhotoUrl = environment.apiPhotoUrl;
   user: User | null = null;
-  mainUrl: string | undefined;
-  form: FormGroup | undefined;
   subscribed: Subscription | undefined;
+
   readonly minTextAreaChars: number = 10;
   readonly maxTextAreaChars: number = 500;
   readonly minInputChars: number = 3;

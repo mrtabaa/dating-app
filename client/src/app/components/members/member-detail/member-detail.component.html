@@ -1,9 +1,9 @@
 <main *ngIf="member$ | async as member">
     <mat-card>
         <ng-container *ngFor="let photo of member.photos">
-            <img *ngIf="photo.isMain" mat-card-image ngSrc="{{photo.url_128}}" width="128" height="128"
+            <img *ngIf="photo.isMain" mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240" height="240"
                 alt="Photo of {{member.knownAs}}">
-            <img *ngIf="!photo.isMain" mat-card-image ngSrc="'./assets/images/defaults/user.png'" width="128" height="128"
+            <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="'./assets/images/defaults/user.png'" width="240" height="240"
             alt="Photo of {{member.knownAs}}">
         </ng-container>
         <mat-card-content>

@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Member } from 'src/app/models/member.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-member-card',
@@ -9,5 +10,5 @@ import { Member } from 'src/app/models/member.model';
 export class MemberCardComponent {
   @Input('memberInput') member: Member | undefined;
 
-  mainUrl: string | undefined;
+  apiPhotoUrl = environment.apiPhotoUrl;
 }

@@ -5,6 +5,10 @@ main {
     mat-card {
         max-width: 15rem;
         min-width: 15rem;
+        
+        mat-card-content{
+            margin-top: 1rem;
+        }
 
         mat-card-actions {
             display: flex;
