@@ -15,8 +15,10 @@ interface PhotoUrl {
 })
 export class PhotoEditorComponent implements OnInit {
   @Input('member') member: Member | undefined;
-  private memberService = Inject(MemberService);
+  // private memberService = Inject(MemberService);
   photoUrls: PhotoUrl[] = [];
+
+  constructor(private memberService: MemberService) {}
 
   ngOnInit(): void {
     this.getPhotoUrls();
@@ -33,7 +35,7 @@ export class PhotoEditorComponent implements OnInit {
       }
   }
 
-  // setMainPhoto(): void {
-
-  // }
+  setMainPhoto(url_128In: string): void {
+    this.memberService.setMainPhoto(url_128In);
+  }
 }

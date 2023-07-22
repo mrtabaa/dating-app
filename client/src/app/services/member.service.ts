@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Member } from '../models/member.model';
@@ -38,18 +38,21 @@ export class MemberService {
   }
 
   updateMember(memberUpdate: MemberUpdate): Observable<UpdateResult> {
-    return this.http.put<any>(this.baseUrl + 'user', memberUpdate).pipe(
+    return this.http.put<UpdateResult>(this.baseUrl + 'user', memberUpdate).pipe(
       finalize(() => {
         const member = this.members.find(member => member.email === memberUpdate.email);
         if (member) {
           const index = this.members.indexOf(member);
-          this.members[index] = {...this.members[index], ...memberUpdate} // copy memberUpdate to the list's member
+          this.members[index] = { ...this.members[index], ...memberUpdate } // copy memberUpdate to the list's member
         }
       })
     );
   }
 
-  // setMainPhoto(): boolean {
-
-  // }
+  setMainPhoto(url_128In: string): void {
+    // cut domain address and convert the address to storage/photos/...
+    let queryParams = new HttpParams().append('photoUrlIn',  url_128In.split('5001/')[1])
+    this.http.put<UpdateResult>(this.baseUrl + 'user/set-main-photo/', {params: queryParams})
+    .subscribe(res => console.log(res));
+  }
 }
