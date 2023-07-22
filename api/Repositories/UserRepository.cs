@@ -106,7 +106,7 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? urlIn, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? url_128_In, CancellationToken cancellationToken)
     {
         List<string> photoUrls = new();
 
@@ -114,14 +114,17 @@ public class UserRepository : IUserRepository
 
         if (photos is null || !photos.Any())
         {
-            _logger.LogError("Album is empty. No photo to delete.");
+            _logger.LogError("Album is empty OR the requested photo is the MainPhoto. No photo to delete.");
             return null;
         }
 
         foreach (Photo photo in photos)
         {
-            if (photo.Url_128 == urlIn)
+            if (photo.Url_128 == url_128_In)
             {
+                if (photo.IsMain is true) // Prevent Main photo from deletion
+                    return null;
+
                 photoUrls.Add(photo.Url_128);
                 photoUrls.Add(photo.Url_512);
                 photoUrls.Add(photo.Url_1024);
@@ -132,7 +135,7 @@ public class UserRepository : IUserRepository
         if (!isDeleteSuccess)
             _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
 
-        var update = Builders<AppUser>.Update.PullFilter(user => user.Photos, photo => photo.Url_128 == urlIn);
+        var update = Builders<AppUser>.Update.PullFilter(user => user.Photos, photo => photo.Url_128 == url_128_In);
 
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, update, null, cancellationToken);
     }
@@ -140,7 +143,7 @@ public class UserRepository : IUserRepository
     public async Task<UpdateResult?> SetMainPhoto(string? userId, string photoUrlIn, CancellationToken cancellationToken)
     {
         // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
-        var filterOld = Builders<AppUser>.Filter.Where(user => user.Id == userId 
+        var filterOld = Builders<AppUser>.Filter.Where(user => user.Id == userId
                                                     && user.Photos.Any<Photo>(photo => photo.IsMain == true));
         var updateOld = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, false);
         await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
