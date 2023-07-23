@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { AccountService } from 'src/app/services/account.service';
-import { MemberService } from 'src/app/services/member.service';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +10,7 @@ import { MemberService } from 'src/app/services/member.service';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor(public accountService: AccountService, private memberService: MemberService) { }
+  constructor(public accountService: AccountService) { }
 
   user$!: Observable<User | null>;
 
@@ -19,15 +18,6 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.user$ = this.accountService.currentUser$;
-    
-
-  }
-
-  getMainPhotoUrl(): string {
-    this.user$.pipe(
-      map(user => {
-      })
-    )
   }
 
   logout() {
