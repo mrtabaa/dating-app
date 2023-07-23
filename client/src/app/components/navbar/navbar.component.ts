@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from 'src/app/models/user.model';
 import { AccountService } from 'src/app/services/account.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -9,6 +10,7 @@ import { AccountService } from 'src/app/services/account.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+  basePhotoUrl = environment.apiPhotoUrl;
 
   constructor(public accountService: AccountService) { }
 
