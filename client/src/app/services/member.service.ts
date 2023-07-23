@@ -5,13 +5,12 @@ import { Member } from '../models/member.model';
 import { Observable, finalize, map, of } from 'rxjs';
 import { MemberUpdate } from '../models/member-update.model';
 import { UpdateResult } from '../models/helpers/update-result.model';
-import { Photo } from '../models/photo.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
-  baseUrl: string = environment.apiUrl;
+  baseUrl: string = environment.apiUrl + 'user';
   members: Member[] = [];
   member: Member | undefined;
 
@@ -20,7 +19,7 @@ export class MemberService {
   getMembers(): Observable<Member[]> {
     if (this.members.length > 0) return of(this.members); // return ObservableOf(members)
 
-    return this.http.get<Member[]>(this.baseUrl + 'user').pipe(
+    return this.http.get<Member[]>(this.baseUrl).pipe(
       map(members => {
         this.members = members;
         return this.members;
@@ -35,11 +34,11 @@ export class MemberService {
         return of(this.member);
     }
 
-    return this.http.get<Member>(this.baseUrl + 'user/email/' + email);
+    return this.http.get<Member>(this.baseUrl + '/email/' + email);
   }
 
   updateMember(memberUpdate: MemberUpdate): Observable<UpdateResult> {
-    return this.http.put<UpdateResult>(this.baseUrl + 'user', memberUpdate).pipe(
+    return this.http.put<UpdateResult>(this.baseUrl, memberUpdate).pipe(
       finalize(() => {
         const member = this.members.find(member => member.email === memberUpdate.email);
         if (member) {
@@ -55,18 +54,14 @@ export class MemberService {
     const dbFormatUrl_128 = url_128In.split('5001/')[1];
     let queryParams = new HttpParams().set('photoUrlIn', dbFormatUrl_128);
 
-    return this.http.put<UpdateResult>(this.baseUrl + 'user/set-main-photo', null, { params: queryParams })
+    return this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams })
       .pipe(finalize(() => {
         const member = this.members.find(member => member.id === idIn);
         if (member) {
-
-          for (const photo of member.photos) {
-            if (photo.isMain === true)
-              photo.isMain = false;
-
-            if (photo.url_128 === dbFormatUrl_128)
-              photo.isMain = true;
-          }
+          member.photos.forEach(photo => {
+            if (photo.isMain === true) photo.isMain = false;
+            if (photo.url_128 === dbFormatUrl_128) photo.isMain = true;
+          })
 
           const index = this.members.indexOf(member);
           this.members[index] = { ...this.members[index], ...member }
@@ -74,9 +69,5 @@ export class MemberService {
           this.member = member;
         }
       }));
-  }
-
-  getMainPhotoUrl(): Photo | undefined {
-    return this.member?.photos.find(photo => photo.isMain === true);
   }
 }

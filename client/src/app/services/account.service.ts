@@ -23,8 +23,7 @@ export class AccountService {
       .pipe(
         map(user => {
           if (user) {
-            this.currentUserSource.next(user);
-            localStorage.setItem('user', JSON.stringify(user));
+            this.setCurrentUser(user);
             return user;
           }
           return null;
@@ -37,8 +36,7 @@ export class AccountService {
       .pipe(
         map(user => {
           if (user) {
-            this.currentUserSource.next(user);
-            localStorage.setItem('user', JSON.stringify(user));
+            this.setCurrentUser(user);
 
             this.setGetReturnUrl();
 
@@ -58,6 +56,8 @@ export class AccountService {
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
   // now user can refresh the page or relaunch the browser without losing authentication or returnUrl
   setCurrentUser(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
+
     this.currentUserSource.next(user);
   }
 
