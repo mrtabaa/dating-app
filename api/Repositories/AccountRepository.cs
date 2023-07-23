@@ -23,7 +23,7 @@ public class AccountRepository : IAccountRepository
     #endregion
 
     #region CRUD
-    public async Task<LoginSuccessDto?> Create(UserRegisterDto userInput)
+    public async Task<UserDto?> Create(UserRegisterDto userInput)
     {
         bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync();
 
@@ -34,15 +34,16 @@ public class AccountRepository : IAccountRepository
         // if insertion successful OR throw an exception
         await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
 
-        return new LoginSuccessDto(
+        return new UserDto(
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
             Token: _tokenService.CreateToken(appUser),
             Name: appUser.Name,
-            Email: appUser.Email
+            Email: appUser.Email,
+            ProfilePhotoUrl: null
         );
     }
 
-    public async Task<LoginSuccessDto?> Login(LoginDto userInput)
+    public async Task<UserDto?> Login(LoginDto userInput)
     {
         var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
 
@@ -52,11 +53,12 @@ public class AccountRepository : IAccountRepository
 
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
         if (user.PasswordHash is not null && user.PasswordHash.SequenceEqual(ComputedHash))
-            return new LoginSuccessDto(
+            return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: _tokenService.CreateToken(user),
                 Name: user.Name,
-                Email: user.Email
+                Email: user.Email,
+                ProfilePhotoUrl: user.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
             );
 
         _ = user ?? throw new ArgumentException("valid userInput but user was not created", nameof(user));

@@ -4,7 +4,7 @@ public record UserRegisterDto(
     string? Schema,
     [MinLength(2), MaxLength(20)] string Name,
     [
-        MaxLength(50), 
+        MaxLength(50),
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
     ] string Email,
     [DataType(DataType.Password), MinLength(7), MaxLength(20)] string Password,
@@ -22,15 +22,8 @@ public record UserRegisterDto(
 public record LoginDto(
     string? Schema,
     [
-        RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format."), 
+        RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format."),
         MaxLength(50)
     ] string Email,
     [MinLength(7), MaxLength(20)] string Password
-);
-
-public record LoginSuccessDto(
-    string Schema,
-    string? Token,
-    string? Name,
-    string? Email
 );
