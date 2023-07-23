@@ -12,18 +12,18 @@ public class AccountController : BaseApiController
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<LoginSuccessDto>> Register(UserRegisterDto userIn)
+    public async Task<ActionResult<UserDto>> Register(UserRegisterDto userIn)
     {
-        LoginSuccessDto? user = await _accountRepository.Create(userIn);
+        UserDto? user = await _accountRepository.Create(userIn);
 
         return user is null ? BadRequest("Email is already registered.") : user;
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginSuccessDto>> Login(LoginDto userInput)
+    public async Task<ActionResult<UserDto>> Login(LoginDto userInput)
     {
-        LoginSuccessDto? user = await _accountRepository.Login(userInput);
+        UserDto? user = await _accountRepository.Login(userInput);
 
-        return user is null ? BadRequest("Invalid username or password.") : user;
+        return user is null ? Unauthorized("Invalid username or password.") : user;
     }
 }
