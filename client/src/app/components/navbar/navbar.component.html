@@ -24,9 +24,9 @@
     <section class="right">
         <!-- if logged-in: show appMeny
             else: show signup/login -->
-        <button [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin" mat-mini-fab>
+        <button class="menu-button" [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin" mat-mini-fab>
             <!-- <mat-card style="display: none;"></mat-card> -->
-            <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill>
+            <img class="top-avatar" *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
             <ng-template #username>{{user.name[0] | titlecase}}</ng-template>
         </button>
         <!-- signup/login -->
@@ -42,13 +42,12 @@
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
             <div *ngIf="user$ | async as user" class="userInfo">
-                <button mat-fab color="basic" class="profileImage">
-                    <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}"
-                        fill>
+                <div color="basic" class="profileImage">
+                    <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
                     <ng-template #username>
                         {{user.name[0] | titlecase}}
                     </ng-template>
-                </button>
+                </div>
                 <div>
                     <p>{{user.name | titlecase}}</p>
                     <p class="email">{{user.email}}</p>

@@ -5,9 +5,13 @@
             width="128" height="128" alt="{{member.knownAs}} photo">
 
         <div class="buttons">
-            {{photo.isMain}}
             <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary" [disabled]="photo.isMain">Main</button>
             <button mat-mini-fab color="warn" [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
         </div>
     </div>
 </section>
+<mat-error *ngIf="errorGlob">
+    This update has failed for this reason: 
+    <br> {{errorGlob}} 
+    <br> Please try again or contact the admin. 
+</mat-error>

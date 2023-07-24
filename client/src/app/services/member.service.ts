@@ -56,29 +56,9 @@ export class MemberService {
     );
   }
 
-  setMainPhoto(url_128In: string): Member | undefined {
-    // cut domain address and convert the address to storage/photos/...
+  setMainPhoto(url_128In: string): Observable<UpdateResult> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams })
-      .pipe(take(1)).subscribe(() => {
-        const member = this.members.find(member => member.id === this.user?.id);
-        if (member && this.user) {
-          member.photos.forEach(photo => {
-            if (photo.isMain === true)
-              photo.isMain = false;
-
-            if (photo.url_128 === url_128In) {
-              photo.isMain = true;
-              this.user.profilePhotoUrl = url_128In;
-              this.accountService.setCurrentUser(this.user);
-            }
-          })
-
-          this.member = member;
-        }
-      });
-
-    return this.member;
+    return this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams })
   }
 }
