@@ -2,8 +2,8 @@
     <div class="card-img-wrapper">
         <ng-container *ngFor="let photo of member.photos">
             <img mat-card-image *ngIf="photo.isMain" ngSrc="{{apiPhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}}">
-            <img mat-card-image *ngIf="member.photos.length === 0" ngSrc="{{'./assets/images/defaults/user.png'}}" width="128" height="128" alt="{{member.knownAs}} photo">
         </ng-container>
+        <img mat-card-image *ngIf="member.photos.length === 0" ngSrc="./assets/images/defaults/user.png" width="128" height="128" alt="{{member.knownAs}} photo">
         <ul class="member-icons">
             <li>
                 <button [routerLink]="['/members/' + member.email]" mat-mini-fab color="warn">
