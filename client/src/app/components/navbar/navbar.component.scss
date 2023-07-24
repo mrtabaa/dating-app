@@ -57,6 +57,12 @@ mat-toolbar {
         }
 
         .profileImage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background-color: rgb(246, 209, 164);
+
             width: 4rem;
             height: 4rem;
             border-radius: 50%;
