@@ -29,11 +29,15 @@ export class PhotoEditorComponent {
       next: updateResult => {
         if (updateResult.modifiedCount === 1 && this.member && this.user) {
           this.member.photos.forEach(photo => {
+            // unset previous main
             if (photo.isMain === true)
               photo.isMain = false;
 
+            // set new selected
             if (this.user && photo.url_128 === url_128In) {
               photo.isMain = true;
+
+              // update navbar photos
               this.user.profilePhotoUrl = url_128In;
               this.accountService.setCurrentUser(this.user);
             }
@@ -42,7 +46,7 @@ export class PhotoEditorComponent {
 
         this.errorGlob = undefined;
       },
-      error: err => this.errorGlob = err.message
+      error: err => this.errorGlob = err.message // if set fails
     });
   }
 
