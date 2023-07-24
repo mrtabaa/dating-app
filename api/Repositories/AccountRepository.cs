@@ -36,6 +36,7 @@ public class AccountRepository : IAccountRepository
 
         return new UserDto(
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+            Id: appUser.Id,
             Token: _tokenService.CreateToken(appUser),
             Name: appUser.Name,
             Email: appUser.Email,
@@ -55,6 +56,7 @@ public class AccountRepository : IAccountRepository
         if (user.PasswordHash is not null && user.PasswordHash.SequenceEqual(ComputedHash))
             return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Id: user.Id,
                 Token: _tokenService.CreateToken(user),
                 Name: user.Name,
                 Email: user.Email,
