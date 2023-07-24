@@ -55,9 +55,9 @@ public class UserController : BaseApiController
     }
 
     [HttpDelete("delete-one-photo")]
-    public async Task<ActionResult<UpdateResult>> DeleteOnePhoto([FromBody] string photoUrl, CancellationToken cancellationToken)
+    public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        var result = await _userRepository.DeleteOnePhoto(User.GetUserId(), photoUrl, cancellationToken);
+        var result = await _userRepository.DeleteOnePhoto(User.GetUserId(), photoUrlIn, cancellationToken);
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }

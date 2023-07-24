@@ -22,6 +22,8 @@ public class UserRepository : IUserRepository
     #endregion
 
     #region CRUD
+
+    #region User Management
     public async Task<List<MemberDto?>> GetUsers(CancellationToken cancellationToken)
     {
         List<MemberDto?> memberDtos = new();
@@ -80,7 +82,9 @@ public class UserRepository : IUserRepository
 
     public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
+    #endregion User Management
 
+    #region Photo Management
     public async Task<UpdateResult?> UploadPhotos(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
@@ -123,7 +127,10 @@ public class UserRepository : IUserRepository
             if (photo.Url_128 == url_128_In)
             {
                 if (photo.IsMain is true) // Prevent Main photo from deletion
+                {
+                    _logger.LogError("Main photo cannot be deleted!");
                     return null;
+                }
 
                 photoUrls.Add(photo.Url_128);
                 photoUrls.Add(photo.Url_512);
@@ -154,6 +161,7 @@ public class UserRepository : IUserRepository
         var updateNew = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, true);
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
+    #endregion Photo Management
 
     #endregion CRUD
 }

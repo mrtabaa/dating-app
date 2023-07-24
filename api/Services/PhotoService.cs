@@ -6,6 +6,7 @@ public class PhotoService : IPhotoService
 
     private readonly IPhotoModifySaveService _photoModifyService;
     private readonly ILogger<IPhotoModifySaveService> _logger;
+    const string wwwRootUrl = "wwwroot/";
 
     public PhotoService(IPhotoModifySaveService photoModifyService, ILogger<IPhotoModifySaveService> logger)
     {
@@ -46,9 +47,9 @@ public class PhotoService : IPhotoService
 
                 #region Create Photos list to save their URLs to db
                 // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
-                filePath_128_sq = filePath_128_sq.Split("wwwroot/")[1];
-                filePath_512_sq = filePath_512_sq.Split("wwwroot/")[1];
-                filePath_1024_sq = filePath_1024_sq.Split("wwwroot/")[1];
+                filePath_128_sq = filePath_128_sq.Split(wwwRootUrl)[1];
+                filePath_512_sq = filePath_512_sq.Split(wwwRootUrl)[1];
+                filePath_1024_sq = filePath_1024_sq.Split(wwwRootUrl)[1];
 
                 Photo photo;
                 if (!userPhotos.Any()) // if user's album is empty set Main: true
@@ -84,9 +85,9 @@ public class PhotoService : IPhotoService
         // delete all 3 resolutions
         foreach (var filePath in filePaths)
         {
-            if (File.Exists(filePath))
+            if (File.Exists(wwwRootUrl + filePath))
             {
-                File.Delete(filePath);
+                File.Delete(wwwRootUrl + filePath);
             }
             else
                 return false;

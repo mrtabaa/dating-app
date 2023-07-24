@@ -59,6 +59,12 @@ export class MemberService {
   setMainPhoto(url_128In: string): Observable<UpdateResult> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    return this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams })
+    return this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
+  }
+
+  deletePhoto(url_128In: string): Observable<UpdateResult> {
+    let queryParams = new HttpParams().set('photoUrlIn', url_128In);
+
+    return this.http.delete<UpdateResult>(this.baseUrl + '/delete-one-photo', {params: queryParams});
   }
 }

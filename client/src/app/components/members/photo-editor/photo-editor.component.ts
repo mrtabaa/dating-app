@@ -45,4 +45,14 @@ export class PhotoEditorComponent {
       error: err => this.errorGlob = err.message
     });
   }
+
+  deletePhoto(url_128In: string, index: number): void {
+    this.memberService.deletePhoto(url_128In).pipe(take(1)).subscribe({
+      next: updateResult => {
+        if (updateResult.modifiedCount === 1 && this.member) {
+          this.member.photos.splice(index, 1);
+        }
+      }
+    })
+  }
 }
