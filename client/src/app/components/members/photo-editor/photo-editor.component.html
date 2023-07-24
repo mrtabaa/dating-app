@@ -1,12 +1,12 @@
-<section class="container" *ngIf="member$ | async as member">
-    <div *ngFor="let photo of photoUrls">
-        <img ngSrc="{{photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
+<section class="container" *ngIf="member">
+    <div *ngFor="let photo of member.photos">
+        <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
         <img mat-card-image *ngIf="member.photos.length === 0" ngSrc="{{'./assets/images/defaults/user.png'}}"
             width="128" height="128" alt="{{member.knownAs}} photo">
 
         <div class="buttons">
             {{photo.isMain}}
-            <button (click)="setMainPhoto(member.id, photo.url_128)" mat-stroked-button color="primary" [disabled]="photo.isMain">Main</button>
+            <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary" [disabled]="photo.isMain">Main</button>
             <button mat-mini-fab color="warn" [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
         </div>
     </div>
