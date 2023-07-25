@@ -68,6 +68,8 @@ public class PhotoService : IPhotoService
                 #endregion ResizeByPixel_Square
 
                 // string? filePath_crop = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
+                // string? filePath_crop_sq = await _photoModifyService.CropGivenSideAndSave_Square(formFile, userId, 512);
+                // string? filePath_original_crop_sq = await _photoModifyService.CropWithOriginalSideAndSave_Square(formFile, userId);
 
 
                 // if conversion fails
