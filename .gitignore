@@ -7,7 +7,7 @@
 ssl/
 
 #wwwroot
-Storage/
+storage/
 
 # User-specific files
 *.rsuser
@@ -15,7 +15,6 @@ Storage/
 *.user
 *.userosscache
 *.sln.docstates
-*.jpg
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
