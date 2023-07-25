@@ -29,10 +29,43 @@ public class PhotoService : IPhotoService
 
                 // string? filePath_var = await _photoModifyService.ResizeByPixel(formFile, userId, 500, 1000);
 
-                string? filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
-                // string? filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
-                string? filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
-                string? filePath_1024_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
+                #region ResizeByPixel_Square
+                string? filePath_crop_sq = string.Empty;
+                string? filePath_128_sq = string.Empty;
+                string? filePath_256_sq = string.Empty;
+                string? filePath_512_sq = string.Empty;
+                string? filePath_1024_sq = string.Empty;
+
+                // prevent storing files on disk if no resize is needed/performed for a larger size.
+                switch (formFile.Length)
+                {
+                    case < 128 * 128:
+                        filePath_crop_sq = await _photoModifyService.CropWithOriginalSideAndSave_Square(formFile, userId);
+                        filePath_1024_sq = filePath_512_sq = filePath_256_sq = filePath_128_sq = filePath_crop_sq;
+                        break;
+                    case < 256 * 256:
+                        filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
+                        filePath_1024_sq = filePath_512_sq = filePath_256_sq = filePath_128_sq;
+                        break;
+                    case < 512 * 512:
+                        filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
+                        filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
+                        filePath_1024_sq = filePath_512_sq = filePath_256_sq;
+                        break;
+                    case < 1024 * 1024:
+                        filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
+                        filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
+                        filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
+                        filePath_1024_sq = filePath_512_sq;
+                        break;
+                    default:
+                        filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
+                        filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
+                        filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
+                        filePath_1024_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
+                        break;
+                }
+                #endregion ResizeByPixel_Square
 
                 // string? filePath_crop = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
 
