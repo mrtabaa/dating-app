@@ -4,6 +4,7 @@ namespace api.Controllers;
 // [Produces("application/json")]
 public class UserController : BaseApiController
 {
+    #region Variables and Constructor
     private readonly IUserRepository _userRepository;
 
     public UserController(IUserRepository userRepository)
@@ -16,7 +17,9 @@ public class UserController : BaseApiController
     {
         return await _userRepository.GetUsers(cancellationToken);
     }
+    #endregion Variables and Constructor
 
+    #region User Management
     [HttpGet("id/{id}")]
     public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
@@ -49,7 +52,9 @@ public class UserController : BaseApiController
         var result = await _userRepository.DeleteUser(userId, cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
+    #endregion User Management
 
+    #region Photo Management
     [RequestSizeLimit(40_000_000)]
     [HttpPost("add-photos")]
     public async Task<ActionResult<UpdateResult>> AddPhotos([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFileCollection files, CancellationToken cancellationToken)
@@ -72,4 +77,5 @@ public class UserController : BaseApiController
     [HttpPut("set-main-photo")]
     public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) => 
         await _userRepository.SetMainPhoto(User.GetUserId(), photoUrlIn, cancellationToken);
+    #endregion Photo Management
 }
