@@ -80,7 +80,7 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken) =>
+    public async Task<DeleteResult?> DeleteUser(string? userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
     #endregion User Management
 

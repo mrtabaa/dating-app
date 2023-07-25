@@ -9,7 +9,7 @@ public interface IUserRepository
 
     public Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string? Id, CancellationToken cancellationToken);
 
-    public Task<DeleteResult?> DeleteUser(string userId, CancellationToken cancellationToken);
+    public Task<DeleteResult?> DeleteUser(string? userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UploadPhotos(IEnumerable<IFormFile> file, string? userId, CancellationToken cancellationToken);
     

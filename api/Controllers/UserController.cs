@@ -43,6 +43,13 @@ public class UserController : BaseApiController
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
 
+    [HttpDelete("delete-user/{userId}")]
+    public async Task<ActionResult<DeleteResult>> DeleteUser(string userId, CancellationToken cancellationToken)
+    {
+        var result = await _userRepository.DeleteUser(userId, cancellationToken);
+        return result is null ? BadRequest("Delete user failed!") : result;
+    }
+
     [RequestSizeLimit(40_000_000)]
     [HttpPost("add-photos")]
     public async Task<ActionResult<UpdateResult>> AddPhotos([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFileCollection files, CancellationToken cancellationToken)
