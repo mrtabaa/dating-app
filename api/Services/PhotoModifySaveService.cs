@@ -137,7 +137,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
             if (sideIn * sideIn >= formFile.Length)
                 // crop to square and save
-                return await CropAndSave(formFile, userId, sideIn, sideIn);
+                return await CropGivenSidesAndSave(formFile, userId, sideIn, sideIn);
             /////
 
             // get the smaller side to crop with square shape
@@ -180,7 +180,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         return sKImage.Subset(SKRectI.Create(startX, startY, width, height));
     }
 
-    public async Task<string?> CropAndSave(IFormFile formFile, string userId, int widthIn, int heightIn)
+    public async Task<string?> CropGivenSidesAndSave(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
@@ -210,6 +210,69 @@ public class PhotoModifySaveService : IPhotoModifySaveService
                 return filePath;
             }
             else return null;
+        }
+    }
+
+    public async Task<string?> CropGivenSideAndSave_Square(IFormFile formFile, string userId, int side)
+    {
+        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
+        {
+            // get image from formFile
+            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+
+            // convert imageData to SKImage
+            using SKImage skImage = SKImage.FromEncodedData(imageData);
+
+            // check if the given sides are not larger than the image size
+            if (side < skImage.Width && side < skImage.Height)
+            {
+                // find the center
+                int centerX = skImage.Width / 2;
+                int centerY = skImage.Height / 2;
+
+                // find the start points
+                int startX = centerX - side / 2;
+                int startY = centerY - side / 2;
+
+                // crop image
+                SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
+                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+
+                string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
+
+                return filePath;
+            }
+            else return null;
+        }
+    }
+
+    public async Task<string?> CropWithOriginalSideAndSave_Square(IFormFile formFile, string userId)
+    {
+        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
+        {
+            // get image from formFile
+            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+
+            // convert imageData to SKImage
+            using SKImage skImage = SKImage.FromEncodedData(imageData);
+
+            int side = Math.Min(skImage.Width, skImage.Height);
+
+            // find the center
+            int centerX = skImage.Width / 2;
+            int centerY = skImage.Height / 2;
+
+            // find the start points
+            int startX = centerX - side / 2;
+            int startY = centerY - side / 2;
+
+            // crop image
+            SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
+            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+
+            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
+
+            return filePath;
         }
     }
     #endregion Crop Methods
@@ -278,7 +341,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.Name;
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.FileName;
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
