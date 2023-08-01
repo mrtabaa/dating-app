@@ -29,9 +29,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    nameCtrl: ['', Validators.required, Validators.minLength(7), Validators.maxLength(20)],
+    nameCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
+    passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
   });
   //#endregion
 
@@ -46,6 +47,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get PasswordCtrl(): FormControl {
     return this.registerFg.get('passwordCtrl') as FormControl;
   }
+  get ConfirmPasswordCtrl(): FormControl {
+    return this.registerFg.get('confirmPasswordCtrl') as FormControl;
+  }
   //#endregion
 
 
@@ -54,7 +58,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     let userRegisterInput: UserRegister = {
       name: this.NameCtrl.value,
       email: this.EmailCtrl.value,
-      password: this.PasswordCtrl.value
+      password: this.PasswordCtrl.value,
+      confirmPassword: this.ConfirmPasswordCtrl.value
     };
 
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
