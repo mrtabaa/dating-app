@@ -32,7 +32,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
     nameCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    dateOfBirthCtrl: [''],
+    knownAsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    genderCtrl: ['', [Validators.required]],
+    introductionCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    lookingForCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    interestsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    cityCtrl: [''],
+    countryCtrl: [''],
   });
   //#endregion
 
@@ -50,6 +58,30 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get ConfirmPasswordCtrl(): FormControl {
     return this.registerFg.get('confirmPasswordCtrl') as FormControl;
   }
+  get DateOfBirthCtrl(): FormControl {
+    return this.registerFg.get('dateOfBirthCtrl') as FormControl;
+  }
+  get KnownAsCtrl(): FormControl {
+    return this.registerFg.get('knownAsCtrl') as FormControl;
+  }
+  get GenderCtrl(): FormControl {
+    return this.registerFg.get('genderCtrl') as FormControl; 
+  }
+  get IntroductionCtrl(): FormControl {
+    return this.registerFg.get('introductionCtrl') as FormControl;
+  }
+  get LookingForCtrl(): FormControl {
+    return this.registerFg.get('lookingForCtrl') as FormControl;
+  }
+  get InterestsCtrl(): FormControl {
+    return this.registerFg.get('interestsCtrl') as FormControl;
+  }
+  get CityCtrl(): FormControl {
+    return this.registerFg.get('cityCtrl') as FormControl;
+  }
+  get CountryCtrl(): FormControl {
+    return this.registerFg.get('countryCtrl') as FormControl; 
+  }
   //#endregion
 
 
@@ -59,7 +91,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
       name: this.NameCtrl.value,
       email: this.EmailCtrl.value,
       password: this.PasswordCtrl.value,
-      confirmPassword: this.ConfirmPasswordCtrl.value
+      confirmPassword: this.ConfirmPasswordCtrl.value,
+      dateOfBirth: this.DateOfBirthCtrl.value,
+      knownAs: this.KnownAsCtrl.value,
+      gender: this.GenderCtrl.value,
+      introduction: this.IntroductionCtrl.value,
+      lookingFor: this.LookingForCtrl.value,
+      interests: this.InterestsCtrl.value,
+      city: this.CityCtrl.value,
+      country: this.CountryCtrl.value
     };
 
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
