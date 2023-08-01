@@ -14,6 +14,8 @@ public class AccountController : BaseApiController
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserRegisterDto userIn)
     {
+        if(userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
+
         UserDto? user = await _accountRepository.Create(userIn);
 
         return user is null ? BadRequest("Email is already registered.") : user;

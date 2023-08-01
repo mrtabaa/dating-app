@@ -50,6 +50,7 @@ public class SeedUsersController : BaseApiController
                 Password: userInput.Password,
                 PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
                 PasswordSalt: hmac.Key,
+                ConfirmPassword: userInput.ConfirmPassword,
                 DateOfBirth: userInput.DateOfBirth,
                 KnownAs: userInput.KnownAs,
                 Created: DateTime.UtcNow,

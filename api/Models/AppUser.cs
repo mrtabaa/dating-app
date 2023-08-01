@@ -9,6 +9,7 @@ public record AppUser(
     byte[]? PasswordHash,
     byte[]? PasswordSalt,
     DateOnly DateOfBirth,
+    string ConfirmPassword,
     string KnownAs,
     DateTime Created,
     DateTime LastActive,
