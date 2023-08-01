@@ -31,6 +31,9 @@ import { MessagesComponent } from '../components/messages/messages.component';
 import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
 import { PhotoEditorComponent } from '../components/members/photo-editor/photo-editor.component';
 
+// ControlValueAccessor helpers
+import { InputCvaComponent } from '../components/helpers/input-cva/input-cva.component';
+
 const components = [
   NoAccessComponent,
   NotFoundComponent,
@@ -50,6 +53,8 @@ const components = [
   PhotoEditorComponent,
 
   ShortenStringPipe,
+
+  InputCvaComponent
 ]
 
 @NgModule({

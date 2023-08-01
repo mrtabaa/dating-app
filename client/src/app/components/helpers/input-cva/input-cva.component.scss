@@ -1,0 +1,9 @@
+div {
+    display: flex;
+    justify-content: center;
+
+    * {
+        flex: 1;
+        min-width: fit-content;
+    }
+}

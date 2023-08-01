@@ -1,28 +1,18 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerUser()">
     <div class="container">
         <h2 class="title">Create Account</h2>
-        <mat-form-field appearance="outline">
-            <mat-label>Full name</mat-label>
-            <input type="text" formControlName="nameCtrl" dirAutofocus placeholder="Enter your name" matInput>
-            <mat-error *ngIf="NameCtrl.touched && NameCtrl.hasError('required')">This field is required.</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Username Email</mat-label>
-            <input type="email" formControlName="emailCtrl" dirAutofocus placeholder="Enter your email" matInput>
-            <mat-hint>Your email is your username.</mat-hint>
-            <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('required')">This field is required.</mat-error>
-            <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('pattern')">Enter a valid email address.</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input type="password" formControlName="passwordCtrl" placeholder="Enter your password" matInput>
-            <mat-hint>7 to 20 characters.</mat-hint>
-            <mat-error *ngIf="PasswordCtrl.touched && PasswordCtrl.hasError('required')">This field is required.</mat-error>
-            <mat-error
-                *ngIf="PasswordCtrl.touched && (PasswordCtrl.hasError('minlength') || PasswordCtrl.hasError('maxlength'))">
-                Between 7 to 20 characters.
-            </mat-error>
-        </mat-form-field>
+        <app-input-cva [formControl]="NameCtrl" [label]="'Full Name'" [placeHolder]="'Enter your name'"
+            [hint]="'Enter your full name'" [isFocused]="true">
+        </app-input-cva>
+        <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Enter your email'"
+            [hint]="'Your email will be used as your username.'">
+        </app-input-cva>
+        <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
+            [placeHolder]="'Enter a password'" [hint]="'Between 7 to 20 characters'">
+        </app-input-cva>
+        <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
+            [placeHolder]="'Confirm your password'" [hint]="'Between 7 to 20 characters'">
+        </app-input-cva>
 
         <button type="submit" mat-raised-button color="primary" class="submitBtn">Register</button>
         <!-- <button type="button" mat-raised-button (click)="checkStatus()">check</button> -->
