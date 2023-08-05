@@ -26,7 +26,7 @@ namespace api.DTOs
                 Interests: userInput.Interests?.Trim(),
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
-                Photos: userInput.Photos
+                Photos: new List<Photo>()
             );
         }
 
