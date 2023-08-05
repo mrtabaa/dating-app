@@ -5,8 +5,8 @@ export class RegisterValidators {
         const password = group.get('passwordCtrl')?.value as string;
         const confirmPassword = group.get('confirmPasswordCtrl')?.value as string;
 
-        console.log('password ' + password);
-        console.log('confirm ' + confirmPassword);
+        // console.log('password ' + password);
+        // console.log('confirm ' + confirmPassword);
 
         return password !== confirmPassword ? { invalidPasswordsMatch: true } : null
     }
