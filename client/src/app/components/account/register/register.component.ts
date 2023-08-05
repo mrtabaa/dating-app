@@ -12,6 +12,9 @@ import { RegisterValidators } from '../../helpers/validators/register.validator'
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  minDate = new Date();
+  maxDate = new Date();
+  age: number | undefined;
 
   subscriptionRegisterUser!: Subscription;
 
@@ -20,6 +23,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.registerFg;
+
+    // set datePicker year limitations
+    const currentYear = new Date().getFullYear();
+    this.minDate = new Date(currentYear - 99, 0, 1);
+    this.maxDate = new Date(currentYear - 18, 0, 1);
   }
 
   ngOnDestroy(): void {
@@ -34,15 +42,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
     emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    dateOfBirthCtrl: [''],
+    dateOfBirthCtrl: ['', [Validators.required]],
     knownAsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     genderCtrl: ['female', [Validators.required]],
     introductionCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     lookingForCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     interestsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    cityCtrl: [''],
-    countryCtrl: [''],
-  }, {validators: [RegisterValidators.confirmPassword]} as AbstractControlOptions);
+    cityCtrl: ['', [Validators.required]],
+    countryCtrl: ['', [Validators.required]],
+  }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
   //#region Forms Properties

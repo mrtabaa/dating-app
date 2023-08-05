@@ -33,6 +33,7 @@ import { PhotoEditorComponent } from '../components/members/photo-editor/photo-e
 
 // ControlValueAccessor helpers
 import { InputCvaComponent } from '../components/helpers/input-cva/input-cva.component';
+import { DatePickerCvaComponent } from '../components/helpers/date-picker-cva/date-picker-cva.component';
 
 const components = [
   NoAccessComponent,
@@ -54,7 +55,8 @@ const components = [
 
   ShortenStringPipe,
 
-  InputCvaComponent
+  InputCvaComponent,
+  DatePickerCvaComponent
 ]
 
 @NgModule({

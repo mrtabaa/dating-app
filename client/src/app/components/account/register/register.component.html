@@ -2,24 +2,26 @@
     <div class="container">
         <h2 class="title">Create Account</h2>
         <div class="gender">
-            <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender">
-                <strong>I am a</strong>
+            <strong>I am a</strong>
+            <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
                 <mat-radio-button value="female">Female</mat-radio-button>
                 <mat-radio-button value="male">Male</mat-radio-button>
                 <mat-radio-button value="other">Other</mat-radio-button>
             </mat-radio-group>
         </div>
         <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-            [hint]="'Your email will be used as your username.'">
+            [hint]="'Your email will be used as your username'">
         </app-input-cva>
         <app-input-cva [formControl]="NameCtrl" [label]="'Known As'" [placeHolder]="'Your name/nickname'"
             [hint]="'Enter your name or nickname'" [isFocused]="true">
         </app-input-cva>
-        <app-input-cva [formControl]="CityCtrl" [label]="'City'" [placeHolder]="'Your city'"
-            [hint]="'Enter your city'">
+        <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
+            [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
+        </app-date-picker-cva>
+        <app-input-cva [formControl]="CityCtrl" [label]="'City'" [placeHolder]="'Your city'" [hint]="'Enter your city'">
         </app-input-cva>
         <app-input-cva [formControl]="CountryCtrl" [label]="'Country'" [placeHolder]="'Your coutnry'"
-            [hint]="'Enter your country.'">
+            [hint]="'Enter your country'">
         </app-input-cva>
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
             [placeHolder]="'Enter a password'" [hint]="'Between 7 to 20 characters'">
