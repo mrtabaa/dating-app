@@ -38,12 +38,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    nameCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    knownAsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
     genderCtrl: ['female', [Validators.required]],
     introductionCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     lookingForCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
@@ -55,9 +54,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Properties
   // Lab's Info
-  get NameCtrl(): FormControl {
-    return this.registerFg.get('nameCtrl') as FormControl;
-  }
   get EmailCtrl(): FormControl {
     return this.registerFg.get('emailCtrl') as FormControl;
   }
@@ -97,7 +93,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   //#region Methods
   registerUser(): void {
     let userRegisterInput: UserRegister = {
-      name: this.NameCtrl.value,
       email: this.EmailCtrl.value,
       password: this.PasswordCtrl.value,
       confirmPassword: this.ConfirmPasswordCtrl.value,
@@ -127,7 +122,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   // other methods
   checkStatus(): void {
-    console.log(this.registerFg.errors);
+    console.log(this.registerFg.value);
   }
   //#endregion
 }
