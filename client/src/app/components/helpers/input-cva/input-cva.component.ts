@@ -7,16 +7,16 @@ import { ControlValueAccessor, NgControl, FormControl } from '@angular/forms';
   styleUrls: ['./input-cva.component.scss']
 })
 export class InputCvaComponent implements ControlValueAccessor {
-  @Input('label') label = '';
-  @Input('type') type = 'text';
-  @Input('placeHolder') placeHolder = '';
-  @Input('hint') hint = '';
-  @Input('isFocused') isFocused = false;
+  @Input({ required: true }) label = '';
+  @Input() type = 'text';
+  @Input({ required: true }) placeHolder = '';
+  @Input() hint = '';
+  @Input() isFocused = false;
 
   constructor(@Self() public ngControl: NgControl) {
     ngControl.valueAccessor = this;
   }
-  
+
   writeValue(obj: any): void {
   }
   registerOnChange(fn: any): void {

@@ -7,9 +7,8 @@ import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
   styleUrls: ['./date-picker-cva.component.scss']
 })
 export class DatePickerCvaComponent implements ControlValueAccessor {
-  @Input('label') label = '';
-  @Input('type') type = 'text';
-  @Input('placeHolder') placeHolder = '';
+  @Input({ required: true }) label = '';
+  @Input({ required: true }) placeHolder = '';
   @Input('hint') hint = '';
   @Input('minDate') minDate: Date | undefined;
   @Input('maxDate') maxDate: Date | undefined;
