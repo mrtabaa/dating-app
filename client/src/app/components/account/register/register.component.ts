@@ -14,7 +14,7 @@ import { RegisterValidators } from '../../helpers/validators/register.validator'
 export class RegisterComponent implements OnInit, OnDestroy {
   minDate = new Date();
   maxDate = new Date();
-  age: number | undefined;
+  isEmailExist: string | undefined;
 
   subscriptionRegisterUser!: Subscription;
 
@@ -26,8 +26,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
     // set datePicker year limitations
     const currentYear = new Date().getFullYear();
-    this.minDate = new Date(currentYear - 99, 0, 1);
-    this.maxDate = new Date(currentYear - 18, 0, 1);
+    this.minDate = new Date(currentYear - 99, 0, 1); // not older than 99 years
+    this.maxDate = new Date(currentYear - 18, 0, 1); // not earlier than 18 years
   }
 
   ngOnDestroy(): void {
@@ -42,13 +42,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
     passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(20)]],
+    knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
     genderCtrl: ['female', [Validators.required]],
-    introductionCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    lookingForCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    interestsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    cityCtrl: ['', [Validators.required]],
-    countryCtrl: ['', [Validators.required]],
+    cityCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -72,15 +69,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
-  get IntroductionCtrl(): FormControl {
-    return this.registerFg.get('introductionCtrl') as FormControl;
-  }
-  get LookingForCtrl(): FormControl {
-    return this.registerFg.get('lookingForCtrl') as FormControl;
-  }
-  get InterestsCtrl(): FormControl {
-    return this.registerFg.get('interestsCtrl') as FormControl;
-  }
   get CityCtrl(): FormControl {
     return this.registerFg.get('cityCtrl') as FormControl;
   }
@@ -92,16 +80,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Methods
   registerUser(): void {
+    const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
+
     let userRegisterInput: UserRegister = {
       email: this.EmailCtrl.value,
       password: this.PasswordCtrl.value,
       confirmPassword: this.ConfirmPasswordCtrl.value,
-      dateOfBirth: this.DateOfBirthCtrl.value,
+      dateOfBirth: dob,
       knownAs: this.KnownAsCtrl.value,
       gender: this.GenderCtrl.value,
-      introduction: this.IntroductionCtrl.value,
-      lookingFor: this.LookingForCtrl.value,
-      interests: this.InterestsCtrl.value,
       city: this.CityCtrl.value,
       country: this.CountryCtrl.value
     };
@@ -112,12 +99,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.router.navigate(['/members']);
           console.log(res);
         },
-        error: err => console.log('Register error:', err),
+        error: err => this.isEmailExist = err.error,
         complete: () => console.log('Register successful.')
       });
 
     // to show validation mat-error on submit button (also added to DOM mat-error)
     this.registerFg.markAllAsTouched();
+  }
+
+  private getDateOnly(dob: string | null): string | undefined {
+    if (!dob) return undefined;
+
+    let theDob = new Date(dob);
+    return new Date(theDob.setMinutes(theDob.getMinutes() - theDob.getTimezoneOffset())).toISOString().slice(0, 10);
   }
 
   // other methods
