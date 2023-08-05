@@ -10,12 +10,19 @@
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
             [placeHolder]="'Enter a password'" [hint]="'Between 7 to 20 characters'">
         </app-input-cva>
-        <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
-            [placeHolder]="'Confirm your password'" [hint]="'Between 7 to 20 characters'">
-        </app-input-cva>
+        <div>
+            <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
+                [placeHolder]="'Confirm your password'" [hint]="'Between 7 to 20 characters'">
+            </app-input-cva>
+            <mat-error
+                *ngIf="PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')">
+                Password entries don't match.
+            </mat-error>
+        </div>
 
         <button type="submit" mat-raised-button color="primary" class="submitBtn">Register</button>
-        <!-- <button type="button" mat-raised-button (click)="checkStatus()">check</button> -->
+        <button type="button" mat-raised-button (click)="checkStatus()">check</button>
         <!-- <p>{{registerFg.value | json}}</p> -->
+        <p>{{registerFg.errors | json}}</p>
     </div>
 </form>

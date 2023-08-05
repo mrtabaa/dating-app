@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserRegister } from 'src/app/models/account/user-register.model';
 import { AccountService } from 'src/app/services/account.service';
+import { RegisterValidators } from '../../helpers/validators/register.validator';
 
 @Component({
   selector: 'app-register',
@@ -41,7 +42,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     interestsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     cityCtrl: [''],
     countryCtrl: [''],
-  });
+  }, { validator: RegisterValidators.confirmPassword });
   //#endregion
 
   //#region Forms Properties
@@ -65,7 +66,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return this.registerFg.get('knownAsCtrl') as FormControl;
   }
   get GenderCtrl(): FormControl {
-    return this.registerFg.get('genderCtrl') as FormControl; 
+    return this.registerFg.get('genderCtrl') as FormControl;
   }
   get IntroductionCtrl(): FormControl {
     return this.registerFg.get('introductionCtrl') as FormControl;
@@ -80,13 +81,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return this.registerFg.get('cityCtrl') as FormControl;
   }
   get CountryCtrl(): FormControl {
-    return this.registerFg.get('countryCtrl') as FormControl; 
+    return this.registerFg.get('countryCtrl') as FormControl;
   }
   //#endregion
 
 
   //#region Methods
-  registerUser() {
+  registerUser(): void {
     let userRegisterInput: UserRegister = {
       name: this.NameCtrl.value,
       email: this.EmailCtrl.value,
@@ -118,7 +119,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   // other methods
   checkStatus(): void {
-    console.log(this.PasswordCtrl);
+    console.log(this.registerFg.errors);
   }
   //#endregion
 }
