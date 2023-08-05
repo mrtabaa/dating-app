@@ -9,7 +9,7 @@ public class SeedUsersController : BaseApiController
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
 
-    public SeedUsersController(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
+    public SeedUsersController(IMongoClient client, IMongoDbSettings dbSettings)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = _database.GetCollection<AppUser>(_collectionName);
@@ -42,7 +42,7 @@ public class SeedUsersController : BaseApiController
         // add each user to DB
         foreach (var userInput in inputUsersDummy)
         {
-            AppUser user = new AppUser(
+            AppUser user = new(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
                 Email: userInput.Email.ToLower(),
