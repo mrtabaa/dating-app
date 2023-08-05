@@ -4,7 +4,7 @@ public record UserDto(
     string Schema,
     string? Id,
     string? Token,
-    string? Name,
+    string? KnownAs,
     string? Email,
     string? ProfilePhotoUrl
 );

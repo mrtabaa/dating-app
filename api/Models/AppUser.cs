@@ -3,7 +3,6 @@ namespace api.Models;
 public record AppUser(
     string? Schema,
     [property: BsonId, BsonRepresentation(BsonType.ObjectId)] string? Id,
-    string Name,
     string Email,
     string Password,
     byte[]? PasswordHash,
@@ -14,9 +13,9 @@ public record AppUser(
     DateTime Created,
     DateTime LastActive,
     string Gender,
-    string Introduction,
-    string LookingFor,
-    string Interests,
+    string? Introduction,
+    string? LookingFor,
+    string? Interests,
     string City,
     string Country,
     List<Photo> Photos

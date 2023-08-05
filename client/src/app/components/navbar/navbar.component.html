@@ -27,7 +27,7 @@
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin" mat-mini-fab>
             <!-- <mat-card style="display: none;"></mat-card> -->
             <img class="top-avatar" *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
-            <ng-template #username>{{user.name[0] | titlecase}}</ng-template>
+            <ng-template #username>{{user.knownAs[0] | titlecase}}</ng-template>
         </button>
         <!-- signup/login -->
         <ng-template #signupLogin>
@@ -45,11 +45,11 @@
                 <div color="basic" class="profileImage">
                     <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
                     <ng-template #username>
-                        {{user.name[0] | titlecase}}
+                        {{user.knownAs[0] | titlecase}}
                     </ng-template>
                 </div>
                 <div>
-                    <p>{{user.name | titlecase}}</p>
+                    <p>{{user.knownAs | titlecase}}</p>
                     <p class="email">{{user.email}}</p>
                 </div>
             </div>

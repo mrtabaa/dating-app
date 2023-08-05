@@ -11,7 +11,6 @@ namespace api.DTOs
             return new AppUser(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
-                Name: userInput.Name.Trim(),
                 Email: userInput.Email.ToLower().Trim(),
                 Password: userInput.Password,
                 PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
@@ -22,9 +21,9 @@ namespace api.DTOs
                 Created: DateTime.UtcNow,
                 LastActive: DateTime.UtcNow,
                 Gender: userInput.Gender,
-                Introduction: userInput.Introduction.Trim(),
-                LookingFor: userInput.LookingFor.Trim(),
-                Interests: userInput.Interests.Trim(),
+                Introduction: userInput.Introduction?.Trim(),
+                LookingFor: userInput.LookingFor?.Trim(),
+                Interests: userInput.Interests?.Trim(),
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
                 Photos: userInput.Photos
@@ -37,7 +36,6 @@ namespace api.DTOs
                 return new MemberDto(
                     Schema: appUser.Schema,
                     Id: appUser.Id,
-                    Name: appUser.Name,
                     Email: appUser.Email,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                     KnownAs: appUser.KnownAs,

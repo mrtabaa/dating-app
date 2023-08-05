@@ -45,7 +45,6 @@ public class SeedUsersController : BaseApiController
             AppUser user = new AppUser(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
-                Name: userInput.Name,
                 Email: userInput.Email.ToLower(),
                 Password: userInput.Password,
                 PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),

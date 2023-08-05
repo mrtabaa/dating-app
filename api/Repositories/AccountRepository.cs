@@ -38,8 +38,8 @@ public class AccountRepository : IAccountRepository
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
             Id: appUser.Id,
             Token: _tokenService.CreateToken(appUser),
-            Name: appUser.Name,
             Email: appUser.Email,
+            KnownAs: appUser.KnownAs,
             ProfilePhotoUrl: null
         );
     }
@@ -58,8 +58,8 @@ public class AccountRepository : IAccountRepository
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: user.Id,
                 Token: _tokenService.CreateToken(user),
-                Name: user.Name,
                 Email: user.Email,
+                KnownAs: user.KnownAs,
                 ProfilePhotoUrl: user.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
             );
 
