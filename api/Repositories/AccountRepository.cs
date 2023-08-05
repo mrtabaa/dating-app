@@ -27,12 +27,15 @@ public class AccountRepository : IAccountRepository
     {
         bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync();
 
-        if (userExist) return (null);
+        if (userExist) return null;
 
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
         // if insertion successful OR throw an exception
         await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
+
+        if (appUser.Id is null)
+            _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
         return new UserDto(
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
@@ -46,24 +49,27 @@ public class AccountRepository : IAccountRepository
 
     public async Task<UserDto?> Login(LoginDto userInput)
     {
-        var user = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
+        var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
 
-        if (user is null) return null;
+        if (appUser is null) return null;
 
-        using var hmac = new HMACSHA512(user.PasswordSalt!);
+        using var hmac = new HMACSHA512(appUser.PasswordSalt!);
+
+        if (appUser.Id is null)
+            _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
-        if (user.PasswordHash is not null && user.PasswordHash.SequenceEqual(ComputedHash))
+        if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
             return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: user.Id,
-                Token: _tokenService.CreateToken(user),
-                Email: user.Email,
-                KnownAs: user.KnownAs,
-                ProfilePhotoUrl: user.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
+                Id: appUser.Id,
+                Token: _tokenService.CreateToken(appUser),
+                Email: appUser.Email,
+                KnownAs: appUser.KnownAs,
+                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
             );
 
-        _ = user ?? throw new ArgumentException("valid userInput but user was not created", nameof(user));
+        _ = appUser ?? throw new ArgumentException("valid userInput but user was not created", nameof(appUser));
         return null;
     }
     #endregion CRUD
