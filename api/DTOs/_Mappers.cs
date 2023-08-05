@@ -20,7 +20,7 @@ namespace api.DTOs
                 KnownAs: userInput.KnownAs.Trim(),
                 Created: DateTime.UtcNow,
                 LastActive: DateTime.UtcNow,
-                Gender: userInput.Gender,
+                Gender: userInput.Gender.ToLower(),
                 Introduction: userInput.Introduction?.Trim(),
                 LookingFor: userInput.LookingFor?.Trim(),
                 Interests: userInput.Interests?.Trim(),
