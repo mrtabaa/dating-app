@@ -1,11 +1,25 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerUser()">
     <div class="container">
         <h2 class="title">Create Account</h2>
-        <app-input-cva [formControl]="NameCtrl" [label]="'Full Name'" [placeHolder]="'Enter your name'"
-            [hint]="'Enter your full name'" [isFocused]="true">
-        </app-input-cva>
-        <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Enter your email'"
+        <div class="gender">
+            <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender">
+                <strong>I am a</strong>
+                <mat-radio-button value="female">Female</mat-radio-button>
+                <mat-radio-button value="male">Male</mat-radio-button>
+                <mat-radio-button value="other">Other</mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
             [hint]="'Your email will be used as your username.'">
+        </app-input-cva>
+        <app-input-cva [formControl]="NameCtrl" [label]="'Known As'" [placeHolder]="'Your name/nickname'"
+            [hint]="'Enter your name or nickname'" [isFocused]="true">
+        </app-input-cva>
+        <app-input-cva [formControl]="CityCtrl" [label]="'City'" [placeHolder]="'Your city'"
+            [hint]="'Enter your city'">
+        </app-input-cva>
+        <app-input-cva [formControl]="CountryCtrl" [label]="'Country'" [placeHolder]="'Your coutnry'"
+            [hint]="'Enter your country.'">
         </app-input-cva>
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
             [placeHolder]="'Enter a password'" [hint]="'Between 7 to 20 characters'">
@@ -22,7 +36,7 @@
 
         <button type="submit" mat-raised-button color="primary" class="submitBtn">Register</button>
         <button type="button" mat-raised-button (click)="checkStatus()">check</button>
-        <!-- <p>{{registerFg.value | json}}</p> -->
-        <p>{{registerFg.errors | json}}</p>
+        <p>{{registerFg.value | json}}</p>
+        <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
 </form>

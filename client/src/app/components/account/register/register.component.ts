@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { AbstractControlOptions, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserRegister } from 'src/app/models/account/user-register.model';
@@ -36,13 +36,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     dateOfBirthCtrl: [''],
     knownAsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    genderCtrl: ['', [Validators.required]],
+    genderCtrl: ['female', [Validators.required]],
     introductionCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     lookingForCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     interestsCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
     cityCtrl: [''],
     countryCtrl: [''],
-  }, { validator: RegisterValidators.confirmPassword });
+  }, {validators: [RegisterValidators.confirmPassword]} as AbstractControlOptions);
   //#endregion
 
   //#region Forms Properties
