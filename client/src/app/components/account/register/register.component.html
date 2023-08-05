@@ -1,4 +1,4 @@
-<form [formGroup]="registerFg" (ngSubmit)="registerUser()">
+<form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
     <div class="container">
         <h2 class="title">Create Account</h2>
         <div class="gender">
@@ -10,10 +10,10 @@
             </mat-radio-group>
         </div>
         <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-            [hint]="'Your email will be used as your username'">
+            [hint]="'Your email will be used as your username'" [isFocused]="true">
         </app-input-cva>
         <app-input-cva [formControl]="KnownAsCtrl" [label]="'Known As'" [placeHolder]="'Your name/nickname'"
-            [hint]="'Enter your name or nickname'" [isFocused]="true">
+            [hint]="'Enter your name or nickname'">
         </app-input-cva>
         <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
             [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
@@ -36,9 +36,15 @@
             </mat-error>
         </div>
 
-        <button type="submit" mat-raised-button color="primary" class="submitBtn">Register</button>
-        <button type="button" mat-raised-button (click)="checkStatus()">check</button>
-        <p>{{registerFg.value | json}}</p>
+        <!-- show api errors -->
+        <div *ngIf="isEmailExist">
+            <mat-error>{{isEmailExist}}</mat-error>
+        </div>
+
+        <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
+            class="submitBtn">Register</button>
+        <!-- <button type="button" mat-raised-button (click)="checkStatus()">check</button> -->
+        <!-- <p>{{registerFg.value | json}}</p> -->
         <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
 </form>
