@@ -4,7 +4,6 @@
         <input [formControl]="Control" [min]="minDate" [max]="maxDate" matInput [matDatepicker]="dp3"
             placeholder="{{placeHolder}}">
         <mat-hint *ngIf="Control.invalid">Between {{minDate?.getFullYear()}} to {{maxDate?.getFullYear()}}</mat-hint>
-        <mat-hint *ngIf="Control.valid">You are yeas old</mat-hint>
         <mat-datepicker-toggle matIconSuffix [for]="dp3"></mat-datepicker-toggle>
         <mat-datepicker #dp3 touchUi disabled="false"></mat-datepicker>
         <mat-error *ngIf="Control.hasError('required')">{{label}} field is required</mat-error>
