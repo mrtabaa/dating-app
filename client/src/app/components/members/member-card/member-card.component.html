@@ -26,8 +26,8 @@
         <div class="title">
             <mat-icon *ngIf="member.gender === 'male'" color="primary">boy</mat-icon>
             <mat-icon *ngIf="member.gender === 'female'" color="primary">girl</mat-icon>
-            <mat-card-title>{{member.knownAs}}</mat-card-title>
+            <mat-card-title>{{member.knownAs | titlecase}}</mat-card-title>
         </div>
-        <mat-card-subtitle>{{member.city}}</mat-card-subtitle>
+        <mat-card-subtitle>{{member.city | titlecase}}</mat-card-subtitle>
     </mat-card-header>
 </mat-card>
