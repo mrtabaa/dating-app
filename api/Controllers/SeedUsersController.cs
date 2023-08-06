@@ -18,7 +18,7 @@ public class SeedUsersController : BaseApiController
 
     #region Add Dummy users to DB
     [HttpPost]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyUsers(IEnumerable<AppUser> inputUsersDummy)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyUsers(IEnumerable<UserRegisterDto> inputUsersDummy)
     {
         #region If databaseExists
         // check if database already exists using its status
@@ -42,14 +42,12 @@ public class SeedUsersController : BaseApiController
         // add each user to DB
         foreach (var userInput in inputUsersDummy)
         {
-            AppUser user = new(
+            AppUser appUser = new(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
                 Email: userInput.Email.ToLower(),
-                Password: userInput.Password,
                 PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
                 PasswordSalt: hmac.Key,
-                ConfirmPassword: userInput.ConfirmPassword,
                 DateOfBirth: userInput.DateOfBirth,
                 KnownAs: userInput.KnownAs,
                 Created: DateTime.UtcNow,
@@ -60,14 +58,14 @@ public class SeedUsersController : BaseApiController
                 Interests: userInput.Interests,
                 City: userInput.City,
                 Country: userInput.Country,
-                Photos: userInput.Photos
+                Photos: userInput.Photos!
             );
 
-            await _collection!.InsertOneAsync(user);
+            await _collection!.InsertOneAsync(appUser);
         }
 
         // get all users from DB
-        IEnumerable<AppUser> appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync();
+        IEnumerable<AppUser> appUsers = await _collection.Find(new BsonDocument()).ToListAsync();
 
         // convert AppUser to MemberDto
         List<MemberDto?> memberDtos = new();
