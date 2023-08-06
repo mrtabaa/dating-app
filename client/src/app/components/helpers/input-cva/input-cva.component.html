@@ -15,7 +15,7 @@
             {{label}} field is required.
         </mat-error>
         <mat-error *ngIf="Control.hasError('pattern')">
-            This {{label}} format is invalid.
+            Enter a valid {{label}}.
         </mat-error>
         <mat-error *ngIf="Control.hasError('minlength')">
             Must be at least {{Control.errors?.['minlength']?.requiredLength}} characters.
