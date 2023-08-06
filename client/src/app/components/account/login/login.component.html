@@ -1,25 +1,12 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
     <div class="container">
         <h2>Login</h2>
-        <mat-form-field appearance="outline">
-            <mat-label>Username</mat-label>
-            <input formControlName="emailCtrl" dirAutofocus placeholder="Email address" matInput>
-            <mat-hint>Your registered email</mat-hint>
-            <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('required')">Email field is required.</mat-error>
-            <mat-error *ngIf="EmailCtrl.touched && EmailCtrl.hasError('pattern')">Enter a valid email
-                format.</mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input formControlName="passwordCtrl" type="text" placeholder="Your password" matInput>
-            <mat-hint>7 to 20 characters.</mat-hint>
-            <mat-error *ngIf="PasswordCtrl.touched && PasswordCtrl.hasError('required')">This field is
-                required.</mat-error>
-            <mat-error
-                *ngIf="PasswordCtrl.touched && (PasswordCtrl.hasError('minlength') || PasswordCtrl.hasError('maxlength'))">
-                Between 7 to 20 characters.
-            </mat-error>
-        </mat-form-field>
+        <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Email address'" [isFocused]="true"
+            [hint]="'Your registered email'">
+        </app-input-cva>
+        <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'" [placeHolder]="'Your password'"
+            [hint]="'7 to 20 characters'">
+        </app-input-cva>
         <button (click)="loginEmail()" class="submitBtn" mat-raised-button color="primary">Sign in</button>
     </div>
 </form>
