@@ -1,7 +1,6 @@
 namespace api.DTOs;
 
 public record UserRegisterDto(
-    string? Schema,
     [
         MaxLength(50),
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
@@ -20,7 +19,6 @@ public record UserRegisterDto(
 );
 
 public record LoginDto(
-    string? Schema,
     [
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format."),
         MaxLength(50)
