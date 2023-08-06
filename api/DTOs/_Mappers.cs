@@ -12,7 +12,7 @@ namespace api.DTOs
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
                 Email: userInput.Email.ToLower().Trim(),
-                PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
+                PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password)),
                 PasswordSalt: hmac.Key,
                 DateOfBirth: userInput.DateOfBirth,
                 KnownAs: userInput.KnownAs.Trim(),
