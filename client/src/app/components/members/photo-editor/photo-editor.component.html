@@ -1,4 +1,83 @@
+<section class="uploader">
+
+    <div style="background-color: greenyellow;">
+
+        <h3>Add Photos</h3>
+
+        <div ng2FileDrop [ngClass]="{'nv-file-over': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)"
+            [uploader]="uploader" class="my-drop-zone" style="background-color: aqua;">
+
+            Drop photos here
+        </div>
+        <mat-card class="example-card">
+            <mat-card-header>
+                <mat-card-title>Add Photos</mat-card-title>
+                <!-- <mat-card-subtitle>Dog Breed</mat-card-subtitle> -->
+            </mat-card-header>
+            <mat-card-content style="display: flex; flex-direction: column; align-items: center;">
+                <mat-icon>cloud_upload</mat-icon>
+                <p>Drop photos here</p>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-button>LIKE</button>
+                <button mat-button>SHARE</button>
+            </mat-card-actions>
+        </mat-card>
+
+        Multiple
+        <input type="file" ng2FileSelect [uploader]="uploader" multiple /><br />
+
+        Single
+        <input type="file" ng2FileSelect [uploader]="uploader" />
+    </div>
+
+    <div class="col-md-9" style="margin-bottom: 40px; background-color: red;" *ngIf="uploader && uploader.queue">
+
+        <h3>Upload queue</h3>
+        <p>Queue length: {{ uploader.queue.length }}</p>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th width="50%">Name</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of uploader.queue">
+                    <td><strong>{{ item?.file?.name }}</strong></td>
+                    <td *ngIf="uploader.options?.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background-color: rgb(234, 125, 143);">
+            <div style="background-color: rgb(43, 226, 195);">
+                Queue progress:
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()"
+                [disabled]="!uploader.getNotUploadedItems().length">
+                <span class="glyphicon glyphicon-upload"></span> Upload all
+            </button>
+            <button type="button" class="btn btn-warning btn-s" (click)="uploader.cancelAll()"
+                [disabled]="!uploader.isUploading">
+                <span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+            </button>
+            <button type="button" class="btn btn-danger btn-s" (click)="uploader.clearQueue()"
+                [disabled]="!uploader.queue.length">
+                <span class="glyphicon glyphicon-trash"></span> Remove all
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
 <section class="container" *ngIf="member">
+    <h1>YOUR PHOTOS HERE</h1>
     <div *ngFor="let photo of member.photos; let i = index">
         <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
 
@@ -10,9 +89,9 @@
         </div>
     </div>
     <h3 *ngIf="member.photos.length === 0">Your album is empty. You may upload some photos.</h3>
+    <mat-error *ngIf="errorGlob">
+        This update has failed for this reason:
+        <br> {{errorGlob}}
+        <br> Please try again or contact the admin.
+    </mat-error>
 </section>
-<mat-error *ngIf="errorGlob">
-    This update has failed for this reason:
-    <br> {{errorGlob}}
-    <br> Please try again or contact the admin.
-</mat-error>

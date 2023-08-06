@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FileUploader } from 'ng2-file-upload';
 import { take } from 'rxjs';
 import { Member } from 'src/app/models/member.model';
 import { User } from 'src/app/models/user.model';
@@ -11,17 +12,54 @@ import { environment } from 'src/environments/environment';
   templateUrl: './photo-editor.component.html',
   styleUrls: ['./photo-editor.component.scss']
 })
-export class PhotoEditorComponent {
+export class PhotoEditorComponent implements OnInit{
   @Input('member') member: Member | undefined;
   user!: User | null;
   errorGlob: string | undefined;
 
   basePhotoUrl: string = environment.apiPhotoUrl;
 
+  uploader: FileUploader | undefined;
+  hasBaseDropZoneOver = false;
+
   constructor(private accountService: AccountService, private memberService: MemberService) {
     accountService.currentUser$.pipe(take(1)).subscribe({
-      next: user => this.user = user
+      next: user => {
+        if (user)
+          this.user = user
+      }
     })
+  }
+
+  ngOnInit(): void {
+    this.initializeUploader();
+  }
+
+  fileOverBase(e: any): void {
+    this.hasBaseDropZoneOver = e;
+  }
+
+  initializeUploader(): void {
+    this.uploader = new FileUploader({
+      url: this.basePhotoUrl + 'user/add-photo',
+      authToken: 'Bearer ' + this.user?.token,
+      isHTML5: true,
+      allowedFileType: ['image'],
+      removeAfterUpload: true,
+      autoUpload: false,
+      maxFileSize: 10 * 1024 * 1024
+    });
+
+    this.uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+    }
+
+    this.uploader.onSuccessItem = (item, response, status, headers) => {
+      if(response) {
+        const photo = JSON.parse(response);
+        this.member?.photos.push(photo);
+      }
+    }
   }
 
   setMainPhoto(url_128In: string): void {

@@ -5,9 +5,10 @@ import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NgxGalleryModule } from '@kolkov/ngx-gallery';
-import { NgOptimizedImage } from '@angular/common'
+import { NgOptimizedImage } from '@angular/common';
 
+import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+import { FileUploadModule } from 'ng2-file-upload';
 
 //pipes
 import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
@@ -69,8 +70,9 @@ const components = [
     ReactiveFormsModule,
     MaterialModule,
     DirectiveModule,
+    NgOptimizedImage,
     NgxGalleryModule,
-    NgOptimizedImage
+    FileUploadModule
   ],
   exports: [components]
 })
