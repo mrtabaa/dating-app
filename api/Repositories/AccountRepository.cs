@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
@@ -9,8 +7,6 @@ public class AccountRepository : IAccountRepository
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly ITokenService _tokenService; // save user credential as a token
-    private readonly CancellationToken _cancellationToken;
-
 
     // constructor - dependency injection
     public AccountRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
@@ -18,14 +14,13 @@ public class AccountRepository : IAccountRepository
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(_collectionName);
         _tokenService = tokenService;
-        _cancellationToken = new CancellationToken();
     }
     #endregion
 
     #region CRUD
-    public async Task<UserDto?> Create(UserRegisterDto userInput)
+    public async Task<UserDto?> Create(UserRegisterDto userInput, CancellationToken cancellationToken)
     {
-        bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync();
+        bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync(cancellationToken);
 
         if (userExist) return null;
 
@@ -47,9 +42,9 @@ public class AccountRepository : IAccountRepository
         );
     }
 
-    public async Task<UserDto?> Login(LoginDto userInput)
+    public async Task<UserDto?> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
-        var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(_cancellationToken);
+        var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         if (appUser is null) return null;
 
