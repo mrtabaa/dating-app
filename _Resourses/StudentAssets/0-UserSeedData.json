@@ -2,6 +2,7 @@
     {
         "Email": "a@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1956-07-22",
         "KnownAs": "Lisa",
@@ -24,6 +25,7 @@
     {
         "Email": "a2@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1995-10-12",
         "KnownAs": "Karen",
@@ -46,6 +48,7 @@
     {
         "Email": "a3@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1959-01-24",
         "KnownAs": "Margo",
@@ -68,6 +71,7 @@
     {
         "Email": "a4@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1988-06-22",
         "KnownAs": "Lois",
@@ -90,6 +94,7 @@
     {
         "Email": "a5@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "female",
         "DateOfBirth": "1956-01-12",
         "KnownAs": "Ruthie",
@@ -112,6 +117,7 @@
     {
         "Email": "a6@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1950-02-07",
         "KnownAs": "Todd",
@@ -134,6 +140,7 @@
     {
         "Email": "a7@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1967-04-09",
         "KnownAs": "Porter",
@@ -156,6 +163,7 @@
     {
         "Email": "a8@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1990-03-23",
         "KnownAs": "Mayo",
@@ -178,6 +186,7 @@
     {
         "Email": "a9@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1952-12-01",
         "KnownAs": "Skinner",
@@ -200,6 +209,7 @@
     {
         "Email": "a10@a.com",
         "Password": "aaaaaaa",
+        "ConfirmPassword": "aaaaaaa",
         "Gender": "male",
         "DateOfBirth": "1978-03-20",
         "KnownAs": "Davis",
