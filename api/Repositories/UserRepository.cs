@@ -85,7 +85,7 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    public async Task<UpdateResult?> UploadPhotos(IEnumerable<IFormFile> files, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UploadPhotos(IFormFile file, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
         {
@@ -101,7 +101,7 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
-        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotosToDisk(files, userId, user.Photos);
+        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotosToDisk(file, userId, user.Photos);
 
         var updatedUser = Builders<AppUser>.Update
         .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
