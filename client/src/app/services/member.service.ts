@@ -17,7 +17,7 @@ export class MemberService {
   member: Member | undefined;
   user!: User;
 
-  constructor(private http: HttpClient, private accountService: AccountService) {
+  constructor(private http: HttpClient, accountService: AccountService) {
     accountService.currentUser$.pipe(take(1)).subscribe({
       next: user => { if (user) this.user = user; }
     });
@@ -65,6 +65,6 @@ export class MemberService {
   deletePhoto(url_128In: string): Observable<UpdateResult> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    return this.http.delete<UpdateResult>(this.baseUrl + '/delete-one-photo', {params: queryParams});
+    return this.http.delete<UpdateResult>(this.baseUrl + '/delete-one-photo', { params: queryParams });
   }
 }
