@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './photo-editor.component.html',
   styleUrls: ['./photo-editor.component.scss']
 })
-export class PhotoEditorComponent implements OnInit{
+export class PhotoEditorComponent implements OnInit {
   @Input('member') member: Member | undefined;
   user!: User | null;
   errorGlob: string | undefined;
@@ -41,13 +41,13 @@ export class PhotoEditorComponent implements OnInit{
 
   initializeUploader(): void {
     this.uploader = new FileUploader({
-      url: this.basePhotoUrl + 'user/add-photo',
+      url: environment.apiUrl + 'user/add-photos',
       authToken: 'Bearer ' + this.user?.token,
       isHTML5: true,
       allowedFileType: ['image'],
       removeAfterUpload: true,
       autoUpload: false,
-      maxFileSize: 10 * 1024 * 1024
+      maxFileSize: 40_000_000, // 8 * 5MB
     });
 
     this.uploader.onAfterAddingFile = (file) => {
@@ -55,7 +55,7 @@ export class PhotoEditorComponent implements OnInit{
     }
 
     this.uploader.onSuccessItem = (item, response, status, headers) => {
-      if(response) {
+      if (response) {
         const photo = JSON.parse(response);
         this.member?.photos.push(photo);
       }

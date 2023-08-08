@@ -1,16 +1,73 @@
-.container{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-
-    
-    div {
-        width: 128px;
-        
-        .buttons {
+main {
+    .uploader {
+        .add-photos {
+            // background-color: greenyellow;
             display: flex;
-            justify-content: space-evenly;
-            align-items: center;
+            justify-content: center;
+
+            * {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            mat-card {
+                width: 100%;
+                height: auto;
+            }
+
+            .nv-file-over {
+                border: dotted 3px rgb(255, 114, 114);
+                background-color: rgb(253, 237, 240);
+            }
+
+            input[type=file] {
+                display: none;
+            }
+        }
+
+        .queue {
+            margin: 40px 0;
+
+            .photos-queue{
+                display: flex;
+                flex-direction: column;
+                margin-top: 1rem;
+
+                * {
+                    display: flex;
+                    flex: 1;
+                }
+            }
+
+            .process{
+                margin-top: 1rem;
+
+                .buttons{
+                    margin-top: 0.5rem;
+                    display: flex;
+                    gap: 1rem;   
+                }
+            }
+        }
+    }
+
+    .album {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+
+
+        div {
+            width: 128px;
+
+            .buttons {
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+            }
         }
     }
 }
