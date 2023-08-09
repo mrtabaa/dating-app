@@ -15,7 +15,7 @@ public class PhotoService : IPhotoService
     }
     #endregion
 
-    public async Task<IEnumerable<Photo>?> AddPhotosToDisk(IFormFile formFile, string userId, List<Photo> userPhotos)
+    public async Task<string[]?> AddPhotosToDisk(IFormFile formFile, string userId)
     {
         // copy file/s to the folder
         if (formFile.Length > 0)
@@ -72,38 +72,17 @@ public class PhotoService : IPhotoService
             }
             #endregion Resize and Create Images to Disk
 
-            #region Create Photos list to save their URLs to db
+            #region Create the photo URLs and return the result
             // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
-            filePath_128_sq = filePath_128_sq.Split(wwwRootUrl)[1];
-            filePath_512_sq = filePath_512_sq.Split(wwwRootUrl)[1];
-            filePath_1024_sq = filePath_1024_sq.Split(wwwRootUrl)[1];
-
-            Photo photo;
-            if (!userPhotos.Any()) // if user's album is empty set Main: true
-            {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url_128: filePath_128_sq,
-                    Url_512: filePath_512_sq,
-                    Url_1024: filePath_1024_sq,
-                    IsMain: true
-                );
-            }
-            else
-            {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url_128: filePath_128_sq,
-                    Url_512: filePath_512_sq,
-                    Url_1024: filePath_1024_sq,
-                    IsMain: false
-                );
-            }
-            userPhotos.Add(photo);
+            return new[]{
+                filePath_128_sq.Split(wwwRootUrl)[1],
+                filePath_512_sq.Split(wwwRootUrl)[1],
+                filePath_1024_sq.Split(wwwRootUrl)[1]
+            };
+            #endregion
         }
-        #endregion
 
-        return userPhotos;
+        return null;
     }
 
     public bool DeletePhotoFromDisk(IEnumerable<string> filePaths)

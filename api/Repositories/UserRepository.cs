@@ -85,7 +85,7 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    public async Task<UpdateResult?> UploadPhotos(IFormFile file, string? userId, CancellationToken cancellationToken)
+    public async Task<Photo?> UploadPhotos(IFormFile file, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
         {
@@ -101,13 +101,47 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
-        IEnumerable<Photo>? addedPhotos = await _photoService.AddPhotosToDisk(file, userId, user.Photos);
+        string[]? photoUrls = await _photoService.AddPhotosToDisk(file, userId);
 
-        var updatedUser = Builders<AppUser>.Update
-        .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-        .Set(doc => doc.Photos, addedPhotos);
+        if (photoUrls is not null)
+        {
+            Photo photo;
+            if (!user.Photos.Any()) // if user's album is empty set Main: true
+            {
+                photo = new Photo(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url_128: photoUrls[0],
+                    Url_512: photoUrls[1],
+                    Url_1024: photoUrls[2],
+                    IsMain: true
+                );
+            }
+            else // user's album is not empty
+            {
+                photo = new Photo(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url_128: photoUrls[0],
+                    Url_512: photoUrls[1],
+                    Url_1024: photoUrls[2],
+                    IsMain: false
+                );
+            }
 
-        return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
+            user.Photos.Add(photo);
+
+            // save to DB
+            var updatedUser = Builders<AppUser>.Update
+                .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                .Set(doc => doc.Photos, user.Photos);
+
+            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
+
+            // return the save photo if save on disk and DB
+            return photoUrls is not null && result.ModifiedCount == 1 ? photo : null;
+        }
+
+        _logger.LogError("PhotoService saving photo to disk failed.");
+        return null;
     }
 
     public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? url_128_In, CancellationToken cancellationToken)
