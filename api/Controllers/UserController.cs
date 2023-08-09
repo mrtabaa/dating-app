@@ -57,13 +57,13 @@ public class UserController : BaseApiController
     #region Photo Management
     [RequestSizeLimit(40_000_000)]
     [HttpPost("add-photos")]
-    public async Task<ActionResult<UpdateResult>> AddPhotos([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Photo>> AddPhotos([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFile file, CancellationToken cancellationToken)
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
-        var result = await _userRepository.UploadPhotos(file, User.GetUserId(), cancellationToken);
+        Photo? photo = await _userRepository.UploadPhotos(file, User.GetUserId(), cancellationToken);
 
-        return result is null ? BadRequest("Add photos failed. See logger") : result;
+        return photo is null ? BadRequest("Add photo failed. See logger") : photo;
     }
 
     [HttpDelete("delete-one-photo")]
