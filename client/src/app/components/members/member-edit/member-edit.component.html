@@ -1,4 +1,4 @@
-<div>
+<div class="container">
     <section class="head">
         <h1 class="title">Your Profile</h1>
         <mat-card class="warning">
@@ -7,40 +7,42 @@
             </mat-card-content>
         </mat-card>
     </section>
-    <section *ngIf="member$ | async as member" class="content">
-        <mat-card>
-            <ng-container *ngFor="let photo of member.photos">
-                <img *ngIf="photo.isMain" mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240"
-                    height="240" alt="Photo of {{member.knownAs}}">
-            </ng-container>
-            <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}"
-                width="240" height="240" alt="Photo of {{member.knownAs}}">
-            <mat-card-content>
-                <div>
-                    <strong>Location</strong>
-                    <p>{{member.city}}, {{member.country}}</p>
-                </div>
-                <div>
-                    <strong>Age</strong>
-                    <p>{{member.age}}</p>
-                </div>
-                <div>
-                    <strong>Last Active</strong>
-                    <p>{{member.lastActive | date}}</p>
-                </div>
-                <div>
-                    <strong>Member Since</strong>
-                    <p>{{member.created | date}}</p>
-                </div>
-            </mat-card-content>
-            <mat-card-actions>
-                <button type="submit" (click)="updateMember()"
-                    [disabled]="memberEditFg.pristine || memberEditFg.invalid" mat-raised-button color="primary">
-                    Save Changes
-                </button>
-            </mat-card-actions>
-        </mat-card>
-        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <div *ngIf="member$ | async as member" class="content">
+        <section class="user-card">
+            <mat-card>
+                <ng-container *ngFor="let photo of member.photos">
+                    <img *ngIf="photo.isMain" mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240"
+                        height="240" alt="Photo of {{member.knownAs}}">
+                </ng-container>
+                <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}"
+                    width="240" height="240" alt="Photo of {{member.knownAs}}">
+                <mat-card-content>
+                    <div>
+                        <strong>Location</strong>
+                        <p>{{member.city}}, {{member.country}}</p>
+                    </div>
+                    <div>
+                        <strong>Age</strong>
+                        <p>{{member.age}}</p>
+                    </div>
+                    <div>
+                        <strong>Last Active</strong>
+                        <p>{{member.lastActive | date}}</p>
+                    </div>
+                    <div>
+                        <strong>Member Since</strong>
+                        <p>{{member.created | date}}</p>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button type="submit" (click)="updateMember()"
+                        [disabled]="memberEditFg.pristine || memberEditFg.invalid" mat-raised-button color="primary">
+                        Save Changes
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </section>
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
             <mat-tab label="About {{member.knownAs}}">
                 <div class="tab-contents">
                     <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
@@ -49,8 +51,8 @@
                             <textarea cdkTextareaAutosize formControlName="introductionCtrl"
                                 [value]="member.introduction" placeholder="Say something about your self" matInput
                                 required>
-                            {{IntroductionCtrl.value}}
-                        </textarea>
+                        {{IntroductionCtrl.value}}
+                    </textarea>
                             <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             <mat-error *ngIf="IntroductionCtrl.hasError('required')">This field is required</mat-error>
                             <mat-error *ngIf="IntroductionCtrl.hasError('minlength')">
@@ -64,8 +66,8 @@
                             <mat-label>Looking For</mat-label>
                             <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
                                 placeholder="Enter what you're looking for" matInput required>
-                            {{member.lookingFor}}
-                        </textarea>
+                        {{member.lookingFor}}
+                    </textarea>
                             <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             <mat-error *ngIf="LookingForCtrl.hasError('required')">This field is required</mat-error>
                             <mat-error *ngIf="LookingForCtrl.hasError('minlength')">
@@ -79,8 +81,8 @@
                             <mat-label>Interests</mat-label>
                             <textarea cdkTextareaAutosize formControlName="interestsCtrl"
                                 placeholder="Enter your interests" matInput required>
-                            {{member.interests}}
-                        </textarea>
+                        {{member.interests}}
+                    </textarea>
                             <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             <mat-error *ngIf="InterestsCtrl.hasError('required')">This field is required</mat-error>
                             <mat-error *ngIf="InterestsCtrl.hasError('minlength')">
@@ -122,6 +124,6 @@
                 </div>
             </mat-tab>
         </mat-tab-group>
-    </section>
+    </div>
 </div>
 <!-- <p>{{ memberEditFg.value | json }}</p> -->
