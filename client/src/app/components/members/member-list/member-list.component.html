@@ -1,3 +1,6 @@
-<div>
-    <app-member-card *ngFor="let member of members$ | async" [memberInput]="member"></app-member-card>
+<div *ngIf="currentUser$ | async as currentUser">
+    <ng-container *ngFor="let member of members$ | async">
+        <!-- show all users except the currentUser -->
+        <app-member-card *ngIf="currentUser.id !== member.id" [memberInput]="member"></app-member-card>
+    </ng-container>
 </div>
