@@ -28,7 +28,7 @@ export class PhotoEditorComponent implements OnInit {
         if (user)
           this.user = user
       }
-    })
+    });
   }
   
   ngOnInit(): void {
@@ -71,7 +71,7 @@ export class PhotoEditorComponent implements OnInit {
             if (photo.isMain === true)
               photo.isMain = false;
 
-            // set new selected
+            // set new selected main
             if (this.user && photo.url_128 === url_128In) {
               photo.isMain = true;
 
