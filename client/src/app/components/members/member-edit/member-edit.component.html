@@ -41,7 +41,7 @@
             </mat-card-actions>
         </mat-card>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-            <!-- <mat-tab label="About {{member.knownAs}}">
+            <mat-tab label="About {{member.knownAs}}">
                 <div class="tab-contents">
                     <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
@@ -115,7 +115,7 @@
                         </mat-form-field>
                     </form>
                 </div>
-            </mat-tab> -->
+            </mat-tab>
             <mat-tab label="Edit Photos">
                 <div class="tab-contents">
                     <app-photo-editor [member]="member"></app-photo-editor>
