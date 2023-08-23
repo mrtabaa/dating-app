@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -16,12 +16,6 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./member-edit.component.scss']
 })
 export class MemberEditComponent implements OnInit, OnDestroy {
-  @HostListener('window:beforeunload', ['$event']) unloadNotification($event: any) {
-    if (this.memberEditFg.dirty) {
-      $event.returnValue = true;
-    }
-  }
-
   member$: Observable<Member> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
   user: User | null = null;
