@@ -53,7 +53,7 @@ public class AccountRepository : IAccountRepository
         if (appUser.Id is null)
             _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
-        var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!));
+        var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
             return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
