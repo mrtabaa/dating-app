@@ -24,23 +24,16 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<List<MemberDto?>> GetUsersAsync(CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>> GetUsersAsync(UserParams userParams, CancellationToken cancellationToken)
     {
-        List<MemberDto?> memberDtos = new();
-
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
 
-        // For large lists
-        await _collection.Find<AppUser>(new BsonDocument())
-        .ForEachAsync(appUser =>
-        {
-            memberDtos.Add(Mappers.GenerateMemberDto(appUser));
-        }, cancellationToken);
+        // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
+        IMongoQueryable<AppUser> query = _collection.AsQueryable<AppUser>();
+        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreateAsync(query, userParams.PageNumber, userParams.PageSize, cancellationToken);
 
-        _logger.LogError("GetUsers was canceled.");
-
-        return memberDtos;
+        return appUsers;
     }
 
     public async Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)

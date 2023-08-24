@@ -4,6 +4,7 @@ global using System.Security.Claims;
 global using System.Security.Cryptography;
 global using System.Text;
 global using api.DTOs;
+global using api.Helpers;
 global using api.Extensions;
 global using api.Extensions.Validations;
 global using api.Interfaces;

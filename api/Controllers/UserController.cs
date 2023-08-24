@@ -11,19 +11,35 @@ public class UserController : BaseApiController
     {
         _userRepository = userRepository;
     }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers(CancellationToken cancellationToken)
-    {
-        return await _userRepository.GetUsers(cancellationToken);
-    }
     #endregion Variables and Constructor
 
     #region User Management
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
+    {
+        List<MemberDto?> memberDtos = new();
+
+        PagedList<AppUser> appUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
+
+        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to MemberDto.
+                If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
+        */
+        Response.AddPaginationHeader(new PaginationHeader(appUsers.CurrentPage, appUsers.PageSize, appUsers.TotalCount, appUsers.TotalPages));
+
+        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
+                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+        foreach (AppUser appUser in appUsers)
+        {
+            memberDtos.Add(Mappers.GenerateMemberDto(appUser));
+        }
+
+        return memberDtos;
+    }
+
     [HttpGet("id/{id}")]
     public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserById(id, cancellationToken);
+        MemberDto? user = await _userRepository.GetUserByIdAsync(id, cancellationToken);
 
         return user is null ? BadRequest("No user found by this ID.") : user;
     }
@@ -31,7 +47,7 @@ public class UserController : BaseApiController
     [HttpGet("email/{email}")]
     public async Task<ActionResult<MemberDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserByEmail(email, cancellationToken);
+        MemberDto? user = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
 
         return user is null ? BadRequest("No user found by this Email.") : user;
     }
@@ -41,7 +57,7 @@ public class UserController : BaseApiController
     {
         // MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 
-        var result = await _userRepository.UpdateUser(memberUpdateDto, User.GetUserId(), cancellationToken);
+        var result = await _userRepository.UpdateUserAsync(memberUpdateDto, User.GetUserId(), cancellationToken);
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
@@ -49,7 +65,7 @@ public class UserController : BaseApiController
     [HttpDelete("delete-user/{userId}")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(string userId, CancellationToken cancellationToken)
     {
-        var result = await _userRepository.DeleteUser(userId, cancellationToken);
+        var result = await _userRepository.DeleteUserAsync(userId, cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
     #endregion User Management
@@ -61,7 +77,7 @@ public class UserController : BaseApiController
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
-        Photo? photo = await _userRepository.UploadPhotos(file, User.GetUserId(), cancellationToken);
+        Photo? photo = await _userRepository.UploadPhotosAsync(file, User.GetUserId(), cancellationToken);
 
         return photo is null ? BadRequest("Add photo failed. See logger") : photo;
     }
@@ -69,13 +85,13 @@ public class UserController : BaseApiController
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        var result = await _userRepository.DeleteOnePhoto(User.GetUserId(), photoUrlIn, cancellationToken);
+        var result = await _userRepository.DeleteOnePhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }
 
     [HttpPut("set-main-photo")]
-    public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) => 
-        await _userRepository.SetMainPhoto(User.GetUserId(), photoUrlIn, cancellationToken);
+    public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
+        await _userRepository.SetMainPhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
     #endregion Photo Management
 }

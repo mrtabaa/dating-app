@@ -1,7 +1,7 @@
 namespace api.Interfaces;
 public interface IUserRepository
 {
-    public Task<List<MemberDto?>> GetUsersAsync(CancellationToken cancellationToken);
+    public Task<PagedList<AppUser>> GetUsersAsync(UserParams userParams, CancellationToken cancellationToken);
 
     public Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken);
 
