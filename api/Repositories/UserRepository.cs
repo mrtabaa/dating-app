@@ -24,7 +24,7 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<List<MemberDto?>> GetUsers(CancellationToken cancellationToken)
+    public async Task<List<MemberDto?>> GetUsersAsync(CancellationToken cancellationToken)
     {
         List<MemberDto?> memberDtos = new();
 
@@ -43,7 +43,7 @@ public class UserRepository : IUserRepository
         return memberDtos;
     }
 
-    public async Task<MemberDto?> GetUserById(string? userId, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -55,14 +55,14 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<MemberDto?> GetUserByEmail(string email, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         return user is null ? null : Mappers.GenerateMemberDto(user);
     }
 
-    public async Task<UpdateResult?> UpdateUser(MemberUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(MemberUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -80,12 +80,12 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<DeleteResult?> DeleteUser(string? userId, CancellationToken cancellationToken) =>
+    public async Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(user => user.Id == userId, cancellationToken);
     #endregion User Management
 
     #region Photo Management
-    public async Task<Photo?> UploadPhotos(IFormFile file, string? userId, CancellationToken cancellationToken)
+    public async Task<Photo?> UploadPhotosAsync(IFormFile file, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
         {
@@ -93,7 +93,7 @@ public class UserRepository : IUserRepository
             return null;
         }
 
-        var user = await GetUserById(userId, cancellationToken);
+        var user = await GetUserByIdAsync(userId, cancellationToken);
         if (user is null)
         {
             _logger.LogError("user is Null / not found");
@@ -144,7 +144,7 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> DeleteOnePhoto(string? userId, string? url_128_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? url_128_In, CancellationToken cancellationToken)
     {
         List<string> photoUrls = new();
 
@@ -181,7 +181,7 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, update, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> SetMainPhoto(string? userId, string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> SetMainPhotoAsync(string? userId, string photoUrlIn, CancellationToken cancellationToken)
     {
         // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
         var filterOld = Builders<AppUser>.Filter.Where(user => user.Id == userId
