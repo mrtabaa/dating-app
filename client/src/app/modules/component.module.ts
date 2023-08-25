@@ -7,9 +7,6 @@ import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgOptimizedImage } from '@angular/common';
 
-import { NgxGalleryModule } from '@kolkov/ngx-gallery';
-import { FileUploadModule } from 'ng2-file-upload';
-
 //pipes
 import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
 
@@ -35,6 +32,11 @@ import { PhotoEditorComponent } from '../components/members/photo-editor/photo-e
 // ControlValueAccessor helpers
 import { InputCvaComponent } from '../components/helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../components/helpers/date-picker-cva/date-picker-cva.component';
+
+
+// 3rd party packages
+import { NgxGalleryModule } from '@kolkov/ngx-gallery';
+import { FileUploadModule } from 'ng2-file-upload';
 
 const components = [
   NoAccessComponent,
