@@ -29,8 +29,19 @@ public class UserRepository : IUserRepository
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
 
+        // calculate DOB based on user's selected Age
+        var MinDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MaxAge - 1));
+        var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MinAge));
+
         // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
         IMongoQueryable<AppUser> query = _collection.AsQueryable<AppUser>();
+
+        query = query.Where(user =>
+                user.Id != userParams.CurrentUserId // don't request/show the currentUser in the list
+                && user.Gender != userParams.Gender // get the opposite gender only
+                && user.DateOfBirth >= MinDob && user.DateOfBirth <= MaxDob
+            );
+
         PagedList<AppUser> appUsers = await PagedList<AppUser>.CreateAsync(query, userParams.PageNumber, userParams.PageSize, cancellationToken);
 
         return appUsers;

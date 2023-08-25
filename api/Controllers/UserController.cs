@@ -19,6 +19,14 @@ public class UserController : BaseApiController
     {
         List<MemberDto?> memberDtos = new();
 
+        MemberDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
+
+        if (currentUser is not null && string.IsNullOrEmpty(userParams.Gender))
+        {
+            userParams.CurrentUserId = currentUser.Id;
+            userParams.Gender = currentUser.Gender == "male" ? "male" : "female";
+        }
+
         PagedList<AppUser> appUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to MemberDto.
