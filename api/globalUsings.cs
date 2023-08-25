@@ -9,6 +9,7 @@ global using api.Extensions;
 global using api.Extensions.Validations;
 global using api.Interfaces;
 global using api.Models;
+global using api.Models.Helpers;
 global using api.Repositories;
 global using api.Services;
 global using api.Settings;
