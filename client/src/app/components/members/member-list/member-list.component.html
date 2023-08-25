@@ -1,6 +1,7 @@
 <main>
+    <h1>Find Your Beloved One</h1>
     <div class="members-list">
-        <app-member-card *ngFor="let member of members$ | async" [memberInput]="member"></app-member-card>
+        <app-member-card *ngFor="let member of members" [memberInput]="member"></app-member-card>
     </div>
     <mat-paginator *ngIf="pagination" #paginator class="paginator" (page)="handlePageEvent($event)"
         [length]="pagination.totalItems" [pageSize]="pagination.itemsPerPage" [disabled]="false"
