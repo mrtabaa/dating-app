@@ -12,6 +12,7 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { MaterialModule } from './modules/material.module';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
     ComponentModule,
     MaterialModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    NgxSpinnerModule.forRoot({type: 'ball-atom'})
   ],
   providers: [
     CountryListService,

@@ -8,23 +8,14 @@ import { LoadingService } from './services/loading.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, AfterContentChecked {
+export class AppComponent implements OnInit {
   title = 'Dating App';
   isLoading: boolean = false;
 
-  constructor(
-    private accountService: AccountService,
-    private loadingService: LoadingService,
-    private cdRef: ChangeDetectorRef) { }
+  constructor(private accountService: AccountService) { }
 
   ngOnInit(): void {
     this.setLocalStorageCurrentValues();
-  }
-  
-  // fix ChangeDetection issue after loading value is changed
-  ngAfterContentChecked(): void {
-    this.isLoading = this.loadingService.isLoading;
-    this.cdRef.detectChanges();
   }
 
   setLocalStorageCurrentValues() {

@@ -11,8 +11,6 @@ import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -20,7 +18,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import {MatPaginatorModule} from '@angular/material/paginator'; 
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   exports: [
@@ -36,12 +34,10 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     MatDividerModule,
     MatStepperModule,
     MatAutocompleteModule,
-    MatProgressSpinnerModule,
     MatCheckboxModule,
     MatTableModule,
     MatTabsModule,
     MatSnackBarModule,
-    MatProgressBarModule,
     MatRadioModule,
     MatDatepickerModule,
     MatNativeDateModule,

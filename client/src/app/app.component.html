@@ -1,12 +1,13 @@
+<ngx-spinner type="ball-atom">
+    <h1>Loading...</h1>
+</ngx-spinner>
 <header>
     <nav>
         <app-navbar></app-navbar>
-        <mat-progress-bar *ngIf="isLoading" color="accent" mode="query"></mat-progress-bar>
     </nav>
 </header>
 <main>
     <router-outlet></router-outlet>
-    <mat-spinner *ngIf="isLoading" color="accent"></mat-spinner>
 </main>
 <footer>
     Footer
