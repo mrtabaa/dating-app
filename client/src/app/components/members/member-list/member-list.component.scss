@@ -1,7 +1,13 @@
-div {
+main {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 2rem;
-    margin: 2rem;
+    flex-direction: column;
+    align-items: center;
+    
+    .members-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 2rem;
+        margin: 2rem;
+    }
 }

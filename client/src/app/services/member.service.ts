@@ -7,6 +7,7 @@ import { MemberUpdate } from '../models/member-update.model';
 import { UpdateResult } from '../models/helpers/update-result.model';
 import { AccountService } from './account.service';
 import { User } from '../models/user.model';
+import { PaginationResult } from '../models/helpers/pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,7 @@ import { User } from '../models/user.model';
 export class MemberService {
   baseUrl: string = environment.apiUrl + 'user';
   members: Member[] = [];
+  paginationResult: PaginationResult<Member[]> = {};
   member: Member | undefined;
   user!: User;
 
@@ -23,13 +25,26 @@ export class MemberService {
     });
   }
 
-  getMembers(): Observable<Member[]> {
-    if (this.members.length > 0) return of(this.members); // return ObservableOf(members)
+  getMembers(page?: number, itemsPerPage?: number): Observable<PaginationResult<Member[]>> {
+    // if (this.members.length > 0) return of(this.members); // return ObservableOf(members) // caching
+    let params = new HttpParams();
 
-    return this.http.get<Member[]>(this.baseUrl).pipe(
-      map(members => {
-        this.members = members;
-        return this.members;
+    if (page && itemsPerPage) {
+      params = params.append('pageNumber', page);
+      params = params.append('pageSize', itemsPerPage);
+    }
+
+    return this.http.get<Member[]>(this.baseUrl, { observe: 'response', params }).pipe(
+      map(response => {
+        if (response.body)
+          this.paginationResult.result = response.body
+
+        const pagination = response.headers.get('Pagination');
+        if (pagination)
+          this.paginationResult.pagination = JSON.parse(pagination);
+
+        return this.paginationResult;
+        // this.members = members; // caching
       })
     );
   }
