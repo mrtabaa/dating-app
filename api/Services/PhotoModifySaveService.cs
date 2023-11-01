@@ -79,7 +79,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             canvas.Flush();
 
             using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
-            using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 100);
 
             string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
 
@@ -111,7 +111,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(width, height), SKFilterQuality.High);
 
             using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-            using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
 
             string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
 
@@ -153,7 +153,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
                 using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
 
                 using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-                using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+                using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
 
                 string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
 
@@ -203,7 +203,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
                 // crop image
                 SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
-                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
 
                 string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
 
@@ -236,7 +236,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
                 // crop image
                 SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
-                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
 
                 string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
 
@@ -268,7 +268,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
             // crop image
             SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
-            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Jpeg, 100);
+            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
 
             string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
 
