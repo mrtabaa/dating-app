@@ -24,21 +24,21 @@ public class UserController : BaseApiController
         if (currentUser is not null && string.IsNullOrEmpty(userParams.Gender))
         {
             userParams.CurrentUserId = currentUser.Id;
-            userParams.Gender = currentUser.Gender == "male" ? "male" : "female";
+            userParams.Gender = currentUser.Gender;
         }
 
-        PagedList<AppUser> appUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
+        PagedList<AppUser> pagedAppUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to MemberDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
-        Response.AddPaginationHeader(new PaginationHeader(appUsers.CurrentPage, appUsers.PageSize, appUsers.TotalCount, appUsers.TotalPages));
+        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalCount, pagedAppUsers.TotalPages));
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
-        foreach (AppUser appUser in appUsers)
+        foreach (AppUser pagedAppUser in pagedAppUsers)
         {
-            memberDtos.Add(Mappers.GenerateMemberDto(appUser));
+            memberDtos.Add(Mappers.GenerateMemberDto(pagedAppUser));
         }
 
         return memberDtos;
