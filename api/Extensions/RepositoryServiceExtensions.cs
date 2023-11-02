@@ -2,7 +2,7 @@ namespace api.Extensions;
 
 public static class RepositoryServiceExtensions
 {
-    public static IServiceCollection AddRepositoryServices(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
     {
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
