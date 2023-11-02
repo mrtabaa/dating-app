@@ -26,7 +26,7 @@ public class AccountRepository : IAccountRepository
 
         AppUser appUser = Mappers.GenerateAppUser(userInput);
 
-        // if insertion successful OR throw an exception
+        // Insertion successful OR throw an exception
         await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
 
         if (appUser.Id is null)
@@ -48,12 +48,12 @@ public class AccountRepository : IAccountRepository
 
         if (appUser is null) return null;
 
-        using var hmac = new HMACSHA512(appUser.PasswordSalt!);
-
         if (appUser.Id is null)
             _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
+        using var hmac = new HMACSHA512(appUser.PasswordSalt!);
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
+        
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
             return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
