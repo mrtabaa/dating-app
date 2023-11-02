@@ -34,17 +34,15 @@ public class UserRepository : IUserRepository
         var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MinAge));
 
         // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
-        IMongoQueryable<AppUser> query = _collection.AsQueryable<AppUser>();
-
-        query = query.Where(user =>
+        IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(user =>
                 user.Id != userParams.CurrentUserId // don't request/show the currentUser in the list
                 && user.Gender != userParams.Gender // get the opposite gender only
                 && user.DateOfBirth >= MinDob && user.DateOfBirth <= MaxDob
             );
 
-        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreateAsync(query, userParams.PageNumber, userParams.PageSize, cancellationToken);
+        PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, userParams.PageNumber, userParams.PageSize, cancellationToken);
 
-        return appUsers;
+        return pagedAppUsers;
     }
 
     public async Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
@@ -105,7 +103,7 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
-        string[]? photoUrls = await _photoService.AddPhotosToDisk(file, userId);
+        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, userId);
 
         if (photoUrls is not null)
         {
@@ -131,9 +129,10 @@ public class UserRepository : IUserRepository
                 );
             }
 
-            user.Photos.Add(photo);
 
             // save to DB
+            user.Photos.Add(photo);
+            
             var updatedUser = Builders<AppUser>.Update
                 .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
                 .Set(doc => doc.Photos, user.Photos);
