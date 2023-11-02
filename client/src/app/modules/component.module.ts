@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgOptimizedImage } from '@angular/common';
+import { DirectiveModule } from './directive.module';
 
 //pipes
 import { ShortenStringPipe } from '../pipes/shorten-string.pipe';
@@ -20,7 +21,6 @@ import { HomeComponent } from '../components/home/home.component';
 import { RegisterComponent } from '../components/account/register/register.component';
 import { LoginComponent } from '../components/account/login/login.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
-import { DirectiveModule } from './directive.module';
 import { ListsComponent } from '../components/lists/lists.component';
 import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
@@ -37,6 +37,7 @@ import { DatePickerCvaComponent } from '../components/helpers/date-picker-cva/da
 // 3rd party packages
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
+import { HttpClientModule } from '@angular/common/http';
 
 const components = [
   NoAccessComponent,
@@ -66,15 +67,16 @@ const components = [
   declarations: [components],
   imports: [
     CommonModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
+    AppRoutingModule, // also in app.module.ts
+    HttpClientModule,
+    BrowserAnimationsModule, // also in app.module.ts
     FormsModule,
     ReactiveFormsModule,
-    MaterialModule,
+    MaterialModule, // do NOT import in app.module.ts
     DirectiveModule,
     NgOptimizedImage,
     NgxGalleryModule,
-    FileUploadModule
+    FileUploadModule,
   ],
   exports: [components]
 })
