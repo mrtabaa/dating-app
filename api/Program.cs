@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 // From customized ServiceExtensions (Extensions folder) for a claen maintained code //
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
-builder.Services.AddRepositoryServices(builder.Configuration);
+builder.Services.AddRepositoryServices();
 #endregion
 
 #region Configure the HTTP request pipeline.
