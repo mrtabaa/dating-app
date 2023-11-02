@@ -2,7 +2,7 @@ namespace api.Helpers;
 
 public class UserParams
 {
-    private const int MaxPageSize = 50;
+    private const int MaxPageSize = 25;
 
     public int PageNumber { get; init; } = 1;
 
@@ -10,7 +10,7 @@ public class UserParams
     public int PageSize
     {
         get { return _pageSize; }
-        set { _pageSize = (value > MaxPageSize) ? MaxPageSize : value; }
+        set { _pageSize = value > MaxPageSize ? MaxPageSize : value; }
     }
 
     public string? CurrentUserId { get; set; }
