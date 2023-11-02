@@ -15,7 +15,7 @@ public class PhotoService : IPhotoService
     }
     #endregion
 
-    public async Task<string[]?> AddPhotosToDisk(IFormFile formFile, string userId)
+    public async Task<string[]?> AddPhotoToDisk(IFormFile formFile, string userId)
     {
         // copy file/s to the folder
         if (formFile.Length > 0)
@@ -32,7 +32,7 @@ public class PhotoService : IPhotoService
             switch (formFile.Length)
             {
                 case < 128 * 128:
-                    string? filePath_crop_sq = await _photoModifyService.CropWithOriginalSideAndSave_Square(formFile, userId);
+                    string? filePath_crop_sq = await _photoModifyService.CropWithOriginalSide_Square(formFile, userId);
                     filePath_1024_sq = filePath_512_sq = filePath_256_sq = filePath_128_sq = filePath_crop_sq;
                     break;
                 // case < 256 * 256:

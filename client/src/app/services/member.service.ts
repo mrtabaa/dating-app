@@ -37,11 +37,11 @@ export class MemberService {
     return this.http.get<Member[]>(this.baseUrl, { observe: 'response', params }).pipe(
       map(response => {
         if (response.body)
-          this.paginationResult.result = response.body
+          this.paginationResult.result = response.body // api's response body
 
         const pagination = response.headers.get('Pagination');
         if (pagination)
-          this.paginationResult.pagination = JSON.parse(pagination);
+          this.paginationResult.pagination = JSON.parse(pagination); // api's response pagination values
 
         return this.paginationResult;
         // this.members = members; // caching

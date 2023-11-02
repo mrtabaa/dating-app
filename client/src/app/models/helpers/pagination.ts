@@ -6,6 +6,6 @@ export interface Pagination {
 }
 
 export interface PaginationResult<T> {
-    result?: T;
-    pagination?: Pagination
+    result?: T; // api's response body
+    pagination?: Pagination // api's response pagination values
 }
