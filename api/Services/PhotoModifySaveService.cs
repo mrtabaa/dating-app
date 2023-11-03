@@ -108,7 +108,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         // performace
-        if(Math.Max(widthIn, heightIn) > maxSideSize_2048)
+        if (Math.Max(widthIn, heightIn) > maxSideSize_2048) // larger than 2048 input is not allowed. 
             return null;
 
         // do the job
@@ -145,7 +145,9 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     /// <returns>filePath</returns>
     public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int sideIn)
     {
-        // performace
+        if (sideIn > maxSideSize_2048) // larger than 2048 input is not allowed. 
+            return null;
+
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -214,6 +216,9 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
     public async Task<string?> Crop(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
+        if (Math.Max(widthIn, heightIn) > maxSideSize_2048) // larger than 2048 input is not allowed. 
+            return null;
+
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -245,6 +250,9 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
     public async Task<string?> Crop_Square(IFormFile formFile, string userId, int sideIn)
     {
+        if (sideIn > maxSideSize_2048) // larger than 2048 input is not allowed. 
+            return null;
+            
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile

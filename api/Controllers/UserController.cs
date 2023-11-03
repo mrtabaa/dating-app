@@ -79,9 +79,9 @@ public class UserController : BaseApiController
     #endregion User Management
 
     #region Photo Management
-    [RequestSizeLimit(40_000_000)]
+    [RequestSizeLimit(2048 * 2048 * 10)]
     [HttpPost("add-photos")]
-    public async Task<ActionResult<Photo>> AddPhotos([MaxFileSize(5_000_000), AllowedFileExtensions] IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Photo>> AddPhotos([MaxFileSize(2048 * 2048), AllowedFileExtensions] IFormFile file, CancellationToken cancellationToken)
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
