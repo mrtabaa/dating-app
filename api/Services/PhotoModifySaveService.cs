@@ -7,6 +7,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
     const string storageAddress = "storage/photos/";
+    const int maxSideSize_2048 = 2048;
 
     readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
     private enum OperationName
@@ -27,7 +28,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #region Resize Methods
 
     /// <summary>
-    /// Reduce image size to around 300k
+    /// Reduce by Scaling to around 300k
     /// Skip if already less than 300k
     /// Save image to hard
     /// </summary>
@@ -94,11 +95,21 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         }
     }
 
+    /// <summary>
+    /// Resize image based on the input sides.
+    /// It does NOT keep the original image's scale if proportional input sides are not give. 
+    /// Skip if either input side is larger than 2048px
+    /// </summary>
+    /// <param name="formFile"></param>
+    /// <param name="userId"></param>
+    /// <param name="widthIn"></param>
+    /// <param name="heightIn"></param>
+    /// <returns></returns>
     public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         // performace
-        if (widthIn * heightIn >= formFile.Length)
-            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
+        if(Math.Max(widthIn, heightIn) > maxSideSize_2048)
+            return null;
 
         // do the job
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
@@ -111,11 +122,8 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
             using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
 
-            int minWidth = Math.Min(widthIn, sourceBitmap.Width);
-            int minHeight = Math.Min(heightIn, sourceBitmap.Height);
-
             // resize
-            using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(minWidth, minHeight), SKFilterQuality.High);
+            using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
 
             using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
             using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
