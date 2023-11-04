@@ -7,7 +7,6 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #region Constructor and vars
     private readonly IWebHostEnvironment _webHostEnvironment;
     const string storageAddress = "storage/photos/";
-    const int maxSideSize_2048 = 2048;
 
     readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
     private enum OperationName
@@ -30,7 +29,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     /// <summary>
     /// Reduce by Scaling to around 300k
     /// Skip if already less than 300k
-    /// Save image to hard
+    /// Save image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
@@ -98,7 +97,8 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     /// <summary>
     /// Resize image based on the input sides.
     /// It does NOT keep the original image's scale if proportional input sides are not give. 
-    /// Skip if either input side is larger than 2048px
+    /// SaveImageAsIs if either input side is larger than the actual image's coresponding side.
+    /// Save image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
@@ -107,10 +107,6 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     /// <returns></returns>
     public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
-        // performace
-        if (Math.Max(widthIn, heightIn) > maxSideSize_2048) // larger than 2048 input is not allowed. 
-            return null;
-
         // do the job
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
@@ -120,6 +116,16 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
+            #region 3 x 5 OR 3 x 3 original image sides
+            // 4 & in => 3 x 3
+            // 3 in => 3 x 3
+            // Already square with min side
+            // performance: if either input side is larger than the actual image's coresponding side
+            if (widthIn >= skImage.Width || heightIn >= skImage.Height)
+                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+            #endregion
+
+            #region images with sides greater than input sides
             using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
 
             // resize
@@ -131,13 +137,14 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
 
             return filePath;
+            #endregion
         }
     }
 
     /// <summary>
     /// Crop-square then resize a photo based on one given side.
-    /// Skip operation if the given side is smaller than both width and height of the original image
-    /// Save image to hard
+    /// Skip operation if image is already square with original min side < sideIn.
+    /// Save image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
@@ -145,9 +152,6 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     /// <returns>filePath</returns>
     public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int sideIn)
     {
-        if (sideIn > maxSideSize_2048) // larger than 2048 input is not allowed. 
-            return null;
-
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -156,28 +160,34 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            ///// performance: SKIP RESIZE
-            if (sideIn * sideIn >= formFile.Length && skImage.Width == skImage.Height)
+            #region 3 x 3 original image sides
+            // 4 in => 3 x 3
+            // 3 in => 3 x 3
+            // Already square with min side
+            if (skImage.Width == skImage.Height && sideIn >= skImage.Width)
                 // save original file
                 return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
+            #endregion
 
-            if (sideIn >= Math.Max(skImage.Width, skImage.Height))
+            #region 3 x 5 original image sides 
+            // 6 in => 3 x 3
+            // 3 in => 3 x 3
+            // sideIn >= original min side (e.g sideIn = 6)
+            if (sideIn >= Math.Min(skImage.Width, skImage.Height))
                 return await CropWithOriginalSide_Square(formFile, userId);
+            #endregion
 
-            if (sideIn * sideIn >= formFile.Length)
-                // crop to square and save
-                return await Crop(formFile, userId, sideIn, sideIn);
-            /////
-
-            // get the smaller side to crop with square shape
+            #region 3 x 5 original image sides 
+            // 2 in => 2 x 2
+            // sideIn < original min side of 3 (e.g sideIn = 2)
+            // crop to square (3 x 3) first, then resize by 2
             int smallerSide = Math.Min(skImage.Width, skImage.Height);
 
-            // crop
             SKImage? croppedImage = CropImageForResize(skImage, smallerSide, smallerSide);
 
+            // resize
             if (croppedImage is not null)
             {
-                // resize
                 using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
                 using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
 
@@ -186,6 +196,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
 
                 return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
             }
+            #endregion
 
             return null;
         }
@@ -194,31 +205,18 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #endregion Resize Methods 
 
     #region Crop Methods
+
     /// <summary>
     /// 
+    /// Save image to hard if successful.
     /// </summary>
-    /// <param name="sKImage"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
+    /// <param name="formFile"></param>
+    /// <param name="userId"></param>
+    /// <param name="widthIn"></param>
+    /// <param name="heightIn"></param>
     /// <returns></returns>
-    private SKImage CropImageForResize(SKImage sKImage, int width, int height)
-    {
-        // find the center
-        int centerX = sKImage.Width / 2;
-        int centerY = sKImage.Height / 2;
-
-        // find the start points
-        int startX = centerX - width / 2;
-        int startY = centerY - height / 2;
-
-        return sKImage.Subset(SKRectI.Create(startX, startY, width, height));
-    }
-
     public async Task<string?> Crop(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
-        if (Math.Max(widthIn, heightIn) > maxSideSize_2048) // larger than 2048 input is not allowed. 
-            return null;
-
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -248,11 +246,16 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         }
     }
 
+    /// <summary>
+    /// 
+    /// Save image to hard if successful.
+    /// </summary>
+    /// <param name="formFile"></param>
+    /// <param name="userId"></param>
+    /// <param name="sideIn"></param>
+    /// <returns></returns>
     public async Task<string?> Crop_Square(IFormFile formFile, string userId, int sideIn)
     {
-        if (sideIn > maxSideSize_2048) // larger than 2048 input is not allowed. 
-            return null;
-            
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
         {
             // get image from formFile
@@ -283,6 +286,13 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         }
     }
 
+    /// <summary>
+    /// 
+    /// Save image to hard if successful.
+    /// </summary>
+    /// <param name="formFile"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public async Task<string?> CropWithOriginalSide_Square(IFormFile formFile, string userId)
     {
         using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
@@ -293,9 +303,10 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            //performance: already square
+            //performance: Skip, already square.
             if (skImage.Width == skImage.Height)
                 return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+
 
             int side = Math.Min(skImage.Width, skImage.Height);
 
@@ -314,6 +325,27 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
         }
     }
+
+    /// <summary>
+    /// Crops SKImage for use in this class only.
+    /// </summary>
+    /// <param name="sKImage"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns>SKImage</returns>
+    private SKImage CropImageForResize(SKImage sKImage, int width, int height)
+    {
+        // find the center
+        int centerX = sKImage.Width / 2;
+        int centerY = sKImage.Height / 2;
+
+        // find the start points
+        int startX = centerX - width / 2;
+        int startY = centerY - height / 2;
+
+        return sKImage.Subset(SKRectI.Create(startX, startY, width, height));
+    }
+
     #endregion Crop Methods
 
     #region Save Methods
