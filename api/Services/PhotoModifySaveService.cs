@@ -207,7 +207,9 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     #region Crop Methods
 
     /// <summary>
-    /// 
+    /// Crop image based on the input sides.
+    /// Skip operation and save original image if both inputs are larger than the original image sides. Save the original image. 
+    /// If either inputs are larger than the coresponding original image's width or height, keep the original side's size, then apply cropping.
     /// Save image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
@@ -225,24 +227,46 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             // convert imageData to SKImage
             using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            // check if the given sides are not larger than the image size
-            if (widthIn < skImage.Width && heightIn < skImage.Height)
+            #region Inputs are larger than original sides
+            /// 3 x 5 or 3 x 3 image original sides
+            // 4 in 6 in => 3 x 5
+            // 3 in 5 in => 3 x 5
+            if (widthIn <= skImage.Width && heightIn <= skImage.Height)
+                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+            #endregion
+
+            #region One or both inputs are smaller than the image original's either side
+            ///// keep the smaller original side and reduce the other side by the input
+            ///
+            /// 3 x 5 or 3 x 3 image original sides
+            
+            // 4 in 4 in => 3 x 4
+            // 3 in 4 in => 3 x 4
+            if (widthIn >= skImage.Width && heightIn < skImage.Height)
             {
-                // find the center
-                int centerX = skImage.Width / 2;
-                int centerY = skImage.Height / 2;
-
-                // find the start points
-                int startX = centerX - widthIn / 2;
-                int startY = centerY - heightIn / 2;
-
-                // crop image
-                SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
-                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
-
-                return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
+                widthIn = skImage.Width; // apply the image's width instead
             }
-            else return null;
+            // 2 in 6 in => 2 x 5
+            // 2 in 5 in => 2 x 5
+            if (widthIn < skImage.Width && heightIn >= skImage.Height)
+            {
+                heightIn = skImage.Height; // apply the image's height instead
+            }
+
+            // find the center
+            int centerX = skImage.Width / 2;
+            int centerY = skImage.Height / 2;
+
+            // find the start points
+            int startX = centerX - widthIn / 2;
+            int startY = centerY - heightIn / 2;
+
+            // crop image
+            SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
+            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+
+            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
+            #endregion
         }
     }
 
