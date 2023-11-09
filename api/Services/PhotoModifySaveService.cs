@@ -88,9 +88,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
             using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 100);
 
-            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
-
-            return filePath;
+            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
         }
     }
 
@@ -134,9 +132,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
             using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
 
-            string? filePath = await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
-
-            return filePath;
+            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
             #endregion
         }
     }
@@ -198,7 +194,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
             }
             #endregion
 
-            return null;
+            return null; //FIXME this method shouldn't return a null. It should return something with any images. 
         }
     }
 
@@ -271,7 +267,7 @@ public class PhotoModifySaveService : IPhotoModifySaveService
     }
 
     /// <summary>
-    /// 
+    /// TODO Continue
     /// Save image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
