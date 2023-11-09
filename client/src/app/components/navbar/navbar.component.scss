@@ -42,7 +42,7 @@ mat-toolbar {
 ::ng-deep .mat-menu {
     width: auto;
 
-    .userInfo {
+    .user-info {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -52,15 +52,13 @@ mat-toolbar {
         * {
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             margin: 0;
             padding: 0;
         }
 
-        .profileImage {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .profile-image {
             font-size: 3rem;
             background-color: rgb(246, 209, 164);
 
