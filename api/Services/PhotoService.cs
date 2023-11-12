@@ -67,7 +67,7 @@ public class PhotoService : IPhotoService
             // if conversion fails
             if (filePath_128_sq is null || filePath_512_sq is null || filePath_1024_sq is null)
             {
-                _logger.LogError("Photo addition failed. e.g. Height/Weight input is larger than the allowed size 2048px."); //FIXME error message
+                _logger.LogError("Photo addition failed. The returned filePath is null which is not allowed.");
                 return null;
             }
             #endregion Resize and Create Images to Disk
