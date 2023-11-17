@@ -14,9 +14,9 @@ public class AccountController : BaseApiController
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
     {
-        if(userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
+        if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        UserDto? user = await _accountRepository.Create(userIn, cancellationToken);
+        UserDto? user = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
         return user is null ? BadRequest("Email is already registered.") : user;
     }
@@ -24,7 +24,7 @@ public class AccountController : BaseApiController
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
-        UserDto? user = await _accountRepository.Login(userInput, cancellationToken);
+        UserDto? user = await _accountRepository.LoginAsync(userInput, cancellationToken);
 
         return user is null ? Unauthorized("Invalid username or password.") : user;
     }

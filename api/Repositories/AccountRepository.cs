@@ -18,7 +18,7 @@ public class AccountRepository : IAccountRepository
     #endregion
 
     #region CRUD
-    public async Task<UserDto?> Create(UserRegisterDto userInput, CancellationToken cancellationToken)
+    public async Task<UserDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
     {
         bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync(cancellationToken);
 
@@ -42,7 +42,7 @@ public class AccountRepository : IAccountRepository
         );
     }
 
-    public async Task<UserDto?> Login(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<UserDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
@@ -53,7 +53,7 @@ public class AccountRepository : IAccountRepository
 
         using var hmac = new HMACSHA512(appUser.PasswordSalt!);
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
-        
+
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
             return new UserDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
