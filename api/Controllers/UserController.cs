@@ -2,15 +2,10 @@ namespace api.Controllers;
 
 [Authorize]
 // [Produces("application/json")]
-public class UserController : BaseApiController
+public class UserController(IUserRepository _userRepository) : BaseApiController
 {
     #region Variables and Constructor
-    private readonly IUserRepository _userRepository;
 
-    public UserController(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
     #endregion Variables and Constructor
 
     #region User Management

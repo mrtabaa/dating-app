@@ -1,18 +1,11 @@
 namespace api.Services;
 
-public class PhotoService : IPhotoService
+public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<IPhotoModifySaveService> _logger) : IPhotoService
 {
     #region Constructor and variables
 
-    private readonly IPhotoModifySaveService _photoModifyService;
-    private readonly ILogger<IPhotoModifySaveService> _logger;
     const string wwwRootUrl = "wwwroot/";
 
-    public PhotoService(IPhotoModifySaveService photoModifyService, ILogger<IPhotoModifySaveService> logger)
-    {
-        _logger = logger;
-        _photoModifyService = photoModifyService;
-    }
     #endregion
 
     public async Task<string[]?> AddPhotoToDisk(IFormFile formFile, string userId)
@@ -20,7 +13,6 @@ public class PhotoService : IPhotoService
         // copy file/s to the folder
         if (formFile.Length > 0)
         {
-
             #region Resize and/or Store Images to Disk
             #region ResizeByPixel_Square
 

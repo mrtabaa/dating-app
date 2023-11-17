@@ -2,15 +2,8 @@ namespace api.Controllers;
 
 [AllowAnonymous] // never use this if you have [Authorize] on the mothods. [Authorize] gets ignored
 [Produces("application/json")]
-public class AccountController : BaseApiController
+public class AccountController(IAccountRepository _accountRepository) : BaseApiController
 {
-    private readonly IAccountRepository _accountRepository;
-
-    public AccountController(IAccountRepository accountRepository)
-    {
-        _accountRepository = accountRepository;
-    }
-
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
     {

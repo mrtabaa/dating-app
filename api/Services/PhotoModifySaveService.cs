@@ -2,10 +2,9 @@ using SkiaSharp;
 
 namespace api.Services;
 
-public class PhotoModifySaveService : IPhotoModifySaveService
+public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : IPhotoModifySaveService
 {
     #region Constructor and vars
-    private readonly IWebHostEnvironment _webHostEnvironment;
     const string storageAddress = "storage/photos/";
 
     readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
@@ -16,11 +15,6 @@ public class PhotoModifySaveService : IPhotoModifySaveService
         ResizeByPixelSquare,
         Crop,
         Original
-    }
-
-    public PhotoModifySaveService(IWebHostEnvironment webHostEnvironment)
-    {
-        _webHostEnvironment = webHostEnvironment;
     }
     #endregion
 
