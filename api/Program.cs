@@ -17,7 +17,7 @@ var app = builder.Build();
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // disable https for development
 
 app.UseStaticFiles();
 

@@ -89,7 +89,7 @@
           "options": {
             "sslCert": "./ssl/server.crt",
             "sslKey": "./ssl/server.key",
-            "ssl": true,
+            "ssl": false,
             "port": 7200
           },
           "configurations": {
