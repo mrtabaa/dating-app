@@ -1,7 +1,6 @@
 namespace api.Repositories;
 public class UserRepository : IUserRepository
 {
-
     #region Db and Token Settings
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser> _collection;
