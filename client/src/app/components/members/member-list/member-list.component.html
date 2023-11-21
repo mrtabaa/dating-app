@@ -3,9 +3,9 @@
     <div class="members-list">
         <app-member-card *ngFor="let member of members" [memberInput]="member"></app-member-card>
     </div>
-    <mat-paginator *ngIf="pagination" #paginator class="paginator" (page)="handlePageEvent($event)"
+    <mat-paginator *ngIf="pagination" #paginator (page)="handlePageEvent($event)"
         [length]="pagination.totalItems" [pageSize]="pagination.itemsPerPage" [disabled]="false"
         [showFirstLastButtons]="showFirstLastButtons" [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []"
-        [hidePageSize]="hidePageSize" [pageIndex]="pageIndex" aria-label="Select page">
+        [hidePageSize]="hidePageSize" [pageIndex]="pageIndex" aria-label="Select page" class="paginator">
     </mat-paginator>
 </main>
