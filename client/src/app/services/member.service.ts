@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { Member } from '../models/member.model';
+import { user } from '../models/user.model';
 import { Observable, finalize, map, of, take } from 'rxjs';
-import { MemberUpdate } from '../models/member-update.model';
+import { MemberUpdate } from '../models/user-update.model';
 import { UpdateResult } from '../models/helpers/update-result.model';
 import { AccountService } from './account.service';
 import { User } from '../models/user.model';
@@ -14,9 +14,9 @@ import { PaginationResult } from '../models/helpers/pagination';
 })
 export class MemberService {
   baseUrl: string = environment.apiUrl + 'user';
-  members: Member[] = [];
-  paginationResult: PaginationResult<Member[]> = {};
-  member: Member | undefined;
+  members: user[] = [];
+  paginationResult: PaginationResult<user[]> = {};
+  user: user | undefined;
   user!: User;
 
   constructor(private http: HttpClient, accountService: AccountService) {
@@ -25,7 +25,7 @@ export class MemberService {
     });
   }
 
-  getMembers(page?: number, itemsPerPage?: number): Observable<PaginationResult<Member[]>> {
+  getMembers(page?: number, itemsPerPage?: number): Observable<PaginationResult<user[]>> {
     // if (this.members.length > 0) return of(this.members); // return ObservableOf(members) // caching
     let params = new HttpParams();
 
@@ -34,7 +34,7 @@ export class MemberService {
       params = params.append('pageSize', itemsPerPage);
     }
 
-    return this.http.get<Member[]>(this.baseUrl, { observe: 'response', params }).pipe(
+    return this.http.get<user[]>(this.baseUrl, { observe: 'response', params }).pipe(
       map(response => {
         if (response.body)
           this.paginationResult.result = response.body // api's response body
@@ -49,23 +49,23 @@ export class MemberService {
     );
   }
 
-  getMember(email: string): Observable<Member> {
+  getMember(email: string): Observable<user> {
     if (this.members.length > 0) {
-      this.member = this.members.find(member => member.email === email);
-      if (this.member)
-        return of(this.member);
+      this.user = this.members.find(user => user.email === email);
+      if (this.user)
+        return of(this.user);
     }
 
-    return this.http.get<Member>(this.baseUrl + '/email/' + email);
+    return this.http.get<user>(this.baseUrl + '/email/' + email);
   }
 
   updateMember(memberUpdate: MemberUpdate): Observable<UpdateResult> {
     return this.http.put<UpdateResult>(this.baseUrl, memberUpdate).pipe(
       finalize(() => {
-        const member = this.members.find(member => member.email === memberUpdate.email);
-        if (member) {
-          const index = this.members.indexOf(member);
-          this.members[index] = { ...this.members[index], ...memberUpdate } // copy memberUpdate to the list's member
+        const user = this.members.find(user => user.email === memberUpdate.email);
+        if (user) {
+          const index = this.members.indexOf(user);
+          this.members[index] = { ...this.members[index], ...memberUpdate } // copy memberUpdate to the list's user
         }
       })
     );

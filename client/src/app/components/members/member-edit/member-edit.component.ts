@@ -3,20 +3,20 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
 import { UpdateResult } from 'src/app/models/helpers/update-result.model';
-import { MemberUpdate } from 'src/app/models/member-update.model';
-import { Member } from 'src/app/models/member.model';
+import { MemberUpdate } from 'src/app/models/user-update.model';
+import { user } from 'src/app/models/user.model';
 import { User } from 'src/app/models/user.model';
 import { AccountService } from 'src/app/services/account.service';
-import { MemberService } from 'src/app/services/member.service';
+import { MemberService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-member-edit',
-  templateUrl: './member-edit.component.html',
-  styleUrls: ['./member-edit.component.scss']
+  selector: 'app-user-edit',
+  templateUrl: './user-edit.component.html',
+  styleUrls: ['./user-edit.component.scss']
 })
 export class MemberEditComponent implements OnInit, OnDestroy {
-  member$: Observable<Member> | undefined;
+  user$: Observable<user> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
   user: User | null = null;
   subscribed: Subscription | undefined;
@@ -37,7 +37,7 @@ export class MemberEditComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.user) {
-      this.member$ = this.memberService.getMember(this.user.email);
+      this.user$ = this.memberService.getMember(this.user.email);
     }
 
     this.initContollersValues();
@@ -72,13 +72,13 @@ export class MemberEditComponent implements OnInit, OnDestroy {
   }
 
   initContollersValues() {
-    if (this.member$ && this.IntroductionCtrl.pristine) {
-      this.subscribed = this.member$.subscribe((member: Member) => {
-        this.IntroductionCtrl.setValue(member.introduction);
-        this.LookingForCtrl.setValue(member.lookingFor);
-        this.InterestsCtrl.setValue(member.interests);
-        this.CityCtrl.setValue(member.city);
-        this.CountryCtrl.setValue(member.country);
+    if (this.user$ && this.IntroductionCtrl.pristine) {
+      this.subscribed = this.user$.subscribe((user: user) => {
+        this.IntroductionCtrl.setValue(user.introduction);
+        this.LookingForCtrl.setValue(user.lookingFor);
+        this.InterestsCtrl.setValue(user.interests);
+        this.CityCtrl.setValue(user.city);
+        this.CountryCtrl.setValue(user.country);
       });
     }
   }

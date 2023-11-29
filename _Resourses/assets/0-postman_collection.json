@@ -1959,7 +1959,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{url}}/api/admin/edit-roles/lisa?roles=Moderator,Member",
+							"raw": "{{url}}/api/admin/edit-roles/lisa?roles=Moderator,user",
 							"host": [
 								"{{url}}"
 							],
@@ -1972,7 +1972,7 @@
 							"query": [
 								{
 									"key": "roles",
-									"value": "Moderator,Member"
+									"value": "Moderator,user"
 								}
 							]
 						}

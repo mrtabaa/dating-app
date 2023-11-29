@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FileUploader } from 'ng2-file-upload';
 import { take } from 'rxjs';
-import { Member } from 'src/app/models/member.model';
+import { user } from 'src/app/models/user.model';
 import { User } from 'src/app/models/user.model';
 import { AccountService } from 'src/app/services/account.service';
-import { MemberService } from 'src/app/services/member.service';
+import { MemberService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -13,7 +13,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./photo-editor.component.scss']
 })
 export class PhotoEditorComponent implements OnInit {
-  @Input('member') member: Member | undefined;
+  @Input('user') user: user | undefined;
   user!: User | null;
   errorGlob: string | undefined;
 
@@ -30,7 +30,7 @@ export class PhotoEditorComponent implements OnInit {
       }
     });
   }
-  
+
   ngOnInit(): void {
     this.initializeUploader();
   }
@@ -57,7 +57,7 @@ export class PhotoEditorComponent implements OnInit {
     this.uploader.onSuccessItem = (item, response, status, headers) => {
       if (response) {
         const photo = JSON.parse(response);
-        this.member?.photos.push(photo);
+        this.user?.photos.push(photo);
       }
     }
   }
@@ -65,8 +65,8 @@ export class PhotoEditorComponent implements OnInit {
   setMainPhoto(url_128In: string): void {
     this.memberService.setMainPhoto(url_128In).pipe(take(1)).subscribe({
       next: updateResult => {
-        if (updateResult.modifiedCount === 1 && this.member && this.user) {
-          this.member.photos.forEach(photo => {
+        if (updateResult.modifiedCount === 1 && this.user && this.user) {
+          this.user.photos.forEach(photo => {
             // unset previous main
             if (photo.isMain === true)
               photo.isMain = false;
@@ -91,8 +91,8 @@ export class PhotoEditorComponent implements OnInit {
   deletePhoto(url_128In: string, index: number): void {
     this.memberService.deletePhoto(url_128In).pipe(take(1)).subscribe({
       next: updateResult => {
-        if (updateResult.modifiedCount === 1 && this.member) {
-          this.member.photos.splice(index, 1);
+        if (updateResult.modifiedCount === 1 && this.user) {
+          this.user.photos.splice(index, 1);
         }
       }
     })

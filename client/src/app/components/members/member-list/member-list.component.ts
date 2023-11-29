@@ -2,20 +2,20 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { Pagination } from 'src/app/models/helpers/pagination';
-import { Member } from 'src/app/models/member.model';
-import { MemberService } from 'src/app/services/member.service';
+import { user } from 'src/app/models/user.model';
+import { MemberService } from 'src/app/services/user.service';
 
 @Component({
-  selector: 'app-member-list',
-  templateUrl: './member-list.component.html',
-  styleUrls: ['./member-list.component.scss']
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.scss']
 })
 export class MemberListComponent implements OnInit, OnDestroy {
   //#region Variables
 
   subscribed: Subscription | undefined;
 
-  members: Member[] = [];
+  members: user[] = [];
   pagination: Pagination | undefined;
 
   // Material Pagination attrs
@@ -33,7 +33,7 @@ export class MemberListComponent implements OnInit, OnDestroy {
   //#endregion
 
   constructor(private memberService: MemberService) { }
-  
+
   ngOnInit(): void {
     this.loadMembers();
   }

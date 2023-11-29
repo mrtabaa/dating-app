@@ -1,6 +1,6 @@
 namespace api.DTOs;
 
-public record MemberUpdateDto(
+public record UserUpdateDto(
     string? Schema,
     [MinLength(10), MaxLength(500)] string Introduction,
     [MinLength(10), MaxLength(500)] string LookingFor,

@@ -10,11 +10,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
     #region User Management
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
     {
-        List<MemberDto?> memberDtos = new();
+        List<UserDto?> memberDtos = new();
 
-        MemberDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
+        UserDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
 
         if (currentUser is not null && string.IsNullOrEmpty(userParams.Gender))
         {
@@ -40,23 +40,23 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserByIdAsync(id, cancellationToken);
+        UserDto? user = await _userRepository.GetUserByIdAsync(id, cancellationToken);
 
         return user is null ? BadRequest("No user found by this ID.") : user;
     }
 
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<MemberDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
+    public async Task<ActionResult<UserDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        MemberDto? user = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
+        UserDto? user = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
 
         return user is null ? BadRequest("No user found by this Email.") : user;
     }
 
     [HttpPut()]
-    public async Task<ActionResult<UpdateResult?>> UpdateUser(MemberUpdateDto memberUpdateDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto memberUpdateDto, CancellationToken cancellationToken)
     {
         // MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 

@@ -5,16 +5,16 @@ public record UserRegisterDto(
         MaxLength(50),
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
     ] string Email,
-    [DataType(DataType.Password), MinLength(7), MaxLength(20)] string Password,
-    [DataType(DataType.Password), MinLength(7), MaxLength(20)] string ConfirmPassword,
-    [MinLength(2), MaxLength(30)] string KnownAs,
+    [DataType(DataType.Password), Length(7, 20)] string Password,
+    [DataType(DataType.Password), Length(7, 20)] string ConfirmPassword,
+    [Length(2, 30)] string KnownAs,
     DateOnly DateOfBirth,
     string Gender,
-    [MinLength(10), MaxLength(500)] string? Introduction,
-    [MinLength(10), MaxLength(500)] string? LookingFor,
-    [MinLength(10), MaxLength(500)] string? Interests,
-    [MinLength(3), MaxLength(30)] string City,
-    [MinLength(3), MaxLength(30)] string Country,
+    [Length(10, 500)] string? Introduction,
+    [Length(10, 500)] string? LookingFor,
+    [Length(10, 500)] string? Interests,
+    [Length(3, 30)] string City,
+    [Length(3, 30)] string Country,
     List<Photo>? Photos
 );
 
@@ -23,5 +23,14 @@ public record LoginDto(
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format."),
         MaxLength(50)
     ] string Email,
-    [MinLength(7), MaxLength(20)] string Password
+    [Length(7, 20)] string Password
+);
+
+public record LoggedInDto(
+    string Schema,
+    string Id,
+    string Token,
+    string KnownAs,
+    string Email,
+    string? ProfilePhotoUrl
 );

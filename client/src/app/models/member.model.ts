@@ -1,6 +1,6 @@
 import { Photo } from "./photo.model";
 
-export interface Member {
+export interface user {
     schema: string | undefined,
     id: string | undefined,
     email: string | undefined,

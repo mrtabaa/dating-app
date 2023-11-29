@@ -22,12 +22,12 @@ import { RegisterComponent } from '../components/account/register/register.compo
 import { LoginComponent } from '../components/account/login/login.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { ListsComponent } from '../components/lists/lists.component';
-import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
+import { MessagesComponent } from '../components/messages/messages.component';
+import { PhotoEditorComponent } from '../components/members/photo-editor/photo-editor.component';
 import { MemberListComponent } from '../components/members/member-list/member-list.component';
 import { MemberCardComponent } from '../components/members/member-card/member-card.component';
-import { MessagesComponent } from '../components/messages/messages.component';
+import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
 import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
-import { PhotoEditorComponent } from '../components/members/photo-editor/photo-editor.component';
 
 // ControlValueAccessor helpers
 import { InputCvaComponent } from '../components/helpers/input-cva/input-cva.component';

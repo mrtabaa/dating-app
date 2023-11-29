@@ -1,10 +1,13 @@
-import { AfterContentChecked, AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { User } from './models/user.model';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
 import { AccountService } from './services/account.service';
-import { LoadingService } from './services/loading.service';
+import { NgxSpinnerModule } from "ngx-spinner";
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, NgxSpinnerModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

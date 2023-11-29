@@ -18,7 +18,7 @@ public class AccountRepository : IAccountRepository
     #endregion
 
     #region CRUD
-    public async Task<UserDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
+    public async Task<LoggedInDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
     {
         bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync(cancellationToken);
 
@@ -32,7 +32,7 @@ public class AccountRepository : IAccountRepository
         if (appUser.Id is null)
             _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
-        return new UserDto(
+        return new LoggedInDto(
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
             Id: appUser.Id,
             Token: _tokenService.CreateToken(appUser),
@@ -42,7 +42,7 @@ public class AccountRepository : IAccountRepository
         );
     }
 
-    public async Task<UserDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<LoggedInDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
@@ -55,7 +55,7 @@ public class AccountRepository : IAccountRepository
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
 
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
-            return new UserDto(
+            return new LoggedInDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: appUser.Id,
                 Token: _tokenService.CreateToken(appUser),

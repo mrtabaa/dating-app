@@ -5,19 +5,19 @@ namespace api.Controllers;
 public class AccountController(IAccountRepository _accountRepository) : BaseApiController
 {
     [HttpPost("register")]
-    public async Task<ActionResult<UserDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoggedInDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        UserDto? user = await _accountRepository.CreateAsync(userIn, cancellationToken);
+        LoggedInDto? user = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
         return user is null ? BadRequest("Email is already registered.") : user;
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
-        UserDto? user = await _accountRepository.LoginAsync(userInput, cancellationToken);
+        LoggedInDto? user = await _accountRepository.LoginAsync(userInput, cancellationToken);
 
         return user is null ? Unauthorized("Invalid username or password.") : user;
     }

@@ -1,8 +1,8 @@
 <main>
     <section class="top">
-        <div class="album" *ngIf="member">
-            <div *ngFor="let photo of member.photos; let i = index">
-                <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
+        <div class="album" *ngIf="user">
+            <div *ngFor="let photo of user.photos; let i = index">
+                <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{user.knownAs}} photo">
 
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary"
@@ -11,7 +11,7 @@
                         [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
                 </div>
             </div>
-            <h3 *ngIf="member.photos.length === 0">Your album is empty. You may upload some photos.</h3>
+            <h3 *ngIf="user.photos.length === 0">Your album is empty. You may upload some photos.</h3>
             <mat-error *ngIf="errorGlob">
                 This update has failed for this reason:
                 <br> {{errorGlob}}

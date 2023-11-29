@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
         return pagedAppUsers;
     }
 
-    public async Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
+    public async Task<UserDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -56,14 +56,14 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<MemberDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         return user is null ? null : Mappers.GenerateMemberDto(user);
     }
 
-    public async Task<UpdateResult?> UpdateUserAsync(MemberUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -131,7 +131,7 @@ public class UserRepository : IUserRepository
 
             // save to DB
             user.Photos.Add(photo);
-            
+
             var updatedUser = Builders<AppUser>.Update
                 .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
                 .Set(doc => doc.Photos, user.Photos);
@@ -152,7 +152,7 @@ public class UserRepository : IUserRepository
 
         List<Photo>? photos = await _collection.AsQueryable().Where<AppUser>(user => user.Id == userId).Select(elem => elem.Photos).SingleOrDefaultAsync();
 
-        if (photos is null || !photos.Any())
+        if (photos is null || photos.Count() < 2)
         {
             _logger.LogError("Album is empty OR the requested photo is the MainPhoto. No photo to delete.");
             return null;

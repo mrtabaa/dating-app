@@ -18,7 +18,7 @@ public class SeedUsersController : BaseApiController
 
     #region Add Dummy users to DB
     [HttpPost]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyUsers(IEnumerable<UserRegisterDto> inputUsersDummy)
+    public async Task<ActionResult<IEnumerable<UserDto?>>> CreateDummyUsers(IEnumerable<UserRegisterDto> inputUsersDummy)
     {
         #region If databaseExists
         // check if database already exists using its status
@@ -68,7 +68,7 @@ public class SeedUsersController : BaseApiController
         IEnumerable<AppUser> appUsers = await _collection.Find(new BsonDocument()).ToListAsync();
 
         // convert AppUser to MemberDto
-        List<MemberDto?> memberDtos = new();
+        List<UserDto?> memberDtos = new();
         foreach (AppUser appuser in appUsers)
         {
             memberDtos.Add(Mappers.GenerateMemberDto(appuser));

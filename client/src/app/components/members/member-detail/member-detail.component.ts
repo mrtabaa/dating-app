@@ -2,17 +2,17 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from '@kolkov/ngx-gallery';
 import { Observable, Subscription } from 'rxjs';
-import { Member } from 'src/app/models/member.model';
-import { MemberService } from 'src/app/services/member.service';
+import { user } from 'src/app/models/user.model';
+import { MemberService } from 'src/app/services/user.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-member-detail',
-  templateUrl: './member-detail.component.html',
-  styleUrls: ['./member-detail.component.scss']
+  selector: 'app-user-detail',
+  templateUrl: './user-detail.component.html',
+  styleUrls: ['./user-detail.component.scss']
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
-  member$: Observable<Member> | undefined;
+  user$: Observable<user> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
   subscribed: Subscription | undefined;
 
@@ -28,21 +28,21 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-      this.subscribed;
+    this.subscribed;
   }
 
   loadMember(): void {
     const email: string | null = this.route.snapshot.paramMap.get('email');
 
     if (email) {
-      this.member$ = this.memberService.getMember(email);
+      this.user$ = this.memberService.getMember(email);
     }
   }
 
   setGalleryImages(): void {
-    this.subscribed = this.member$?.subscribe(
-      (member: Member) => {
-        for (const photo of member.photos) {
+    this.subscribed = this.user$?.subscribe(
+      (user: user) => {
+        for (const photo of user.photos) {
           this.galleryImages.push(
             {
               small: this.apiPhotoUrl + photo.url_128,

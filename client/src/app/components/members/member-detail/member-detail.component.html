@@ -1,27 +1,27 @@
-<main *ngIf="member$ | async as member">
+<main *ngIf="user$ | async as user">
     <mat-card>
-        <ng-container *ngFor="let photo of member.photos">
+        <ng-container *ngFor="let photo of user.photos">
             <img *ngIf="photo.isMain" mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240" height="240"
-                alt="Photo of {{member.knownAs}}">
+                alt="Photo of {{user.knownAs}}">
         </ng-container>
-        <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="./assets/images/defaults/user.png" width="240"
-            height="240" alt="Photo of {{member.knownAs}}">
+        <img *ngIf="user.photos.length === 0" mat-card-image ngSrc="./assets/images/defaults/user.png" width="240"
+            height="240" alt="Photo of {{user.knownAs}}">
         <mat-card-content>
             <div>
                 <strong>Location</strong>
-                <p>{{member.city}}, {{member.country}}</p>
+                <p>{{user.city}}, {{user.country}}</p>
             </div>
             <div>
                 <strong>Age</strong>
-                <p>{{member.age}}</p>
+                <p>{{user.age}}</p>
             </div>
             <div>
                 <strong>Last Active</strong>
-                <p>{{member.lastActive | date}}</p>
+                <p>{{user.lastActive | date}}</p>
             </div>
             <div>
-                <strong>Member Since</strong>
-                <p>{{member.created | date}}</p>
+                <strong>user Since</strong>
+                <p>{{user.created | date}}</p>
             </div>
         </mat-card-content>
         <mat-card-actions>
@@ -30,18 +30,18 @@
         </mat-card-actions>
     </mat-card>
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-        <mat-tab label="About {{member.knownAs}}">
+        <mat-tab label="About {{user.knownAs}}">
             <div class="tab-contents">
                 <h4>Introduction</h4>
-                <p>{{member.introduction}}</p>
+                <p>{{user.introduction}}</p>
                 <h4>Looking For</h4>
-                <p>{{member.lookingFor}}</p>
+                <p>{{user.lookingFor}}</p>
             </div>
         </mat-tab>
         <mat-tab label="Interests">
             <div class="tab-contents">
                 <h4>Interests</h4>
-                <p>{{member.interests}}</p>
+                <p>{{user.interests}}</p>
             </div>
         </mat-tab>
         <mat-tab label="Photos">

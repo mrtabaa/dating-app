@@ -7,31 +7,31 @@
             </mat-card-content>
         </mat-card>
     </section>
-    <div *ngIf="member$ | async as member" class="content">
+    <div *ngIf="user$ | async as user" class="content">
         <section class="user-card">
             <mat-card>
-                <ng-container *ngFor="let photo of member.photos">
+                <ng-container *ngFor="let photo of user.photos">
                     <img *ngIf="photo.isMain" mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240"
-                        height="240" alt="Photo of {{member.knownAs}}">
+                        height="240" alt="Photo of {{user.knownAs}}">
                 </ng-container>
-                <img *ngIf="member.photos.length === 0" mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}"
-                    width="240" height="240" alt="Photo of {{member.knownAs}}">
+                <img *ngIf="user.photos.length === 0" mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}"
+                    width="240" height="240" alt="Photo of {{user.knownAs}}">
                 <mat-card-content>
                     <div>
                         <strong>Location</strong>
-                        <p>{{member.city}}, {{member.country}}</p>
+                        <p>{{user.city}}, {{user.country}}</p>
                     </div>
                     <div>
                         <strong>Age</strong>
-                        <p>{{member.age}}</p>
+                        <p>{{user.age}}</p>
                     </div>
                     <div>
                         <strong>Last Active</strong>
-                        <p>{{member.lastActive | date}}</p>
+                        <p>{{user.lastActive | date}}</p>
                     </div>
                     <div>
-                        <strong>Member Since</strong>
-                        <p>{{member.created | date}}</p>
+                        <strong>user Since</strong>
+                        <p>{{user.created | date}}</p>
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
@@ -43,13 +43,13 @@
             </mat-card>
         </section>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab label="About {{member.knownAs}}">
+            <mat-tab label="About {{user.knownAs}}">
                 <div class="tab-contents">
                     <form [formGroup]="memberEditFg" (ngSubmit)="memberEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
                             <mat-label>Introduction</mat-label>
                             <textarea cdkTextareaAutosize formControlName="introductionCtrl"
-                                [value]="member.introduction" placeholder="Say something about your self" matInput
+                                [value]="user.introduction" placeholder="Say something about your self" matInput
                                 required>
                         {{IntroductionCtrl.value}}
                     </textarea>
@@ -66,7 +66,7 @@
                             <mat-label>Looking For</mat-label>
                             <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
                                 placeholder="Enter what you're looking for" matInput required>
-                        {{member.lookingFor}}
+                        {{user.lookingFor}}
                     </textarea>
                             <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             <mat-error *ngIf="LookingForCtrl.hasError('required')">This field is required</mat-error>
@@ -81,7 +81,7 @@
                             <mat-label>Interests</mat-label>
                             <textarea cdkTextareaAutosize formControlName="interestsCtrl"
                                 placeholder="Enter your interests" matInput required>
-                        {{member.interests}}
+                        {{user.interests}}
                     </textarea>
                             <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             <mat-error *ngIf="InterestsCtrl.hasError('required')">This field is required</mat-error>
@@ -120,7 +120,7 @@
             </mat-tab>
             <mat-tab label="Edit Photos">
                 <div class="tab-contents">
-                    <app-photo-editor [member]="member"></app-photo-editor>
+                    <app-photo-editor [user]="user"></app-photo-editor>
                 </div>
             </mat-tab>
         </mat-tab-group>

@@ -1,12 +1,12 @@
-<mat-card *ngIf="member" class="card">
+<mat-card *ngIf="user" class="card">
     <div class="card-img-wrapper">
-        <ng-container *ngFor="let photo of member.photos">
-            <img mat-card-image *ngIf="photo.isMain" ngSrc="{{apiPhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}}">
+        <ng-container *ngFor="let photo of user.photos">
+            <img mat-card-image *ngIf="photo.isMain" ngSrc="{{apiPhotoUrl + photo.url_128}}" width="128" height="128" alt="{{user.knownAs}}">
         </ng-container>
-        <img mat-card-image *ngIf="member.photos.length === 0" ngSrc="./assets/images/defaults/user.png" width="128" height="128" alt="{{member.knownAs}} photo">
-        <ul class="member-icons">
+        <img mat-card-image *ngIf="user.photos.length === 0" ngSrc="./assets/images/defaults/user.png" width="128" height="128" alt="{{user.knownAs}} photo">
+        <ul class="user-icons">
             <li>
-                <button [routerLink]="['/members/' + member.email]" mat-mini-fab color="warn">
+                <button [routerLink]="['/members/' + user.email]" mat-mini-fab color="warn">
                     <mat-icon>person_add</mat-icon>
                 </button>
             </li>
@@ -24,10 +24,10 @@
     </div>
     <mat-card-header>
         <div class="title">
-            <mat-icon *ngIf="member.gender === 'male'" color="primary">boy</mat-icon>
-            <mat-icon *ngIf="member.gender === 'female'" color="primary">girl</mat-icon>
-            <mat-card-title>{{member.knownAs | titlecase}}</mat-card-title>
+            <mat-icon *ngIf="user.gender === 'male'" color="primary">boy</mat-icon>
+            <mat-icon *ngIf="user.gender === 'female'" color="primary">girl</mat-icon>
+            <mat-card-title>{{user.knownAs | titlecase}}</mat-card-title>
         </div>
-        <mat-card-subtitle>{{member.city | titlecase}}</mat-card-subtitle>
+        <mat-card-subtitle>{{user.city | titlecase}}</mat-card-subtitle>
     </mat-card-header>
 </mat-card>

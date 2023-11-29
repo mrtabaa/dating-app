@@ -28,10 +28,10 @@ namespace api.DTOs
             );
         }
 
-        public static MemberDto? GenerateMemberDto(AppUser appUser)
+        public static UserDto? GenerateMemberDto(AppUser appUser)
         {
             if (!(appUser.Id is null || appUser.Schema is null))
-                return new MemberDto(
+                return new UserDto(
                     Schema: appUser.Schema,
                     Id: appUser.Id,
                     Email: appUser.Email,

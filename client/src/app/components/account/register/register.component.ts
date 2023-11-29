@@ -1,17 +1,29 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AbstractControlOptions, FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { UserRegister } from 'src/app/models/account/user-register.model';
-import { AccountService } from 'src/app/services/account.service';
 import { RegisterValidators } from '../../helpers/validators/register.validator';
+import { UserRegister } from '../../../models/account/user-register.model';
+import { AccountService } from '../../../services/account.service';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule,
+    MatButtonModule, MatInputModule
+  ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  private accountService = inject(AccountService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+
   minDate = new Date();
   maxDate = new Date();
   isEmailExist: string | undefined;
@@ -19,8 +31,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   subscriptionRegisterUser!: Subscription;
 
   //#region Base
-  constructor(private fb: FormBuilder, private accountService: AccountService, private router: Router) { }
-
   ngOnInit() {
     this.registerFg;
 

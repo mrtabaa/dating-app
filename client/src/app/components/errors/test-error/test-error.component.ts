@@ -1,16 +1,18 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 @Component({
+  standalone: true,
+  imports: [],
   selector: 'app-test-error',
   templateUrl: './test-error.component.html',
   styleUrls: ['./test-error.component.scss']
 })
 export class TestErrorComponent {
+  private http = inject(HttpClient);
+
   private baseUrl = 'https://localhost:5001/';
   validationErrors: string[] =[];
-
-  constructor(private http: HttpClient) { }
 
   get404Error(): void {
     this.http.get(this.baseUrl + 'buggy/not-found').subscribe({

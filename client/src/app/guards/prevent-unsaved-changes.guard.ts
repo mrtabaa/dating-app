@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
+import { MemberEditComponent } from '../components/members/user-edit/user-edit.component';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PreventUnsavedChangesGuard  {
+export class PreventUnsavedChangesGuard {
   canDeactivate(
     component: MemberEditComponent,): boolean {
     if (component.memberEditFg.dirty) {
