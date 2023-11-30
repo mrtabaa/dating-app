@@ -66,11 +66,11 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
 
             #region Create the photo URLs and return the result
             // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
-            return new string[]{
+            return [
                 filePath_128_sq.Split(wwwRootUrl)[1],
                 filePath_512_sq.Split(wwwRootUrl)[1],
                 filePath_1024_sq.Split(wwwRootUrl)[1]
-            };
+            ];
             #endregion
         }
 
