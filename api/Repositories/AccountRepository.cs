@@ -55,6 +55,9 @@ public class AccountRepository : IAccountRepository
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
 
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
+        {
+            UpdateLastActiveInDb(appUser, cancellationToken);
+
             return new LoggedInDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: appUser.Id,
@@ -63,9 +66,18 @@ public class AccountRepository : IAccountRepository
                 KnownAs: appUser.KnownAs,
                 ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
             );
+        }
 
-        _ = appUser ?? throw new ArgumentException("valid userInput but user was not created", nameof(appUser));
         return null;
     }
     #endregion CRUD
+
+    private async void UpdateLastActiveInDb(AppUser appUser, CancellationToken cancellationToken)
+    {
+        var newLastActive = Builders<AppUser>.Update.Set(user =>
+                       user.LastActive, DateTime.UtcNow);
+
+        await _collection.UpdateOneAsync<AppUser>(user =>
+        user.Id == appUser.Id, newLastActive, null, cancellationToken);
+    }
 }
