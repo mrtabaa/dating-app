@@ -31,7 +31,7 @@ public static class ApplicationServiceExtensions
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
-                .AllowAnyMethod().WithOrigins("http://localhost:7200"));
+                .AllowAnyMethod().WithOrigins("http://localhost:4300"));
         });
 
         #endregion Others
