@@ -35,34 +35,6 @@
   "City": "Greenbush",
   "Country": "Martinique",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1374/crop/128x128/a0f4fc8a-6c80-401c-a53e-7bfe8aae53e3_03.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1374/crop/128x128/a0f4fc8a-6c80-401c-a53e-7bfe8aae53e3_03.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1374/crop/128x128/a0f4fc8a-6c80-401c-a53e-7bfe8aae53e3_03.jpg",
-      "IsMain": true
-    },
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/128x128/18446f1e-5b1d-4f3e-89ec-c7c19f72d716_20200115_231817.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/512x512/641bb4b0-f597-4f44-b12c-22f4ecf85e61_20200115_231817.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/1024x1024/e100687f-eeab-49d4-9969-7b674728c398_20200115_231817.jpg",
-      "IsMain": false
-    },
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/128x128/9d4c80cf-638a-4929-8030-4a74e2cf3844_20201221_181650.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/512x512/d548509a-2a35-49a1-a2a0-d7399a7860e1_20201221_181650.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/1024x1024/89dfbab6-5a03-4f7b-8f71-65c77285655a_20201221_181650.jpg",
-      "IsMain": false
-    },
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/128x128/aa7e5502-b94a-49d9-9def-930baf73a980_20201221_191225.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/512x512/e3d65f4c-85e3-4a35-b24a-fe09e3a5b4fb_20201221_191225.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1374/resize-pixel-square/1024x1024/de490702-351f-4fbb-b607-a08dec889a83_20201221_191225.jpg",
-      "IsMain": false
-    }
   ]
 },
 {
@@ -140,13 +112,7 @@
   "City": "Celeryville",
   "Country": "Grenada",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1375/crop/128x128/657ba499-1edc-45e1-8120-00db5c8a4649_02.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1375/crop/128x128/657ba499-1edc-45e1-8120-00db5c8a4649_02.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1375/crop/128x128/657ba499-1edc-45e1-8120-00db5c8a4649_02.jpg",
-      "IsMain": true
-    }
+    
   ]
 },
 {
@@ -186,13 +152,7 @@
   "City": "Rosewood",
   "Country": "Svalbard and Jan Mayen Islands",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1376/crop/128x128/f5b456a5-5b3f-4610-9371-2916b334cff4_04.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1376/crop/128x128/f5b456a5-5b3f-4610-9371-2916b334cff4_04.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1376/crop/128x128/f5b456a5-5b3f-4610-9371-2916b334cff4_04.jpg",
-      "IsMain": true
-    }
+   
   ]
 },
 {
@@ -232,13 +192,7 @@
   "City": "Orviston",
   "Country": "Zimbabwe",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1377/crop/128x128/c5211275-2ad2-432f-a694-71ee35a4e307_18.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1377/crop/128x128/c5211275-2ad2-432f-a694-71ee35a4e307_18.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1377/crop/128x128/c5211275-2ad2-432f-a694-71ee35a4e307_18.jpg",
-      "IsMain": true
-    }
+   
   ]
 },
 {
@@ -278,13 +232,7 @@
   "City": "Germanton",
   "Country": "Antigua and Barbuda",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1378/crop/128x128/5ddde0f0-d0b5-4c3b-aede-d3dc9d834e19_19.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1378/crop/128x128/5ddde0f0-d0b5-4c3b-aede-d3dc9d834e19_19.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1378/crop/128x128/5ddde0f0-d0b5-4c3b-aede-d3dc9d834e19_19.jpg",
-      "IsMain": true
-    }
+   
   ]
 },
 {
@@ -324,13 +272,7 @@
   "City": "Cliff",
   "Country": "British Indian Ocean Territory",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c1379/crop/128x128/89614516-0152-436d-aad0-de2a520f61d3_09.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c1379/crop/128x128/89614516-0152-436d-aad0-de2a520f61d3_09.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c1379/crop/128x128/89614516-0152-436d-aad0-de2a520f61d3_09.jpg",
-      "IsMain": true
-    }
+    
   ]
 },
 {
@@ -370,13 +312,7 @@
   "City": "Welda",
   "Country": "Christmas Island",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c137a/crop/128x128/0efe4576-42ca-403e-857c-c22cf43c9020_05.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c137a/crop/128x128/0efe4576-42ca-403e-857c-c22cf43c9020_05.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c137a/crop/128x128/0efe4576-42ca-403e-857c-c22cf43c9020_05.jpg",
-      "IsMain": true
-    }
+    
   ]
 },
 {
@@ -416,13 +352,7 @@
   "City": "Clarence",
   "Country": "Burkina Faso",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c137b/crop/128x128/990559e3-daf2-41c1-93c0-6d311e1e9cfe_07.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c137b/crop/128x128/990559e3-daf2-41c1-93c0-6d311e1e9cfe_07.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c137b/crop/128x128/990559e3-daf2-41c1-93c0-6d311e1e9cfe_07.jpg",
-      "IsMain": true
-    }
+    
   ]
 },
 {
@@ -462,13 +392,7 @@
   "City": "Herald",
   "Country": "Poland",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64ab47192d469368979c137c/crop/128x128/8ce708aa-4ca7-4ecc-a1cc-c7d2e41f64ea_08.jpg",
-      "Url_512": "storage/photos/64ab47192d469368979c137c/crop/128x128/8ce708aa-4ca7-4ecc-a1cc-c7d2e41f64ea_08.jpg",
-      "Url_1024": "storage/photos/64ab47192d469368979c137c/crop/128x128/8ce708aa-4ca7-4ecc-a1cc-c7d2e41f64ea_08.jpg",
-      "IsMain": true
-    }
+    
   ]
 },
 {
@@ -508,13 +432,7 @@
   "City": "Miami",
   "Country": "United States",
   "Photos": [
-    {
-      "Schema": "1.0.2",
-      "Url_128": "storage/photos/64bf1b27dc1f734238b96332/crop/128x128/9476712e-8f85-4885-9f6f-9d4be9c4430e_09.jpg",
-      "Url_512": "storage/photos/64bf1b27dc1f734238b96332/crop/128x128/9476712e-8f85-4885-9f6f-9d4be9c4430e_09.jpg",
-      "Url_1024": "storage/photos/64bf1b27dc1f734238b96332/crop/128x128/9476712e-8f85-4885-9f6f-9d4be9c4430e_09.jpg",
-      "IsMain": true
-    }
+   
   ]
 },
 {
