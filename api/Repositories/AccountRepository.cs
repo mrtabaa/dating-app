@@ -74,7 +74,7 @@ public class AccountRepository : IAccountRepository
 
     private async void UpdateLastActiveInDb(AppUser appUser, CancellationToken cancellationToken)
     {
-        var newLastActive = Builders<AppUser>.Update.Set(user =>
+        UpdateDefinition<AppUser> newLastActive = Builders<AppUser>.Update.Set(user =>
                        user.LastActive, DateTime.UtcNow);
 
         await _collection.UpdateOneAsync<AppUser>(user =>
