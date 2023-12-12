@@ -7,7 +7,7 @@ public interface IUserRepository
 
     public Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
 
-    public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto memberUpdateDto, string? Id, CancellationToken cancellationToken);
+    public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? Id, CancellationToken cancellationToken);
 
     public Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken);
 

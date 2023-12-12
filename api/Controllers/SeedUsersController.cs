@@ -67,14 +67,14 @@ public class SeedUsersController : BaseApiController
         // get all users from DB
         IEnumerable<AppUser> appUsers = await _collection.Find(new BsonDocument()).ToListAsync();
 
-        // convert AppUser to MemberDto
-        List<UserDto?> memberDtos = new();
+        // convert AppUser to UserDto
+        List<UserDto?> userDtos = new();
         foreach (AppUser appuser in appUsers)
         {
-            memberDtos.Add(Mappers.GenerateMemberDto(appuser));
+            userDtos.Add(Mappers.GenerateUserDto(appuser));
         }
 
-        return memberDtos;
+        return userDtos;
         #endregion
     }
     #endregion

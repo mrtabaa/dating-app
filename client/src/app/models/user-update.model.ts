@@ -1,4 +1,4 @@
-export interface MemberUpdate {
+export interface UserUpdate {
     email: string | undefined,
     introduction: string,
     lookingFor: string,

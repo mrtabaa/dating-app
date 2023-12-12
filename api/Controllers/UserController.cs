@@ -12,7 +12,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
     {
-        List<UserDto?> memberDtos = new();
+        List<UserDto?> userDtos = new();
 
         UserDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
 
@@ -24,19 +24,19 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         PagedList<AppUser> pagedAppUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
 
-        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to MemberDto.
+        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
         Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalCount, pagedAppUsers.TotalPages));
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
-                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+                After that step we can convert AppUser to UserDto in here (NOT in the UserRepository) */
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
-            memberDtos.Add(Mappers.GenerateMemberDto(pagedAppUser));
+            userDtos.Add(Mappers.GenerateUserDto(pagedAppUser));
         }
 
-        return memberDtos;
+        return userDtos;
     }
 
     [HttpGet("id/{id}")]
@@ -56,11 +56,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpPut()]
-    public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto memberUpdateDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        // MemberDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
+        // UserDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
 
-        var result = await _userRepository.UpdateUserAsync(memberUpdateDto, User.GetUserId(), cancellationToken);
+        var result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserId(), cancellationToken);
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }

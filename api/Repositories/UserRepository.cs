@@ -50,7 +50,7 @@ public class UserRepository : IUserRepository
         {
             AppUser user = await _collection.Find<AppUser>(user => user.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-            return user is null ? null : Mappers.GenerateMemberDto(user);
+            return user is null ? null : Mappers.GenerateUserDto(user);
         }
 
         return null;
@@ -60,20 +60,20 @@ public class UserRepository : IUserRepository
     {
         AppUser user = await _collection.Find<AppUser>(user => user.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
-        return user is null ? null : Mappers.GenerateMemberDto(user);
+        return user is null ? null : Mappers.GenerateUserDto(user);
     }
 
-    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto memberUpdateDto, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
             var updatedUser = Builders<AppUser>.Update
             .Set(user => user.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-            .Set(user => user.Introduction, memberUpdateDto.Introduction.Trim())
-            .Set(user => user.LookingFor, memberUpdateDto.LookingFor.Trim())
-            .Set(user => user.Interests, memberUpdateDto.Interests.Trim())
-            .Set(user => user.City, memberUpdateDto.City.Trim())
-            .Set(user => user.Country, memberUpdateDto.Country.Trim());
+            .Set(user => user.Introduction, userUpdateDto.Introduction.Trim())
+            .Set(user => user.LookingFor, userUpdateDto.LookingFor.Trim())
+            .Set(user => user.Interests, userUpdateDto.Interests.Trim())
+            .Set(user => user.City, userUpdateDto.City.Trim())
+            .Set(user => user.Country, userUpdateDto.Country.Trim());
 
             return await _collection.UpdateOneAsync<AppUser>(user => user.Id == userId, updatedUser, null, cancellationToken);
         }
