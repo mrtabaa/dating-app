@@ -7,15 +7,17 @@
         </a>
 
         <!-- #region NavLinks -->
-        <ng-container *ngIf="user$ | async">
-            <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
-                <a *ngFor="let link of links" mat-tab-link [routerLink]="['/' + link]" routerLinkActive
-                    #rla="routerLinkActive" [active]="rla.isActive">
-                    {{link | titlecase}}
-                </a>
-            </nav>
-            <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
-        </ng-container>
+        @if(user$ | async) {
+        <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
+            @for (link of links; track $index) {
+            <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive
+                #rla="routerLinkActive" [active]="rla.isActive">
+                {{link | titlecase}}
+            </a>
+            }
+        </nav>
+        <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+        }
         <!-- #endregion -->
     </section>
     <!-- #endregion -->
@@ -24,34 +26,44 @@
     <section class="right">
         <!-- if logged-in: show appMenu
             else: show signup/login -->
-        <button class="menu-button" [mat-menu-trigger-for]="appMenu" *ngIf="user$ | async as user; else signupLogin" mat-mini-fab>
-            <img class="top-avatar" *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
-            <ng-template #username>{{user.knownAs[0] | titlecase}}</ng-template>
+        @if(user$ | async; as user) {
+        <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
+            @if(user.profilePhotoUrl) {
+            <img class="top-avatar" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
+            }
+            @else() {
+            {{user.knownAs[0] | titlecase}}
+            }
         </button>
+        }
+        @else {
         <!-- signup/login -->
-        <ng-template #signupLogin>
-            <button mat-raised-button color="accent" routerLink="/register">
-                Sign Up
-            </button>
-            <button mat-raised-button color="accent" routerLink="/login" routerLinkActive="router-link-active">
-                Login
-            </button>
-        </ng-template>
+        <button mat-raised-button color="accent" routerLink="/register">
+            Sign Up
+        </button>
+        <button mat-raised-button color="accent" routerLink="/login" routerLinkActive="router-link-active">
+            Login
+        </button>
+        }
         <!-- menu if logged-in -->
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
-            <div *ngIf="user$ | async as user" class="user-info">
+            @if(user$ | async; as user) {
+            <div class="user-info">
                 <div class="profile-image">
-                    <img *ngIf="user.profilePhotoUrl; else username" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
-                    <ng-template #username>
-                        {{user.knownAs[0] | titlecase}}
-                    </ng-template>
+                    @if(user.profilePhotoUrl) {
+                    <img mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
+                    }
+                    @else {
+                    {{user.knownAs[0] | titlecase}}
+                    }
                 </div>
                 <div>
                     <p>{{user.knownAs | titlecase}}</p>
                     <p class="email">{{user.email}}</p>
                 </div>
             </div>
+            }
             <!-- navigation -->
             <mat-divider></mat-divider>
             <mat-list>

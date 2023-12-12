@@ -1,0 +1,39 @@
+@if (user) {
+<mat-card class="card">
+    <div class="card-img-wrapper">
+        @for (photo of user.photos; track $index) {
+        @if (photo.isMain) {
+        <img mat-card-image *ngIf="" ngSrc="{{apiPhotoUrl + photo.url_128}}" width="128" height="128" alt="{{user.knownAs}}">
+        }
+        }
+        @if (user.photos.length === 0) {
+        <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="128" height="128" alt="{{user.knownAs}} photo">
+        }
+        <ul class="user-icons">
+            <li>
+                <button [routerLink]="['/users/' + user.email]" mat-mini-fab color="warn">
+                    <mat-icon>person_add</mat-icon>
+                </button>
+            </li>
+            <li>
+                <button mat-mini-fab color="warn">
+                    <mat-icon>favorite</mat-icon>
+                </button>
+            </li>
+            <li>
+                <button mat-mini-fab color="warn">
+                    <mat-icon>mail</mat-icon>
+                </button>
+            </li>
+        </ul>
+    </div>
+    <mat-card-header>
+        <div class="title">
+            <mat-icon *ngIf="user.gender === 'male'" color="primary">boy</mat-icon>
+            <mat-icon *ngIf="user.gender === 'female'" color="primary">girl</mat-icon>
+            <mat-card-title>{{user.knownAs | titlecase}}</mat-card-title>
+        </div>
+        <mat-card-subtitle>{{user.city | titlecase}}</mat-card-subtitle>
+    </mat-card-header>
+</mat-card>
+}

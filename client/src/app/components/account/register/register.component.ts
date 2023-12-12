@@ -2,19 +2,23 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { RegisterValidators } from '../../helpers/validators/register.validator';
+import { RegisterValidators } from '../../_helpers/validators/register.validator';
 import { UserRegister } from '../../../models/account/user-register.model';
 import { AccountService } from '../../../services/account.service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatRadioModule } from '@angular/material/radio';
+import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
+import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    MatButtonModule, MatInputModule
+    InputCvaComponent, DatePickerCvaComponent,
+    MatButtonModule, MatInputModule, MatRadioModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
@@ -106,7 +110,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
       .subscribe({
         next: res => {
-          this.router.navigate(['/members']);
+          this.router.navigate(['/users']);
           console.log(res);
         },
         error: err => this.isEmailExist = err.error,

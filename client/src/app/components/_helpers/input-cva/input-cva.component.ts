@@ -1,8 +1,14 @@
 import { Component, Input, Self } from '@angular/core';
-import { ControlValueAccessor, NgControl, FormControl } from '@angular/forms';
+import { ControlValueAccessor, NgControl, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-input-cva',
+  standalone: true,
+  imports: [
+    FormsModule, ReactiveFormsModule,
+    MatInputModule
+  ],
   templateUrl: './input-cva.component.html',
   styleUrls: ['./input-cva.component.scss']
 })

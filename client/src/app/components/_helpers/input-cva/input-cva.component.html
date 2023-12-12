@@ -1,0 +1,35 @@
+<div>
+    <mat-form-field appearance="outline">
+        <mat-label>{{label}}</mat-label>
+        @if (isFocused) {
+        <input dirAutofocus type={{type}} [formControl]="Control" placeholder="{{placeHolder}}" matInput>
+        }
+        @else {
+        <input type={{type}} [formControl]="Control" placeholder="{{placeHolder}}" matInput>
+        }
+
+        @if(Control.pristine) {
+        <mat-hint>{{hint}}</mat-hint>
+        }
+        @if (Control.hasError('required')) {
+        <mat-error>
+            {{label}} field is required.
+        </mat-error>
+        }
+        @else if(Control.hasError('pattern')) {
+        <mat-error>
+            Enter a valid {{label}}.
+        </mat-error>
+        }
+        @else if(Control.hasError('minlength')) {
+        <mat-error>
+            Must be at least {{Control.errors?.['minlength']?.requiredLength}} characters.
+        </mat-error>
+        }
+        @else if(Control.hasError('maxlength')) {
+        <mat-error>
+            Must be at most {{Control.errors?.['maxlength']?.requiredLength}} characters.
+        </mat-error>
+        }
+    </mat-form-field>
+</div>

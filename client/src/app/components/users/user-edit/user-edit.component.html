@@ -1,0 +1,166 @@
+<div class="container">
+    <section class="head">
+        <h1 class="title">Your Profile</h1>
+        <mat-card class="warning">
+            @if (userEditFg.dirty) {
+            <mat-card-content>
+                <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
+            </mat-card-content>
+            }
+        </mat-card>
+    </section>
+    @if(user$ | async; as user) {
+    <div class="content">
+        <section class="user-card">
+            <mat-card>
+                @for (photo of user.photos; track $index) {
+                @if (photo.isMain) {
+                <img mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240" height="240"
+                    alt="Photo of {{user.knownAs}}">
+                }
+                }
+                @if (user.photos.length === 0) {
+                <img mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}" width="240" height="240"
+                    alt="Photo of {{user.knownAs}}">
+                }
+                <mat-card-content>
+                    <div>
+                        <strong>Location</strong>
+                        <p>{{user.city}}, {{user.country}}</p>
+                    </div>
+                    <div>
+                        <strong>Age</strong>
+                        <p>{{user.age}}</p>
+                    </div>
+                    <div>
+                        <strong>Last Active</strong>
+                        <p>{{user.lastActive | date}}</p>
+                    </div>
+                    <div>
+                        <strong>user Since</strong>
+                        <p>{{user.created | date}}</p>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button type="submit" (click)="updateUser()" [disabled]="userEditFg.pristine || userEditFg.invalid"
+                        mat-raised-button color="primary">
+                        Save Changes
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </section>
+        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
+            <mat-tab label="About {{user.knownAs}}">
+                <div class="tab-contents">
+                    <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Introduction</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="user.introduction"
+                                placeholder="Say something about your self" matInput required>
+                            {{IntroductionCtrl.value}}
+                            </textarea>
+                            <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            @if (IntroductionCtrl.hasError('required')) {
+                            <mat-error>This field is required</mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Looking For</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
+                                placeholder="Enter what you're looking for" matInput required>
+                            {{user.lookingFor}}
+                            </textarea>
+                            <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            @if (IntroductionCtrl.hasError('required')) {
+                            <mat-error>This field is required</mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Interests</mat-label>
+                            <textarea cdkTextareaAutosize formControlName="interestsCtrl"
+                                placeholder="Enter your interests" matInput required>
+                        {{user.interests}}
+                            </textarea>
+                            <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                            @if (IntroductionCtrl.hasError('required')) {
+                            <mat-error>This field is required</mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>City</mat-label>
+                            <input formControlName="cityCtrl" placeholder="Enter your city" matInput required>
+                            @if (IntroductionCtrl.hasError('required')) {
+                            <mat-error>This field is required</mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
+                            <mat-label>Country</mat-label>
+                            <input cdkTextareaAutosize formControlName="countryCtrl" placeholder="Enter your country."
+                                matInput required>
+                            @if (IntroductionCtrl.hasError('required')) {
+                            <mat-error>This field is required</mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of {{minTextAreaChars}} characters is requried.
+                            </mat-error>
+                            }
+                            @else if (IntroductionCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of {{maxTextAreaChars}} characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                    </form>
+                </div>
+            </mat-tab>
+            <mat-tab label="Edit Photos">
+                <div class="tab-contents">
+                    <app-photo-editor [user]="user"></app-photo-editor>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    }
+</div>
+<!-- <p>{{ userEditFg.value | json }}</p> -->

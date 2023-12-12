@@ -3,16 +3,18 @@ import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription } from 'rxjs';
 import { UserLogin } from '../../../models/account/user-login.model';
-import { User } from '../../../models/user.model';
+import { LoggedInUser } from '../../../models/loggedInUser.model';
 import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
+    InputCvaComponent,
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatInputModule
   ],
@@ -24,7 +26,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
-  user$!: Observable<User | null>;
+  user$!: Observable<LoggedInUser | null>;
   subscrition!: Subscription;
 
   ngOnInit(): void {

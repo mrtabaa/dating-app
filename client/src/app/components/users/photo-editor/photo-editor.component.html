@@ -1,23 +1,30 @@
 <main>
+    @if(user) {
     <section class="top">
-        <div class="album" *ngIf="user">
-            <div *ngFor="let photo of user.photos; let i = index">
+        <div class="album">
+            @for (photo of user.photos; track $index) {
+            <div>
                 <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{user.knownAs}} photo">
 
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Main</button>
-                    <button (click)="deletePhoto(photo.url_128, i)" mat-mini-fab color="warn"
+                    <button (click)="deletePhoto(photo.url_128, $index)" mat-mini-fab color="warn"
                         [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
                 </div>
             </div>
-            <h3 *ngIf="user.photos.length === 0">Your album is empty. You may upload some photos.</h3>
-            <mat-error *ngIf="errorGlob">
+            }
+            @if (user.photos.length === 0) {
+            <h3>Your album is empty. You may upload some photos.</h3>
+            }
+            @if (errorGlob) {
+            <mat-error>
                 This update has failed for this reason:
                 <br> {{errorGlob}}
                 <br> Please try again or contact the admin.
             </mat-error>
-            <mat-card class="uploader" ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
+            }
+            <!-- <mat-card class="uploader" ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
                 [uploader]="uploader" [ngClass]="{'nv-file-over': hasBaseDropZoneOver}">
                 <mat-card-header>
                     <mat-card-title>Add Photos</mat-card-title>
@@ -30,11 +37,13 @@
                     <button type="button" mat-raised-button>Choose Photos</button>
                     <input #fileInput ng2FileSelect [uploader]="uploader" multiple type="file" id="file">
                 </mat-card-actions>
-            </mat-card>
+            </mat-card> -->
         </div>
     </section>
-
-    <section class="queue" *ngIf="uploader && uploader.queue && uploader.queue.length">
+    }
+<!-- 
+    @if (uploader && uploader.queue && uploader.queue.length) {
+    <section class="queue">
         <h2>Upload Queue</h2>
         <p>Queue length: {{ uploader.queue.length }}</p>
 
@@ -43,10 +52,14 @@
                 <strong>Name</strong>
                 <strong>Size</strong>
             </div>
-            <div *ngFor="let item of uploader.queue">
+            @for (item of uploader.queue; track $index) {
+            <div>
                 <p>{{ item?.file?.name }}</p>
-                <p *ngIf="uploader.options?.isHTML5" nowrap> {{ item?.file?.size/1024/1024 | number:'.2' }} MB</p>
+                @if (uploader.options?.isHTML5) {
+                <p nowrap> {{ item?.file?.size/1024/1024 | number:'.2' }} MB</p>
+                }
             </div>
+            }
         </div>
 
         <div class="process">
@@ -71,4 +84,5 @@
             </div>
         </div>
     </section>
+    } -->
 </main>

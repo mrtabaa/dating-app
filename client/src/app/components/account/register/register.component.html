@@ -30,16 +30,17 @@
             <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
                 [placeHolder]="'Confirm your password'" [hint]="'Between 7 to 20 characters'">
             </app-input-cva>
-            <mat-error
-                *ngIf="PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')">
-                Password entries don't match.
-            </mat-error>
+            @if(PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
+            <mat-error>Password entries don't match.</mat-error>
+            }
         </div>
 
         <!-- show api errors -->
-        <div *ngIf="isEmailExist">
+        @if(isEmailExist) {
+        <div>
             <mat-error>{{isEmailExist}}</mat-error>
         </div>
+        }
 
         <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
             class="submitBtn">Register</button>

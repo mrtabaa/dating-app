@@ -1,21 +1,21 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
 
 @Directive({
-  selector: '[dirInputFormat]'
+  selector: '[dirInputFormat]',
+  standalone: true
 })
 export class InputFormatDirective {
-
-  constructor(private el: ElementRef) { }
+  private elRef = inject(ElementRef);
 
   @Input('dirInputFormat') format!: string;
 
   @HostListener('blur')
   onBlur() {
-    let value: string = this.el.nativeElement.value;
+    let value: string = this.elRef.nativeElement.value;
 
     if (this.format == 'uppercase')
-      this.el.nativeElement.value = value.toUpperCase();
+      this.elRef.nativeElement.value = value.toUpperCase();
     else
-      this.el.nativeElement.value = value.toLowerCase();
+      this.elRef.nativeElement.value = value.toLowerCase();
   }
 }
