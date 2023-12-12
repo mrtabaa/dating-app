@@ -23,11 +23,11 @@ import { LoginComponent } from '../components/account/login/login.component';
 import { NavbarComponent } from '../components/navbar/navbar.component';
 import { ListsComponent } from '../components/lists/lists.component';
 import { MessagesComponent } from '../components/messages/messages.component';
-import { PhotoEditorComponent } from '../components/members/photo-editor/photo-editor.component';
-import { MemberListComponent } from '../components/members/member-list/member-list.component';
-import { MemberCardComponent } from '../components/members/member-card/member-card.component';
-import { MemberDetailComponent } from '../components/members/member-detail/member-detail.component';
-import { MemberEditComponent } from '../components/members/member-edit/member-edit.component';
+import { PhotoEditorComponent } from '../components/users/photo-editor/photo-editor.component';
+import { UserListComponent } from '../components/users/user-list/user-list.component';
+import { UserCardComponent } from '../components/users/user-card/user-card.component';
+import { UserDetailComponent } from '../components/users/user-detail/user-detail.component';
+import { UserEditComponent } from '../components/users/user-edit/user-edit.component';
 
 // ControlValueAccessor helpers
 import { InputCvaComponent } from '../components/helpers/input-cva/input-cva.component';
@@ -49,12 +49,12 @@ const components = [
   RegisterComponent,
   LoginComponent,
   NavbarComponent,
-  MemberListComponent,
-  MemberDetailComponent,
+  UserListComponent,
+  UserDetailComponent,
   ListsComponent,
-  MemberCardComponent,
+  UserCardComponent,
   MessagesComponent,
-  MemberEditComponent,
+  UserEditComponent,
   PhotoEditorComponent,
 
   ShortenStringPipe,
