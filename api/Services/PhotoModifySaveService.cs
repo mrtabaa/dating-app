@@ -58,32 +58,30 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
                 break;
         }
 
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
-        {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
 
-            // convert imageData to SKImage
-            using SKImage skImageSource = SKImage.FromEncodedData(imageData);
-            using SKBitmap bitmapSource = SKBitmap.FromImage(skImageSource);
+        // convert imageData to SKImage
+        using SKImage skImageSource = SKImage.FromEncodedData(imageData);
+        using SKBitmap bitmapSource = SKBitmap.FromImage(skImageSource);
 
-            int width = (int)Math.Round(bitmapSource.Width * resizeFactor);
-            int height = (int)Math.Round(bitmapSource.Height * resizeFactor);
+        int width = (int)Math.Round(bitmapSource.Width * resizeFactor);
+        int height = (int)Math.Round(bitmapSource.Height * resizeFactor);
 
-            using SKBitmap bitmapResized = new(width, height, bitmapSource.ColorType, bitmapSource.AlphaType);
+        using SKBitmap bitmapResized = new(width, height, bitmapSource.ColorType, bitmapSource.AlphaType);
 
-            using SKCanvas canvas = new(bitmapResized);
+        using SKCanvas canvas = new(bitmapResized);
 
-            canvas.SetMatrix(SKMatrix.CreateScale(resizeFactor, resizeFactor));
-            canvas.DrawBitmap(bitmapSource, new SKPoint());
-            canvas.ResetMatrix();
-            canvas.Flush();
+        canvas.SetMatrix(SKMatrix.CreateScale(resizeFactor, resizeFactor));
+        canvas.DrawBitmap(bitmapSource, new SKPoint());
+        canvas.ResetMatrix();
+        canvas.Flush();
 
-            using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
-            using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
+        using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 100);
 
-            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
-        }
+        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
     }
 
     /// <summary>
@@ -100,35 +98,33 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     public async Task<string> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
         // do the job
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
-        {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
 
-            // convert imageData to SKImage
-            using SKImage skImage = SKImage.FromEncodedData(imageData);
+        // convert imageData to SKImage
+        using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            #region 3 x 5 OR 3 x 3 original image sides
-            // 4 & in => 3 x 3
-            // 3 in => 3 x 3
-            // Already square with min side
-            // performance: if either input side is larger than the actual image's coresponding side
-            if (widthIn >= skImage.Width || heightIn >= skImage.Height)
-                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
-            #endregion
+        #region 3 x 5 OR 3 x 3 original image sides
+        // 4 & in => 3 x 3
+        // 3 in => 3 x 3
+        // Already square with min side
+        // performance: if either input side is larger than the actual image's coresponding side
+        if (widthIn >= skImage.Width || heightIn >= skImage.Height)
+            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+        #endregion
 
-            #region images with sides greater than input sides
-            using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
+        #region images with sides greater than input sides
+        using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
 
-            // resize
-            using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
+        // resize
+        using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
 
-            using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-            using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
 
-            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
-            #endregion
-        }
+        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
+        #endregion
     }
 
     /// <summary>
@@ -142,50 +138,48 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// <returns>filePath</returns>
     public async Task<string> ResizeByPixel_Square(IFormFile formFile, string userId, int sideIn)
     {
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
-        {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
 
-            // convert imageData to SKImage
-            using SKImage skImage = SKImage.FromEncodedData(imageData);
+        // convert imageData to SKImage
+        using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            #region 3 x 3 original image sides
-            // 4 in => 3 x 3
-            // 3 in => 3 x 3
-            // Already square with min side
-            if (skImage.Width == skImage.Height && sideIn >= skImage.Width)
-                // save original file
-                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
-            #endregion
+        #region 3 x 3 original image sides
+        // 4 in => 3 x 3
+        // 3 in => 3 x 3
+        // Already square with min side
+        if (skImage.Width == skImage.Height && sideIn >= skImage.Width)
+            // save original file
+            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
+        #endregion
 
-            #region 3 x 5 original image sides 
-            // 6 in => 3 x 3
-            // 3 in => 3 x 3
-            // sideIn >= original min side (e.g sideIn = 6)
-            if (sideIn >= Math.Min(skImage.Width, skImage.Height))
-                return await CropWithOriginalSide_Square(formFile, userId);
-            #endregion
+        #region 3 x 5 original image sides 
+        // 6 in => 3 x 3
+        // 3 in => 3 x 3
+        // sideIn >= original min side (e.g sideIn = 6)
+        if (sideIn >= Math.Min(skImage.Width, skImage.Height))
+            return await CropWithOriginalSide_Square(formFile, userId);
+        #endregion
 
-            #region 3 x 5 original image sides 
-            // 2 in => 2 x 2
-            // sideIn < original min side of 3 (e.g sideIn = 2)
-            // crop to square (3 x 3) first, then resize by 2
-            int smallerSide = Math.Min(skImage.Width, skImage.Height);
+        #region 3 x 5 original image sides 
+        // 2 in => 2 x 2
+        // sideIn < original min side of 3 (e.g sideIn = 2)
+        // crop to square (3 x 3) first, then resize by 2
+        int smallerSide = Math.Min(skImage.Width, skImage.Height);
 
-            // crop
-            SKImage? croppedImage = CropImageForResize(skImage, smallerSide, smallerSide);
+        // crop
+        SKImage? croppedImage = CropImageForResize(skImage, smallerSide, smallerSide);
 
-            // resize
-            using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
-            using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
+        // resize
+        using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
+        using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
 
-            using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-            using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
 
-            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
-            #endregion
-        }
+        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
+        #endregion
     }
 
     #endregion Resize Methods 
@@ -205,55 +199,53 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// <returns></returns>
     public async Task<string> Crop(IFormFile formFile, string userId, int widthIn, int heightIn)
     {
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+
+        // convert imageData to SKImage
+        using SKImage skImage = SKImage.FromEncodedData(imageData);
+
+        #region Inputs are larger than original sides
+        /// 3 x 5 or 3 x 3 image original sides
+        // 4 in 6 in => 3 x 5
+        // 3 in 5 in => 3 x 5
+        if (widthIn <= skImage.Width && heightIn <= skImage.Height)
+            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+        #endregion
+
+        #region One or both inputs are smaller than the image original's either side
+        ///// keep the smaller original side and reduce the other side by the input
+        ///
+        /// 3 x 5 or 3 x 3 image original sides
+
+        // 4 in 4 in => 3 x 4
+        // 3 in 4 in => 3 x 4
+        if (widthIn >= skImage.Width && heightIn < skImage.Height)
         {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
-
-            // convert imageData to SKImage
-            using SKImage skImage = SKImage.FromEncodedData(imageData);
-
-            #region Inputs are larger than original sides
-            /// 3 x 5 or 3 x 3 image original sides
-            // 4 in 6 in => 3 x 5
-            // 3 in 5 in => 3 x 5
-            if (widthIn <= skImage.Width && heightIn <= skImage.Height)
-                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
-            #endregion
-
-            #region One or both inputs are smaller than the image original's either side
-            ///// keep the smaller original side and reduce the other side by the input
-            ///
-            /// 3 x 5 or 3 x 3 image original sides
-
-            // 4 in 4 in => 3 x 4
-            // 3 in 4 in => 3 x 4
-            if (widthIn >= skImage.Width && heightIn < skImage.Height)
-            {
-                widthIn = skImage.Width; // apply the image's width instead
-            }
-            // 2 in 6 in => 2 x 5
-            // 2 in 5 in => 2 x 5
-            if (widthIn < skImage.Width && heightIn >= skImage.Height)
-            {
-                heightIn = skImage.Height; // apply the image's height instead
-            }
-
-            // find the center
-            int centerX = skImage.Width / 2;
-            int centerY = skImage.Height / 2;
-
-            // find the start points
-            int startX = centerX - widthIn / 2;
-            int startY = centerY - heightIn / 2;
-
-            // crop image
-            SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
-            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
-
-            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
-            #endregion
+            widthIn = skImage.Width; // apply the image's width instead
         }
+        // 2 in 6 in => 2 x 5
+        // 2 in 5 in => 2 x 5
+        if (widthIn < skImage.Width && heightIn >= skImage.Height)
+        {
+            heightIn = skImage.Height; // apply the image's height instead
+        }
+
+        // find the center
+        int centerX = skImage.Width / 2;
+        int centerY = skImage.Height / 2;
+
+        // find the start points
+        int startX = centerX - widthIn / 2;
+        int startY = centerY - heightIn / 2;
+
+        // crop image
+        SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+
+        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
+        #endregion
     }
 
     /// <summary>
@@ -267,33 +259,31 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// <returns></returns>
     public async Task<string> Crop_Square(IFormFile formFile, string userId, int sideIn)
     {
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+
+        // convert imageData to SKImage
+        using SKImage skImage = SKImage.FromEncodedData(imageData);
+
+        // if the given side is larger than the image size and it's already square
+        if (sideIn > skImage.Width && skImage.Width == skImage.Height)
+            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+        else
         {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+            // find the center
+            int centerX = skImage.Width / 2;
+            int centerY = skImage.Height / 2;
 
-            // convert imageData to SKImage
-            using SKImage skImage = SKImage.FromEncodedData(imageData);
+            // find the start points
+            int startX = centerX - sideIn / 2;
+            int startY = centerY - sideIn / 2;
 
-            // if the given side is larger than the image size and it's already square
-            if (sideIn > skImage.Width && skImage.Width == skImage.Height)
-                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
-            else
-            {
-                // find the center
-                int centerX = skImage.Width / 2;
-                int centerY = skImage.Height / 2;
+            // crop image
+            SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, sideIn, sideIn));
+            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
 
-                // find the start points
-                int startX = centerX - sideIn / 2;
-                int startY = centerY - sideIn / 2;
-
-                // crop image
-                SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, sideIn, sideIn));
-                using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
-
-                return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, sideIn, sideIn);
-            }
+            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, sideIn, sideIn);
         }
     }
 
@@ -307,35 +297,33 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// <returns></returns>
     public async Task<string> CropWithOriginalSide_Square(IFormFile formFile, string userId)
     {
-        using (var binaryReader = new BinaryReader(formFile.OpenReadStream()))
-        {
-            // get image from formFile
-            byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
+        using var binaryReader = new BinaryReader(formFile.OpenReadStream());
+        // get image from formFile
+        byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
 
-            // convert imageData to SKImage
-            using SKImage skImage = SKImage.FromEncodedData(imageData);
+        // convert imageData to SKImage
+        using SKImage skImage = SKImage.FromEncodedData(imageData);
 
-            //performance: Skip, already square.
-            if (skImage.Width == skImage.Height)
-                return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
+        //performance: Skip, already square.
+        if (skImage.Width == skImage.Height)
+            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original);
 
 
-            int side = Math.Min(skImage.Width, skImage.Height);
+        int side = Math.Min(skImage.Width, skImage.Height);
 
-            // find the center
-            int centerX = skImage.Width / 2;
-            int centerY = skImage.Height / 2;
+        // find the center
+        int centerX = skImage.Width / 2;
+        int centerY = skImage.Height / 2;
 
-            // find the start points
-            int startX = centerX - side / 2;
-            int startY = centerY - side / 2;
+        // find the start points
+        int startX = centerX - side / 2;
+        int startY = centerY - side / 2;
 
-            // crop image
-            SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
-            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+        // crop image
+        SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
 
-            return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
-        }
+        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
     }
 
     /// <summary>

@@ -31,13 +31,11 @@ public class AllowedFileExtensions : ValidationAttribute
 
     public static bool IsFileValid(IFormFile file)
     {
-        using (var reader = new BinaryReader(file.OpenReadStream()))
-        {
-            var signatures = _fileSignatures.Values.SelectMany(x => x).ToList();  // flatten all signatures to single list
-            var headerBytes = reader.ReadBytes(_fileSignatures.Max(m => m.Value.Max(n => n.Length)));
-            bool result = signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
-            return result;
-        }
+        using var reader = new BinaryReader(file.OpenReadStream());
+        var signatures = _fileSignatures.Values.SelectMany(x => x).ToList();  // flatten all signatures to single list
+        var headerBytes = reader.ReadBytes(_fileSignatures.Max(m => m.Value.Max(n => n.Length)));
+        bool result = signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
+        return result;
     }
 
     public static Dictionary<string, List<byte[]>> _fileSignatures = new()
