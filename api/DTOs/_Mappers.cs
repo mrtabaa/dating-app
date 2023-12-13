@@ -3,7 +3,7 @@ namespace api.DTOs
     public static class Mappers
     {
         #region Generator Methods
-        public static AppUser GenerateAppUser(UserRegisterDto userInput)
+        public static AppUser ConvertUserRegisterDtoToAppUser(UserRegisterDto userInput)
         {
             // manually dispose HMACSHA512 after being done
             using var hmac = new HMACSHA512();
@@ -24,14 +24,14 @@ namespace api.DTOs
                 Interests: userInput.Interests?.Trim(),
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
-                Photos: new List<Photo>()
+                Photos: []
             );
         }
 
-        public static UserDto? GenerateUserDto(AppUser appUser)
+        public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser)
         {
             if (!(appUser.Id is null || appUser.Schema is null))
-                return new UserDto(
+                return new MemberDto(
                     Schema: appUser.Schema,
                     Id: appUser.Id,
                     Email: appUser.Email,
