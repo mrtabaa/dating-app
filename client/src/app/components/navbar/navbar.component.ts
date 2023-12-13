@@ -25,7 +25,7 @@ import { MatDividerModule } from '@angular/material/divider';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  accountService = inject(AccountService);
+  private accountService = inject(AccountService);
 
   basePhotoUrl = environment.apiPhotoUrl;
 
