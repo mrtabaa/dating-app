@@ -3,9 +3,9 @@ public interface IUserRepository
 {
     public Task<PagedList<AppUser>> GetUsersAsync(UserParams userParams, CancellationToken cancellationToken);
 
-    public Task<UserDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken);
+    public Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken);
 
-    public Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
+    public Task<MemberDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? Id, CancellationToken cancellationToken);
 

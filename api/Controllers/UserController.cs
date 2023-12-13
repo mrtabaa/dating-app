@@ -10,11 +10,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
     #region User Management
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
     {
-        List<UserDto?> userDtos = new();
+        List<MemberDto?> memberDtos = [];
 
-        UserDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
+        MemberDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
 
         if (currentUser is not null && string.IsNullOrEmpty(userParams.Gender))
         {
@@ -33,26 +33,26 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
                 After that step we can convert AppUser to UserDto in here (NOT in the UserRepository) */
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
-            userDtos.Add(Mappers.GenerateUserDto(pagedAppUser));
+            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
         }
 
-        return userDtos;
+        return memberDtos;
     }
 
     [HttpGet("id/{id}")]
-    public async Task<ActionResult<UserDto>> GetUserById(string id, CancellationToken cancellationToken)
+    public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
-        UserDto? user = await _userRepository.GetUserByIdAsync(id, cancellationToken);
+        MemberDto? memberDto = await _userRepository.GetUserByIdAsync(id, cancellationToken);
 
-        return user is null ? BadRequest("No user found by this ID.") : user;
+        return memberDto is null ? BadRequest("No user found by this ID.") : memberDto;
     }
 
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<UserDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
+    public async Task<ActionResult<MemberDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
-        UserDto? user = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
+        MemberDto? memberDto = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
 
-        return user is null ? BadRequest("No user found by this Email.") : user;
+        return memberDto is null ? BadRequest("No user found by this Email.") : memberDto;
     }
 
     [HttpPut()]

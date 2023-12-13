@@ -20,11 +20,11 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoggedInDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
     {
-        bool userExist = await _collection.AsQueryable().Where<AppUser>(user => user.Email == userInput.Email).AnyAsync(cancellationToken);
+        bool userExist = await _collection.AsQueryable().Where<AppUser>(appUser => appUser.Email == userInput.Email).AnyAsync(cancellationToken);
 
         if (userExist) return null;
 
-        AppUser appUser = Mappers.GenerateAppUser(userInput);
+        AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(userInput);
 
         // Insertion successful OR throw an exception
         await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
@@ -44,7 +44,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoggedInDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
-        var appUser = await _collection.Find<AppUser>(user => user.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
+        var appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         if (appUser is null) return null;
 
@@ -77,7 +77,7 @@ public class AccountRepository : IAccountRepository
         UpdateDefinition<AppUser> newLastActive = Builders<AppUser>.Update.Set(user =>
                        user.LastActive, DateTime.UtcNow);
 
-        await _collection.UpdateOneAsync<AppUser>(user =>
-        user.Id == appUser.Id, newLastActive, null, cancellationToken);
+        await _collection.UpdateOneAsync(appUser =>
+        appUser.Id == appUser.Id, newLastActive, null, cancellationToken);
     }
 }

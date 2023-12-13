@@ -1,4 +1,6 @@
-public record UserDto(
+namespace api.DTOs;
+
+public record MemberDto(
     string Schema,
     string Id,
     string Email,
