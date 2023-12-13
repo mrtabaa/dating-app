@@ -1,9 +1,8 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-// import { FileUploadModule } from 'ng2-file-upload';
-// import { FileUploader } from 'ng2-file-upload';
+import { FileUploadModule, FileUploader } from 'ng2-file-upload';
 import { take } from 'rxjs';
 import { LoggedInUser } from '../../../models/loggedInUser.model';
 import { User } from '../../../models/user.model';
@@ -11,13 +10,16 @@ import { environment } from '../../../../environments/environment';
 import { AccountService } from '../../../services/account.service';
 import { UserService } from '../../../services/user.service';
 import { UpdateResult } from '../../../models/helpers/update-result.model';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-photo-editor',
   standalone: true,
   imports: [
-    NgOptimizedImage,
-    MatIconModule, MatFormFieldModule
+    CommonModule, NgOptimizedImage,
+    MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
+    FileUploadModule
   ],
   templateUrl: './photo-editor.component.html',
   styleUrls: ['./photo-editor.component.scss']
@@ -31,7 +33,7 @@ export class PhotoEditorComponent implements OnInit {
   errorGlob: string | undefined;
   basePhotoUrl: string = environment.apiPhotoUrl;
 
-  // uploader: FileUploader | undefined;
+  uploader: FileUploader | undefined;
   hasBaseDropZoneOver = false;
 
   constructor() {
@@ -44,35 +46,35 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.initializeUploader();
+    this.initializeUploader();
   }
 
   fileOverBase(event: boolean): void {
     this.hasBaseDropZoneOver = event;
   }
 
-  // initializeUploader(): void {
-  //   this.uploader = new FileUploader({
-  //     url: environment.apiUrl + 'user/add-photos',
-  //     authToken: 'Bearer ' + this.user?.token,
-  //     isHTML5: true,
-  //     allowedFileType: ['image'],
-  //     removeAfterUpload: true,
-  //     autoUpload: false,
-  //     maxFileSize: 40_000_000, // 8 * 5MB
-  //   });
+  initializeUploader(): void {
+    this.uploader = new FileUploader({
+      url: environment.apiUrl + 'user/add-photos',
+      authToken: 'Bearer ' + this.loggedInUser?.token,
+      isHTML5: true,
+      allowedFileType: ['image'],
+      removeAfterUpload: true,
+      autoUpload: false,
+      maxFileSize: 40_000_000, // 8 * 5MB
+    });
 
-  //   this.uploader.onAfterAddingFile = (file) => {
-  //     file.withCredentials = false;
-  //   }
+    this.uploader.onAfterAddingFile = (file) => {
+      file.withCredentials = false;
+    }
 
-  //   this.uploader.onSuccessItem = (item, response, status, headers) => {
-  //     if (response) {
-  //       const photo = JSON.parse(response);
-  //       this.user?.photos.push(photo);
-  //     }
-  //   }
-  // }
+    this.uploader.onSuccessItem = (item, response, status, headers) => {
+      if (response) {
+        const photo = JSON.parse(response);
+        this.user?.photos.push(photo);
+      }
+    }
+  }
 
   setMainPhoto(url_128In: string): void {
     this.userService.setMainPhoto(url_128In).pipe(take(1)).subscribe({
