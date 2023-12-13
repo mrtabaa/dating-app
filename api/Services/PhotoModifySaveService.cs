@@ -35,29 +35,15 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
             return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
 
         // do the job
-        float resizeFactor;
-        switch (formFile.Length)
+        var resizeFactor = formFile.Length switch
         {
-            case < 500_000:
-                resizeFactor = 0.9f;
-                break;
-            case < 1_000_000:
-                resizeFactor = 0.72f;
-                break;
-            case < 2_000_000:
-                resizeFactor = 0.32f;
-                break;
-            case < 3_000_000:
-                resizeFactor = 0.3f;
-                break;
-            case < 4_000_000:
-                resizeFactor = 0.2f;
-                break;
-            default:
-                resizeFactor = 0.15f;
-                break;
-        }
-
+            < 500_000 => 0.9f,
+            < 1_000_000 => 0.72f,
+            < 2_000_000 => 0.32f,
+            < 3_000_000 => 0.3f,
+            < 4_000_000 => 0.2f,
+            _ => 0.15f,
+        };
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
         byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
