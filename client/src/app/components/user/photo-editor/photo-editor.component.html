@@ -1,10 +1,10 @@
 <main>
-    @if(user) {
+    @if(user && member) {
     <section class="top">
         <div class="album">
-            @for (photo of user.photos; track $index) {
+            @for (photo of member.photos; track $index) {
             <div>
-                <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{user.knownAs}} photo">
+                <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
 
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary"
@@ -14,7 +14,7 @@
                 </div>
             </div>
             }
-            @if (user.photos.length === 0) {
+            @if (member.photos.length === 0) {
             <h3>Your album is empty. You may upload some photos.</h3>
             }
             @if (errorGlob) {
