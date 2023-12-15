@@ -48,7 +48,7 @@ export class AccountService {
   }
 
   logout(): void {
-    localStorage.removeItem('user');
+    localStorage.removeItem('token');
     this.currentUserSource.next(null);
     this.router.navigate(['/login'])
   }
@@ -56,7 +56,7 @@ export class AccountService {
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
   // now user can refresh the page or relaunch the browser without losing authentication or returnUrl
   setCurrentUser(user: User): void {
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', user.token);
 
     this.currentUserSource.next(user);
   }

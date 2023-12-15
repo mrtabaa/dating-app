@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { AccountService } from './services/account.service';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { UserService } from './services/user.service';
+import { take } from 'rxjs';
+import { User } from './models/user.model';
 
 @Component({
   selector: 'app-root',
@@ -16,20 +19,26 @@ import { NavbarComponent } from './components/navbar/navbar.component';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  accountService = inject(AccountService);
+  userService = inject(UserService);
+
   title = 'Dating App';
   isLoading: boolean = false;
 
-  constructor(private accountService: AccountService) { }
+  constructor() { }
 
   ngOnInit(): void {
     this.getLocalStorageCurrentValues();
   }
 
   getLocalStorageCurrentValues() {
-    const userString = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
 
-    if (userString) {
-      this.accountService.setCurrentUser(JSON.parse(userString));
+    if (token) {
+      this.userService.getUser().pipe(take(1)).subscribe((user: User) => {
+        this.accountService.setCurrentUser(user);
+      });
+
     }
   }
 }
