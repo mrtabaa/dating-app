@@ -10,8 +10,8 @@
         @if(user$ | async) {
         <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
             @for (link of links; track $index) {
-            <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive
-                #rla="routerLinkActive" [active]="rla.isActive">
+            <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
+                [active]="rla.isActive">
                 {{link | titlecase}}
             </a>
             }
@@ -29,7 +29,7 @@
         @if(user$ | async; as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
-            <img class="top-avatar" mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
+            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs}}">
             }
             @else() {
             {{user.knownAs[0] | titlecase}}
@@ -52,7 +52,7 @@
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
-                    <img mat-card-avatar src="{{basePhotoUrl + user.profilePhotoUrl}}">
+                    <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs}}">
                     }
                     @else {
                     {{user.knownAs[0] | titlecase}}
