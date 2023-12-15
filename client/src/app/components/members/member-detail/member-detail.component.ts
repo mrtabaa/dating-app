@@ -4,11 +4,11 @@ import { NgOptimizedImage } from '@angular/common';
 // import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from '@kolkov/ngx-gallery';
 import { Observable, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { User } from '../../../models/user.model';
-import { UserService } from '../../../services/user.service';
+import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MemberService } from '../../../services/member.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -17,14 +17,14 @@ import { MatTabsModule } from '@angular/material/tabs';
     CommonModule, NgOptimizedImage,
     MatCardModule, MatTabsModule
   ],
-  templateUrl: './user-detail.component.html',
-  styleUrls: ['./user-detail.component.scss']
+  templateUrl: './member-detail.component.html',
+  styleUrls: ['./member-detail.component.scss']
 })
-export class UserDetailComponent implements OnInit, OnDestroy {
-  private userService = inject(UserService);
+export class MemberDetailComponent implements OnInit, OnDestroy {
+  private memberService = inject(MemberService);
   private route = inject(ActivatedRoute);
 
-  user$: Observable<User> | undefined;
+  member$: Observable<Member> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
   subscribed: Subscription | undefined;
 
@@ -45,13 +45,13 @@ export class UserDetailComponent implements OnInit, OnDestroy {
     const email: string | null = this.route.snapshot.paramMap.get('email');
 
     if (email) {
-      this.user$ = this.userService.getUser(email);
+      this.member$ = this.memberService.getMember(email);
     }
   }
 
   setGalleryImages(): void {
-    this.subscribed = this.user$?.subscribe(
-      (user: User) => {
+    this.subscribed = this.member$?.subscribe(
+      (user: Member) => {
         // for (const photo of user.photos) {
         //   this.galleryImages.push(
         //     {

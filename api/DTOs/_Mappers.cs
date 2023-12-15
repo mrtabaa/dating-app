@@ -51,6 +51,22 @@ namespace api.DTOs
             return null;
         }
 
+        public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
+        {
+            if (!(appUser.Id is null || appUser.Schema is null))
+            {
+                return new LoggedInDto(
+                    Schema: appUser.Schema,
+                    Token: token,
+                    KnownAs: appUser.KnownAs,
+                    Email: appUser.Email,
+                    ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
+                );
+            }
+
+            return null;
+        }
+
         #endregion Generator Methods
 
         #region Helper Functions

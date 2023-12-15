@@ -23,44 +23,29 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<PagedList<AppUser>> GetUsersAsync(UserParams userParams, CancellationToken cancellationToken)
+
+    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userId, string? token, CancellationToken cancellationToken)
     {
-        // For small lists
-        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
-
-        // calculate DOB based on user's selected Age
-        var MinDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MaxAge - 1));
-        var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MinAge));
-
-        // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
-        IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(user =>
-                user.Id != userParams.CurrentUserId // don't request/show the currentUser in the list
-                && user.Gender != userParams.Gender // get the opposite gender only
-                && user.DateOfBirth >= MinDob && user.DateOfBirth <= MaxDob
-            );
-
-        PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, userParams.PageNumber, userParams.PageSize, cancellationToken);
-
-        return pagedAppUsers;
-    }
-
-    public async Task<MemberDto?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
-    {
-        if (userId is not null)
+        if (!(userId is null || token is null))
         {
             AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-            return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
+            return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
         }
 
         return null;
     }
 
-    public async Task<MemberDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<AppUser?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
     {
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
+        if (userId is not null)
+        {
+            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-        return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
+            return appUser is null ? null : appUser;
+        }
+
+        return null;
     }
 
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken)
@@ -94,8 +79,8 @@ public class UserRepository : IUserRepository
             return null;
         }
 
-        var member = await GetUserByIdAsync(userId, cancellationToken);
-        if (member is null)
+        AppUser? appUser = await GetUserByIdAsync(userId, cancellationToken);
+        if (appUser is null)
         {
             _logger.LogError("user is Null / not found");
             return null;
@@ -107,7 +92,7 @@ public class UserRepository : IUserRepository
         if (photoUrls is not null)
         {
             Photo photo;
-            if (member.Photos.Count == 0) // if user's album is empty set Main: true
+            if (appUser.Photos.Count == 0) // if user's album is empty set Main: true
             {
                 photo = new Photo(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
@@ -130,11 +115,11 @@ public class UserRepository : IUserRepository
 
 
             // save to DB
-            member.Photos.Add(photo);
+            appUser.Photos.Add(photo);
 
             var updatedUser = Builders<AppUser>.Update
                 .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                .Set(doc => doc.Photos, member.Photos);
+                .Set(doc => doc.Photos, appUser.Photos);
 
             UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
 

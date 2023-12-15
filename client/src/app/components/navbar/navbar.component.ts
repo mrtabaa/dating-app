@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Observable } from 'rxjs';
-import { LoggedInUser } from '../../models/loggedInUser.model';
+import { User } from '../../models/user.model';
 import { AccountService } from '../../services/account.service';
 import { environment } from '../../../environments/environment';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
@@ -17,7 +17,7 @@ import { MatDividerModule } from '@angular/material/divider';
   selector: 'app-navbar',
   standalone: true,
   imports: [
-    CommonModule, RouterLink, RouterLinkActive,
+    CommonModule, RouterLink, RouterLinkActive, NgOptimizedImage,
     MatIconModule, MatToolbarModule, MatTabsModule, MatMenuModule,
     MatButtonModule, MatListModule, MatDividerModule
   ],
@@ -29,7 +29,7 @@ export class NavbarComponent implements OnInit {
 
   basePhotoUrl = environment.apiPhotoUrl;
 
-  user$!: Observable<LoggedInUser | null>;
+  user$!: Observable<User | null>;
 
   links = ['users', 'lists', 'messages'];
 

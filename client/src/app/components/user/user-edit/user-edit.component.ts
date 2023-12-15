@@ -5,17 +5,18 @@ import { Observable, Subscription, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { UserUpdate } from '../../../models/user-update.model';
-import { User } from '../../../models/user.model';
+import { Member } from '../../../models/member.model';
 import { AccountService } from '../../../services/account.service';
-import { UserService } from '../../../services/user.service';
-import { LoggedInUser } from '../../../models/loggedInUser.model';
-import { PhotoEditorComponent } from '../photo-editor/photo-editor.component';
+import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { User } from '../../../models/user.model';
+import { MemberService } from '../../../services/member.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -31,12 +32,13 @@ import { MatInputModule } from '@angular/material/input';
 export class UserEditComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private userService = inject(UserService);
+  private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
-  user$: Observable<User> | undefined;
+  member$: Observable<Member> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
-  loggedInUser: LoggedInUser | null = null;
+  user: User | null = null;
   subscribed: Subscription | undefined;
 
   readonly minTextAreaChars: number = 10;
@@ -46,12 +48,12 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   constructor() {
     this.accountService.currentUser$.pipe(
-      take(1)).subscribe(loggedInUser => this.loggedInUser = loggedInUser);
+      take(1)).subscribe(user => this.user = user);
   }
 
   ngOnInit(): void {
-    if (this.loggedInUser) {
-      this.user$ = this.userService.getUser(this.loggedInUser.email);
+    if (this.user) {
+      this.member$ = this.memberService.getMember(this.user.email);
     }
 
     this.initContollersValues();
@@ -86,8 +88,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   initContollersValues() {
-    if (this.user$ && this.IntroductionCtrl.pristine) {
-      this.subscribed = this.user$.subscribe((user: User) => {
+    if (this.member$ && this.IntroductionCtrl.pristine) {
+      this.subscribed = this.member$.subscribe((user: Member) => {
         this.IntroductionCtrl.setValue(user.introduction);
         this.LookingForCtrl.setValue(user.lookingFor);
         this.InterestsCtrl.setValue(user.interests);
@@ -100,7 +102,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   updateUser(): void {
 
     let updatedUser: UserUpdate = {
-      email: this.loggedInUser?.email,
+      email: this.user?.email,
       introduction: this.IntroductionCtrl.value,
       lookingFor: this.LookingForCtrl.value,
       interests: this.InterestsCtrl.value,

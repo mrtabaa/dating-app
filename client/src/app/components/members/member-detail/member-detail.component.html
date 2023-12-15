@@ -1,32 +1,32 @@
-@if (user$ | async; as user) {
+@if (member$ | async; as member) {
 <main>
     <mat-card>
-        @for (photo of user.photos; track $index) {
+        @for (photo of member.photos; track $index) {
         @if (photo.isMain) {
         <img mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240" height="240"
-            alt="Photo of {{user.knownAs}}">
+            alt="Photo of {{member.knownAs}}">
         }
         }
-        @if (user.photos.length === 0) {
+        @if (member.photos.length === 0) {
         <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="240" height="240"
-            alt="Photo of {{user.knownAs}}">
+            alt="Photo of {{member.knownAs}}">
         }
         <mat-card-content>
             <div>
                 <strong>Location</strong>
-                <p>{{user.city}}, {{user.country}}</p>
+                <p>{{member.city}}, {{member.country}}</p>
             </div>
             <div>
                 <strong>Age</strong>
-                <p>{{user.age}}</p>
+                <p>{{member.age}}</p>
             </div>
             <div>
                 <strong>Last Active</strong>
-                <p>{{user.lastActive | date}}</p>
+                <p>{{member.lastActive | date}}</p>
             </div>
             <div>
-                <strong>user Since</strong>
-                <p>{{user.created | date}}</p>
+                <strong>member Since</strong>
+                <p>{{member.created | date}}</p>
             </div>
         </mat-card-content>
         <mat-card-actions>
@@ -35,18 +35,18 @@
         </mat-card-actions>
     </mat-card>
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-        <mat-tab label="About {{user.knownAs}}">
+        <mat-tab label="About {{member.knownAs}}">
             <div class="tab-contents">
                 <h4>Introduction</h4>
-                <p>{{user.introduction}}</p>
+                <p>{{member.introduction}}</p>
                 <h4>Looking For</h4>
-                <p>{{user.lookingFor}}</p>
+                <p>{{member.lookingFor}}</p>
             </div>
         </mat-tab>
         <mat-tab label="Interests">
             <div class="tab-contents">
                 <h4>Interests</h4>
-                <p>{{user.interests}}</p>
+                <p>{{member.interests}}</p>
             </div>
         </mat-tab>
         <mat-tab label="Photos">

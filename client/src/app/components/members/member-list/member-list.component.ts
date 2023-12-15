@@ -2,28 +2,28 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { Pagination } from '../../../models/helpers/pagination';
-import { User } from '../../../models/user.model';
-import { UserService } from '../../../services/user.service';
-import { UserCardComponent } from '../user-card/user-card.component';
+import { Member } from '../../../models/member.model';
+import { MemberCardComponent } from '../member-card/member-card.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MemberService } from '../../../services/member.service';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
   imports: [
-    UserCardComponent,
+    MemberCardComponent,
     MatPaginatorModule
   ],
-  templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.scss']
+  templateUrl: './member-list.component.html',
+  styleUrls: ['./member-list.component.scss']
 })
-export class UserListComponent implements OnInit, OnDestroy {
+export class MemberListComponent implements OnInit, OnDestroy {
   //#region Variables
-  private userService = inject(UserService);
+  private memberService = inject(MemberService);
 
   subscribed: Subscription | undefined;
 
-  users: User[] = [];
+  members: Member[] = [];
   pagination: Pagination | undefined;
 
   // Material Pagination attrs
@@ -49,10 +49,10 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   loadUsers(): void {
-    this.subscribed = this.userService.getUsers(this.pageIndex + 1, this.pageSize).subscribe({
+    this.subscribed = this.memberService.getMembers(this.pageIndex + 1, this.pageSize).subscribe({
       next: response => {
         if (response.result && response.pagination) {
-          this.users = response.result;
+          this.members = response.result;
           this.pagination = response.pagination;
         }
       }

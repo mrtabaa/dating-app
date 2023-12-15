@@ -7,6 +7,7 @@ public static class RepositoryServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMemberRepository, MemberRepository>();
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<IPhotoModifySaveService, PhotoModifySaveService>();
 

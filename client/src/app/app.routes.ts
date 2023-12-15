@@ -8,12 +8,12 @@ import { TestErrorComponent } from './components/errors/test-error/test-error.co
 import { HomeComponent } from './components/home/home.component';
 import { ListsComponent } from './components/lists/lists.component';
 import { MessagesComponent } from './components/messages/messages.component';
-import { UserDetailComponent } from './components/users/user-detail/user-detail.component';
-import { UserEditComponent } from './components/users/user-edit/user-edit.component';
-import { UserListComponent } from './components/users/user-list/user-list.component';
+import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
+import { MemberListComponent } from './components/members/member-list/member-list.component';
 import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
 import { AuthGuard } from './guards/auth.guard';
 import { PreventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
+import { UserEditComponent } from './components/user/user-edit/user-edit.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -22,8 +22,8 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [AuthGuard],
         children: [
-            { path: 'users', component: UserListComponent },
-            { path: 'users/:email', component: UserDetailComponent },
+            { path: 'users', component: MemberListComponent },
+            { path: 'users/:email', component: MemberDetailComponent },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [PreventUnsavedChangesGuard] },
             { path: 'lists', component: ListsComponent },
             { path: 'messages', component: MessagesComponent },

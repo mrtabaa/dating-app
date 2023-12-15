@@ -1,8 +1,8 @@
 <main>
     <h1>Find Your Beloved One</h1>
-    <div class="users-list">
-        @for (user of users; track $index) {
-        <app-user-card [userInput]="user"></app-user-card>
+    <div class="members-list">
+        @for (member of members; track $index) {
+        <app-member-card [memberInput]="member"></app-member-card>
         }
     </div>
     @if (pagination) {

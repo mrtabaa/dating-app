@@ -1,73 +1,37 @@
+using Microsoft.AspNetCore.Authentication;
+
 namespace api.Controllers;
 
 [Authorize]
 // [Produces("application/json")]
 public class UserController(IUserRepository _userRepository) : BaseApiController
 {
-    #region Variables and Constructor
-
-    #endregion Variables and Constructor
-
     #region User Management
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetUsers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
+    [HttpGet("id")]
+    public async Task<ActionResult<LoggedInDto>> GetLoggedInUser(CancellationToken cancellationToken)
     {
-        List<MemberDto?> memberDtos = [];
+        string? token = Response.HttpContext.GetTokenAsync("access_token").Result;
 
-        MemberDto? currentUser = await _userRepository.GetUserByIdAsync(User.GetUserId(), cancellationToken);
+        LoggedInDto? loggedInDto = await _userRepository.GetLoggedInUserAsync(User.GetUserId(), token, cancellationToken);
 
-        if (currentUser is not null && string.IsNullOrEmpty(userParams.Gender))
-        {
-            userParams.CurrentUserId = currentUser.Id;
-            userParams.Gender = currentUser.Gender;
-        }
-
-        PagedList<AppUser> pagedAppUsers = await _userRepository.GetUsersAsync(userParams, cancellationToken);
-
-        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
-                If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
-        */
-        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalCount, pagedAppUsers.TotalPages));
-
-        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
-                After that step we can convert AppUser to UserDto in here (NOT in the UserRepository) */
-        foreach (AppUser pagedAppUser in pagedAppUsers)
-        {
-            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
-        }
-
-        return memberDtos;
+        return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
     }
 
-    [HttpGet("id/{id}")]
-    public async Task<ActionResult<MemberDto>> GetUserById(string id, CancellationToken cancellationToken)
-    {
-        MemberDto? memberDto = await _userRepository.GetUserByIdAsync(id, cancellationToken);
-
-        return memberDto is null ? BadRequest("No user found by this ID.") : memberDto;
-    }
-
-    [HttpGet("email/{email}")]
-    public async Task<ActionResult<MemberDto>> GetUserByEmail(string email, CancellationToken cancellationToken)
-    {
-        MemberDto? memberDto = await _userRepository.GetUserByEmailAsync(email, cancellationToken);
-
-        return memberDto is null ? BadRequest("No user found by this Email.") : memberDto;
-    }
-
-    [HttpPut()]
+    [HttpPut]
     public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        // UserDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken);
-
+        // UserDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken); TODO what is this?
+        // TODO Change var
         var result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserId(), cancellationToken);
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
 
+    // TODO remove userId
     [HttpDelete("delete-user/{userId}")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(string userId, CancellationToken cancellationToken)
     {
+        // TODO Change var
         var result = await _userRepository.DeleteUserAsync(userId, cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
@@ -88,6 +52,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
+        //TODO remove var
         var result = await _userRepository.DeleteOnePhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;

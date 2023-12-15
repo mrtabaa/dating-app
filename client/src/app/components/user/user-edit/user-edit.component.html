@@ -9,36 +9,36 @@
             }
         </mat-card>
     </section>
-    @if(user$ | async; as user) {
+    @if(member$ | async; as member) {
     <div class="content">
         <section class="user-card">
             <mat-card>
-                @for (photo of user.photos; track $index) {
+                @for (photo of member.photos; track $index) {
                 @if (photo.isMain) {
                 <img mat-card-image ngSrc="{{apiPhotoUrl + photo.url_128}}" width="240" height="240"
-                    alt="Photo of {{user.knownAs}}">
+                    alt="Photo of {{member.knownAs}}">
                 }
                 }
-                @if (user.photos.length === 0) {
+                @if (member.photos.length === 0) {
                 <img mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}" width="240" height="240"
-                    alt="Photo of {{user.knownAs}}">
+                    alt="Photo of {{member.knownAs}}">
                 }
                 <mat-card-content>
                     <div>
                         <strong>Location</strong>
-                        <p>{{user.city}}, {{user.country}}</p>
+                        <p>{{member.city}}, {{member.country}}</p>
                     </div>
                     <div>
                         <strong>Age</strong>
-                        <p>{{user.age}}</p>
+                        <p>{{member.age}}</p>
                     </div>
                     <div>
                         <strong>Last Active</strong>
-                        <p>{{user.lastActive | date}}</p>
+                        <p>{{member.lastActive | date}}</p>
                     </div>
                     <div>
                         <strong>user Since</strong>
-                        <p>{{user.created | date}}</p>
+                        <p>{{member.created | date}}</p>
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
@@ -50,12 +50,12 @@
             </mat-card>
         </section>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab label="About {{user.knownAs}}">
+            <mat-tab label="About {{member.knownAs}}">
                 <div class="tab-contents">
                     <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
                             <mat-label>Introduction</mat-label>
-                            <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="user.introduction"
+                            <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="member.introduction"
                                 placeholder="Say something about your self" matInput required>
                             {{IntroductionCtrl.value}}
                             </textarea>
@@ -78,7 +78,7 @@
                             <mat-label>Looking For</mat-label>
                             <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
                                 placeholder="Enter what you're looking for" matInput required>
-                            {{user.lookingFor}}
+                            {{member.lookingFor}}
                             </textarea>
                             <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             @if (IntroductionCtrl.hasError('required')) {
@@ -99,7 +99,7 @@
                             <mat-label>Interests</mat-label>
                             <textarea cdkTextareaAutosize formControlName="interestsCtrl"
                                 placeholder="Enter your interests" matInput required>
-                        {{user.interests}}
+                        {{member.interests}}
                             </textarea>
                             <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
                             @if (IntroductionCtrl.hasError('required')) {
@@ -156,7 +156,7 @@
             </mat-tab>
             <mat-tab label="Edit Photos">
                 <div class="tab-contents">
-                    <app-photo-editor [user]="user"></app-photo-editor>
+                    <app-photo-editor [member]="member"></app-photo-editor>
                 </div>
             </mat-tab>
         </mat-tab-group>

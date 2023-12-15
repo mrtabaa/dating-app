@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription } from 'rxjs';
 import { UserLogin } from '../../../models/account/user-login.model';
-import { LoggedInUser } from '../../../models/loggedInUser.model';
+import { User } from '../../../models/user.model';
 import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
-  user$!: Observable<LoggedInUser | null>;
+  user$!: Observable<User | null>;
   subscrition!: Subscription;
 
   ngOnInit(): void {
