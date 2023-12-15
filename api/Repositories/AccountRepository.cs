@@ -34,7 +34,6 @@ public class AccountRepository : IAccountRepository
 
         return new LoggedInDto(
             Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-            Id: appUser.Id,
             Token: _tokenService.CreateToken(appUser),
             Email: appUser.Email,
             KnownAs: appUser.KnownAs,
@@ -60,7 +59,6 @@ public class AccountRepository : IAccountRepository
 
             return new LoggedInDto(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: appUser.Id,
                 Token: _tokenService.CreateToken(appUser),
                 Email: appUser.Email,
                 KnownAs: appUser.KnownAs,
