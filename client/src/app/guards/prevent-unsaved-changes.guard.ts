@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-
-import { UserEditComponent } from '../components/users/user-edit/user-edit.component';
+import { UserEditComponent } from '../components/user/user-edit/user-edit.component';
 
 @Injectable({
   providedIn: 'root'
