@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { User } from '../../models/user.model';
 import { AccountService } from '../../services/account.service';
 import { environment } from '../../../environments/environment';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -31,7 +31,7 @@ export class NavbarComponent implements OnInit {
 
   user$!: Observable<User | null>;
 
-  links = ['users', 'lists', 'messages'];
+  links = ['members', 'lists', 'messages'];
 
   ngOnInit(): void {
     this.user$ = this.accountService.currentUser$;

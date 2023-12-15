@@ -10,21 +10,21 @@ import { ListsComponent } from './components/lists/lists.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
 import { MemberListComponent } from './components/members/member-list/member-list.component';
-import { AuthLoggedInGuard } from './guards/auth-logged-in.guard';
-import { AuthGuard } from './guards/auth.guard';
-import { PreventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
 import { UserEditComponent } from './components/user/user-edit/user-edit.component';
+import { authGuard } from './guards/auth.guard';
+import { authLoggedInGuard } from './guards/auth-logged-in.guard';
+import { preventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     {
         path: '',
         runGuardsAndResolvers: 'always',
-        canActivate: [AuthGuard],
+        canActivate: [authGuard],
         children: [
-            { path: 'users', component: MemberListComponent },
-            { path: 'users/:email', component: MemberDetailComponent },
-            { path: 'user/edit', component: UserEditComponent, canDeactivate: [PreventUnsavedChangesGuard] },
+            { path: 'members', component: MemberListComponent },
+            { path: 'member/:email', component: MemberDetailComponent },
+            { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
             { path: 'lists', component: ListsComponent },
             { path: 'messages', component: MessagesComponent },
         ]
@@ -32,7 +32,7 @@ export const routes: Routes = [
     {
         path: '',
         runGuardsAndResolvers: 'always',
-        canActivate: [AuthLoggedInGuard],
+        canActivate: [authLoggedInGuard],
         children: [
             { path: 'login', component: LoginComponent },
             { path: 'register', component: RegisterComponent },
