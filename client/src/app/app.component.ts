@@ -25,8 +25,6 @@ export class AppComponent implements OnInit {
   title = 'Dating App';
   isLoading: boolean = false;
 
-  constructor() { }
-
   ngOnInit(): void {
     this.getLocalStorageCurrentValues();
   }
@@ -36,7 +34,10 @@ export class AppComponent implements OnInit {
 
     if (token) {
       this.userService.getUser().pipe(take(1)).subscribe((user: User) => {
-        this.accountService.setCurrentUser(user);
+        if (user)
+          this.accountService.setCurrentUser(user);
+        else // if token is expired and api call is unauthorized.
+          this.accountService.logout();
       });
 
     }
