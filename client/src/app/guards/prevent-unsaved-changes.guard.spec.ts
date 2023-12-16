@@ -1,16 +1,18 @@
 import { TestBed } from '@angular/core/testing';
+import { CanDeactivateFn } from '@angular/router';
 
-import { PreventUnsavedChangesGuard } from './prevent-unsaved-changes.guard';
+import { preventUnsavedChangesGuard } from './prevent-unsaved-changes.guard';
+import { UserEditComponent } from '../components/user/user-edit/user-edit.component';
 
-describe('PreventUnsavedChangesGuard', () => {
-  let guard: PreventUnsavedChangesGuard;
+describe('preventUnsavedChangesGuard', () => {
+  const executeGuard: CanDeactivateFn<UserEditComponent> = (...guardParameters) => 
+      TestBed.runInInjectionContext(() => preventUnsavedChangesGuard(...guardParameters));
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    guard = TestBed.inject(PreventUnsavedChangesGuard);
   });
 
   it('should be created', () => {
-    expect(guard).toBeTruthy();
+    expect(executeGuard).toBeTruthy();
   });
 });
