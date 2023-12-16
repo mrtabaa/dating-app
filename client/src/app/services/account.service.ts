@@ -21,7 +21,7 @@ export class AccountService {
   register(userInput: UserRegister): Observable<User | null> {
     return this.http.post<User>(this.baseUrl + 'register', userInput)
       .pipe(
-        map(user => {
+        map((user: User) => {
           if (user) {
             this.setCurrentUser(user);
             return user;
@@ -34,7 +34,7 @@ export class AccountService {
   login(userInput: UserLogin): Observable<User | null> {
     return this.http.post<User>(this.baseUrl + 'login', userInput)
       .pipe(
-        map(user => {
+        map((user: User) => {
           if (user) {
             this.setCurrentUser(user);
 
@@ -50,7 +50,7 @@ export class AccountService {
   logout(): void {
     localStorage.removeItem('token');
     this.currentUserSource.next(null);
-    this.router.navigate(['/login'])
+    this.router.navigate(['login'])
   }
 
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
@@ -66,7 +66,7 @@ export class AccountService {
 
     returnUrl
       ? this.router.navigate([returnUrl])
-      : this.router.navigate(['users']);
+      : this.router.navigate(['members']);
 
     localStorage.removeItem('returnUrl');
   }
