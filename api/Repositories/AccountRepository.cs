@@ -33,7 +33,6 @@ public class AccountRepository : IAccountRepository
             _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
         return new LoggedInDto(
-            Schema: AppVariablesExtensions.AppVersions.Last<string>(),
             Token: _tokenService.CreateToken(appUser),
             Email: appUser.Email,
             KnownAs: appUser.KnownAs,
@@ -58,7 +57,6 @@ public class AccountRepository : IAccountRepository
             UpdateLastActiveInDb(appUser, cancellationToken);
 
             return new LoggedInDto(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Token: _tokenService.CreateToken(appUser),
                 Email: appUser.Email,
                 KnownAs: appUser.KnownAs,

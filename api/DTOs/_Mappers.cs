@@ -56,7 +56,6 @@ namespace api.DTOs
             if (!(appUser.Id is null || appUser.Schema is null))
             {
                 return new LoggedInDto(
-                    Schema: appUser.Schema,
                     Token: token,
                     KnownAs: appUser.KnownAs,
                     Email: appUser.Email,

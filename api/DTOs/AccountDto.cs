@@ -27,7 +27,6 @@ public record LoginDto(
 );
 
 public record LoggedInDto(
-    string Schema,
     string Token,
     string KnownAs,
     string Email,
