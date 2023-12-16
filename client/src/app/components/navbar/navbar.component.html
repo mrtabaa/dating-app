@@ -29,7 +29,7 @@
         @if(user$ | async; as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
-            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs}}">
+            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs[0]}}">
             }
             @else() {
             {{user.knownAs[0] | titlecase}}
@@ -44,7 +44,7 @@
         <button mat-raised-button color="accent" routerLink="/login" routerLinkActive="router-link-active">
             Login
         </button>
-        }
+        }   
         <!-- menu if logged-in -->
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
