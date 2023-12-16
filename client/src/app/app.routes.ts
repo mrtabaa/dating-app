@@ -34,8 +34,8 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authLoggedInGuard],
         children: [
-            { path: 'login', component: LoginComponent },
-            { path: 'register', component: RegisterComponent },
+            { path: 'account/login', component: LoginComponent },
+            { path: 'account/register', component: RegisterComponent },
         ]
     },
     {

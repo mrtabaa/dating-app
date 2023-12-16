@@ -50,7 +50,7 @@ export class AccountService {
   logout(): void {
     localStorage.removeItem('token');
     this.currentUserSource.next(null);
-    this.router.navigate(['login'])
+    this.router.navigate(['account/login'])
   }
 
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
