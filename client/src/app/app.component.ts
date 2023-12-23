@@ -39,9 +39,7 @@ export class AppComponent implements OnInit {
             this.accountService.setCurrentUser(user);
           },
           error: () => this.accountService.logout() // if token is expired and api call is unauthorized.
-        }
-      );
-
+        });
     }
   }
 }
