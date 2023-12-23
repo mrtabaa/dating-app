@@ -21,8 +21,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
         // UserDto? user = await _userRepository.GetUserById(User.GetUserId(), cancellationToken); TODO what is this?
-        // TODO Change var
-        var result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserId(), cancellationToken);
+        UpdateResult? result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserId(), cancellationToken);
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
@@ -31,8 +30,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpDelete("delete-user/{userId}")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(string userId, CancellationToken cancellationToken)
     {
-        // TODO Change var
-        var result = await _userRepository.DeleteUserAsync(userId, cancellationToken);
+        DeleteResult? result = await _userRepository.DeleteUserAsync(userId, cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
     #endregion User Management
@@ -52,8 +50,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        //TODO remove var
-        var result = await _userRepository.DeleteOnePhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
+        UpdateResult? result = await _userRepository.DeleteOnePhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }
