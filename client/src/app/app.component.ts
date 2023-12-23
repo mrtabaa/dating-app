@@ -33,12 +33,14 @@ export class AppComponent implements OnInit {
     const token = localStorage.getItem('token');
 
     if (token) {
-      this.userService.getUser().pipe(take(1)).subscribe((user: User) => {
-        if (user)
-          this.accountService.setCurrentUser(user);
-        else // if token is expired and api call is unauthorized.
-          this.accountService.logout();
-      });
+      this.userService.getUser().pipe(take(1)).subscribe(
+        {
+          next: (user: User) => {
+            this.accountService.setCurrentUser(user);
+          },
+          error: () => this.accountService.logout() // if token is expired and api call is unauthorized.
+        }
+      );
 
     }
   }
