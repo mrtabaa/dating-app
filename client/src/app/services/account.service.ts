@@ -13,7 +13,7 @@ import { LoggedInUser } from '../models/logged-in-user.model';
 export class AccountService {
   private baseUrl = environment.apiUrl + "account/";
 
-  currentUserSig = signal<LoggedInUser | null>(null);
+  loggedInUserSig = signal<LoggedInUser | null>(null);
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -46,30 +46,30 @@ export class AccountService {
       );
   }
 
-   // get logged-in user when browser is refreshed
-   getLoggedInUser(): Observable<LoggedInUser | null> {
-    return this.http.get<LoggedInUser>(this.baseUrl).pipe(
-      map((loggedInUserResponse: LoggedInUser | null) => {
-        if (loggedInUserResponse)
-          return loggedInUserResponse
-
-        return null;
-      })
-    );
+  /**
+   * Get logged-in user when browser is refreshed
+   * Called in app.component.ts
+   * @returns Observable<LoggedInUser | null>
+   */
+  getLoggedInUser(): Observable<LoggedInUser | null> {
+    return this.http.get<LoggedInUser>(this.baseUrl);
   }
 
   logout(): void {
     localStorage.clear();
-    this.currentUserSig.set(null);
+    this.loggedInUserSig.set(null);
     this.router.navigate(['account/login'])
   }
 
-  // used in app-component to set currentUserSource from the stored brwoser's localStorage key
-  // now user can refresh the page or relaunch the browser without losing authentication or returnUrl
+  /**
+   * Used in app-component to set currentUserSig
+   * Now user can refresh the page or relaunch the browser without losing authentication or returnUrl
+   * @param loggedInUser 
+   */
   setCurrentUser(loggedInUser: LoggedInUser): void {
     localStorage.setItem('token', loggedInUser.token);
 
-    this.currentUserSig.set(loggedInUser);
+    this.loggedInUserSig.set(loggedInUser);
   }
 
   setGetReturnUrl(): void {

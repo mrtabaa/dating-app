@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
           error: (err) => { //if token is expired and api call is unauthorized.
             console.log(err.error);
             this.accountService.logout()
-          } 
+          }
         });
     }
   }
