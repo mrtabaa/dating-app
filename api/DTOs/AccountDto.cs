@@ -27,6 +27,7 @@ public record LoginDto(
 );
 
 public record LoggedInDto(
+    string Id,
     string Token,
     string KnownAs,
     string Email,
