@@ -56,6 +56,18 @@ public class AccountRepository : IAccountRepository
 
         return null;
     }
+
+    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userId, string? token, CancellationToken cancellationToken)
+    {
+        if (!(userId is null || token is null))
+        {
+            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+
+            return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+        }
+
+        return null;
+    }
     #endregion CRUD
 
     private async void UpdateLastActiveInDb(AppUser appUserIn, CancellationToken cancellationToken)

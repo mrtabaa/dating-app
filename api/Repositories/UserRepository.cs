@@ -23,19 +23,6 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-
-    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userId, string? token, CancellationToken cancellationToken)
-    {
-        if (!(userId is null || token is null))
-        {
-            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-
-            return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
-        }
-
-        return null;
-    }
-
     public async Task<AppUser?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)

@@ -21,4 +21,14 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         return loggedInDto is null ? Unauthorized("Invalid username or password.") : loggedInDto;
     }
+
+    [HttpGet]
+    public async Task<ActionResult<LoggedInDto>> GetLoggedInUser(CancellationToken cancellationToken)
+    {
+        string? token = Response.HttpContext.GetTokenAsync("access_token").Result;
+
+        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserId(), token, cancellationToken);
+
+        return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
+    }
 }
