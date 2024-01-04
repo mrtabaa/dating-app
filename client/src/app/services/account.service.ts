@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { UserLogin } from '../models/account/user-login.model';
 import { UserRegister } from '../models/account/user-register.model';
 import { environment } from '../../environments/environment';
-import { User } from '../models/user.model';
+import { LoggedInUser } from '../models/logged-in-user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +13,14 @@ import { User } from '../models/user.model';
 export class AccountService {
   private baseUrl = environment.apiUrl + "account/";
 
-  private currentUserSource = new BehaviorSubject<User | null>(null);
-  currentUser$ = this.currentUserSource.asObservable();
+  currentUserSig = signal<LoggedInUser | null>(null);
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  register(userInput: UserRegister): Observable<User | null> {
-    return this.http.post<User>(this.baseUrl + 'register', userInput)
+  register(userInput: UserRegister): Observable<LoggedInUser | null> {
+    return this.http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
       .pipe(
-        map((user: User) => {
+        map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
             return user;
@@ -31,10 +30,10 @@ export class AccountService {
       );
   }
 
-  login(userInput: UserLogin): Observable<User | null> {
-    return this.http.post<User>(this.baseUrl + 'login', userInput)
+  login(userInput: UserLogin): Observable<LoggedInUser | null> {
+    return this.http.post<LoggedInUser>(this.baseUrl + 'login', userInput)
       .pipe(
-        map((user: User) => {
+        map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
 
@@ -47,18 +46,30 @@ export class AccountService {
       );
   }
 
+   // get logged-in user when browser is refreshed
+   getLoggedInUser(): Observable<LoggedInUser | null> {
+    return this.http.get<LoggedInUser>(this.baseUrl).pipe(
+      map((loggedInUserResponse: LoggedInUser | null) => {
+        if (loggedInUserResponse)
+          return loggedInUserResponse
+
+        return null;
+      })
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('token');
-    this.currentUserSource.next(null);
+    this.currentUserSig.set(null);
     this.router.navigate(['account/login'])
   }
 
   // used in app-component to set currentUserSource from the stored brwoser's localStorage key
   // now user can refresh the page or relaunch the browser without losing authentication or returnUrl
-  setCurrentUser(user: User): void {
-    localStorage.setItem('token', user.token);
+  setCurrentUser(loggedInUser: LoggedInUser): void {
+    localStorage.setItem('token', loggedInUser.token);
 
-    this.currentUserSource.next(user);
+    this.currentUserSig.set(loggedInUser);
   }
 
   setGetReturnUrl(): void {

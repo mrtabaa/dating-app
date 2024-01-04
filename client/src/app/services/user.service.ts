@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, finalize, map, of, take } from 'rxjs';
 import { UserUpdate } from '../models/user-update.model';
 import { UpdateResult } from '../models/helpers/update-result.model';
-import { User } from '../models/user.model';
+import { LoggedInUser } from '../models/logged-in-user.model';
 import { PaginationResult } from '../models/helpers/pagination';
 import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
@@ -24,10 +24,6 @@ export class UserService {
     // inject(AccountService).currentUser$.pipe(take(1)).subscribe({
     //   next: user => { if (user) this.user = user; }
     // });
-  }
-
-  getUser(): Observable<User> {
-    return this.http.get<User>(this.baseUrl + "/id");
   }
 
   updateUser(userUpdate: UserUpdate): Observable<UpdateResult> {
