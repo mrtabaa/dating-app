@@ -11,10 +11,8 @@ import { environment } from '../../environments/environment';
 export class MemberService {
   private http = inject(HttpClient);
 
-  baseUrl: string = environment.apiUrl + 'member';
-  members: Member[] = [];
+  baseUrl: string = environment.apiUrl + 'member/';
   paginationResult: PaginationResult<Member[]> = {};
-  member: Member | undefined;
 
   getMembers(page?: number, itemsPerPage?: number): Observable<PaginationResult<Member[]>> {
     // if (this.users.length > 0) return of(this.users); // return ObservableOf(users) // caching
@@ -40,13 +38,7 @@ export class MemberService {
     );
   }
 
-  getMember(id: string | undefined): Observable<Member> {
-    if (this.members.length > 0 && id) {
-      this.member = this.members.find(member => member.id === id);
-      if (this.member)
-        return of(this.member);
-    }
-
-    return this.http.get<Member>(this.baseUrl + '/id/' + id);
+  getMember(id: string | undefined): Observable<Member> | undefined {
+    return this.http.get<Member>(this.baseUrl + 'id/' + id);
   }
 }

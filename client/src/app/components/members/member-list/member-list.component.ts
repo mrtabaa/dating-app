@@ -41,14 +41,14 @@ export class MemberListComponent implements OnInit, OnDestroy {
   //#endregion
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadMembers();
   }
 
   ngOnDestroy(): void {
     this.subscribed?.unsubscribe();
   }
 
-  loadUsers(): void {
+  loadMembers(): void {
     this.subscribed = this.memberService.getMembers(this.pageIndex + 1, this.pageSize).subscribe({
       next: response => {
         if (response.result && response.pagination) {
@@ -63,6 +63,6 @@ export class MemberListComponent implements OnInit, OnDestroy {
     this.pageEvent = e;
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
-    this.loadUsers();
+    this.loadMembers();
   }
 }
