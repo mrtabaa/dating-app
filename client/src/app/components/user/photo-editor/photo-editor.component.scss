@@ -4,12 +4,12 @@ main {
     gap: 2rem;
 
     .top {
-        .album {
+        .gallery {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
 
-            div {
+            .photos {
                 width: 128px;
 
                 img {

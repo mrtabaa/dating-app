@@ -1,9 +1,9 @@
 <main>
     @if(loggedInUser && member) {
     <section class="top">
-        <div class="album">
+        <div class="gallery">
             @for (photo of member.photos; track $index) {
-            <div>
+            <div class="photos">
                 <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
 
                 <div class="buttons">
@@ -14,9 +14,6 @@
                 </div>
             </div>
             }
-            @if (member.photos.length === 0) {
-            <h3>Your album is empty. You may upload some photos.</h3>
-            }
             @if (errorGlob) {
             <mat-error>
                 This update has failed for this reason:
@@ -24,22 +21,26 @@
                 <br> Please try again or contact the admin.
             </mat-error>
             }
-
-            <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()" [uploader]="uploader"
-                [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
+            <div class="photo-area">
+                @if (member.photos.length === 0) {
+                <mat-error>Your album is empty. You may upload some photos.</mat-error>
+                }
+                <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
+                    [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
                             'nv-file-over': hasBaseDropZoneOver}">
-                <mat-card-header>
-                    <mat-card-title>Add Photos</mat-card-title>
-                    <mat-card-subtitle>Click or Drop photos here</mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <mat-icon>cloud_upload</mat-icon>
-                </mat-card-content>
-                <mat-card-actions>
-                    <button type="button" mat-raised-button>Choose Photos</button>
-                    <input #fileInput ng2FileSelect [uploader]="uploader" multiple type="file" id="file">
-                </mat-card-actions>
-            </mat-card>
+                    <mat-card-header>
+                        <mat-card-title>Add Photos</mat-card-title>
+                        <mat-card-subtitle>Click or Drop photos here</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <mat-icon>cloud_upload</mat-icon>
+                    </mat-card-content>
+                    <mat-card-actions>
+                        <button type="button" mat-raised-button>Choose Photos</button>
+                        <input #fileInput ng2FileSelect [uploader]="uploader" multiple type="file" id="file">
+                    </mat-card-actions>
+                </mat-card>
+            </div>
         </div>
     </section>
     }
