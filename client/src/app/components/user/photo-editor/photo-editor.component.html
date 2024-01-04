@@ -24,9 +24,10 @@
                 <br> Please try again or contact the admin.
             </mat-error>
             }
-            
-            <mat-card class="uploader" ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
-                [uploader]="uploader" [ngClass]="{'nv-file-over': hasBaseDropZoneOver}">
+
+            <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()" [uploader]="uploader"
+                [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
+                            'nv-file-over': hasBaseDropZoneOver}">
                 <mat-card-header>
                     <mat-card-title>Add Photos</mat-card-title>
                     <mat-card-subtitle>Click or Drop photos here</mat-card-subtitle>
@@ -42,7 +43,7 @@
         </div>
     </section>
     }
-    
+
     @if (uploader && uploader.queue && uploader.queue.length) {
     <section class="queue">
         <h2>Upload Queue</h2>

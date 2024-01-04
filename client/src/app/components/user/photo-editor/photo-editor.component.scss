@@ -23,9 +23,8 @@ main {
                 }
             }
 
-            .uploader {
+            @mixin uploaderMixin {
                 min-width: 200px;
-                border: rgb(206, 206, 206) solid 1px;
 
                 * {
                     display: flex;
@@ -41,14 +40,22 @@ main {
                     }
                 }
 
-                .nv-file-over {
-                    border: dotted 3px rgb(255, 114, 114);
-                    background-color: rgb(253, 237, 240);
-                }
-
                 input[type=file] {
                     display: none;
                 }
+            }
+
+            .nv-file-not-over {
+                border: rgb(206, 206, 206) solid 1px;
+
+                @include uploaderMixin();
+            }
+
+            .nv-file-over {
+                border: dotted 3px rgb(255, 114, 114);
+                background-color: rgb(253, 237, 240);
+
+                @include uploaderMixin();
             }
         }
     }
