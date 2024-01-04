@@ -59,7 +59,7 @@ export class AccountService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    localStorage.clear();
     this.currentUserSig.set(null);
     this.router.navigate(['account/login'])
   }
