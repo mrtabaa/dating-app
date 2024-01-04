@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Observable, Subscription, take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { UserUpdate } from '../../../models/user-update.model';
@@ -14,7 +14,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
-import { User } from '../../../models/user.model';
 import { MemberService } from '../../../services/member.service';
 import { UserService } from '../../../services/user.service';
 
@@ -29,38 +28,41 @@ import { UserService } from '../../../services/user.service';
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
-export class UserEditComponent implements OnInit, OnDestroy {
+export class UserEditComponent implements OnDestroy {
   private accountService = inject(AccountService);
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
-  member$: Observable<Member> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
-  user: User | null = null;
-  subscribed: Subscription | undefined;
+  subscribedMember: Subscription | undefined;
+  member: Member | undefined;
 
   readonly minTextAreaChars: number = 10;
   readonly maxTextAreaChars: number = 500;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 30;
 
-  constructor() {
-    this.accountService.currentUser$.pipe(
-      take(1)).subscribe(user => this.user = user);
-  }
-
   ngOnInit(): void {
-    if (this.user) {
-      this.member$ = this.memberService.getMember(this.user.email);
-    }
-
-    this.initContollersValues();
+    this.getMember();
   }
 
   ngOnDestroy(): void {
-    this.subscribed?.unsubscribe();
+    this.subscribedMember?.unsubscribe();
+  }
+
+  getMember(): void {
+    this.accountService.getLoggedInUser().pipe(take(1)).subscribe(loggedInUser => {
+      if (loggedInUser) {
+        this.memberService.getMember(loggedInUser.id).pipe(take(1)).subscribe(member => {
+          if (member) {
+            this.member = member;
+            this.initContollersValues(member);
+          }
+        });
+      }
+    });
   }
 
   userEditFg: FormGroup = this.fb.group({
@@ -87,52 +89,49 @@ export class UserEditComponent implements OnInit, OnDestroy {
     return this.userEditFg.get('countryCtrl') as FormControl;
   }
 
-  initContollersValues() {
-    if (this.member$ && this.IntroductionCtrl.pristine) {
-      this.subscribed = this.member$.subscribe((user: Member) => {
-        this.IntroductionCtrl.setValue(user.introduction);
-        this.LookingForCtrl.setValue(user.lookingFor);
-        this.InterestsCtrl.setValue(user.interests);
-        this.CityCtrl.setValue(user.city);
-        this.CountryCtrl.setValue(user.country);
-      });
-    }
+  initContollersValues(member: Member) {
+    this.IntroductionCtrl.setValue(member.introduction);
+    this.LookingForCtrl.setValue(member.lookingFor);
+    this.InterestsCtrl.setValue(member.interests);
+    this.CityCtrl.setValue(member.city);
+    this.CountryCtrl.setValue(member.country);
   }
 
-  updateUser(): void {
+  updateUser(member: Member): void {
+    if (member) {
+      let updatedUser: UserUpdate = {
+        email: member.email,
+        introduction: this.IntroductionCtrl.value,
+        lookingFor: this.LookingForCtrl.value,
+        interests: this.InterestsCtrl.value,
+        city: this.CityCtrl.value,
+        country: this.CountryCtrl.value
+      }
 
-    let updatedUser: UserUpdate = {
-      email: this.user?.email,
-      introduction: this.IntroductionCtrl.value,
-      lookingFor: this.LookingForCtrl.value,
-      interests: this.InterestsCtrl.value,
-      city: this.CityCtrl.value,
-      country: this.CountryCtrl.value
-    }
-
-    this.subscribed = this.userService.updateUser(updatedUser).subscribe({
-      next: (updateResult: UpdateResult) => {
-        if (updateResult.isAcknowledged && updateResult.modifiedCount > 0) {
-          this.matSnak.open("Successfully updated.", "Close", {
-            horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
-          });
-        }
-        else {
-          this.matSnak.open("Update failed.", "Close", {
-            horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
-          });
-        }
-      },
-      error: (errors: any[]) => {
-        for (const errorCategory of errors) {
-          for (const error of errorCategory) {
-            console.log(error);
+      this.subscribedMember = this.userService.updateUser(updatedUser).subscribe({
+        next: (updateResult: UpdateResult) => {
+          if (updateResult.isAcknowledged && updateResult.modifiedCount > 0) {
+            this.matSnak.open("Successfully updated.", "Close", {
+              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
+            });
+          }
+          else {
+            this.matSnak.open("Update failed.", "Close", {
+              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
+            });
+          }
+        },
+        error: (errors: any[]) => {
+          for (const errorCategory of errors) {
+            for (const error of errorCategory) {
+              console.log(error);
+            }
           }
         }
-      }
-    });
+      });
 
-    this.userEditFg.markAsPristine();
+      this.userEditFg.markAsPristine();
+    }
   }
 
   logForm() {

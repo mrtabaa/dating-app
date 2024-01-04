@@ -9,7 +9,7 @@
             }
         </mat-card>
     </section>
-    @if(member$ | async; as member) {
+    @if(member) {
     <div class="content">
         <section class="user-card">
             <mat-card>
@@ -42,8 +42,8 @@
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
-                    <button type="submit" (click)="updateUser()" [disabled]="userEditFg.pristine || userEditFg.invalid"
-                        mat-raised-button color="primary">
+                    <button type="submit" (click)="updateUser(member)"
+                        [disabled]="userEditFg.pristine || userEditFg.invalid" mat-raised-button color="primary">
                         Save Changes
                     </button>
                 </mat-card-actions>
@@ -55,8 +55,9 @@
                     <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
                             <mat-label>Introduction</mat-label>
-                            <textarea cdkTextareaAutosize formControlName="introductionCtrl" [value]="member.introduction"
-                                placeholder="Say something about your self" matInput required>
+                            <textarea cdkTextareaAutosize formControlName="introductionCtrl"
+                                [value]="member.introduction" placeholder="Say something about your self" matInput
+                                required>
                             {{IntroductionCtrl.value}}
                             </textarea>
                             <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
