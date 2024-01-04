@@ -20,7 +20,7 @@ public class AccountRepository : IAccountRepository
     #region CRUD
     public async Task<LoggedInDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
     {
-        bool userExist = await _collection.AsQueryable().Where<AppUser>(appUser => appUser.Email == userInput.Email).AnyAsync(cancellationToken);
+        bool userExist = await _collection.Find<AppUser>(appUser => appUser.Email == userInput.Email).AnyAsync(cancellationToken);
 
         if (userExist) return null;
 
@@ -32,12 +32,7 @@ public class AccountRepository : IAccountRepository
         if (appUser.Id is null)
             _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
 
-        return new LoggedInDto(
-            Token: _tokenService.CreateToken(appUser),
-            Email: appUser.Email,
-            KnownAs: appUser.KnownAs,
-            ProfilePhotoUrl: null
-        );
+        return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
     }
 
     public async Task<LoggedInDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
@@ -56,24 +51,19 @@ public class AccountRepository : IAccountRepository
         {
             UpdateLastActiveInDb(appUser, cancellationToken);
 
-            return new LoggedInDto(
-                Token: _tokenService.CreateToken(appUser),
-                Email: appUser.Email,
-                KnownAs: appUser.KnownAs,
-                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
-            );
+            return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
         }
 
         return null;
     }
     #endregion CRUD
 
-    private async void UpdateLastActiveInDb(AppUser appUser, CancellationToken cancellationToken)
+    private async void UpdateLastActiveInDb(AppUser appUserIn, CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> newLastActive = Builders<AppUser>.Update.Set(user =>
-                       user.LastActive, DateTime.UtcNow);
+        UpdateDefinition<AppUser> newLastActive = Builders<AppUser>.Update.Set(appUser =>
+                       appUser.LastActive, DateTime.UtcNow);
 
         await _collection.UpdateOneAsync(appUser =>
-        appUser.Id == appUser.Id, newLastActive, null, cancellationToken);
+        appUser.Id == appUserIn.Id, newLastActive, null, cancellationToken);
     }
 }
