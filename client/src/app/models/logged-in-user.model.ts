@@ -1,4 +1,4 @@
-export interface User {
+export interface LoggedInUser {
     knownAs: string;
     email: string;
     token: string;

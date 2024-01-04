@@ -6,7 +6,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { UserService } from './services/user.service';
 import { take } from 'rxjs';
-import { User } from './models/user.model';
+import { LoggedInUser } from './models/logged-in-user.model';
 
 @Component({
   selector: 'app-root',
@@ -33,12 +33,16 @@ export class AppComponent implements OnInit {
     const token = localStorage.getItem('token');
 
     if (token) {
-      this.userService.getUser().pipe(take(1)).subscribe(
+      this.accountService.getLoggedInUser().pipe(take(1)).subscribe(
         {
-          next: (user: User) => {
-            this.accountService.setCurrentUser(user);
+          next: (loggedInUser: LoggedInUser | null) => {
+            if (loggedInUser)
+              this.accountService.setCurrentUser(loggedInUser);
           },
-          error: () => this.accountService.logout() // if token is expired and api call is unauthorized.
+          error: (err) => { //if token is expired and api call is unauthorized.
+            console.log(err.error);
+            this.accountService.logout()
+          } 
         });
     }
   }
