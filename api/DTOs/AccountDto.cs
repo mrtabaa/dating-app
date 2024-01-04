@@ -8,7 +8,7 @@ public record UserRegisterDto(
     [DataType(DataType.Password), Length(7, 20)] string Password,
     [DataType(DataType.Password), Length(7, 20)] string ConfirmPassword,
     [Length(2, 30)] string KnownAs,
-    DateOnly DateOfBirth,
+    [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
     [Length(10, 500)] string? Introduction,
     [Length(10, 500)] string? LookingFor,
