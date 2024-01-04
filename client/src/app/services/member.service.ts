@@ -40,13 +40,13 @@ export class MemberService {
     );
   }
 
-  getMember(email: string): Observable<Member> {
-    if (this.members.length > 0) {
-      this.member = this.members.find(member => member.email === email);
+  getMember(id: string | undefined): Observable<Member> {
+    if (this.members.length > 0 && id) {
+      this.member = this.members.find(member => member.id === id);
       if (this.member)
         return of(this.member);
     }
 
-    return this.http.get<Member>(this.baseUrl + '/email/' + email);
+    return this.http.get<Member>(this.baseUrl + '/id/' + id);
   }
 }
