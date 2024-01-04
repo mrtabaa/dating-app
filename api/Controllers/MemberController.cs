@@ -36,13 +36,20 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
     [HttpGet("id/{memberId}")]
     public async Task<ActionResult<MemberDto>> GetMemberById(string memberId, CancellationToken cancellationToken)
     {
+        if (memberId is null || memberId.Length != 24)
+            return BadRequest("Invalid memberId. Contact the admin.");
+
         MemberDto? memberDto = await _memberRepository.GetMemberByIdAsync(memberId, cancellationToken);
 
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
 
     [HttpGet("email/{email}")]
-    public async Task<ActionResult<MemberDto>> GetMemberByEmail(string email, CancellationToken cancellationToken)
+    public async Task<ActionResult<MemberDto>> GetMemberByEmail(
+            [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format. Contact the admin if persists.")]
+            string email,
+            CancellationToken cancellationToken
+        )
     {
         MemberDto? memberDto = await _memberRepository.GetMemberByEmailAsync(email, cancellationToken);
 
