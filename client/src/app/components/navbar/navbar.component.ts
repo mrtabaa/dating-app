@@ -1,7 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Observable } from 'rxjs';
-import { User } from '../../models/user.model';
+import { LoggedInUser } from '../../models/logged-in-user.model';
 import { AccountService } from '../../services/account.service';
 import { environment } from '../../../environments/environment';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -29,12 +28,12 @@ export class NavbarComponent implements OnInit {
 
   basePhotoUrl = environment.apiPhotoUrl;
 
-  user$!: Observable<User | null>;
+  loggedInUserSig: Signal<LoggedInUser | null> | undefined;
 
   links = ['members', 'lists', 'messages'];
 
   ngOnInit(): void {
-    this.user$ = this.accountService.currentUser$;
+    this.loggedInUserSig = this.accountService.loggedInUserSig;
   }
 
   logout() {

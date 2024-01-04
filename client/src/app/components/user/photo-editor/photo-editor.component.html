@@ -1,5 +1,5 @@
 <main>
-    @if(user && member) {
+    @if(loggedInUser && member) {
     <section class="top">
         <div class="album">
             @for (photo of member.photos; track $index) {

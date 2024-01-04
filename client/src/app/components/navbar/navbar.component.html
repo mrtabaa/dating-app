@@ -7,7 +7,7 @@
         </a>
 
         <!-- #region NavLinks -->
-        @if(user$ | async) {
+        @if(loggedInUserSig && loggedInUserSig()) {
         <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
             @for (link of links; track $index) {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
@@ -26,7 +26,7 @@
     <section class="right">
         <!-- if logged-in: show appMenu
             else: show signup/login -->
-        @if(user$ | async; as user) {
+        @if(loggedInUserSig && loggedInUserSig(); as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
             <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs[0]}}">
@@ -48,7 +48,7 @@
         <!-- menu if logged-in -->
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
-            @if(user$ | async; as user) {
+            @if(loggedInUserSig && loggedInUserSig(); as user) {
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {

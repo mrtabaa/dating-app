@@ -11,7 +11,7 @@ import { UserService } from '../../../services/user.service';
 import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
-import { User } from '../../../models/user.model';
+import { LoggedInUser } from '../../../models/logged-in-user.model';
 
 @Component({
   selector: 'app-photo-editor',
@@ -29,7 +29,7 @@ export class PhotoEditorComponent implements OnInit {
   private accountService = inject(AccountService);
   private userService = inject(UserService);
 
-  user: User | undefined;
+  loggedInUser: LoggedInUser | null | undefined;
   errorGlob: string | undefined;
   basePhotoUrl: string = environment.apiPhotoUrl;
 
@@ -37,12 +37,7 @@ export class PhotoEditorComponent implements OnInit {
   hasBaseDropZoneOver = false;
 
   constructor() {
-    this.accountService.currentUser$.pipe(take(1)).subscribe({
-      next: (user: User | null) => {
-        if (user)
-          this.user = user
-      }
-    });
+    this.loggedInUser = this.accountService.loggedInUserSig();
   }
 
   ngOnInit(): void {
@@ -54,24 +49,26 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   initializeUploader(): void {
-    this.uploader = new FileUploader({
-      url: environment.apiUrl + 'user/add-photo',
-      authToken: 'Bearer ' + this.user?.token,
-      isHTML5: true,
-      allowedFileType: ['image'],
-      removeAfterUpload: true,
-      autoUpload: false,
-      maxFileSize: 40_000_000, // 8 * 5MB
-    });
+    if (this.loggedInUser) {
+      this.uploader = new FileUploader({
+        url: environment.apiUrl + 'user/add-photo',
+        authToken: 'Bearer ' + this.loggedInUser.token,
+        isHTML5: true,
+        allowedFileType: ['image'],
+        removeAfterUpload: true,
+        autoUpload: false,
+        maxFileSize: 40_000_000, // 8 * 5MB
+      });
 
-    this.uploader.onAfterAddingFile = (file) => {
-      file.withCredentials = false;
-    }
+      this.uploader.onAfterAddingFile = (file) => {
+        file.withCredentials = false;
+      }
 
-    this.uploader.onSuccessItem = (item, response, status, headers) => {
-      if (response) {
-        const photo = JSON.parse(response);
-        this.member?.photos.push(photo);
+      this.uploader.onSuccessItem = (item, response, status, headers) => {
+        if (response) {
+          const photo = JSON.parse(response);
+          this.member?.photos.push(photo);
+        }
       }
     }
   }
@@ -79,19 +76,19 @@ export class PhotoEditorComponent implements OnInit {
   setMainPhoto(url_128In: string): void {
     this.userService.setMainPhoto(url_128In).pipe(take(1)).subscribe({
       next: (updateResult: UpdateResult) => {
-        if (updateResult.modifiedCount === 1 && this.user && this.member) {
+        if (updateResult.modifiedCount === 1 && this.loggedInUser && this.member) {
           this.member.photos.forEach(photo => {
             // unset previous main
             if (photo.isMain === true)
               photo.isMain = false;
 
             // set new selected main
-            if (this.user && photo.url_128 === url_128In) {
+            if (photo.url_128 === url_128In) {
               photo.isMain = true;
 
               // update navbar photos
-              this.user.profilePhotoUrl = url_128In;
-              this.accountService.setCurrentUser(this.user);
+              this.loggedInUser!.profilePhotoUrl = url_128In;
+              this.accountService.setCurrentUser(this.loggedInUser!);
             }
           })
         }
