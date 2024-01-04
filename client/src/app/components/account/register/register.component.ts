@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   minDate = new Date();
   maxDate = new Date();
-  isEmailExist: string | undefined;
+  emailExistsErrorMessage: string | undefined;
 
   subscriptionRegisterUser!: Subscription;
 
@@ -59,7 +59,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
     genderCtrl: ['female', [Validators.required]],
     cityCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]]
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -110,10 +110,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
       .subscribe({
         next: res => {
+          //TODO replace users with members or move this to account.service
           this.router.navigate(['/users']);
           console.log(res);
         },
-        error: err => this.isEmailExist = err.error,
+        error: err => this.emailExistsErrorMessage = err.error,
         complete: () => console.log('Register successful.')
       });
 

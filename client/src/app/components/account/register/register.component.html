@@ -36,9 +36,9 @@
         </div>
 
         <!-- show api errors -->
-        @if(isEmailExist) {
+        @if(emailExistsErrorMessage) {
         <div>
-            <mat-error>{{isEmailExist}}</mat-error>
+            <mat-error>{{emailExistsErrorMessage}}</mat-error>
         </div>
         }
 
