@@ -22,7 +22,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     #endregion User Management
 
     #region Photo Management
-    [RequestSizeLimit(4096 * 4096), AllowedFileExtensions] // only jpeg, jpg, png up to 4096 x 4096
+    [FileSize(500 * 500, 2000 * 2000), AllowedFileExtensions] // only jpeg, jpg, png. Between 250KB(500x500) and 4MB(2000x2000)
     [HttpPost("add-photo")]
     public async Task<ActionResult<Photo>> AddPhoto(IFormFile file, CancellationToken cancellationToken)
     {
