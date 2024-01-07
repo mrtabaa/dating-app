@@ -12,6 +12,7 @@ import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
+import { Photo } from '../../../models/photo.model';
 
 @Component({
   selector: 'app-photo-editor',
@@ -66,15 +67,18 @@ export class PhotoEditorComponent implements OnInit {
 
       this.uploader.onSuccessItem = (item, response, status, headers) => {
         if (response) {
-          const photo = JSON.parse(response);
+          const photo: Photo = JSON.parse(response);
           this.member?.photos.push(photo);
+
+          if(this.member?.photos.length === 0) 
+            // this.accountService.loggedInUserSig.update(user => user?.profilePhotoUrl, photo.url_165) // TODO update navbar when 1st photo is added
         }
       }
     }
   }
 
-  setMainPhoto(url_128In: string): void {
-    this.userService.setMainPhoto(url_128In).pipe(take(1)).subscribe({
+  setMainPhoto(url_165In: string): void {
+    this.userService.setMainPhoto(url_165In).pipe(take(1)).subscribe({
       next: (updateResult: UpdateResult) => {
         if (updateResult.modifiedCount === 1 && this.loggedInUser && this.member) {
           this.member.photos.forEach(photo => {
@@ -83,11 +87,11 @@ export class PhotoEditorComponent implements OnInit {
               photo.isMain = false;
 
             // set new selected main
-            if (photo.url_128 === url_128In) {
+            if (photo.url_165 === url_165In) {
               photo.isMain = true;
 
               // update navbar photos
-              this.loggedInUser!.profilePhotoUrl = url_128In;
+              this.loggedInUser!.profilePhotoUrl = url_165In;
               this.accountService.setCurrentUser(this.loggedInUser!);
             }
           })

@@ -4,12 +4,12 @@
         <div class="gallery">
             @for (photo of member.photos; track $index) {
             <div class="photos">
-                <img ngSrc="{{basePhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}} photo">
+                <img ngSrc="{{basePhotoUrl + photo.url_165}}" width="165" height="165" alt="{{member.knownAs}} photo">
 
                 <div class="buttons">
-                    <button (click)="setMainPhoto(photo.url_128)" mat-stroked-button color="primary"
+                    <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Main</button>
-                    <button (click)="deletePhoto(photo.url_128, $index)" mat-mini-fab color="warn"
+                    <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn"
                         [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
                 </div>
             </div>

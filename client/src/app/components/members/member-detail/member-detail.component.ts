@@ -52,7 +52,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.subscribed = this.member$?.subscribe(
       (member: Member) => {
         for (const photo of member.photos) {
-          this.images.push(new ImageItem({src: this.apiPhotoUrl + photo.url_1024, thumb: this.apiPhotoUrl + photo.url_128}));
+          this.images.push(new ImageItem({src: this.apiPhotoUrl + photo.url_enlarged, thumb: this.apiPhotoUrl + photo.url_165}));
         }
       }
     );

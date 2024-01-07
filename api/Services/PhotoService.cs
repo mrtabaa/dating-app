@@ -8,56 +8,34 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
 
     #endregion
 
+    /// <summary>
+    /// ADD PHOTO TO DISK
+    /// Store photos on disk by creating a folder based on fileName, userId, size, crop, etc. Each user will have a folder named after their db _Id.
+    /// Resize and square image with 165px(navbar & thumbnail), 256px(card).
+    /// Scale image to a ~300kb max size for the enlarged gallery photo.
+    /// Store photo address in db as "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
+    /// 
+    /// DELETE PHOTO FROM DISK
+    /// </summary>
+    /// <param name="formFile"></param>
+    /// <param name="userId"></param>
+    /// <returns>ADD: array of filePaths. DELETE: boolean</returns>
     public async Task<string[]?> AddPhotoToDisk(IFormFile formFile, string userId)
     {
         // copy file/s to the folder
         if (formFile.Length > 0)
         {
             #region Resize and/or Store Images to Disk
-            #region ResizeByPixel_Square
+            string? filePath_165_sq; // navbar & thumbnail
+            string? filePath_256_sq; // card
+            string? filePath_enlarged; // enlarged photo up to ~300kb
 
-            string? filePath_128_sq;
-            string? filePath_256_sq; // NOT USED in this app
-            string? filePath_512_sq;
-            string? filePath_1024_sq;
-            // prevent storing files on disk if no resize is needed/performed for a larger size.
-            switch (formFile.Length)
-            {
-                case < 128 * 128:
-                    string? filePath_crop_sq = await _photoModifyService.CropWithOriginalSide_Square(formFile, userId);
-                    filePath_1024_sq = filePath_512_sq = filePath_256_sq = filePath_128_sq = filePath_crop_sq;
-                    break;
-                // case < 256 * 256:
-                //     filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
-                //     filePath_1024_sq = filePath_512_sq = filePath_256_sq = filePath_128_sq;
-                //     break;
-                case < 512 * 512:
-                    filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
-                    filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
-                    filePath_1024_sq = filePath_512_sq = filePath_256_sq;
-                    break;
-                case < 1024 * 1024:
-                    filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
-                    // filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
-                    filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
-                    filePath_1024_sq = filePath_512_sq;
-                    break;
-                default:
-                    filePath_128_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 128);
-                    // filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256);
-                    filePath_512_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 512);
-                    filePath_1024_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 1024);
-                    break;
-            }
-            #endregion ResizeByPixel_Square
-
-            // string? filePath_crop = await _photoModifyService.CropAndSave(formFile, userId, 1000, 1200);
-            // string? filePath_crop_sq = await _photoModifyService.CropGivenSideAndSave_Square(formFile, userId, 512);
-            // string? filePath_original_crop_sq = await _photoModifyService.CropWithOriginalSideAndSave_Square(formFile, userId);
-
+            filePath_165_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 165); // navbar & thumbnail
+            filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256); // card
+            filePath_enlarged = await _photoModifyService.ResizeImageByScale(formFile, userId); // enlarged photo
 
             // if conversion fails
-            if (filePath_128_sq is null || filePath_512_sq is null || filePath_1024_sq is null)
+            if (filePath_165_sq is null || filePath_256_sq is null || filePath_enlarged is null)
             {
                 _logger.LogError("Photo addition failed. The returned filePath is null which is not allowed.");
                 return null;
@@ -65,11 +43,11 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
             #endregion Resize and Create Images to Disk
 
             #region Create the photo URLs and return the result
-            // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
+            // // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
             return [
-                filePath_128_sq.Split(wwwRootUrl)[1],
-                filePath_512_sq.Split(wwwRootUrl)[1],
-                filePath_1024_sq.Split(wwwRootUrl)[1]
+                filePath_165_sq.Split(wwwRootUrl)[1],
+                filePath_256_sq.Split(wwwRootUrl)[1],
+                filePath_enlarged.Split(wwwRootUrl)[1]
             ];
             #endregion
         }
@@ -77,10 +55,14 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
         return null;
     }
 
+    /// <summary>
+    /// Delete all files of the requested photo to be deleted.
+    /// </summary>
+    /// <param name="filePaths"></param>
+    /// <returns>bool</returns>
     public bool DeletePhotoFromDisk(IEnumerable<string> filePaths)
     {
-        // delete all 3 resolutions
-        foreach (var filePath in filePaths)
+        foreach (string filePath in filePaths)
         {
             if (File.Exists(wwwRootUrl + filePath))
             {

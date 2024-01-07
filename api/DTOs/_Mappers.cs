@@ -60,13 +60,32 @@ namespace api.DTOs
                     Token: token,
                     KnownAs: appUser.KnownAs,
                     Email: appUser.Email,
-                    ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_128
+                    ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
                 );
             }
 
             return null;
         }
 
+        public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain)
+        {
+            if (isMain)
+                return new Photo(
+                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                        Url_165: photoUrls[0],
+                        Url_256: photoUrls[1],
+                        Url_enlarged: photoUrls[2],
+                        IsMain: isMain
+                );
+
+            return new Photo(
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Url_165: photoUrls[0],
+                    Url_256: photoUrls[1],
+                    Url_enlarged: photoUrls[2],
+                    IsMain: isMain
+            );
+        }
         #endregion Generator Methods
 
         #region Helper Functions
