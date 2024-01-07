@@ -79,27 +79,14 @@ public class UserRepository : IUserRepository
         if (photoUrls is not null)
         {
             Photo photo;
-            if (appUser.Photos.Count == 0) // if user's album is empty set Main: true
+            if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
             {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url_128: photoUrls[0],
-                    Url_512: photoUrls[1],
-                    Url_1024: photoUrls[2],
-                    IsMain: true
-                );
+                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: true);
             }
             else // user's album is not empty
             {
-                photo = new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url_128: photoUrls[0],
-                    Url_512: photoUrls[1],
-                    Url_1024: photoUrls[2],
-                    IsMain: false
-                );
+                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: false);
             }
-
 
             // save to DB
             appUser.Photos.Add(photo);
@@ -118,7 +105,7 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? url_128_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? url_165_In, CancellationToken cancellationToken)
     {
         List<string> photoUrls = [];
 
@@ -132,7 +119,7 @@ public class UserRepository : IUserRepository
 
         foreach (Photo photo in photos)
         {
-            if (photo.Url_128 == url_128_In)
+            if (photo.Url_165 == url_165_In)
             {
                 if (photo.IsMain is true) // Prevent Main photo from deletion
                 {
@@ -140,9 +127,9 @@ public class UserRepository : IUserRepository
                     return null;
                 }
 
-                photoUrls.Add(photo.Url_128);
-                photoUrls.Add(photo.Url_512);
-                photoUrls.Add(photo.Url_1024);
+                photoUrls.Add(photo.Url_165);
+                photoUrls.Add(photo.Url_256);
+                photoUrls.Add(photo.Url_enlarged);
             }
         }
 
@@ -150,7 +137,7 @@ public class UserRepository : IUserRepository
         if (!isDeleteSuccess)
             _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
 
-        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_128 == url_128_In);
+        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
 
         return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, update, null, cancellationToken);
     }
@@ -165,7 +152,7 @@ public class UserRepository : IUserRepository
 
         // SET the new main photo: find new photo by its Url_128; update IsMain to True
         var filterNew = Builders<AppUser>.Filter.Where(appUser => appUser.Id == userId
-                                                    && appUser.Photos.Any<Photo>(photo => photo.Url_128 == photoUrlIn));
+                                                    && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
         var updateNew = Builders<AppUser>.Update.Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
