@@ -110,8 +110,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
       .subscribe({
         next: res => {
-          //TODO replace users with members or move this to account.service
-          this.router.navigate(['/users']);
+          this.router.navigate(['/members']);
           console.log(res);
         },
         error: err => this.emailExistsErrorMessage = err.error,
