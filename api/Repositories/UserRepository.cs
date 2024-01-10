@@ -23,7 +23,7 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetUserByIdAsync(string? userId, CancellationToken cancellationToken)
+    public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -66,7 +66,7 @@ public class UserRepository : IUserRepository
             return null;
         }
 
-        AppUser? appUser = await GetUserByIdAsync(userId, cancellationToken);
+        AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
         {
             _logger.LogError("user is Null / not found");
