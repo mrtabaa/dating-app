@@ -70,13 +70,36 @@ export class PhotoEditorComponent implements OnInit {
           const photo: Photo = JSON.parse(response);
           this.member?.photos.push(photo);
 
-          if(this.member?.photos.length === 0) 
-            // this.accountService.loggedInUserSig.update(user => user?.profilePhotoUrl, photo.url_165) // TODO update navbar when 1st photo is added
+          // set navbar profile photo when first photo is uploaded
+          if (this.member?.photos.length === 1)
+            this.setNavbarProfilePhoto(photo.url_165)
         }
       }
     }
   }
 
+  /**
+   * Set navbar profile photo ONLY when FIRST photo is uploaded.
+   * @param url_165 
+   */
+  setNavbarProfilePhoto(url_165: string): void {
+    if (this.loggedInUser?.id) {
+      const updatedLoggedInUser: LoggedInUser = {
+        id: this.loggedInUser?.id,
+        knownAs: this.loggedInUser.knownAs,
+        email: this.loggedInUser.email,
+        token: this.loggedInUser.token,
+        profilePhotoUrl: url_165 // set profile photo
+      }
+
+      this.accountService.loggedInUserSig.set(updatedLoggedInUser)
+    }
+  }
+
+  /**
+   * Set main photo for card and album
+   * @param url_165In 
+   */
   setMainPhoto(url_165In: string): void {
     this.userService.setMainPhoto(url_165In).pipe(take(1)).subscribe({
       next: (updateResult: UpdateResult) => {
