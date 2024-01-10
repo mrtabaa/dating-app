@@ -2,6 +2,11 @@
     @if(loggedInUser && member) {
     <section class="top">
         <div class="gallery">
+            <!-- TODO check this -->
+            @if (member.photos.length === 0) {
+            <mat-error>Your album is empty. You may upload some photos.</mat-error>
+            }
+
             @for (photo of member.photos; track $index) {
             <div class="photos">
                 <img ngSrc="{{basePhotoUrl + photo.url_165}}" width="165" height="165" alt="{{member.knownAs}} photo">
@@ -14,17 +19,8 @@
                 </div>
             </div>
             }
-            @if (errorGlob) {
-            <mat-error>
-                This update has failed for this reason:
-                <br> {{errorGlob}}
-                <br> Please try again or contact the admin.
-            </mat-error>
-            }
-            <div class="photo-area">
-                @if (member.photos.length === 0) {
-                <mat-error>Your album is empty. You may upload some photos.</mat-error>
-                }
+
+            <div class="upload-photo-area">
                 <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
                     [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
                             'nv-file-over': hasBaseDropZoneOver}">
@@ -41,6 +37,14 @@
                     </mat-card-actions>
                 </mat-card>
             </div>
+            <!-- TODO check this -->
+            @if (errorGlob) {
+            <mat-error>
+                This update has failed for this reason:
+                <br> {{errorGlob}}
+                <br> Please try again or contact the admin.
+            </mat-error>
+            }
         </div>
     </section>
     }
