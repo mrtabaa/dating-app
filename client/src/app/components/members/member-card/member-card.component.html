@@ -3,7 +3,7 @@
     <div class="card-img-wrapper">
         @for (photo of member.photos; track $index) {
         @if (photo.isMain) {
-        <img ngSrc="{{apiPhotoUrl + photo.url_128}}" width="128" height="128" alt="{{member.knownAs}}" mat-card-image>
+        <img ngSrc="{{apiPhotoUrl + photo.url_165}}" width="128" height="128" alt="{{member.knownAs}}" mat-card-image>
         }
         }
         @if (member.photos.length === 0) {
