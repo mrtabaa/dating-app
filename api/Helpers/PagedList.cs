@@ -27,7 +27,7 @@ public class PagedList<T> : List<T>
     /// <returns>PageList<T> object with its prop values</returns>
     public static async Task<PagedList<T>> CreatePagedListAsync(IMongoQueryable<T>? source, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
-        var count = await source.CountAsync();
+        var count = await source.CountAsync(cancellationToken);
         var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
 
         return new PagedList<T>(items, count, pageNumber, pageSize);
