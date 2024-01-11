@@ -60,6 +60,7 @@ namespace api.DTOs
                     Token: token,
                     KnownAs: appUser.KnownAs,
                     Email: appUser.Email,
+                    Gender: appUser.Gender,
                     ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
                 );
             }

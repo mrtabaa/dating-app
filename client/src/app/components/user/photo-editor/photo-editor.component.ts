@@ -89,6 +89,7 @@ export class PhotoEditorComponent implements OnInit {
         knownAs: this.loggedInUser.knownAs,
         email: this.loggedInUser.email,
         token: this.loggedInUser.token,
+        gender: this.loggedInUser.gender,
         profilePhotoUrl: url_165 // set profile photo
       }
 

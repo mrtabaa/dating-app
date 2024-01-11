@@ -31,5 +31,6 @@ public record LoggedInDto(
     string Token,
     string KnownAs,
     string Email,
+    string Gender,
     string? ProfilePhotoUrl
 );

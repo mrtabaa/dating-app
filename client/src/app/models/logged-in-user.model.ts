@@ -3,5 +3,6 @@ export interface LoggedInUser {
     knownAs: string;
     email: string;
     token: string;
+    gender: string
     profilePhotoUrl: string;
 }
