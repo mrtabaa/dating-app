@@ -13,7 +13,7 @@ public class UserParams
         set { _pageSize = value > MaxPageSize ? MaxPageSize : value; }
     }
 
-    public string? CurrentUserId { get; set; }
+    public string? LoggedInUserId { get; set; }
     public string? Gender { get; set; }
     public int MinAge { get; set; } = 18;
     public int MaxAge { get; set; } = 100;
