@@ -26,8 +26,8 @@ public class MemberRepository : IMemberRepository
 
         // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
         IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(user =>
-                user.Id != memberParams.CurrentUserId // don't request/show the currentUser in the list
-                && user.Gender != memberParams.Gender // get the opposite gender only
+                user.Id != memberParams.LoggedInUserId // don't request/show the currentUser in the list
+                && user.Gender == memberParams.Gender // get the opposite gender by default. It's set in MemberController
                 && user.DateOfBirth >= MinDob && user.DateOfBirth <= MaxDob
             );
 
