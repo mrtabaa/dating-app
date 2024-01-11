@@ -25,10 +25,10 @@ public class MemberRepository : IMemberRepository
         var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
         // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
-        IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(user =>
-                user.Id != memberParams.LoggedInUserId // don't request/show the currentUser in the list
-                && user.Gender == memberParams.Gender // get the opposite gender by default. It's set in MemberController
-                && user.DateOfBirth >= MinDob && user.DateOfBirth <= MaxDob
+        IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(appUser =>
+                appUser.Id != memberParams.LoggedInUserId // don't request/show the currentUser in the list
+                && appUser.Gender == memberParams.Gender // get the opposite gender by default. It's set in MemberController
+                && appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob
             );
 
         PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
