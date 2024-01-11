@@ -13,7 +13,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         if (appUser is not null && string.IsNullOrEmpty(userParams.Gender))
         {
             userParams.LoggedInUserId = appUser.Id;
-            userParams.Gender = userParams.Gender == "male" ? "female": "male";
+            userParams.Gender = appUser.Gender == "male" ? "female": "male";
         }
 
         PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(userParams, cancellationToken);
