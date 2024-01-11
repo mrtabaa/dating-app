@@ -22,9 +22,9 @@ main {
 
     .tab-contents {
         padding: 1rem;
-    }
 
-    .ngx-gallery {
-        display: inline-block;
+        .gallery {
+            max-width: 40%;
+        }
     }
 }
