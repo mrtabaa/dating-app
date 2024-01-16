@@ -10,8 +10,8 @@
         {
             "name": "Angular Client",
             "request": "launch",
-            "type": "chrome",
-            "url": "https://localhost:4200",
+            "type": "firefox",
+            "url": "http://localhost:4300",
             "webRoot": "${workspaceFolder}/client"
         }
     ]
