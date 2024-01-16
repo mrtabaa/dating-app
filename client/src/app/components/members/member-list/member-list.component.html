@@ -1,15 +1,26 @@
 <main>
     <h1>Find Your Beloved One</h1>
+    <div class="filter">
+        <mat-form-field>
+            <mat-label>Select a Gender</mat-label>
+            <mat-select [(ngModel)]="gender" name="gender">
+                <mat-option [value]="'female'" (click)="loadFilteredMembers()">Female</mat-option>
+                <mat-option [value]="'male'" (click)="loadFilteredMembers()">Male</mat-option>
+                <mat-option [value]="'other'" (click)="loadFilteredMembers()">Other</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
     <div class="members-list">
         @for (member of members; track $index) {
         <app-member-card [memberInput]="member"></app-member-card>
         }
     </div>
-    @if (pagination) {
+    @if (pagination && memberParams) {
     <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
-        [pageSize]="pagination.itemsPerPage" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSize]="memberParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
         [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-        [pageIndex]="pageIndex" aria-label="Select page" class="paginator">
+        [pageIndex]="memberParams.pageNumber - 1" aria-label="Select page" class="paginator">
+        <!-- pageIndex must start from 0 -->
     </mat-paginator>
     }
 </main>
