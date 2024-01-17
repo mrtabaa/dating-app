@@ -86,6 +86,26 @@ export class MemberListComponent implements OnDestroy {
     this.loadMembers();
   }
 
+  resetFilter(): void {
+    this.gender = undefined;
+    this.minAge = 18;
+    this.maxAge = 99;
+    
+    const loggedInGender = this.accountService.loggedInUserSig()?.gender === 'male' ? 'female' : 'male';
+
+    if (this.memberParams && loggedInGender) {
+      this.memberParams = {
+        pageNumber: this.memberParams.pageNumber,
+        pageSize: this.memberParams.pageSize,
+        gender: loggedInGender,
+        minAge: this.minAge,
+        maxAge: this.maxAge
+      }
+
+      this.loadMembers();
+    }
+  }
+
   loadMembers(): void {
     if (this.memberParams) {
       this.subscribed = this.memberService.getMembers(this.memberParams).subscribe({

@@ -26,8 +26,11 @@
                     }
                 </mat-select>
             </mat-form-field>
-            <button mat-stroked-button (click)="loadFilteredMembers()" [disabled]="minAge > maxAge"
-                color="primary">Filter</button>
+            <div class="buttons">
+                <button mat-stroked-button (click)="loadFilteredMembers()" [disabled]="minAge > maxAge"
+                    color="primary">Filter</button>
+                <button mat-stroked-button (click)="resetFilter()" [disabled]="!gender" color="warn">Reset</button>
+            </div>
         </div>
         @if (minAge > maxAge) {
         <mat-error>'From age' cannot be greater than 'To age'.</mat-error>
