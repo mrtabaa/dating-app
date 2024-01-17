@@ -1,16 +1,42 @@
 <main>
     <h1>Find Your Beloved One</h1>
-    <div class="filter">
-        <mat-form-field>
-            <mat-label>Select a Gender</mat-label>
-            <mat-select [(ngModel)]="gender" name="gender">
-                <mat-option [value]="'female'" (click)="loadFilteredMembers()">Female</mat-option>
-                <mat-option [value]="'male'" (click)="loadFilteredMembers()">Male</mat-option>
-                <mat-option [value]="'other'" (click)="loadFilteredMembers()">Other</mat-option>
-            </mat-select>
-        </mat-form-field>
-    </div>
+    <section class="filter">
+        <div class="fields">
+            <mat-form-field>
+                <mat-label>Select a Gender</mat-label>
+                <mat-select [(ngModel)]="gender" name="gender">
+                    <mat-option [value]="'female'">Female</mat-option>
+                    <mat-option [value]="'male'">Male</mat-option>
+                    <mat-option [value]="'other'">Other</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>From age</mat-label>
+                <mat-select [(ngModel)]="minAge" name="minAge">
+                    @for (age of ages; track $index) {
+                    <mat-option [value]="age">{{age}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>To age</mat-label>
+                <mat-select [(ngModel)]="maxAge" name="maxAge">
+                    @for (age of ages; track $index) {
+                    <mat-option [value]="age">{{age}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <button mat-stroked-button (click)="loadFilteredMembers()" [disabled]="minAge > maxAge"
+                color="primary">Filter</button>
+        </div>
+        @if (minAge > maxAge) {
+        <mat-error>'From age' cannot be greater than 'To age'.</mat-error>
+        }
+    </section>
     <div class="members-list">
+        @if (members?.length === 0) {
+        <mat-hint>No user exists with this filter. Change or Reset the filter.</mat-hint>
+        }
         @for (member of members; track $index) {
         <app-member-card [memberInput]="member"></app-member-card>
         }
