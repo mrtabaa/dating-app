@@ -38,7 +38,7 @@
     </section>
     <div class="members-list">
         @if (members?.length === 0) {
-        <mat-hint>No user exists with this filter. Change or Reset the filter.</mat-hint>
+        <p>No user exists with this filter. Please change the filter values or Reset the filter.</p>
         }
         @for (member of members; track $index) {
         <app-member-card [memberInput]="member"></app-member-card>
