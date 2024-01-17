@@ -356,11 +356,11 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-        using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+        using (FileStream fileStream = new(filePath, FileMode.Create))
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
             await sKData.AsStream().CopyToAsync(fileStream);
@@ -390,11 +390,11 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + fileName;
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-        using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+        using (FileStream fileStream = new(filePath, FileMode.Create))
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
             await sKData.AsStream().CopyToAsync(fileStream);
@@ -422,7 +422,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + formFile.FileName;
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(formFile.FileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -436,4 +436,16 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         return filePath;
     }
     #endregion SaveMethods
+
+    #region Helpers
+    /// <summary>
+    /// Get formFile.fileName and convert any extensions to webp. e.g. my-photo.jpeg => my-photo.webp
+    /// </summary>
+    /// <param name="fileNameInput"></param>
+    /// <returns>my-photo.webp</returns>
+    private static string? GenerateFileNameToWebp(string fileNameInput) 
+    {   
+        return fileNameInput.Split(".")[0] + ".webp";
+    }
+    #endregion Helpers
 }
