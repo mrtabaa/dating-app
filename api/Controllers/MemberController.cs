@@ -6,6 +6,9 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
     {
+        if(userParams.MinAge > userParams.MaxAge)
+            return BadRequest("Selected minAge cannot be greater than maxAge");
+
         List<MemberDto?> memberDtos = [];
 
         AppUser? appUser = await _userRepository.GetByIdAsync(User.GetUserId(), cancellationToken);
