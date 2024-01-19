@@ -58,7 +58,7 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    public async Task<Photo?> UploadPhotosAsync(IFormFile file, string? userId, CancellationToken cancellationToken)
+    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken)
     {
         if (userId is null)
         {

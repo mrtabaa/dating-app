@@ -7,7 +7,7 @@ public interface IUserRepository
 
     public Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken);
 
-    public Task<Photo?> UploadPhotosAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
+    public Task<Photo?> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? urlIn, CancellationToken cancellationToken);
 
