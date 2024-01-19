@@ -55,7 +55,7 @@ export class UserEditComponent implements OnDestroy {
   getMember(): void {
     this.accountService.getLoggedInUser().pipe(take(1)).subscribe(loggedInUser => {
       if (loggedInUser) {
-        this.memberService.getMember(loggedInUser.id)?.pipe(take(1)).subscribe(member => {
+        this.memberService.getMemberById(loggedInUser.id)?.pipe(take(1)).subscribe(member => {
           if (member) {
             this.member = member;
             this.initContollersValues(member);
