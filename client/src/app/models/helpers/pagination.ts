@@ -5,7 +5,7 @@ export interface Pagination {
     totalPages: number;
 }
 
-export interface PaginationResult<T> {
+export class PaginatedResult<T> { // Declare as a class so we can create an object of it
     result?: T; // api's response body
-    pagination?: Pagination // api's response pagination values
+    pagination?: Pagination; // api's response pagination values
 }
