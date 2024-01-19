@@ -4,26 +4,22 @@ public class AllowedFileExtensions : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        var files = value as IEnumerable<IFormFile>;
-        if (files is not null && files.Any())
-            foreach (IFormFile file in files)
+        var file = value as IFormFile;
+        if (file is not null)
+        {
+            if (!IsFileValid(file))
             {
-                if (file is not null)
+
+                // get only allowed extensions to show
+                string? keys = null;
+                foreach (var key in _fileSignatures.Keys)
                 {
-                    if (!IsFileValid(file))
-                    {
-
-                        // get only allowed extensions to show
-                        string? keys = null;
-                        foreach (var key in _fileSignatures.Keys)
-                        {
-                            keys += key + ", ";
-                        }
-
-                        return new ValidationResult($"File type is not allowed. These extensions are allowed only: {keys}");
-                    }
+                    keys += key + ", ";
                 }
+
+                return new ValidationResult($"File type is not allowed. These extensions are allowed only: {keys}");
             }
+        }
 
         return ValidationResult.Success;
     }

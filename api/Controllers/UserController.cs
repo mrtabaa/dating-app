@@ -22,13 +22,13 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     #endregion User Management
 
     #region Photo Management
-    [FileSize(500 * 500, 2000 * 2000), AllowedFileExtensions] // only jpeg, jpg, png. Between 250KB(500x500) and 4MB(2000x2000)
+    // only jpeg, jpg, png. Between 250KB(500x500) and 4MB(2000x2000)
     [HttpPost("add-photo")]
-    public async Task<ActionResult<Photo>> AddPhoto(IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions, FileSize(500 * 500, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
-        Photo? photo = await _userRepository.UploadPhotosAsync(file, User.GetUserId(), cancellationToken);
+        Photo? photo = await _userRepository.UploadPhotoAsync(file, User.GetUserId(), cancellationToken);
 
         return photo is null ? BadRequest("Add photo failed. See logger") : photo;
     }
