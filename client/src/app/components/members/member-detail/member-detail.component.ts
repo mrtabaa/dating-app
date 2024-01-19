@@ -44,7 +44,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     const id: string | null = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.member$ = this.memberService.getMember(id);
+      this.member$ = this.memberService.getMemberById(id);
     }
   }
 
@@ -52,7 +52,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.subscribed = this.member$?.subscribe(
       (member: Member) => {
         for (const photo of member.photos) {
-          this.images.push(new ImageItem({src: this.apiPhotoUrl + photo.url_enlarged, thumb: this.apiPhotoUrl + photo.url_165}));
+          this.images.push(new ImageItem({ src: this.apiPhotoUrl + photo.url_enlarged, thumb: this.apiPhotoUrl + photo.url_165 }));
         }
       }
     );
