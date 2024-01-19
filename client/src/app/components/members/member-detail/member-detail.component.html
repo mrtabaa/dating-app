@@ -51,12 +51,15 @@
         </mat-tab>
         <mat-tab label="Photos">
             <div class="tab-contents">
-                <!-- TODO change album to thumbnails like Instagram -->
                 @if (images.length > 0) {
-                    <gallery class="gallery" [items]="images"></gallery>
+                @for (image of images; track $index) {
+                <div class="gallery" [lightbox]="$index" gallerize>
+                    <img [src]="image.data?.thumb">
+                </div>
+                }
                 }
                 @else {
-                    <p>This user has not shared any photos!</p>
+                <p>This member has not shared any photos!</p>
                 }
             </div>
         </mat-tab>

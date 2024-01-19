@@ -9,7 +9,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MemberService } from '../../../services/member.service';
 import { MatButtonModule } from '@angular/material/button';
-import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
+import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
+import { LightboxModule } from 'ng-gallery/lightbox';
 
 @Component({
   selector: 'app-user-detail',
@@ -17,7 +18,7 @@ import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
   imports: [
     CommonModule, NgOptimizedImage,
     MatCardModule, MatTabsModule, MatButtonModule,
-    GalleryModule
+    GalleryModule, LightboxModule
   ],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.scss']
@@ -25,6 +26,7 @@ import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 export class MemberDetailComponent implements OnInit, OnDestroy {
   private memberService = inject(MemberService);
   private route = inject(ActivatedRoute);
+  private gallery = inject(Gallery);
 
   member$: Observable<Member> | undefined;
   apiPhotoUrl = environment.apiPhotoUrl;
@@ -56,5 +58,8 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    const galleryRef = this.gallery.ref();
+    galleryRef.load(this.images)
   }
 }

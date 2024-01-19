@@ -5,8 +5,8 @@ main {
     mat-card {
         max-width: 15rem;
         min-width: 15rem;
-        
-        mat-card-content{
+
+        mat-card-content {
             margin-top: 1rem;
         }
 
@@ -22,9 +22,8 @@ main {
 
     .tab-contents {
         padding: 1rem;
-
-        .gallery {
-            max-width: 40%;
-        }
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 }
