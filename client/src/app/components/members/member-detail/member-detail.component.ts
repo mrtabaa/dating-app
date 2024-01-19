@@ -56,10 +56,11 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
         for (const photo of member.photos) {
           this.images.push(new ImageItem({ src: this.apiPhotoUrl + photo.url_enlarged, thumb: this.apiPhotoUrl + photo.url_165 }));
         }
+
+        // load ng-gallery and insert images
+        const galleryRef = this.gallery.ref();
+        galleryRef.load(this.images)
       }
     );
-
-    const galleryRef = this.gallery.ref();
-    galleryRef.load(this.images)
   }
 }
