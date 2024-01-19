@@ -1,5 +1,5 @@
 @if (member) {
-<mat-card class="card">
+<mat-card class="card" [routerLink]="['/member/' + member.id]">
     <div class="card-img-wrapper">
         @for (photo of member.photos; track $index) {
         @if (photo.isMain) {
@@ -42,7 +42,7 @@
             <mat-icon color="primary">group_add</mat-icon>
             }
             }
-            <mat-card-title>{{member.knownAs | titlecase}}</mat-card-title>
+            <mat-card-title>{{member.knownAs | titlecase}}, {{member.age}}</mat-card-title>
         </div>
         <mat-card-subtitle>{{member.city | titlecase}}</mat-card-subtitle>
     </mat-card-header>
