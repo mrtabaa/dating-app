@@ -51,7 +51,13 @@
         </mat-tab>
         <mat-tab label="Photos">
             <div class="tab-contents">
-                <gallery class="gallery" [items]="images"></gallery>
+                <!-- TODO change album to thumbnails like Instagram -->
+                @if (images.length > 0) {
+                    <gallery class="gallery" [items]="images"></gallery>
+                }
+                @else {
+                    <p>This user has not shared any photos!</p>
+                }
             </div>
         </mat-tab>
         <mat-tab label="Messages">
