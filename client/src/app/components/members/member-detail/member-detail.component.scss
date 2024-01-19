@@ -22,8 +22,12 @@ main {
 
     .tab-contents {
         padding: 1rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+
+        }
     }
 }

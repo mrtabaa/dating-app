@@ -52,11 +52,11 @@
         <mat-tab label="Photos">
             <div class="tab-contents">
                 @if (images.length > 0) {
-                @for (image of images; track $index) {
-                <div class="gallery" [lightbox]="$index" gallerize>
-                    <img [src]="image.data?.thumb">
+                <div class="gallery">
+                    @for (image of images; track $index) {
+                    <img [lightbox]="$index" gallerize [src]="image.data?.thumb">
+                    }
                 </div>
-                }
                 }
                 @else {
                 <p>This member has not shared any photos!</p>
