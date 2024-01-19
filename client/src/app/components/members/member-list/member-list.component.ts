@@ -31,6 +31,7 @@ export class MemberListComponent implements OnDestroy {
   subscribed: Subscription | undefined;
 
   pagination: Pagination | undefined;
+  loggedInGender: string | undefined;
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
   gender: string | undefined;
@@ -55,10 +56,10 @@ export class MemberListComponent implements OnDestroy {
   //#region auto-run methods
   constructor() {
     effect(() => {
-      const loggedInGender = this.accountService.loggedInUserSig()?.gender;
+      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
 
-      if (loggedInGender)
-        this.memberParams = new MemberParams(loggedInGender);
+      if (this.loggedInGender)
+        this.memberParams = new MemberParams(this.loggedInGender);
 
       this.loadMembers();
     });
@@ -87,23 +88,16 @@ export class MemberListComponent implements OnDestroy {
   }
 
   resetFilter(): void {
-    this.gender = undefined;
-    this.minAge = 18;
-    this.maxAge = 99;
-    
-    const loggedInGender = this.accountService.loggedInUserSig()?.gender === 'male' ? 'female' : 'male';
+    if (this.loggedInGender)
+      this.memberParams = new MemberParams(this.loggedInGender);
 
-    if (this.memberParams && loggedInGender) {
-      this.memberParams = {
-        pageNumber: this.memberParams.pageNumber,
-        pageSize: this.memberParams.pageSize,
-        gender: loggedInGender,
-        minAge: this.minAge,
-        maxAge: this.maxAge
-      }
-
-      this.loadMembers();
+    if (this.memberParams && this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge) {
+      this.gender = undefined;
+      this.minAge = this.memberParams.minAge;
+      this.maxAge = this.memberParams.maxAge;
     }
+
+    this.loadMembers();
   }
 
   loadMembers(): void {

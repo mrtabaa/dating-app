@@ -5,7 +5,7 @@ export class MemberParams {
     pageSize = 5;
     gender: string;
     minAge = 18;
-    maxAge = 100;
+    maxAge = 99;
 
     constructor(gender: string) {
         this.gender = gender === 'female' ? 'male' : 'female';
