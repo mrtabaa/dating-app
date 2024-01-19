@@ -27,7 +27,7 @@
                 </mat-select>
             </mat-form-field>
             <div class="buttons">
-                <button mat-stroked-button (click)="loadFilteredMembers()" [disabled]="minAge > maxAge"
+                <button mat-stroked-button (click)="getFilteredMembers()" [disabled]="minAge > maxAge || !gender && minAge === 18 && maxAge === 99"
                     color="primary">Filter</button>
                 <button mat-stroked-button (click)="resetFilter()" [disabled]="!gender" color="warn">Reset</button>
             </div>

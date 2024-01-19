@@ -61,7 +61,7 @@ export class MemberListComponent implements OnDestroy {
       if (this.loggedInGender)
         this.memberParams = new MemberParams(this.loggedInGender);
 
-      this.loadMembers();
+      this.getMembers();
     });
   }
 
@@ -70,7 +70,7 @@ export class MemberListComponent implements OnDestroy {
   }
   //#endregion auto-run methods
 
-  loadFilteredMembers(): void {
+  getFilteredMembers(): void {
     if (!this.gender)
       this.gender = this.memberParams?.gender;
 
@@ -84,7 +84,7 @@ export class MemberListComponent implements OnDestroy {
       }
     }
 
-    this.loadMembers();
+    this.getMembers();
   }
 
   resetFilter(): void {
@@ -97,10 +97,10 @@ export class MemberListComponent implements OnDestroy {
       this.maxAge = this.memberParams.maxAge;
     }
 
-    this.loadMembers();
+    this.getMembers();
   }
 
-  loadMembers(): void {
+  getMembers(): void {
     if (this.memberParams) {
       this.subscribed = this.memberService.getMembers(this.memberParams).subscribe({
         next: response => {
@@ -119,7 +119,7 @@ export class MemberListComponent implements OnDestroy {
       this.memberParams.pageSize = e.pageSize;
       this.memberParams.pageNumber = e.pageIndex + 1;
 
-      this.loadMembers();
+      this.getMembers();
     }
   }
 }
