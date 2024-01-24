@@ -1,14 +1,16 @@
-<ngx-spinner type="ball-atom">
-  <h1>Loading...</h1>
-</ngx-spinner>
-<header>
-  <nav>
+<div class="page">
+  <ngx-spinner type="ball-atom">
+    <h1>Loading...</h1>
+  </ngx-spinner>
+  <header>
+    <nav>
       <app-navbar />
-  </nav>
-</header>
-<main>
-  <router-outlet />
-</main>
-<footer>
-  Footer
-</footer>
+    </nav>
+  </header>
+  <main>
+    <router-outlet />
+  </main>
+  <footer>
+    <app-footer></app-footer>
+  </footer>
+</div>
