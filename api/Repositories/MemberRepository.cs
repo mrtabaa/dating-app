@@ -24,12 +24,17 @@ public class MemberRepository : IMemberRepository
         var MinDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
         var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
-        // set query to AsQuerable to use it agains MongoDB in another file e.g. PagedList
-        IMongoQueryable<AppUser> query = _collection.AsQueryable().Where<AppUser>(appUser =>
-                appUser.Id != memberParams.LoggedInUserId // don't request/show the currentUser in the list
-                && appUser.Gender == memberParams.Gender // get the opposite gender by default. It's set in MemberController
-                && appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob
-            );
+        // set query to AsQuerable to use it agains MongoDB later
+        IMongoQueryable<AppUser> query = _collection.AsQueryable();
+        
+        query = query.Where(appUser => appUser.Id != memberParams.LoggedInUserId); // don't request/show the currentUser in the list
+        query = query.Where(appUser => appUser.Gender == memberParams.Gender); // get the opposite gender by default. It's set in MemberController
+        query = query.Where(appUser => appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob); // get ages between 2 age inputs
+        query = memberParams.OrderBy switch { // sort users based on Created or LastActive
+            "age" => query.OrderByDescending(appUser => appUser.DateOfBirth).ThenBy(appUser => appUser.Id),
+            "created" => query.OrderByDescending(appUser => appUser.Created).ThenBy(appUser => appUser.Id),
+            _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
+        };
 
         PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
 
