@@ -2,12 +2,12 @@ using SkiaSharp;
 
 namespace api.Services;
 
-public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : IPhotoModifySaveService
+public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : PhotoStandardSize, IPhotoModifySaveService
 {
     #region Constructor and vars
     const string storageAddress = "storage/photos/";
 
-    readonly string[] operations = { "resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original" };
+    readonly string[] operations = ["resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original"];
     private enum OperationName
     {
         ResizeByScale,
@@ -28,22 +28,12 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
     /// <returns>filePath</returns>
-    public async Task<string> ResizeImageByScale(IFormFile formFile, string userId)
+    public async Task<string> ResizeImageByScale(IFormFile formFile, string userId, int standardSizeIndex)
     {
         // performace
         if (formFile.Length < 300_000)
             return await SaveImageAsIs(formFile, userId, (int)OperationName.Original); // return filePath
 
-        // do the job
-        var resizeFactor = formFile.Length switch
-        {
-            < 500_000 => 0.9f,
-            < 1_000_000 => 0.72f,
-            < 2_000_000 => 0.32f,
-            < 3_000_000 => 0.3f,
-            < 4_000_000 => 0.2f,
-            _ => 0.15f,
-        };
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
         byte[]? imageData = binaryReader.ReadBytes((int)formFile.Length);
@@ -52,20 +42,29 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         using SKImage skImageSource = SKImage.FromEncodedData(imageData);
         using SKBitmap bitmapSource = SKBitmap.FromImage(skImageSource);
 
-        int width = (int)Math.Round(bitmapSource.Width * resizeFactor);
-        int height = (int)Math.Round(bitmapSource.Height * resizeFactor);
+        int width;
+        int height;
 
-        using SKBitmap bitmapResized = new(width, height, bitmapSource.ColorType, bitmapSource.AlphaType);
+        if (bitmapSource.Width > bitmapSource.Height)
+        {
+            width = dimensions[standardSizeIndex].Side1;
+            height = dimensions[standardSizeIndex].Side2;
+        }
+        else if (bitmapSource.Width < bitmapSource.Height)
+        {
+            width = dimensions[standardSizeIndex].Side2;
+            height = dimensions[standardSizeIndex].Side1;
+        }
+        else
+        {
+            width = dimensions[standardSizeIndex].Side2;
+            height = dimensions[standardSizeIndex].Side2;
+        }
 
-        using SKCanvas canvas = new(bitmapResized);
-
-        canvas.SetMatrix(SKMatrix.CreateScale(resizeFactor, resizeFactor));
-        canvas.DrawBitmap(bitmapSource, new SKPoint());
-        canvas.ResetMatrix();
-        canvas.Flush();
+        using SKBitmap bitmapResized = bitmapSource.Resize(new SKImageInfo(width, height), SKFilterQuality.None);
 
         using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
-        using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale);
     }
@@ -107,7 +106,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
 
         using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn);
         #endregion
@@ -162,7 +161,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
         using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
 
         using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn);
         #endregion
@@ -228,7 +227,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
 
         // crop image
         SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
-        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn);
         #endregion
@@ -267,7 +266,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
 
             // crop image
             SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, sideIn, sideIn));
-            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+            using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
 
             return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, sideIn, sideIn);
         }
@@ -307,7 +306,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
 
         // crop image
         SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
-        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 100);
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side);
     }
@@ -443,8 +442,8 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : I
     /// </summary>
     /// <param name="fileNameInput"></param>
     /// <returns>my-photo.webp</returns>
-    private static string? GenerateFileNameToWebp(string fileNameInput) 
-    {   
+    private static string? GenerateFileNameToWebp(string fileNameInput)
+    {
         return fileNameInput.Split(".")[0] + ".webp";
     }
     #endregion Helpers
