@@ -6,7 +6,7 @@ namespace image_processing.Services;
 
 public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : PhotoStandardSize, IPhotoModifySaveService
 {
-    #region Constructor and vars
+    #region vars
     const string storageAddress = "storage/photos/";
 
     readonly string[] operations = ["resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original"];
