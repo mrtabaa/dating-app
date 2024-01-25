@@ -32,7 +32,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
 
             filePath_165_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 165); // navbar & thumbnail
             filePath_256_sq = await _photoModifyService.ResizeByPixel_Square(formFile, userId, 256); // card
-            filePath_enlarged = await _photoModifyService.ResizeImageByScale(formFile, userId, (int)PhotoStandardSize.DimensionsEnum._4_3_800x600); // enlarged photo
+            filePath_enlarged = await _photoModifyService.ResizeImageByScale(formFile, userId, (int)DimensionsEnum._4_3_800x600); // enlarged photo
 
             // if conversion fails
             if (filePath_165_sq is null || filePath_256_sq is null || filePath_enlarged is null)

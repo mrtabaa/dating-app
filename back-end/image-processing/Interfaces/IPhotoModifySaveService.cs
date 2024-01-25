@@ -1,4 +1,4 @@
-namespace api.Interfaces;
+namespace image_processing.Interfaces;
 
 public interface IPhotoModifySaveService
 {

@@ -1,4 +1,4 @@
-namespace api.Services;
+namespace image_processing.Helpers;
 
 public class PhotoStandardSize
 {
@@ -7,7 +7,7 @@ public class PhotoStandardSize
         int Side2
     );
 
-    private protected enum DimensionsEnum
+    protected enum DimensionsEnum
     {
         // 4:3
         _4_3_640x480,

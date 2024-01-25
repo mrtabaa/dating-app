@@ -1,6 +1,8 @@
+using image_processing.Interfaces;
+using image_processing.Helpers;
 using SkiaSharp;
 
-namespace api.Services;
+namespace image_processing.Services;
 
 public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : PhotoStandardSize, IPhotoModifySaveService
 {
@@ -27,6 +29,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
+    /// <param name="standardSizeIndex"></param>
     /// <returns>filePath</returns>
     public async Task<string> ResizeImageByScale(IFormFile formFile, string userId, int standardSizeIndex)
     {
