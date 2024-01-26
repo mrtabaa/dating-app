@@ -12,13 +12,14 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { range } from 'lodash';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
   imports: [
     MemberCardComponent, FormsModule,
-    MatPaginatorModule, MatSelectModule, MatButtonModule
+    MatPaginatorModule, MatSelectModule, MatButtonModule, MatIconModule
   ],
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss']
@@ -40,6 +41,10 @@ export class MemberListComponent implements OnDestroy {
 
   // installed lodash library
   ages: number[] = [...range(18, 100)];
+
+  orderOptions: string[] = ['lastActive', 'created', 'age'];
+  orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
+  orderBy: string = this.orderOptions[0];
 
   // Material Pagination attrs
   // pageSize = 5;
@@ -80,7 +85,8 @@ export class MemberListComponent implements OnDestroy {
         pageSize: this.memberParams.pageSize,
         gender: this.gender,
         minAge: this.minAge,
-        maxAge: this.maxAge
+        maxAge: this.maxAge,
+        orderBy: this.orderBy
       }
     }
 
@@ -91,10 +97,12 @@ export class MemberListComponent implements OnDestroy {
     if (this.loggedInGender)
       this.memberParams = new MemberParams(this.loggedInGender);
 
+    // TODO remove from if: this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge
     if (this.memberParams && this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge) {
       this.gender = undefined;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
+      this.orderBy = this.memberParams.orderBy;
     }
 
     this.getMembers();
