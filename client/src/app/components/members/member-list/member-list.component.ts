@@ -110,26 +110,32 @@ export class MemberListComponent implements OnDestroy {
   }
 
   disableFilterBotton(): boolean {
-    if (this.minAge > this.maxAge ||
-      (
-        this.gender == this.memberParams?.gender
-        && this.minAge === this.memberParams?.minAge
-        && this.maxAge === this.memberParams?.maxAge
-      )
-    ) {
-      return true
+    if (this.loggedInGender) {
+      const memberParams = new MemberParams(this.loggedInGender);
+      if (this.minAge > this.maxAge ||
+        (
+          this.gender == memberParams.gender
+          && this.minAge === memberParams.minAge
+          && this.maxAge === memberParams.maxAge
+        )
+      ) {
+        return true
+      }
     }
 
     return false;
   }
 
   disableResetBotton(): boolean {
-    if (
-      this.gender == this.memberParams?.gender
-      && this.minAge === this.memberParams?.minAge
-      && this.maxAge === this.memberParams?.maxAge
-    ) {
-      return true
+    if (this.loggedInGender) {
+      const memberParams = new MemberParams(this.loggedInGender);
+      if (
+        this.gender == memberParams.gender
+        && this.minAge === memberParams.minAge
+        && this.maxAge === memberParams.maxAge
+      ) {
+        return true
+      }
     }
 
     return false;
