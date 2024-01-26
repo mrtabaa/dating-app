@@ -6,7 +6,7 @@ public class UserParams
 
     public int PageNumber { get; init; } = 1;
 
-    private int _pageSize = 10;
+    private int _pageSize = 5;
     public int PageSize
     {
         get { return _pageSize; }
