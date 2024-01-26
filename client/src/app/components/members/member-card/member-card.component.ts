@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { Member } from '../../../models/member.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [
     CommonModule,
-    NgOptimizedImage, RouterLink,
+    NgOptimizedImage, RouterLink, ShortenStringPipe,
     MatCardModule, MatIconModule
   ],
   templateUrl: './member-card.component.html',

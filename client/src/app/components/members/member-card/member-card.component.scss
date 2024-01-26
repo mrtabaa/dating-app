@@ -68,5 +68,9 @@ $min_card_size: 9rem;
     .title {
         display: flex;
         align-items: center;
+
+        mat-card-title {
+            font-size: 1rem;
+        }
     }
 }

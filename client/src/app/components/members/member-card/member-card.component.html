@@ -42,7 +42,7 @@
             <mat-icon color="primary">group_add</mat-icon>
             }
             }
-            <mat-card-title>{{member.knownAs | titlecase}}, {{member.age}}</mat-card-title>
+            <mat-card-title>{{member.knownAs | shortenString:7 | titlecase}}, {{member.age}}</mat-card-title>
         </div>
         <mat-card-subtitle>{{member.city | titlecase}}</mat-card-subtitle>
     </mat-card-header>
