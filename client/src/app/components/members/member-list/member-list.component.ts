@@ -40,7 +40,7 @@ export class MemberListComponent implements OnDestroy {
   maxAge: number = 99;
 
   // installed lodash library
-  ages: number[] = [...range(18, 100)];
+  ages: number[] = [...range(this.minAge, this.maxAge + 1)]; // Add 1 since lodash excludes last number. 100 => 99
 
   orderOptions: string[] = ['lastActive', 'created', 'age'];
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
@@ -86,7 +86,7 @@ export class MemberListComponent implements OnDestroy {
         gender: this.gender,
         minAge: this.minAge,
         maxAge: this.maxAge,
-        orderBy: this.orderBy
+        sortBy: this.orderBy
       }
     }
 
@@ -102,7 +102,7 @@ export class MemberListComponent implements OnDestroy {
       this.gender = undefined;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
-      this.orderBy = this.memberParams.orderBy;
+      this.orderBy = this.memberParams.sortBy;
     }
 
     this.getMembers();
