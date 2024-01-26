@@ -4,9 +4,9 @@ namespace api.Controllers;
 public class MemberController(IMemberRepository _memberRepository, IUserRepository _userRepository) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] UserParams userParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] MemberParams userParams, CancellationToken cancellationToken)
     {
-        if(userParams.MinAge > userParams.MaxAge)
+        if (userParams.MinAge > userParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
         List<MemberDto?> memberDtos = [];
@@ -16,7 +16,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         if (appUser is not null && string.IsNullOrEmpty(userParams.Gender))
         {
             userParams.LoggedInUserId = appUser.Id;
-            userParams.Gender = appUser.Gender == "male" ? "female": "male";
+            userParams.Gender = appUser.Gender == "male" ? "female" : "male";
         }
 
         PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(userParams, cancellationToken);
