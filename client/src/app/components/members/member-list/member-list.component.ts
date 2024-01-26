@@ -99,8 +99,7 @@ export class MemberListComponent implements OnDestroy {
     if (this.loggedInGender)
       this.memberParams = new MemberParams(this.loggedInGender);
 
-    // TODO remove from if: this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge
-    if (this.memberParams && this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge) {
+    if (this.memberParams) {
       this.gender = this.memberParams.gender;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
