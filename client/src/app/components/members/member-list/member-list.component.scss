@@ -24,13 +24,12 @@ main {
                 display: flex;
                 gap: 1rem;
 
-                // TODO make smaller
-                // mat-form-field {
-                //     width: 7rem;
-                // }
+                mat-form-field {
+                    width: 7rem;
+                }
 
                 .buttons {
-                    // margin-top: 0.5rem; // adjust to select mat-form-field items
+                    margin-top: 0.5rem; // adjust to select mat-form-field items
                     display: flex;
                     gap: 0.2rem;
                 }
