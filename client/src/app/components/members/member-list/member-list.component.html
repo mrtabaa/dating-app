@@ -28,12 +28,10 @@
                     </mat-select>
                 </mat-form-field>
                 <div class="buttons">
-                    <!-- TODO disable bottons corrctly -->
-                    <button mat-mini-fab (click)="getFilteredMembers()"
-                        [disabled]="minAge > maxAge || !gender && minAge === 18 && maxAge === 99" color="primary">
+                    <button mat-mini-fab (click)="getFilteredMembers()" [disabled]="disableFilterBotton()" color="primary"> 
                         <mat-icon>filter_alt</mat-icon>
                     </button>
-                    <button mat-mini-fab (click)="resetFilter()" [disabled]="true" color="primary">
+                    <button mat-mini-fab (click)="resetFilter()" [disabled]="disableResetBotton()" color="primary">
                         <mat-icon>undo</mat-icon>
                     </button>
                 </div>

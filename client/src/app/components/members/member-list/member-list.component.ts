@@ -109,6 +109,32 @@ export class MemberListComponent implements OnDestroy {
     this.getMembers();
   }
 
+  disableFilterBotton(): boolean {
+    if (this.minAge > this.maxAge ||
+      (
+        this.gender == this.memberParams?.gender
+        && this.minAge === this.memberParams?.minAge
+        && this.maxAge === this.memberParams?.maxAge
+      )
+    ) {
+      return true
+    }
+
+    return false;
+  }
+
+  disableResetBotton(): boolean {
+    if (
+      this.gender == this.memberParams?.gender
+      && this.minAge === this.memberParams?.minAge
+      && this.maxAge === this.memberParams?.maxAge
+    ) {
+      return true
+    }
+
+    return false;
+  }
+
   getMembers(): void {
     if (this.memberParams) {
       this.subscribed = this.memberService.getMembers(this.memberParams).subscribe({
