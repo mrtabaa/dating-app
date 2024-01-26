@@ -2,43 +2,38 @@
     <h1>Find Your Beloved One</h1>
     <section class="filterSort">
         <div class="filter">
-            <div class="fields">
-                <mat-form-field>
-                    <mat-label>Gender</mat-label>
-                    <mat-select [(ngModel)]="gender" name="gender">
-                        <mat-option [value]="'female'">Female</mat-option>
-                        <mat-option [value]="'male'">Male</mat-option>
-                        <mat-option [value]="'other'">Other</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>From age</mat-label>
-                    <mat-select [(ngModel)]="minAge" name="minAge">
-                        @for (age of ages; track $index) {
-                        <mat-option [value]="age">{{age}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>To age</mat-label>
-                    <mat-select [(ngModel)]="maxAge" name="maxAge">
-                        @for (age of ages; track $index) {
-                        <mat-option [value]="age">{{age}}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                <div class="buttons">
-                    <button mat-mini-fab (click)="getFilteredMembers()" [disabled]="disableFilterBotton()" color="primary"> 
-                        <mat-icon>filter_alt</mat-icon>
-                    </button>
-                    <button mat-mini-fab (click)="resetFilter()" [disabled]="disableResetBotton()" color="primary">
-                        <mat-icon>undo</mat-icon>
-                    </button>
-                </div>
+            <mat-form-field>
+                <mat-label>Gender</mat-label>
+                <mat-select [(ngModel)]="gender" name="gender">
+                    <mat-option [value]="'female'">Female</mat-option>
+                    <mat-option [value]="'male'">Male</mat-option>
+                    <mat-option [value]="'other'">Other</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>From age</mat-label>
+                <mat-select [(ngModel)]="minAge" name="minAge">
+                    @for (age of ages; track $index) {
+                    <mat-option [value]="age" [disabled]="age > maxAge">{{age}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>To age</mat-label>
+                <mat-select [(ngModel)]="maxAge" name="maxAge">
+                    @for (age of ages; track $index) {
+                    <mat-option [value]="age" [disabled]="age < minAge">{{age}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <div class="buttons">
+                <button mat-mini-fab (click)="getFilteredMembers()" [disabled]="disableFilterBotton()" color="primary">
+                    <mat-icon>filter_alt</mat-icon>
+                </button>
+                <button mat-mini-fab (click)="resetFilter()" [disabled]="disableResetBotton()" color="primary">
+                    <mat-icon>undo</mat-icon>
+                </button>
             </div>
-            @if (minAge > maxAge) {
-            <mat-error>'From age' cannot be greater than 'To age'.</mat-error>
-            }
         </div>
         <div class="sort">
             <mat-form-field>
