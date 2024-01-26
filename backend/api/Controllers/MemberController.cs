@@ -4,22 +4,22 @@ namespace api.Controllers;
 public class MemberController(IMemberRepository _memberRepository, IUserRepository _userRepository) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] MemberParams userParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
     {
-        if (userParams.MinAge > userParams.MaxAge)
+        if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
         List<MemberDto?> memberDtos = [];
 
         AppUser? appUser = await _userRepository.GetByIdAsync(User.GetUserId(), cancellationToken);
 
-        if (appUser is not null && string.IsNullOrEmpty(userParams.Gender))
+        if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
-            userParams.LoggedInUserId = appUser.Id;
-            userParams.Gender = appUser.Gender == "male" ? "female" : "male";
+            memberParams.LoggedInUserId = appUser.Id;
+            memberParams.Gender = appUser.Gender == "male" ? "female" : "male";
         }
 
-        PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(userParams, cancellationToken);
+        PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(memberParams, cancellationToken);
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
