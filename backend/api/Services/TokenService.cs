@@ -19,6 +19,7 @@ public class TokenService : ITokenService
 
         var claims = new List<Claim> {
             new(JwtRegisteredClaimNames.NameId, user.Id!)
+            // new(JwtRegisteredClaimNames.UniqueName, user.Email) // use if needed. Also add in ClaimPrincipalExtensions
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
