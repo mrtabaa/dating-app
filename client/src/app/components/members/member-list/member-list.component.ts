@@ -86,7 +86,7 @@ export class MemberListComponent implements OnDestroy {
         gender: this.gender,
         minAge: this.minAge,
         maxAge: this.maxAge,
-        sortBy: this.orderBy
+        orderBy: this.orderBy
       }
     }
 
@@ -102,7 +102,7 @@ export class MemberListComponent implements OnDestroy {
       this.gender = undefined;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
-      this.orderBy = this.memberParams.sortBy;
+      this.orderBy = this.memberParams.orderBy;
     }
 
     this.getMembers();
