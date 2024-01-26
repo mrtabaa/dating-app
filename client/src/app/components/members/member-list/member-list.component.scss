@@ -9,20 +9,31 @@ main {
         font-weight: bold;
     }
 
-    .filter {
+    .filterSort {
         display: flex;
-        flex-direction: column;
-        align-items: center;
+        justify-content: space-between;
+        width: 100%;
 
-        .fields {
+        .filter {
+            // style empty list with this filter message
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 1rem;
 
-            .buttons {
+            .fields {
                 display: flex;
-                flex-direction: column;
-                gap: 0.2rem;
+                gap: 1rem;
+
+                // TODO make smaller
+                // mat-form-field {
+                //     width: 7rem;
+                // }
+
+                .buttons {
+                    // margin-top: 0.5rem; // adjust to select mat-form-field items
+                    display: flex;
+                    gap: 0.2rem;
+                }
             }
         }
     }
