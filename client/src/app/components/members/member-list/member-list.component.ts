@@ -63,8 +63,10 @@ export class MemberListComponent implements OnDestroy {
     effect(() => {
       this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
 
-      if (this.loggedInGender)
+      if (this.loggedInGender) {
         this.memberParams = new MemberParams(this.loggedInGender);
+        this.gender = this.memberParams.gender;
+      }
 
       this.getMembers();
     });
@@ -99,7 +101,7 @@ export class MemberListComponent implements OnDestroy {
 
     // TODO remove from if: this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge
     if (this.memberParams && this.memberParams.gender && this.memberParams.minAge && this.memberParams.maxAge) {
-      this.gender = undefined;
+      this.gender = this.memberParams.gender;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
       this.orderBy = this.memberParams.orderBy;
