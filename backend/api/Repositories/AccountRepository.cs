@@ -49,8 +49,6 @@ public class AccountRepository : IAccountRepository
 
         if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
         {
-            UpdateLastActiveInDb(appUser, cancellationToken);
-
             return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
         }
 
@@ -69,13 +67,4 @@ public class AccountRepository : IAccountRepository
         return null;
     }
     #endregion CRUD
-
-    private async void UpdateLastActiveInDb(AppUser appUserIn, CancellationToken cancellationToken)
-    {
-        UpdateDefinition<AppUser> newLastActive = Builders<AppUser>.Update.Set(appUser =>
-                       appUser.LastActive, DateTime.UtcNow);
-
-        await _collection.UpdateOneAsync(appUser =>
-        appUser.Id == appUserIn.Id, newLastActive, null, cancellationToken);
-    }
 }

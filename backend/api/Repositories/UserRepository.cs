@@ -53,6 +53,14 @@ public class UserRepository : IUserRepository
         return null;
     }
 
+    public async Task<UpdateResult?> UpdateLastActive(string loggedInUserId, CancellationToken cancellationToken)
+    {
+        UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
+            .Set(appUser => appUser.LastActive, DateTime.UtcNow);
+
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == loggedInUserId, updatedUserLastActive, null, cancellationToken);
+    }
+
     public async Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken) =>
         await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Id == userId, cancellationToken);
     #endregion User Management
