@@ -96,17 +96,16 @@ export class MemberListComponent implements OnDestroy {
   }
 
   resetFilter(): void {
-    if (this.loggedInGender)
+    if (this.loggedInGender) {
       this.memberParams = new MemberParams(this.loggedInGender);
-
-    if (this.memberParams) {
+      
       this.gender = this.memberParams.gender;
       this.minAge = this.memberParams.minAge;
       this.maxAge = this.memberParams.maxAge;
       this.orderBy = this.memberParams.orderBy;
-    }
 
-    this.getMembers();
+      this.getMembers();
+    }
   }
 
   disableFilterBotton(): boolean {
