@@ -13,13 +13,15 @@ import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { range } from 'lodash';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
   imports: [
     MemberCardComponent, FormsModule,
-    MatPaginatorModule, MatSelectModule, MatButtonModule, MatIconModule
+    MatPaginatorModule, MatSelectModule, MatButtonModule, 
+    MatIconModule, MatDividerModule
   ],
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss']

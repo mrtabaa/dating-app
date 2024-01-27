@@ -1,52 +1,69 @@
 main {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: stretch;
+    gap: 1rem;
+    // background-color: yellow;
 
-    h1 {
-        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-        font-size: 2rem;
-        font-weight: bold;
-    }
-
-    .filterSort {
+    .sidebar {
+        // background-color: red;
         display: flex;
-        justify-content: space-between;
-        width: 100%;
+        flex-direction: column;
+        gap: 2rem;
+        margin-top: 5rem;
+
+        * {
+            display: flex;
+        }
 
         .filter {
+
             // style empty list with this filter message
-            display: flex;
             flex-direction: column;
             align-items: center;
 
-            .fields {
-                display: flex;
-                gap: 1rem;
+            mat-form-field {
+                // width: 7rem;
+            }
 
-                mat-form-field {
-                    width: 7rem;
-                }
-
-                .buttons {
-                    margin-top: 0.5rem; // adjust to select mat-form-field items
-                    display: flex;
-                    gap: 0.2rem;
-                }
+            .buttons {
+                // background-color: green;
+                margin-top: 0.5rem; // adjust to select mat-form-field items
+                gap: 0.2rem;
             }
         }
+
+        .order-by {}
     }
 
-    .members-list {
+    .members-container {
+        // background-color: blue;
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        gap: 2rem;
-        margin: 2rem;
+        flex: auto;
 
-        p {
-            font-size: 1rem;
-            color: rgb(66, 66, 66);
+        h1 {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            font-size: 2rem;
+            font-weight: bold;
+            align-self: center;
+            // background-color: green;
         }
+
+        .members {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem;
+
+            p {
+                font-size: 1rem;
+                color: rgb(66, 66, 66);
+            }
+        }
+
+        .paginator {}
     }
 }
