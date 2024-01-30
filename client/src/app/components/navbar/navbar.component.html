@@ -29,7 +29,8 @@
         @if(loggedInUserSig && loggedInUserSig(); as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
-            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" width="165" height="165" priority alt="{{user.knownAs[0]}}">
+            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill priority
+                alt="{{user.knownAs[0]}}">
             }
             @else() {
             {{user.knownAs[0] | titlecase}}
@@ -44,7 +45,7 @@
         <button mat-raised-button color="accent" routerLink="account/login" routerLinkActive="router-link-active">
             Login
         </button>
-        }   
+        }
         <!-- menu if logged-in -->
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
@@ -52,7 +53,8 @@
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
-                    <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" width="165" height="165" priority alt="{{user.knownAs}}">
+                    <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill priority
+                        alt="{{user.knownAs}}">
                     }
                     @else {
                     {{user.knownAs[0] | titlecase}}
