@@ -1,21 +1,24 @@
 <main>
     <section class="sidebar">
         <div class="order-by">
+            @if(memberParams) {
             <mat-form-field>
                 <mat-label>Order by</mat-label>
-                <mat-select [(ngModel)]="orderBy" name="orderBy">
+                <mat-select [(ngModel)]="memberParams.orderBy" name="orderBy">
                     @for (orderOption of orderOptions; track $index) {
-                    <mat-option [value]="orderOption" (click)="getFilteredMembers()"
-                        [disabled]="orderOption === orderBy">{{orderOptionsView[$index]}}</mat-option>
+                    <mat-option [value]="orderOption" (click)="getMembers()"
+                        [disabled]="orderOption === memberParams.orderBy">{{orderOptionsView[$index]}}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
+            }
         </div>
         <mat-divider></mat-divider>
         <div class="filter">
+            @if(memberParams) {
             <mat-form-field>
                 <mat-label>Gender</mat-label>
-                <mat-select [(ngModel)]="gender" name="gender">
+                <mat-select [(ngModel)]="memberParams.gender" name="gender">
                     <mat-option [value]="'female'">Female</mat-option>
                     <mat-option [value]="'male'">Male</mat-option>
                     <mat-option [value]="'other'">Other</mat-option>
@@ -23,28 +26,29 @@
             </mat-form-field>
             <mat-form-field>
                 <mat-label>From age</mat-label>
-                <mat-select [(ngModel)]="minAge" name="minAge">
+                <mat-select [(ngModel)]="memberParams.minAge" name="minAge">
                     @for (age of ages; track $index) {
-                    <mat-option [value]="age" [disabled]="age > maxAge">{{age}}</mat-option>
+                    <mat-option [value]="age" [disabled]="age > memberParams.maxAge">{{age}}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>To age</mat-label>
-                <mat-select [(ngModel)]="maxAge" name="maxAge">
+                <mat-select [(ngModel)]="memberParams.maxAge" name="maxAge">
                     @for (age of ages; track $index) {
-                    <mat-option [value]="age" [disabled]="age < minAge">{{age}}</mat-option>
+                    <mat-option [value]="age" [disabled]="age < memberParams.minAge">{{age}}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
             <div class="buttons">
-                <button mat-stroked-button (click)="getFilteredMembers()" color="primary">
-                    Filter
-                </button>
                 <button mat-stroked-button (click)="resetFilter()" color="warn">
                     Reset
                 </button>
+                <button mat-stroked-button (click)="getMembers()" color="primary">
+                    Apply Filters
+                </button>
             </div>
+            }
         </div>
     </section>
     <section class="members-container">

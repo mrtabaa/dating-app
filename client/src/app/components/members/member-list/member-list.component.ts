@@ -1,4 +1,4 @@
-import { Component, OnDestroy, effect, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { Pagination } from '../../../models/helpers/pagination';
@@ -9,7 +9,6 @@ import { MemberService } from '../../../services/member.service';
 import { MemberParams } from '../../../models/helpers/member-params';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
-import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { range } from 'lodash';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,33 +19,28 @@ import { MatDividerModule } from '@angular/material/divider';
   standalone: true,
   imports: [
     MemberCardComponent, FormsModule,
-    MatPaginatorModule, MatSelectModule, MatButtonModule, 
+    MatPaginatorModule, MatSelectModule, MatButtonModule,
     MatIconModule, MatDividerModule
   ],
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss']
 })
-export class MemberListComponent implements OnDestroy {
+export class MemberListComponent implements OnInit, OnDestroy {
   //#region Variables
   private memberService = inject(MemberService);
-  private accountService = inject(AccountService);
 
   subscribed: Subscription | undefined;
 
   pagination: Pagination | undefined;
-  loggedInGender: string | undefined;
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
-  gender: string | undefined;
-  minAge: number = 18;
-  maxAge: number = 99;
 
   // installed lodash library
-  ages: number[] = [...range(this.minAge, this.maxAge + 1)]; // Add 1 since lodash excludes last number. 100 => 99
+  // TODO improve hard-coded numbers
+  ages: number[] = [...range(18, 100)]; // Add 1 since lodash excludes last number. 100 => 99
 
   orderOptions: string[] = ['lastActive', 'created', 'age'];
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
-  orderBy: string = this.orderOptions[0];
 
   // Material Pagination attrs
   // pageSize = 5;
@@ -62,16 +56,11 @@ export class MemberListComponent implements OnDestroy {
 
   //#region auto-run methods
   constructor() {
-    effect(() => {
-      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
+    this.memberParams = this.memberService.getMemberParams();
+  }
 
-      if (this.loggedInGender) {
-        this.memberParams = new MemberParams(this.loggedInGender);
-        this.gender = this.memberParams.gender;
-      }
-
-      this.getMembers();
-    });
+  ngOnInit(): void {
+    this.getMembers();
   }
 
   ngOnDestroy(): void {
@@ -79,40 +68,17 @@ export class MemberListComponent implements OnDestroy {
   }
   //#endregion auto-run methods
 
-  getFilteredMembers(): void {
-    if (!this.gender)
-      this.gender = this.memberParams?.gender;
-
-    if (this.memberParams && this.gender) {
-      this.memberParams = {
-        pageNumber: this.memberParams.pageNumber,
-        pageSize: this.memberParams.pageSize,
-        gender: this.gender,
-        minAge: this.minAge,
-        maxAge: this.maxAge,
-        orderBy: this.orderBy
-      }
-    }
-
-    this.getMembers();
-  }
-
   resetFilter(): void {
-    if (this.loggedInGender) {
-      this.memberParams = new MemberParams(this.loggedInGender);
-      
-      this.gender = this.memberParams.gender;
-      this.minAge = this.memberParams.minAge;
-      this.maxAge = this.memberParams.maxAge;
-      this.orderBy = this.memberParams.orderBy;
-
-      this.getMembers();
-    }
+    this.memberService.resetMemberParams();
   }
 
   getMembers(): void {
     if (this.memberParams) {
-      this.subscribed = this.memberService.getMembers(this.memberParams).subscribe({
+      console.log('component getMembers()', this.memberParams)
+
+      this.memberService.setMemberParams(this.memberParams);
+
+      this.subscribed = this.memberService.getMembers().subscribe({
         next: response => {
           if (response.result && response.pagination) {
             this.members = response.result;
@@ -129,6 +95,7 @@ export class MemberListComponent implements OnDestroy {
       this.memberParams.pageSize = e.pageSize;
       this.memberParams.pageNumber = e.pageIndex + 1;
 
+      this.memberService.setMemberParams(this.memberParams);
       this.getMembers();
     }
   }

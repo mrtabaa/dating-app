@@ -1,31 +1,69 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { PaginatedResult } from '../models/helpers/pagination';
 import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
 import { MemberParams } from '../models/helpers/member-params';
+import { AccountService } from './account.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
   private http = inject(HttpClient);
+  private accountService = inject(AccountService);
 
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
+  memberParams: MemberParams | undefined;
+  loggedInGender: string | undefined;
 
-  getMembers(memberParams: MemberParams): Observable<PaginatedResult<Member[]>> {
+  constructor() {
+    effect(() => {
+      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
 
-    const response = this.memberCache.get(Object.values(memberParams).join('-'));
+      if (this.loggedInGender) {
+        this.memberParams = new MemberParams(this.loggedInGender);
 
-    if (response) return of(response);
+        this.getMembers();
+      }
+    });
+  }
 
-    const params = this.getHttpParams(memberParams);
+  setMemberParams(memberParamsInput: MemberParams): void {
+    this.memberParams = memberParamsInput;
+  }
+
+  getMemberParams(): MemberParams | undefined {
+    console.log('getParams(', this.memberParams);
+    return this.memberParams;
+  }
+
+  resetMemberParams(): MemberParams | undefined {
+    if (this.loggedInGender)
+      return new MemberParams(this.loggedInGender);
+
+    console.log('restet', this.loggedInGender);
+    return;
+  }
+
+  getMembers(): Observable<PaginatedResult<Member[]>> {
+
+    if (this.memberParams) {
+      const response = this.memberCache.get(Object.values(this.memberParams).join('-'));
+
+      if (response) {
+        return of(response)
+      };
+    }
+
+    const params = this.getHttpParams();
 
     return this.getPaginatedResult<Member[]>(this.baseUrl, params).pipe(
       map(response => {
-        this.memberCache.set(Object.values(memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+        if (this.memberParams)
+          this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
         return response;
       })
     );
@@ -57,15 +95,17 @@ export class MemberService {
   }
 
   //#region Helpers
-  private getHttpParams(memberParams: MemberParams): HttpParams {
+  private getHttpParams(): HttpParams {
     let params = new HttpParams();
 
-    params = params.append('pageNumber', memberParams.pageNumber);
-    params = params.append('pageSize', memberParams.pageSize);
-    params = params.append('gender', memberParams.gender);
-    params = params.append('minAge', memberParams.minAge);
-    params = params.append('maxAge', memberParams.maxAge);
-    params = params.append('orderBy', memberParams.orderBy);
+    if (this.memberParams) {
+      params = params.append('pageNumber', this.memberParams.pageNumber);
+      params = params.append('pageSize', this.memberParams.pageSize);
+      params = params.append('gender', this.memberParams.gender);
+      params = params.append('minAge', this.memberParams.minAge);
+      params = params.append('maxAge', this.memberParams.maxAge);
+      params = params.append('orderBy', this.memberParams.orderBy);
+    }
 
     return params;
   }
