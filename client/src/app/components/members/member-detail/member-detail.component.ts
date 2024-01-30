@@ -11,6 +11,7 @@ import { MemberService } from '../../../services/member.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 import { LightboxModule } from 'ng-gallery/lightbox';
+import { IntlModule } from "angular-ecmascript-intl";
 
 @Component({
   selector: 'app-user-detail',
@@ -18,7 +19,7 @@ import { LightboxModule } from 'ng-gallery/lightbox';
   imports: [
     CommonModule, NgOptimizedImage,
     MatCardModule, MatTabsModule, MatButtonModule,
-    GalleryModule, LightboxModule
+    GalleryModule, LightboxModule, IntlModule
   ],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.scss']

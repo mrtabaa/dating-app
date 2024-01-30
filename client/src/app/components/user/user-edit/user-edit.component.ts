@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MemberService } from '../../../services/member.service';
 import { UserService } from '../../../services/user.service';
+import { IntlModule } from 'angular-ecmascript-intl';
 
 @Component({
   selector: 'app-user-edit',
@@ -23,7 +24,8 @@ import { UserService } from '../../../services/user.service';
   imports: [
     CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
     PhotoEditorComponent,
-    MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule
+    MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+    IntlModule
   ],
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
