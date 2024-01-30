@@ -13,11 +13,12 @@ export class MemberService {
   private http = inject(HttpClient);
 
   baseUrl: string = environment.apiUrl + 'member/';
-  memberCache = new Map();
+  memberCache = new Map<string, PaginatedResult<Member[]>>();
 
   getMembers(memberParams: MemberParams): Observable<PaginatedResult<Member[]>> {
 
     const response = this.memberCache.get(Object.values(memberParams).join('-'));
+
     if (response) return of(response);
 
     const params = this.getHttpParams(memberParams);
@@ -30,8 +31,29 @@ export class MemberService {
     );
   }
 
-  getMemberById(id: string | undefined): Observable<Member> | undefined {
-    return this.http.get<Member>(this.baseUrl + 'id/' + id);
+  /**
+   * If member is already loaded in memberCache in getMembers(), loop through it and return the member. Otherwise call the api to get the member. 
+   * @param idInput 
+   * @returns Observable<Member> | undefined
+   */
+  getMemberById(idInput: string | undefined): Observable<Member> | undefined {
+    //#region performance section
+    // const member = this.memberCache.get('1-5-18-99-lastActive-male');
+    let member: Member | undefined;
+
+    this.memberCache.forEach((value: PaginatedResult<Member[]>) =>
+      value.result?.forEach((result: Member) => {
+        if (result && result.id === idInput) {
+          member = result;
+        }
+      }
+      ));
+
+    if (member) return of(member);
+    //#endregion
+
+    // all above code is for performance which prevent calling api if members were already loaded in getMembers()
+    return this.http.get<Member>(this.baseUrl + 'id/' + idInput);
   }
 
   //#region Helpers
