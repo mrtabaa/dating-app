@@ -29,7 +29,7 @@
         @if(loggedInUserSig && loggedInUserSig(); as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
-            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs[0]}}">
+            <img class="top-avatar" mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" width="165" height="165" priority alt="{{user.knownAs[0]}}">
             }
             @else() {
             {{user.knownAs[0] | titlecase}}
@@ -52,7 +52,7 @@
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
-                    <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill alt="{{user.knownAs}}">
+                    <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" width="165" height="165" priority alt="{{user.knownAs}}">
                     }
                     @else {
                     {{user.knownAs[0] | titlecase}}
