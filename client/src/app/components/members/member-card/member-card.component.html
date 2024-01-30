@@ -1,14 +1,16 @@
 @if (member) {
 <mat-card class="card" [routerLink]="['/member/' + member.id]">
     <div class="card-img-wrapper">
+        @if (member.photos.length === 0) {
+        <img ngSrc="/assets/images/defaults/user.png" width="128" height="128" alt="{{member.knownAs}} photo"
+            mat-card-image>
+        }
+        @else {
         @for (photo of member.photos; track $index) {
         @if (photo.isMain) {
         <img ngSrc="{{apiPhotoUrl + photo.url_165}}" width="128" height="128" alt="{{member.knownAs}}" mat-card-image>
         }
         }
-        @if (member.photos.length === 0) {
-        <img ngSrc="/assets/images/defaults/user.png" width="128" height="128" alt="{{member.knownAs}} photo"
-            mat-card-image>
         }
 
         <ul class="user-icons">
