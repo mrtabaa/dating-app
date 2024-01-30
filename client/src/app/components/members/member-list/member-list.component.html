@@ -13,7 +13,6 @@
         </div>
         <mat-divider></mat-divider>
         <div class="filter">
-            <h3>Filter</h3>
             <mat-form-field>
                 <mat-label>Gender</mat-label>
                 <mat-select [(ngModel)]="gender" name="gender">
@@ -39,11 +38,11 @@
                 </mat-select>
             </mat-form-field>
             <div class="buttons">
-                <button mat-mini-fab (click)="getFilteredMembers()" [disabled]="disableFilterBotton()" color="primary">
-                    <mat-icon>filter_alt</mat-icon>
+                <button mat-stroked-button (click)="getFilteredMembers()" [disabled]="disableFilterBotton()" color="primary">
+                    Filter
                 </button>
-                <button mat-mini-fab (click)="resetFilter()" [disabled]="disableResetBotton()" color="primary">
-                    <mat-icon>undo</mat-icon>
+                <button mat-stroked-button (click)="resetFilter()" [disabled]="disableResetBotton()" color="warn">
+                    Reset
                 </button>
             </div>
         </div>
