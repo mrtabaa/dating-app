@@ -110,38 +110,6 @@ export class MemberListComponent implements OnDestroy {
     }
   }
 
-  disableFilterBotton(): boolean {
-    if (this.loggedInGender) {
-      const memberParams = new MemberParams(this.loggedInGender);
-      if (this.minAge > this.maxAge ||
-        (
-          this.gender == memberParams.gender
-          && this.minAge === memberParams.minAge
-          && this.maxAge === memberParams.maxAge
-        )
-      ) {
-        return true
-      }
-    }
-
-    return false;
-  }
-
-  disableResetBotton(): boolean {
-    if (this.loggedInGender) {
-      const memberParams = new MemberParams(this.loggedInGender);
-      if (
-        this.gender == memberParams.gender
-        && this.minAge === memberParams.minAge
-        && this.maxAge === memberParams.maxAge
-      ) {
-        return true
-      }
-    }
-
-    return false;
-  }
-
   getMembers(): void {
     if (this.memberParams) {
       this.subscribed = this.memberService.getMembers(this.memberParams).subscribe({
