@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { PaginatedResult } from '../models/helpers/pagination';
 import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
@@ -13,11 +13,21 @@ export class MemberService {
   private http = inject(HttpClient);
 
   baseUrl: string = environment.apiUrl + 'member/';
+  memberCache = new Map();
 
   getMembers(memberParams: MemberParams): Observable<PaginatedResult<Member[]>> {
+
+    const response = this.memberCache.get(Object.values(memberParams).join('-'));
+    if (response) return of(response);
+
     const params = this.getHttpParams(memberParams);
 
-    return this.getPaginatedResult<Member[]>(this.baseUrl, params);
+    return this.getPaginatedResult<Member[]>(this.baseUrl, params).pipe(
+      map(response => {
+        this.memberCache.set(Object.values(memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+        return response;
+      })
+    );
   }
 
   private getHttpParams(memberParams: MemberParams): HttpParams {
