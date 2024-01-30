@@ -30,6 +30,11 @@ export class MemberService {
     );
   }
 
+  getMemberById(id: string | undefined): Observable<Member> | undefined {
+    return this.http.get<Member>(this.baseUrl + 'id/' + id);
+  }
+
+  //#region Helpers
   private getHttpParams(memberParams: MemberParams): HttpParams {
     let params = new HttpParams();
 
@@ -65,8 +70,5 @@ export class MemberService {
       })
     );
   }
-
-  getMemberById(id: string | undefined): Observable<Member> | undefined {
-    return this.http.get<Member>(this.baseUrl + 'id/' + id);
-  }
+  //#endregion
 }
