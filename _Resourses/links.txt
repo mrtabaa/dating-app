@@ -1,2 +1,15 @@
 MongoDb operations:
 https://mongodb.github.io/mongo-csharp-driver/2.0/getting_started/quick_tour/
+
+Pipes library: timeAgo, country, currency, etc.
+npm install angular-ecmascript-intl --save
+
+ng-gallery
+https://ngx-gallery.netlify.app/#/getting-started/gallery
+
+ng2-file-upload
+https://valor-software.com/ng2-file-upload/
+
+ngx-spinner
+https://www.npmjs.com/package/ngx-spinner
+https://napster2210.github.io/ngx-spinner/
