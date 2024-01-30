@@ -38,7 +38,7 @@ namespace api.DTOs
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                     KnownAs: appUser.KnownAs,
                     Created: appUser.Created,
-                    LastActive: DateTime.UtcNow,
+                    LastActive: appUser.LastActive,
                     Gender: appUser.Gender,
                     Introduction: appUser.Introduction,
                     LookingFor: appUser.LookingFor,
