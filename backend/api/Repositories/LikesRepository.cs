@@ -24,23 +24,44 @@ public class LikesRepository : ILikesRepository
     }
     #endregion
 
-    async Task<bool> ILikesRepository.AddLikeAsync(string? loggedInUserId, string targetMemberId, CancellationToken cancellationToken)
+    async Task<LikeStatus> ILikesRepository.AddLikeAsync(string? loggedInUserId, string targetMemberId, CancellationToken cancellationToken)
     {
-        AppUser? targetAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
+        LikeStatus likeStatus = new();
 
+        bool doesExist = await _collection.Find<Like>(like =>
+            like.LoggedInUserId == loggedInUserId
+            && like.TargetMemberId == targetMemberId)
+            .AnyAsync(cancellationToken: cancellationToken);
+
+        if (doesExist)
+        {
+            likeStatus.IsAlreadyLiked = true;
+            return likeStatus;
+        }
+
+        AppUser? targetAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
         if (targetAppUser is not null)
         {
             Like? like = Mappers.ConvertAppUsertoLike(targetAppUser, loggedInUserId);
 
             if (like is not null)
             {
-                await _collection.InsertOneAsync(like);
+                try
+                {
+                    await _collection.InsertOneAsync(like);
 
-                return true; // success
+                    likeStatus.IsSuccess = true;
+                    return likeStatus; // success
+                }
+                catch (System.Exception)
+                {
+
+                    return likeStatus;
+                }
             }
         }
 
-        return false; // appUser not found
+        return likeStatus; // Faild
     }
 
     // async Task<IEnumerable<Like>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string targetMemberId, string predicate, CancellationToken cancellationToken)

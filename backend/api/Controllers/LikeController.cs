@@ -12,13 +12,19 @@ public class LikeController(ILikesRepository _likesRepository) : BaseApiControll
 
         if (!string.IsNullOrEmpty(loggedInUserId))
         {
-            bool success = await _likesRepository.AddLikeAsync(loggedInUserId, targetMemberId, cancellationToken);
-            if (success)
+            if (loggedInUserId == targetMemberId)
+                return BadRequest("Liking yourself is great but is not stored!");
+
+            LikeStatus likeStatus = await _likesRepository.AddLikeAsync(loggedInUserId, targetMemberId, cancellationToken);
+            if (likeStatus.IsSuccess)
                 return Ok();
+
+            if (likeStatus.IsAlreadyLiked)
+                return BadRequest("The user is already liked.");
 
             return BadRequest("Liking the member failed. Try agian.");
         }
 
-        return BadRequest("The user is not logged-in or ID has failed. Contact the admin.");
+        return BadRequest("Operation failed. Contact the admin.");
     }
 }
