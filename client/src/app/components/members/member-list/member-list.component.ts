@@ -74,7 +74,6 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   getMembers(): void {
     if (this.memberParams) {
-      console.log('component getMembers()', this.memberParams)
 
       this.memberService.setMemberParams(this.memberParams);
 

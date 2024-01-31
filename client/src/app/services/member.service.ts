@@ -20,15 +20,20 @@ export class MemberService {
   loggedInGender: string | undefined;
 
   constructor() {
-    effect(() => {
-      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
+    const memberParamsString = localStorage.getItem('memberParams');
+    if (memberParamsString)
+      this.memberParams = JSON.parse(memberParamsString);
+    else
+      effect(() => {
+        this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
 
-      if (this.loggedInGender) {
-        this.memberParams = new MemberParams(this.loggedInGender);
+        if (this.loggedInGender) {
+          this.memberParams = new MemberParams(this.loggedInGender);
+          localStorage.setItem('memberParams', JSON.stringify(this.memberParams));
 
-        this.getMembers();
-      }
-    });
+          this.getMembers();
+        }
+      });
   }
 
   setMemberParams(memberParamsInput: MemberParams): void {
@@ -44,7 +49,6 @@ export class MemberService {
     if (this.loggedInGender)
       return new MemberParams(this.loggedInGender);
 
-    console.log('restet', this.loggedInGender);
     return;
   }
 
