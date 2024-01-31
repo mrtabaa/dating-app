@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.subscrition = this.accountService.login(userLoginInput)
       .subscribe({
         next: res => {
-          console.log('User:', res)
+          // console.log('User:', res)
         },
         error: err => this.snackBar.open(err.error, "Close", {
           horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000
