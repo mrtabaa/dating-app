@@ -54,7 +54,7 @@
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
                     <img mat-card-avatar ngSrc="{{basePhotoUrl + user.profilePhotoUrl}}" fill priority
-                        alt="{{user.knownAs}}">
+                        alt="{{user.knownAs[0]}}">
                     }
                     @else {
                     {{user.knownAs[0] | titlecase}}
