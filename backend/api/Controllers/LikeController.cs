@@ -8,8 +8,8 @@ public class LikeController(ILikesRepository _likesRepository) : BaseApiControll
     [HttpPost("{targetMemberId}")]
     public async Task<ActionResult> AddLike(string targetMemberId, CancellationToken cancellationToken)
     {
-        // if (!ValidateMongoDbId(targetMemberId))
-        //     return BadRequest("Invalid id is given.");
+        if (!ValidateMongoDbId(targetMemberId))
+            return BadRequest("Invalid id is given.");
 
         string? loggedInUserId = User.GetUserId();
 
@@ -45,9 +45,9 @@ public class LikeController(ILikesRepository _likesRepository) : BaseApiControll
         return likes;
     }
 
-    // private static bool ValidateMongoDbId(string targetMemberId)
-    // {
-    //     // TODO Validate all mongo IDs before any query to prevent exceptions
-    //     return ObjectId.TryParse(targetMemberId, out ObjectId objectId);
-    // }
+    private static bool ValidateMongoDbId(string targetMemberId)
+    {
+        // TODO Validate all mongo IDs before any query to prevent exceptions
+        return ObjectId.TryParse(targetMemberId, out ObjectId objectId);
+    }
 }
