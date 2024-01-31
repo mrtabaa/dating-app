@@ -30,6 +30,9 @@ mat-toolbar {
             font-size: 1.5rem;
 
             .top-avatar {
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 position: absolute;
                 top: 0;
                 left: 0;
