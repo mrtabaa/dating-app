@@ -9,7 +9,9 @@ public class UserRepository : IUserRepository
 
     // constructor - dependency injections
     public UserRepository(
-        IMongoClient client, IMongoDbSettings dbSettings, ILogger<UserRepository> logger, IPhotoService photoService)
+        IMongoClient client, IMongoDbSettings dbSettings,
+        ILogger<UserRepository> logger, IPhotoService photoService
+        )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(_collectionName);
