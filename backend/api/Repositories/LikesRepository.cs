@@ -64,12 +64,18 @@ public class LikesRepository : ILikesRepository
         return likeStatus; // Faild
     }
 
-    // async Task<IEnumerable<Like>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string targetMemberId, string predicate, CancellationToken cancellationToken)
-    // {
-    //     if (predicate.Equals("liked"))
-    //         return await _collection.Find<Like>(like => like.LoggedInUserId == loggedInUserId && like.TargetMemberId == targetMemberId).ToListAsync();
+    async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string predicate, CancellationToken cancellationToken)
+    {
+        if (predicate.Equals("liked"))
+            return await _collection.Find<Like>(like =>
+                like.LoggedInUserId == loggedInUserId)
+                .ToListAsync(cancellationToken);
 
-    //     if (predicate.Equals("likedBy"))
-    //         return await _collection.Find<Like>(like => like.LoggedInUserId == loggedInUserId && like.TargetMemberId == targetMemberId).ToListAsync();
-    // }
+        if (predicate.Equals("liked-by"))
+            return await _collection.Find<Like>(like =>
+                like.TargetMemberId == loggedInUserId)
+                .ToListAsync(cancellationToken);
+
+        return null;
+    }
 }
