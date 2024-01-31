@@ -75,20 +75,16 @@ export class MemberListComponent implements OnInit, OnDestroy {
   }
 
   getMembers(): void {
-    console.log('COMP getMembers()')
-    if (this.memberParams) {
+    this.setMemberParams();
 
-      this.memberService.setMemberParams(this.memberParams);
-
-      this.subscribed = this.memberService.getMembers().subscribe({
-        next: response => {
-          if (response.result && response.pagination) {
-            this.members = response.result;
-            this.pagination = response.pagination;
-          }
+    this.subscribed = this.memberService.getMembers().subscribe({
+      next: response => {
+        if (response.result && response.pagination) {
+          this.members = response.result;
+          this.pagination = response.pagination;
         }
-      });
-    }
+      }
+    });
   }
 
   handlePageEvent(e: PageEvent) {
@@ -99,6 +95,22 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
       this.memberService.setMemberParams(this.memberParams);
       this.getMembers();
+    }
+  }
+
+  /**
+   * Either send memberParams chosen by the user 
+   * Or load the stored memberParams from localStorage for the page refreshes. 
+   */
+  private setMemberParams(): void {
+    if (this.memberParams)
+      this.memberService.setMemberParams(this.memberParams);
+
+    else {
+      const memberParams = localStorage.getItem('memberParams'); 
+      
+      if (memberParams)
+      this.memberParams = JSON.parse(memberParams);
     }
   }
 }

@@ -20,20 +20,14 @@ export class MemberService {
   loggedInGender: string | undefined;
 
   constructor() {
-    // const memberParamsString = localStorage.getItem('memberParams');
-    // if (memberParamsString)
-    //   this.memberParams = JSON.parse(memberParamsString);
-    // else
     effect(() => {
-      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
+      const gender = this.accountService.loggedInUserSig()?.gender;
 
-      if (this.loggedInGender) {
-        localStorage.setItem('gender', this.loggedInGender); // keep it after effect is destroyed
+      if (gender) {
+        this.memberParams = new MemberParams(gender);
+        this.loggedInGender = gender;
 
-        this.memberParams = new MemberParams(this.loggedInGender);
-        this.setMemberParams(this.memberParams);
-
-        localStorage.setItem('memberParams', JSON.stringify(this.memberParams)); // prevent memberParams loss on browswer refresh
+        localStorage.setItem('memberParams', JSON.stringify(this.memberParams));
 
         this.getMembers(); // since it relies on memberParams and loggedInUserSig()?.gender, it has to be called in effect. 
       }
@@ -49,16 +43,16 @@ export class MemberService {
   }
 
   resetMemberParams(): MemberParams | undefined {
-    const gender = localStorage.getItem('gender');
 
-    if (gender)
-      return new MemberParams(gender);
+    if (this.loggedInGender)
+      return new MemberParams(this.loggedInGender);
 
     return;
   }
 
   getMembers(): Observable<PaginatedResult<Member[]>> {
-    let response;
+    let response: PaginatedResult<Member[]> | undefined;
+    console.log('getMembers()', this.memberParams);
 
     if (this.memberParams)
       response = this.memberCache.get(Object.values(this.memberParams).join('-'));
