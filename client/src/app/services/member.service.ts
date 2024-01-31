@@ -20,20 +20,24 @@ export class MemberService {
   loggedInGender: string | undefined;
 
   constructor() {
-    const memberParamsString = localStorage.getItem('memberParams');
-    if (memberParamsString)
-      this.memberParams = JSON.parse(memberParamsString);
-    else
-      effect(() => {
-        this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
+    // const memberParamsString = localStorage.getItem('memberParams');
+    // if (memberParamsString)
+    //   this.memberParams = JSON.parse(memberParamsString);
+    // else
+    effect(() => {
+      this.loggedInGender = this.accountService.loggedInUserSig()?.gender;
 
-        if (this.loggedInGender) {
-          this.memberParams = new MemberParams(this.loggedInGender);
-          localStorage.setItem('memberParams', JSON.stringify(this.memberParams));
+      if (this.loggedInGender) {
+        localStorage.setItem('gender', this.loggedInGender); // keep it after effect is destroyed
 
-          this.getMembers();
-        }
-      });
+        this.memberParams = new MemberParams(this.loggedInGender);
+        this.setMemberParams(this.memberParams);
+
+        localStorage.setItem('memberParams', JSON.stringify(this.memberParams)); // prevent memberParams loss on browswer refresh
+
+        this.getMembers(); // since it relies on memberParams and loggedInUserSig()?.gender, it has to be called in effect. 
+      }
+    });
   }
 
   setMemberParams(memberParamsInput: MemberParams): void {
@@ -41,26 +45,25 @@ export class MemberService {
   }
 
   getMemberParams(): MemberParams | undefined {
-    console.log('getParams(', this.memberParams);
     return this.memberParams;
   }
 
   resetMemberParams(): MemberParams | undefined {
-    if (this.loggedInGender)
-      return new MemberParams(this.loggedInGender);
+    const gender = localStorage.getItem('gender');
+
+    if (gender)
+      return new MemberParams(gender);
 
     return;
   }
 
   getMembers(): Observable<PaginatedResult<Member[]>> {
+    let response;
 
-    if (this.memberParams) {
-      const response = this.memberCache.get(Object.values(this.memberParams).join('-'));
+    if (this.memberParams)
+      response = this.memberCache.get(Object.values(this.memberParams).join('-'));
 
-      if (response) {
-        return of(response)
-      };
-    }
+    if (response) return of(response);
 
     const params = this.getHttpParams();
 

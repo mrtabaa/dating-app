@@ -69,10 +69,13 @@ export class MemberListComponent implements OnInit, OnDestroy {
   //#endregion auto-run methods
 
   resetFilter(): void {
-    this.memberService.resetMemberParams();
+    this.memberParams = this.memberService.resetMemberParams();
+
+    this.getMembers();
   }
 
   getMembers(): void {
+    console.log('COMP getMembers()')
     if (this.memberParams) {
 
       this.memberService.setMemberParams(this.memberParams);
