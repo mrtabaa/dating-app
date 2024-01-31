@@ -3,7 +3,7 @@ namespace api.DTOs
     public static class Mappers
     {
         #region Generator Methods
-        public static AppUser ConvertUserRegisterDtoToAppUser(UserRegisterDto userInput)
+        public static AppUser ConvertUserRegisterDtoToAppUser(UserRegisterDto userInput) //, int likedCount, int likedByCount
         {
             // manually dispose HMACSHA512 after being done
             using var hmac = new HMACSHA512();
@@ -25,6 +25,8 @@ namespace api.DTOs
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
                 Photos: []
+                // LikedCount: likedCount, // TODO add these
+                // LikedByCount: likedByCount
             );
         }
 
@@ -32,7 +34,7 @@ namespace api.DTOs
         {
             if (!(appUser.Id is null || appUser.Schema is null))
                 return new MemberDto(
-                    Schema: appUser.Schema,
+                    Schema: appUser.Schema, // TODO use this instead of calling the version list on other methods
                     Id: appUser.Id,
                     Email: appUser.Email,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
@@ -53,7 +55,7 @@ namespace api.DTOs
 
         public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
         {
-            if (!(appUser.Id is null || appUser.Schema is null))
+            if (!(appUser.Id is null || appUser.Schema is null)) // TODO remove schema from here
             {
                 return new LoggedInDto(
                     Id: appUser.Id,
@@ -72,7 +74,7 @@ namespace api.DTOs
         {
             if (isMain)
                 return new Photo(
-                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                        Schema: AppVariablesExtensions.AppVersions.Last<string>(), // TODO remove these, user appUser.Schema
                         Url_165: photoUrls[0],
                         Url_256: photoUrls[1],
                         Url_enlarged: photoUrls[2],
@@ -85,6 +87,25 @@ namespace api.DTOs
                     Url_256: photoUrls[1],
                     Url_enlarged: photoUrls[2],
                     IsMain: isMain
+            );
+        }
+
+        public static Like? ConvertAppUsertoLike(AppUser targetAppUser, string? loggedInUserId)
+        {
+            if (loggedInUserId is null || targetAppUser.Id is null)
+                return null;
+
+            return new Like(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Id: null,
+                LoggedInUserId: loggedInUserId,
+                TargetMemberId: targetAppUser.Id,
+                Email: targetAppUser.Email,
+                Age: targetAppUser.DateOfBirth.CalculateAge(),
+                KnownAs: targetAppUser.KnownAs,
+                Gender: targetAppUser.Gender,
+                City: targetAppUser.City,
+                PhotoUrl: targetAppUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
             );
         }
         #endregion Generator Methods
