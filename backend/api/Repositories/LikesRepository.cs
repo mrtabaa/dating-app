@@ -70,8 +70,7 @@ public class LikesRepository : ILikesRepository
         return likeStatus; // Faild
     }
 
-    // TODO Add DTO to remove Id before sending to client
-    async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    async Task<List<LikeDto>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         // TODO replace with ObjectId
@@ -82,15 +81,21 @@ public class LikesRepository : ILikesRepository
 
         if (predicate.Equals("liked"))
         {
-            return await _collection.Find<Like>(like => like.LoggedInUser.Id == loggedInUserId)
+            IEnumerable<Like> likes = await _collection.Find<Like>(like => like.LoggedInUser.Id == loggedInUserId)
                 .ToListAsync(cancellationToken);
+
+            return ConvertLikesToLikeDtos(likes);
         }
 
         if (predicate.Equals("liked-by"))
-            return await _collection.Find<Like>(like => like.TargetMember.Id == loggedInUserId)
+        {
+            IEnumerable<Like> likes = await _collection.Find<Like>(like => like.TargetMember.Id == loggedInUserId)
                 .ToListAsync(cancellationToken);
 
-        return null;
+            return ConvertLikesToLikeDtos(likes);
+        }
+
+        return [];
     }
 
     /// <summary>
@@ -106,5 +111,25 @@ public class LikesRepository : ILikesRepository
 
         return await _collectionUsers.UpdateOneAsync<AppUser>(appUser =>
             appUser.Id == targetMemberId, updateLikedByCount, null, cancellationToken);
+    }
+
+    /// <summary>
+    /// Get the list of Likes and convert them to a list of LikeDto
+    /// </summary>
+    /// <param name="likes"></param>
+    /// <returns>LikeDtos</returns>
+    private static List<LikeDto> ConvertLikesToLikeDtos(IEnumerable<Like> likes)
+    {
+        List<LikeDto> likeDtos = [];
+
+        if (!likes.Any())
+            return [];
+
+        foreach (Like like in likes)
+        {
+            likeDtos.Add(Mappers.ConvertLikeToLikeDto(like));
+        }
+
+        return likeDtos;
     }
 }

@@ -114,7 +114,26 @@ namespace api.DTOs
                     City: targetMember.City,
                     PhotoUrl: targetMember.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
                 )
+            );
+        }
 
+        public static LikeDto ConvertLikeToLikeDto(Like like)
+        {
+            return new LikeDto(
+                LoggedInUserDto: new LoggedInUserDto(
+                    Age: like.LoggedInUser.Age,
+                    KnownAs: like.LoggedInUser.KnownAs,
+                    Gender: like.LoggedInUser.Gender,
+                    City: like.LoggedInUser.City,
+                    PhotoUrl: like.LoggedInUser.PhotoUrl
+                ),
+                TargetMemberDto: new TargetMemberDto(
+                    Age: like.TargetMember.Age,
+                    KnownAs: like.TargetMember.KnownAs,
+                    Gender: like.TargetMember.Gender,
+                    City: like.TargetMember.City,
+                    PhotoUrl: like.TargetMember.PhotoUrl
+                )
             );
         }
         #endregion Generator Methods
