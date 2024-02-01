@@ -28,16 +28,16 @@ public class LikesRepository : ILikesRepository
     {
         LikeStatus likeStatus = new();
 
-        // bool doesExist = await _collection.Find<Like>(like =>
-        //     like.LoggedInUserId == loggedInUserId
-        //     && like.TargetMemberId == targetMemberId)
-        //     .AnyAsync(cancellationToken: cancellationToken);
+        bool doesExist = await _collection.Find<Like>(like =>
+            like.LoggedInUser.LoggedInUserId == loggedInUserId
+            && like.TargetMember.TargetMemberId == targetMemberId)
+            .AnyAsync(cancellationToken: cancellationToken);
 
-        // if (doesExist)
-        // {
-        //     likeStatus.IsAlreadyLiked = true;
-        //     return likeStatus;
-        // }
+        if (doesExist)
+        {
+            likeStatus.IsAlreadyLiked = true;
+            return likeStatus;
+        }
 
         AppUser? loggedInUserAppUser = await _userRepository.GetByIdAsync(loggedInUserId, cancellationToken);
         AppUser? targetMemberAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
@@ -66,11 +66,11 @@ public class LikesRepository : ILikesRepository
         return likeStatus; // Faild
     }
 
+    // TODO Add DTOs to not return extra items like other side of the like
     async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string predicate, CancellationToken cancellationToken)
     {
         if (predicate.Equals("liked"))
         {
-
             return await _collection.Find<Like>(like => like.LoggedInUser.LoggedInUserId == loggedInUserId)
                 .ToListAsync(cancellationToken);
         }
