@@ -4,6 +4,7 @@ namespace api.Repositories;
 public class LikesRepository : ILikesRepository
 {
     #region Db and Token Settings
+    private readonly IMongoClient _client; // used for Session
     private readonly IMongoCollection<Like> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
     private readonly IUserRepository _userRepository;
@@ -15,6 +16,7 @@ public class LikesRepository : ILikesRepository
         IUserRepository userRepository, ILogger<UserRepository> logger
         )
     {
+        _client = client; // used for Session
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<Like>("likes");
         _collectionUsers = dbName.GetCollection<AppUser>("users");
@@ -49,20 +51,29 @@ public class LikesRepository : ILikesRepository
 
             if (like is not null)
             {
+                // Create a session object that is used when leveraging transactions
+                using var session = await _client.StartSessionAsync(null, cancellationToken);
+
+                // Begin transaction
+                session.StartTransaction();
+
                 try
                 {
                     // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
-                    await _collection.InsertOneAsync(like, null, cancellationToken);
+                    await _collection.InsertOneAsync(session, like, null, cancellationToken);
 
-                    UpdateResult? updateResult = await UpdateLikedByCount(targetMemberAppUser.Id, cancellationToken);
+                    await UpdateLikedByCount(session, targetMemberAppUser.Id, cancellationToken);
 
                     likeStatus.IsSuccess = true;
                     return likeStatus; // success
                 }
                 catch (System.Exception ex)
                 {
-                    _logger.LogError("Like failed:" + ex.Message);
-                    return likeStatus;
+                    await session.AbortTransactionAsync(cancellationToken);
+
+                    _logger.LogError("Like failed. Error writing to MongoDB" + ex.Message);
+
+                    return likeStatus; // all false
                 }
             }
         }
@@ -100,17 +111,18 @@ public class LikesRepository : ILikesRepository
 
     /// <summary>
     /// Increament Liked-byCount of the member who was liked. (TargetMember)
+    /// This is part of a MondoDb session. MongoDb will undo insertion and update if any fails. So we don't need to verify the completion of the db process.
     /// </summary>
     /// <param name="targetMemberId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<UpdateResult?> UpdateLikedByCount(string? targetMemberId, CancellationToken cancellationToken)
+    private async Task UpdateLikedByCount(IClientSessionHandle session, string? targetMemberId, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateLikedByCount = Builders<AppUser>.Update
         .Inc(appUser => appUser.Liked_byCount, 1); // Increament by 1 for each like
 
-        return await _collectionUsers.UpdateOneAsync<AppUser>(appUser =>
-            appUser.Id == targetMemberId, updateLikedByCount, null, cancellationToken);
+        await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
+                appUser.Id == targetMemberId, updateLikedByCount, null, cancellationToken);
     }
 
     /// <summary>
