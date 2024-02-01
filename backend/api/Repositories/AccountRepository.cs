@@ -66,5 +66,8 @@ public class AccountRepository : IAccountRepository
 
         return null;
     }
+
+    public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
+       await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion CRUD
 }

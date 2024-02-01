@@ -1,9 +1,9 @@
 namespace api.Controllers;
 
-[AllowAnonymous] // never use this if you have [Authorize] on the mothods. [Authorize] gets ignored
 [Produces("application/json")]
 public class AccountController(IAccountRepository _accountRepository) : BaseApiController
 {
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<LoggedInDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
     {
@@ -14,6 +14,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return loggedInDto is null ? BadRequest("Email is already registered.") : loggedInDto;
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
@@ -22,6 +23,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return loggedInDto is null ? Unauthorized("Invalid username or password.") : loggedInDto;
     }
 
+    [Authorize] //TODO Test it in client on refresh. Add to teach if works
     [HttpGet]
     public async Task<ActionResult<LoggedInDto>> GetLoggedInUser(CancellationToken cancellationToken)
     {
@@ -30,5 +32,15 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserEmail(), token, cancellationToken);
 
         return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
+    }
+
+    // its Authorized
+    [HttpDelete("delete-user")]
+    public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
+    {
+        var temp = User.GetUserEmail();
+
+        DeleteResult? result = await _accountRepository.DeleteUserAsync(User.GetUserEmail(), cancellationToken);
+        return result is null ? BadRequest("Delete user failed!") : result;
     }
 }

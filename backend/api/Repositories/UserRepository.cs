@@ -74,9 +74,6 @@ public class UserRepository : IUserRepository
 
         return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == loggedInUserEmail, updatedUserLastActive, null, cancellationToken);
     }
-
-    public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
-        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion User Management
 
     #region Photo Management

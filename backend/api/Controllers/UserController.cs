@@ -12,14 +12,6 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
-
-    // TODO Move this to account
-    [HttpDelete("delete-user")]
-    public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
-    {
-        DeleteResult? result = await _userRepository.DeleteUserAsync(User.GetUserEmail(), cancellationToken);
-        return result is null ? BadRequest("Delete user failed!") : result;
-    }
     #endregion User Management
 
     #region Photo Management

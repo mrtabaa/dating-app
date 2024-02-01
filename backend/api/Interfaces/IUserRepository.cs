@@ -9,8 +9,6 @@ public interface IUserRepository
 
     public Task<UpdateResult?> UpdateLastActive(string loggedInUserId, CancellationToken cancellationToken);
 
-    public Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken);
-
     public Task<Photo?> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? urlIn, CancellationToken cancellationToken);
