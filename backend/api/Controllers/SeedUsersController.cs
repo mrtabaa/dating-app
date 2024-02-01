@@ -42,24 +42,7 @@ public class SeedUsersController : BaseApiController
         // add each user to DB
         foreach (var userInput in inputUsersDummy)
         {
-            AppUser appUser = new(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: null,
-                Email: userInput.Email.ToLower(),
-                PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password!)),
-                PasswordSalt: hmac.Key,
-                DateOfBirth: userInput.DateOfBirth,
-                KnownAs: userInput.KnownAs,
-                Created: DateTime.UtcNow,
-                LastActive: DateTime.UtcNow,
-                Gender: userInput.Gender,
-                Introduction: userInput.Introduction,
-                LookingFor: userInput.LookingFor,
-                Interests: userInput.Interests,
-                City: userInput.City,
-                Country: userInput.Country,
-                Photos: userInput.Photos!
-            );
+            AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(userInput);
 
             await _collection!.InsertOneAsync(appUser);
         }
