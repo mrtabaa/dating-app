@@ -59,6 +59,7 @@ public class LikesRepository : ILikesRepository
 
                 try
                 {
+                    // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
                     await _collection.InsertOneAsync(session, like, null, cancellationToken);
 
                     await UpdateLikedByCount(session, targetMemberAppUser.Id, cancellationToken);
@@ -110,7 +111,7 @@ public class LikesRepository : ILikesRepository
 
     /// <summary>
     /// Increament Liked-byCount of the member who was liked. (TargetMember)
-    /// This is part of a MondoDb session. MongoDb will undo Insert and Update if any fails. So we don't need to verify the completion of the db process.
+    /// This is part of a MondoDb session. MongoDb will undo insertion and update if any fails. So we don't need to verify the completion of the db process.
     /// </summary>
     /// <param name="targetMemberId"></param>
     /// <param name="cancellationToken"></param>
