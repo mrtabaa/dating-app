@@ -54,7 +54,7 @@ namespace api.DTOs
 
         public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
         {
-            if (!(appUser.Id is null || appUser.Schema is null)) // TODO remove schema from here
+            if (appUser.Id is not null)
             {
                 return new LoggedInDto(
                     Id: appUser.Id,
