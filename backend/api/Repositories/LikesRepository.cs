@@ -82,12 +82,12 @@ public class LikesRepository : ILikesRepository
 
         if (predicate.Equals("liked"))
         {
-            return await _collection.Find<Like>(like => like.LoggedInUser.LoggedInUserId == loggedInUserId)
+            return await _collection.Find<Like>(like => like.LoggedInUser.Id == loggedInUserId)
                 .ToListAsync(cancellationToken);
         }
 
         if (predicate.Equals("liked-by"))
-            return await _collection.Find<Like>(like => like.TargetMember.TargetMemberId == loggedInUserId)
+            return await _collection.Find<Like>(like => like.TargetMember.Id == loggedInUserId)
                 .ToListAsync(cancellationToken);
 
         return null;
