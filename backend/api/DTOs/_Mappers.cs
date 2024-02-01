@@ -90,22 +90,33 @@ namespace api.DTOs
             );
         }
 
-        public static Like? ConvertAppUsertoLike(AppUser targetAppUser, string? loggedInUserId)
+        public static Like? ConvertAppUsertoLike(AppUser loggedInUser, AppUser targetMember, string? loggedInUserId)
         {
-            if (loggedInUserId is null || targetAppUser.Id is null)
+            if (loggedInUserId is null || loggedInUser.Id is null || targetMember.Id is null)
                 return null;
 
             return new Like(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: null,
-                LoggedInUserId: loggedInUserId,
-                TargetMemberId: targetAppUser.Id,
-                Email: targetAppUser.Email,
-                Age: targetAppUser.DateOfBirth.CalculateAge(),
-                KnownAs: targetAppUser.KnownAs,
-                Gender: targetAppUser.Gender,
-                City: targetAppUser.City,
-                PhotoUrl: targetAppUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
+                LoggedInUser: new LoggedInUser(
+                    loggedInUserId = loggedInUser.Id,
+                    Email: loggedInUser.Email,
+                    Age: loggedInUser.DateOfBirth.CalculateAge(),
+                    KnownAs: loggedInUser.KnownAs,
+                    Gender: loggedInUser.Gender,
+                    City: loggedInUser.City,
+                    PhotoUrl: loggedInUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
+                ),
+                TargetMember: new TargetMember(
+                    TargetMemberId: targetMember.Id,
+                    Email: targetMember.Email,
+                    Age: targetMember.DateOfBirth.CalculateAge(),
+                    KnownAs: targetMember.KnownAs,
+                    Gender: targetMember.Gender,
+                    City: targetMember.City,
+                    PhotoUrl: targetMember.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
+                )
+
             );
         }
         #endregion Generator Methods

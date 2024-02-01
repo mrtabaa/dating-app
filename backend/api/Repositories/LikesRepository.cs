@@ -28,21 +28,23 @@ public class LikesRepository : ILikesRepository
     {
         LikeStatus likeStatus = new();
 
-        bool doesExist = await _collection.Find<Like>(like =>
-            like.LoggedInUserId == loggedInUserId
-            && like.TargetMemberId == targetMemberId)
-            .AnyAsync(cancellationToken: cancellationToken);
+        // bool doesExist = await _collection.Find<Like>(like =>
+        //     like.LoggedInUserId == loggedInUserId
+        //     && like.TargetMemberId == targetMemberId)
+        //     .AnyAsync(cancellationToken: cancellationToken);
 
-        if (doesExist)
-        {
-            likeStatus.IsAlreadyLiked = true;
-            return likeStatus;
-        }
+        // if (doesExist)
+        // {
+        //     likeStatus.IsAlreadyLiked = true;
+        //     return likeStatus;
+        // }
 
-        AppUser? targetAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
-        if (targetAppUser is not null)
+        AppUser? loggedInUserAppUser = await _userRepository.GetByIdAsync(loggedInUserId, cancellationToken);
+        AppUser? targetMemberAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
+
+        if (loggedInUserAppUser is not null && targetMemberAppUser is not null)
         {
-            Like? like = Mappers.ConvertAppUsertoLike(targetAppUser, loggedInUserId);
+            Like? like = Mappers.ConvertAppUsertoLike(loggedInUserAppUser, targetMemberAppUser, loggedInUserId);
 
             if (like is not null)
             {
@@ -66,15 +68,19 @@ public class LikesRepository : ILikesRepository
 
     async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string predicate, CancellationToken cancellationToken)
     {
-        if (predicate.Equals("liked"))
-            return await _collection.Find<Like>(like =>
-                like.LoggedInUserId == loggedInUserId)
-                .ToListAsync(cancellationToken);
+        // if (predicate.Equals("liked"))
+        // {
+        //     var query = _collection.AsQueryable().Where()
 
-        if (predicate.Equals("liked-by"))
-            return await _collection.Find<Like>(like =>
-                like.TargetMemberId == loggedInUserId)
-                .ToListAsync(cancellationToken);
+        // return await _collection.Find<Like>(like =>
+        //     like.LoggedInUserId == loggedInUserId)
+        //     .ToListAsync(cancellationToken);
+        // }
+
+        // if (predicate.Equals("liked-by"))
+        //     return await _collection.Find<Like>(like =>
+        //         like.TargetMemberId == loggedInUserId)
+        //         .ToListAsync(cancellationToken);
 
         return null;
     }
