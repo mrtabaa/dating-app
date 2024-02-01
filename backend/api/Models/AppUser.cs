@@ -16,5 +16,7 @@ public record AppUser(
     string? Interests,
     string City,
     string Country,
-    List<Photo> Photos
+    List<Photo> Photos, // TODO limit to 100 photos
+    int Liked_byCount
+// int FriendsCount // TODO pre-calc number of friends
 );

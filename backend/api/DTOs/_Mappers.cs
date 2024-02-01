@@ -24,9 +24,8 @@ namespace api.DTOs
                 Interests: userInput.Interests?.Trim(),
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
-                Photos: []
-                // LikedCount: likedCount, // TODO add these
-                // LikedByCount: likedByCount
+                Photos: [],
+                Liked_byCount: 0
             );
         }
 
