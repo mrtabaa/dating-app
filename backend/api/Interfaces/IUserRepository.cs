@@ -1,7 +1,7 @@
 namespace api.Interfaces;
 public interface IUserRepository
 {
-    // public Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken);
+    public Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken);
 
     public Task<AppUser?> GetByEmailAsync(string? userEmail, CancellationToken cancellationToken);
 

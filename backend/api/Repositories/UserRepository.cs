@@ -25,18 +25,17 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    // TODO uncomment
-    // public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
-    // {
-    //     if (userId is not null)
-    //     {
-    //         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+    public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
+    {
+        if (userId is not null)
+        {
+            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-    //         return appUser is null ? null : appUser;
-    //     }
+            return appUser is null ? null : appUser;
+        }
 
-    //     return null;
-    // }
+        return null;
+    }
 
     public async Task<AppUser?> GetByEmailAsync(string? userEmail, CancellationToken cancellationToken)
     {
