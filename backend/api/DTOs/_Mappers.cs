@@ -33,7 +33,7 @@ namespace api.DTOs
         {
             if (!(appUser.Id is null || appUser.Schema is null))
                 return new MemberDto(
-                    Schema: appUser.Schema, // TODO use this instead of calling the version list on other methods
+                    Schema: appUser.Schema,
                     Id: appUser.Id,
                     Email: appUser.Email,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
@@ -73,7 +73,7 @@ namespace api.DTOs
         {
             if (isMain)
                 return new Photo(
-                        Schema: AppVariablesExtensions.AppVersions.Last<string>(), // TODO remove these, user appUser.Schema
+                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                         Url_165: photoUrls[0],
                         Url_256: photoUrls[1],
                         Url_enlarged: photoUrls[2],
@@ -95,7 +95,7 @@ namespace api.DTOs
                 return null;
 
             return new Like(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Schema: loggedInUser.Schema,
                 Id: null,
                 LoggedInUser: new LoggedInUser(
                     loggedInUserId = loggedInUser.Id,
