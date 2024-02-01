@@ -25,13 +25,13 @@ public class LikesRepository : ILikesRepository
     }
     #endregion
 
-    async Task<LikeStatus> ILikesRepository.AddLikeAsync(string? loggedInUserId, string targetMemberId, CancellationToken cancellationToken)
+    async Task<LikeStatus> ILikesRepository.AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
     {
         LikeStatus likeStatus = new();
 
         bool doesExist = await _collection.Find<Like>(like =>
-            like.LoggedInUser.LoggedInUserId == loggedInUserId
-            && like.TargetMember.TargetMemberId == targetMemberId)
+            like.LoggedInUser.Email == loggedInUserEmail
+            && like.TargetMember.Email == targetMemberEmail)
             .AnyAsync(cancellationToken: cancellationToken);
 
         if (doesExist)
@@ -40,12 +40,12 @@ public class LikesRepository : ILikesRepository
             return likeStatus;
         }
 
-        AppUser? loggedInUserAppUser = await _userRepository.GetByIdAsync(loggedInUserId, cancellationToken);
-        AppUser? targetMemberAppUser = await _userRepository.GetByIdAsync(targetMemberId, cancellationToken);
+        AppUser? loggedInUserAppUser = await _userRepository.GetByEmailAsync(loggedInUserEmail, cancellationToken);
+        AppUser? targetMemberAppUser = await _userRepository.GetByEmailAsync(targetMemberEmail, cancellationToken);
 
-        if (!(loggedInUserAppUser is null || targetMemberAppUser is null || loggedInUserId is null))
+        if (!(loggedInUserAppUser is null || targetMemberAppUser is null))
         {
-            Like? like = Mappers.ConvertAppUsertoLike(loggedInUserAppUser, targetMemberAppUser, loggedInUserId);
+            Like? like = Mappers.ConvertAppUsertoLike(loggedInUserAppUser, targetMemberAppUser);
 
             if (like is not null)
             {
@@ -54,7 +54,7 @@ public class LikesRepository : ILikesRepository
                     // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
                     await _collection.InsertOneAsync(like, null, cancellationToken);
 
-                    UpdateResult? updateResult = await UpdateLikedByCount(targetMemberId, cancellationToken);
+                    UpdateResult? updateResult = await UpdateLikedByCount(targetMemberAppUser.Id, cancellationToken);
 
                     likeStatus.IsSuccess = true;
                     return likeStatus; // success
@@ -70,9 +70,16 @@ public class LikesRepository : ILikesRepository
         return likeStatus; // Faild
     }
 
-    // TODO Add DTOs to not return extra items like other side of the like
-    async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserId, string predicate, CancellationToken cancellationToken)
+    // TODO Add DTO to remove Id before sending to client
+    async Task<List<Like>?> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
+        // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
+        // TODO replace with ObjectId
+        string? loggedInUserId = await _collectionUsers.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Email == loggedInUserEmail)
+            .Select(appUser => appUser.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+
         if (predicate.Equals("liked"))
         {
             return await _collection.Find<Like>(like => like.LoggedInUser.LoggedInUserId == loggedInUserId)
@@ -92,7 +99,7 @@ public class LikesRepository : ILikesRepository
     /// <param name="targetMemberId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<UpdateResult?> UpdateLikedByCount(string targetMemberId, CancellationToken cancellationToken)
+    private async Task<UpdateResult?> UpdateLikedByCount(string? targetMemberId, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateLikedByCount = Builders<AppUser>.Update
         .Inc(appUser => appUser.Liked_byCount, 1); // Increament by 1 for each like

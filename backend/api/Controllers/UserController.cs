@@ -8,15 +8,16 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpPut]
     public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        UpdateResult? result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserId(), cancellationToken);
+        UpdateResult? result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserEmail(), cancellationToken);
 
         return result is null ? BadRequest("Update failed. See logger") : result;
     }
 
+    // TODO Move this to account
     [HttpDelete("delete-user")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
-        DeleteResult? result = await _userRepository.DeleteUserAsync(User.GetUserId(), cancellationToken);
+        DeleteResult? result = await _userRepository.DeleteUserAsync(User.GetUserEmail(), cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
     #endregion User Management
@@ -28,7 +29,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
-        Photo? photo = await _userRepository.UploadPhotoAsync(file, User.GetUserId(), cancellationToken);
+        Photo? photo = await _userRepository.UploadPhotoAsync(file, User.GetUserEmail(), cancellationToken);
 
         return photo is null ? BadRequest("Add photo failed. See logger") : photo;
     }
@@ -36,13 +37,13 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        UpdateResult? result = await _userRepository.DeleteOnePhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
+        UpdateResult? result = await _userRepository.DeleteOnePhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }
 
     [HttpPut("set-main-photo")]
     public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
-        await _userRepository.SetMainPhotoAsync(User.GetUserId(), photoUrlIn, cancellationToken);
+        await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
     #endregion Photo Management
 }

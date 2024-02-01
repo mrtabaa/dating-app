@@ -12,15 +12,15 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
         // return if User is not authenticated
         if (resultContext.HttpContext.User.Identity is not null && !resultContext.HttpContext.User.Identity.IsAuthenticated) return;
 
-        string? loggedInUserId = resultContext.HttpContext.User.GetUserId();
+        string? loggedInUserEmail = resultContext.HttpContext.User.GetUserEmail();
 
         IUserRepository userRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
 
-        if (!string.IsNullOrEmpty(loggedInUserId))
+        if (!string.IsNullOrEmpty(loggedInUserEmail))
         {
-            UpdateResult? updateResult = await userRepository.UpdateLastActive(loggedInUserId, cancellationToken);
+            UpdateResult? updateResult = await userRepository.UpdateLastActive(loggedInUserEmail, cancellationToken);
 
             if (updateResult?.ModifiedCount == 0)
                 _logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");

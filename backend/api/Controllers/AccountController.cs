@@ -27,7 +27,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     {
         string? token = Response.HttpContext.GetTokenAsync("access_token").Result;
 
-        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserId(), token, cancellationToken);
+        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserEmail(), token, cancellationToken);
 
         return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
     }

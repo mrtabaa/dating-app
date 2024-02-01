@@ -27,10 +27,10 @@ public class AccountRepository : IAccountRepository
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(userInput);
 
         // Insertion successful OR throw an exception
-        await _collection!.InsertOneAsync(appUser); // mark ! after _collection! tells compiler it's nullable
+        await _collection!.InsertOneAsync(appUser, null, cancellationToken); // mark ! after _collection! tells compiler it's nullable
 
-        if (appUser.Id is null)
-            _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
+        if (appUser.Email is null)
+            _ = appUser.Email ?? throw new ArgumentException("appUser.Email cannot be null", nameof(appUser.Email));
 
         return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
     }
@@ -41,8 +41,8 @@ public class AccountRepository : IAccountRepository
 
         if (appUser is null) return null;
 
-        if (appUser.Id is null)
-            _ = appUser.Id ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Id));
+        if (appUser.Email is null)
+            _ = appUser.Email ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Email));
 
         using var hmac = new HMACSHA512(appUser.PasswordSalt!);
         var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
@@ -55,11 +55,11 @@ public class AccountRepository : IAccountRepository
         return null;
     }
 
-    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userId, string? token, CancellationToken cancellationToken)
+    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userEmail, string? token, CancellationToken cancellationToken)
     {
-        if (!(userId is null || token is null))
+        if (!(userEmail is null || token is null))
         {
-            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
 
             return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
         }

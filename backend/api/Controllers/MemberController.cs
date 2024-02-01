@@ -11,7 +11,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
 
         List<MemberDto?> memberDtos = [];
 
-        AppUser? appUser = await _userRepository.GetByIdAsync(User.GetUserId(), cancellationToken);
+        AppUser? appUser = await _userRepository.GetByEmailAsync(User.GetUserEmail(), cancellationToken);
 
         if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
         {

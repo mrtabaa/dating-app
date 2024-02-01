@@ -25,11 +25,24 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
+    // TODO uncomment
+    // public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
+    // {
+    //     if (userId is not null)
+    //     {
+    //         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+
+    //         return appUser is null ? null : appUser;
+    //     }
+
+    //     return null;
+    // }
+
+    public async Task<AppUser?> GetByEmailAsync(string? userEmail, CancellationToken cancellationToken)
     {
-        if (userId is not null)
+        if (userEmail is not null)
         {
-            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
 
             return appUser is null ? null : appUser;
         }
@@ -37,9 +50,9 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userEmail, CancellationToken cancellationToken)
     {
-        if (userId is not null)
+        if (userEmail is not null)
         {
             var updatedUser = Builders<AppUser>.Update
             .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
@@ -49,42 +62,43 @@ public class UserRepository : IUserRepository
             .Set(appUser => appUser.City, userUpdateDto.City.Trim())
             .Set(appUser => appUser.Country, userUpdateDto.Country.Trim());
 
-            return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+            return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, updatedUser, null, cancellationToken);
         }
 
         return null;
     }
 
-    public async Task<UpdateResult?> UpdateLastActive(string loggedInUserId, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateLastActive(string loggedInUserEmail, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == loggedInUserId, updatedUserLastActive, null, cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == loggedInUserEmail, updatedUserLastActive, null, cancellationToken);
     }
 
-    public async Task<DeleteResult?> DeleteUserAsync(string? userId, CancellationToken cancellationToken) =>
-        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Id == userId, cancellationToken);
+    public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
+        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion User Management
 
     #region Photo Management
-    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken)
+    // TODO test this in linux with Postman
+    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userEmail, CancellationToken cancellationToken)
     {
-        if (userId is null)
+        if (userEmail is null)
         {
-            _logger.LogError("userId is Null");
+            _logger.LogError("userEmail is Null");
             return null;
         }
 
-        AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
-        if (appUser is null)
+        AppUser? appUser = await GetByEmailAsync(userEmail, cancellationToken);
+        if (appUser is null || appUser.Id is null)
         {
             _logger.LogError("user is Null / not found");
             return null;
         }
 
-        // save file in Storage using PhotoService / userId makes the folder name
-        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, userId);
+        // save file in Storage using PhotoService / userEmail makes the folder name
+        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id);
 
         if (photoUrls is not null)
         {
@@ -105,7 +119,7 @@ public class UserRepository : IUserRepository
                 .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
                 .Set(doc => doc.Photos, appUser.Photos);
 
-            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, updatedUser, null, cancellationToken);
 
             // return the save photo if save on disk and DB
             return photoUrls is not null && result.ModifiedCount == 1 ? photo : null;
@@ -115,13 +129,14 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userId, string? url_165_In, CancellationToken cancellationToken)
+    // TODO test this in linux with Postman
+    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
     {
         List<string> photoUrls = [];
 
-        List<Photo>? photos = await _collection.AsQueryable().Where<AppUser>(appUser => appUser.Id == userId).Select(elem => elem.Photos).SingleOrDefaultAsync();
+        List<Photo>? photos = await _collection.AsQueryable().Where<AppUser>(appUser => appUser.Email == userEmail).Select(elem => elem.Photos).SingleOrDefaultAsync(cancellationToken);
 
-        if (photos is null || photos.Count() < 2)
+        if (photos is null || photos.Count < 2)
         {
             _logger.LogError("Album is empty OR the requested photo is the MainPhoto. No photo to delete.");
             return null;
@@ -149,19 +164,20 @@ public class UserRepository : IUserRepository
 
         var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, update, null, cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(string? userId, string photoUrlIn, CancellationToken cancellationToken)
+    // TODO test this in linux with Postman
+    public async Task<UpdateResult?> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
     {
         // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
-        var filterOld = Builders<AppUser>.Filter.Where(appUser => appUser.Id == userId
+        var filterOld = Builders<AppUser>.Filter.Where(appUser => appUser.Email == userEmail
                                                     && appUser.Photos.Any<Photo>(photo => photo.IsMain == true));
         var updateOld = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, false);
         await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
 
         // SET the new main photo: find new photo by its Url_128; update IsMain to True
-        var filterNew = Builders<AppUser>.Filter.Where(appUser => appUser.Id == userId
+        var filterNew = Builders<AppUser>.Filter.Where(appUser => appUser.Email == userEmail
                                                     && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
         var updateNew = Builders<AppUser>.Update.Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
