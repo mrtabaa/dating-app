@@ -50,14 +50,14 @@ public class LikesRepository : ILikesRepository
             {
                 try
                 {
-                    await _collection.InsertOneAsync(like);
+                    await _collection.InsertOneAsync(like, null, cancellationToken);
 
                     likeStatus.IsSuccess = true;
                     return likeStatus; // success
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
-
+                    _logger.LogError("Like failed:" + ex.Message);
                     return likeStatus;
                 }
             }
