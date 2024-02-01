@@ -8,7 +8,8 @@ public record Like(
 );
 
 public record LoggedInUser(
-    string LoggedInUserId, // loggedInUser who likes others
+    // TODO use DTO to not send Id to client
+    string Id, // loggedInUser who likes others
     string Email,
     int Age,
     string KnownAs,
@@ -18,7 +19,8 @@ public record LoggedInUser(
 );
 
 public record TargetMember(
-    string TargetMemberId, // the user who's liked by loggedInUser
+    // TODO use DTO to not send Id to client
+    string Id, // the user who's liked by loggedInUser
     string Email,
     int Age,
     string KnownAs,

@@ -97,7 +97,7 @@ namespace api.DTOs
                 Schema: loggedInUser.Schema,
                 Id: null,
                 LoggedInUser: new LoggedInUser(
-                    LoggedInUserId: loggedInUser.Id,
+                    Id: loggedInUser.Id,
                     Email: loggedInUser.Email,
                     Age: loggedInUser.DateOfBirth.CalculateAge(),
                     KnownAs: loggedInUser.KnownAs,
@@ -106,7 +106,7 @@ namespace api.DTOs
                     PhotoUrl: loggedInUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
                 ),
                 TargetMember: new TargetMember(
-                    TargetMemberId: targetMember.Id,
+                    Id: targetMember.Id,
                     Email: targetMember.Email,
                     Age: targetMember.DateOfBirth.CalculateAge(),
                     KnownAs: targetMember.KnownAs,
