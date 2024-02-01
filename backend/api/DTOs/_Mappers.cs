@@ -57,7 +57,6 @@ namespace api.DTOs
             if (appUser.Id is not null)
             {
                 return new LoggedInDto(
-                    Id: appUser.Id,
                     Token: token,
                     KnownAs: appUser.KnownAs,
                     Email: appUser.Email,
@@ -89,16 +88,16 @@ namespace api.DTOs
             );
         }
 
-        public static Like? ConvertAppUsertoLike(AppUser loggedInUser, AppUser targetMember, string? loggedInUserId)
+        public static Like? ConvertAppUsertoLike(AppUser loggedInUser, AppUser targetMember)
         {
-            if (loggedInUserId is null || loggedInUser.Id is null || targetMember.Id is null)
+            if (loggedInUser.Id is null || targetMember.Id is null)
                 return null;
 
             return new Like(
                 Schema: loggedInUser.Schema,
                 Id: null,
                 LoggedInUser: new LoggedInUser(
-                    loggedInUserId = loggedInUser.Id,
+                    LoggedInUserId: loggedInUser.Id,
                     Email: loggedInUser.Email,
                     Age: loggedInUser.DateOfBirth.CalculateAge(),
                     KnownAs: loggedInUser.KnownAs,
