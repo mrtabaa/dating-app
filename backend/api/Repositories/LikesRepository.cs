@@ -51,25 +51,26 @@ public class LikesRepository : ILikesRepository
 
             if (like is not null)
             {
+                //// Session is NOT supported in MongoDb Standalone servers!
                 // Create a session object that is used when leveraging transactions
-                using var session = await _client.StartSessionAsync(null, cancellationToken);
+                // using var session = await _client.StartSessionAsync(null, cancellationToken);
 
                 // Begin transaction
-                session.StartTransaction();
+                // session.StartTransaction();
 
                 try
                 {
                     // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
-                    await _collection.InsertOneAsync(session, like, null, cancellationToken);
+                    await _collection.InsertOneAsync(like, null, cancellationToken);
 
-                    await UpdateLikedByCount(session, targetMemberAppUser.Id, cancellationToken);
+                    await UpdateLikedByCount(targetMemberAppUser.Id, cancellationToken);
 
                     likeStatus.IsSuccess = true;
                     return likeStatus; // success
                 }
                 catch (System.Exception ex)
                 {
-                    await session.AbortTransactionAsync(cancellationToken);
+                    // await session.AbortTransactionAsync(cancellationToken);
 
                     _logger.LogError("Like failed. Error writing to MongoDB" + ex.Message);
 
@@ -116,12 +117,12 @@ public class LikesRepository : ILikesRepository
     /// <param name="targetMemberId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateLikedByCount(IClientSessionHandle session, string? targetMemberId, CancellationToken cancellationToken)
+    private async Task UpdateLikedByCount( string? targetMemberId, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateLikedByCount = Builders<AppUser>.Update
         .Inc(appUser => appUser.Liked_byCount, 1); // Increament by 1 for each like
 
-        await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
+        await _collectionUsers.UpdateOneAsync<AppUser>(appUser =>
                 appUser.Id == targetMemberId, updateLikedByCount, null, cancellationToken);
     }
 
