@@ -47,7 +47,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     const id: string | null = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      this.member$ = this.memberService.getMemberById(id);
+      this.member$ = this.memberService.getMemberByEmail(id);
     }
   }
 

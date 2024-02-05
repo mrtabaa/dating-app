@@ -72,17 +72,17 @@ export class MemberService {
 
   /**
    * If member is already loaded in memberCache in getMembers(), loop through it and return the member. Otherwise call the api to get the member. 
-   * @param idInput 
+   * @param emailInput 
    * @returns Observable<Member> | undefined
    */
-  getMemberById(idInput: string | undefined): Observable<Member> | undefined {
+  getMemberByEmail(emailInput: string | undefined): Observable<Member> | undefined {
     //#region performance section
     // const member = this.memberCache.get('1-5-18-99-lastActive-male');
     let member: Member | undefined;
 
     this.memberCache.forEach((value: PaginatedResult<Member[]>) =>
       value.result?.forEach((result: Member) => {
-        if (result && result.id === idInput) {
+        if (result && result.email === emailInput) {
           member = result;
         }
       }
@@ -92,7 +92,7 @@ export class MemberService {
     //#endregion
 
     // all above code is for performance which prevent calling api if members were already loaded in getMembers()
-    return this.http.get<Member>(this.baseUrl + 'id/' + idInput);
+    return this.http.get<Member>(this.baseUrl + 'email/' + emailInput);
   }
 
   //#region Helpers
