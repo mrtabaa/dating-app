@@ -43,7 +43,6 @@ export class MemberService {
   }
 
   resetMemberParams(): MemberParams | undefined {
-
     if (this.loggedInGender)
       return new MemberParams(this.loggedInGender);
 
