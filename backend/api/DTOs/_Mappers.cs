@@ -88,54 +88,16 @@ namespace api.DTOs
             );
         }
 
-        public static Like? ConvertAppUsertoLike(AppUser loggedInUser, AppUser targetMember)
+        public static Like? ConvertAppUsertoLike(string loggedInUserId, string targetMemberId)
         {
-            if (loggedInUser.Id is null || targetMember.Id is null)
-                return null;
-
             return new Like(
-                Schema: loggedInUser.Schema,
-                Id: null,
-                LoggedInUser: new LoggedInUser(
-                    Id: loggedInUser.Id,
-                    Email: loggedInUser.Email,
-                    Age: loggedInUser.DateOfBirth.CalculateAge(),
-                    KnownAs: loggedInUser.KnownAs,
-                    Gender: loggedInUser.Gender,
-                    City: loggedInUser.City,
-                    PhotoUrl: loggedInUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
-                ),
-                TargetMember: new TargetMember(
-                    Id: targetMember.Id,
-                    Email: targetMember.Email,
-                    Age: targetMember.DateOfBirth.CalculateAge(),
-                    KnownAs: targetMember.KnownAs,
-                    Gender: targetMember.Gender,
-                    City: targetMember.City,
-                    PhotoUrl: targetMember.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_256
-                )
-            );
+                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                    Id: null,
+                    LoggedInUserId: loggedInUserId,
+                    TargetMemberId: targetMemberId
+                );
         }
 
-        public static LikeDto ConvertLikeToLikeDto(Like like)
-        {
-            return new LikeDto(
-                LoggedInUserDto: new LoggedInUserDto(
-                    Age: like.LoggedInUser.Age,
-                    KnownAs: like.LoggedInUser.KnownAs,
-                    Gender: like.LoggedInUser.Gender,
-                    City: like.LoggedInUser.City,
-                    PhotoUrl: like.LoggedInUser.PhotoUrl
-                ),
-                TargetMemberDto: new TargetMemberDto(
-                    Age: like.TargetMember.Age,
-                    KnownAs: like.TargetMember.KnownAs,
-                    Gender: like.TargetMember.Gender,
-                    City: like.TargetMember.City,
-                    PhotoUrl: like.TargetMember.PhotoUrl
-                )
-            );
-        }
         #endregion Generator Methods
 
         #region Helper Functions

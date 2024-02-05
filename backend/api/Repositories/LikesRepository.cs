@@ -7,8 +7,7 @@ public class LikesRepository : ILikesRepository
     private readonly IMongoClient _client; // used for Session
     private readonly IMongoCollection<Like> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
-    private readonly IUserRepository _userRepository;
-    private readonly ILogger<UserRepository> _logger;
+    private readonly ILogger<UserRepository> _logger; // TODO fix type
 
     // constructor - dependency injections
     public LikesRepository(
@@ -21,19 +20,22 @@ public class LikesRepository : ILikesRepository
         _collection = dbName.GetCollection<Like>("likes");
         _collectionUsers = dbName.GetCollection<AppUser>("users");
 
-        _userRepository = userRepository;
-
         _logger = logger;
     }
     #endregion
 
     async Task<LikeStatus> ILikesRepository.AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
     {
+        // TODO break down to functions
         LikeStatus likeStatus = new();
 
+        AppUser? loggedInAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == loggedInUserEmail).FirstOrDefaultAsync(cancellationToken);
+        AppUser? targetMemberAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == targetMemberEmail).FirstOrDefaultAsync(cancellationToken);
+
+        // TODO implement already likes
         bool doesExist = await _collection.Find<Like>(like =>
-            like.LoggedInUser.Email == loggedInUserEmail
-            && like.TargetMember.Email == targetMemberEmail)
+            like.LoggedInUserId == loggedInAppUser.Id
+            && like.TargetMemberId == targetMemberAppUser.Id)
             .AnyAsync(cancellationToken: cancellationToken);
 
         if (doesExist)
@@ -42,22 +44,19 @@ public class LikesRepository : ILikesRepository
             return likeStatus;
         }
 
-        AppUser? loggedInUserAppUser = await _userRepository.GetByEmailAsync(loggedInUserEmail, cancellationToken);
-        AppUser? targetMemberAppUser = await _userRepository.GetByEmailAsync(targetMemberEmail, cancellationToken);
-
-        if (!(loggedInUserAppUser is null || targetMemberAppUser is null))
+        if (!(loggedInAppUser.Id is null || targetMemberAppUser.Id is null))
         {
-            Like? like = Mappers.ConvertAppUsertoLike(loggedInUserAppUser, targetMemberAppUser);
+            // likes.Add()
+            Like? like = Mappers.ConvertAppUsertoLike(loggedInAppUser.Id, targetMemberAppUser.Id);
+
+            //// Session is NOT supported in MongoDb Standalone servers!
+            // Create a session object that is used when leveraging transactions
+            using var session = await _client.StartSessionAsync(null, cancellationToken);
+
+            // Begin transaction
+            session.StartTransaction();
 
             if (like is not null)
-            {
-                //// Session is NOT supported in MongoDb Standalone servers!
-                // Create a session object that is used when leveraging transactions
-                using var session = await _client.StartSessionAsync(null, cancellationToken);
-
-                // Begin transaction
-                session.StartTransaction();
-
                 try
                 {
                     // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
@@ -78,13 +77,12 @@ public class LikesRepository : ILikesRepository
 
                     return likeStatus; // all false
                 }
-            }
         }
 
         return likeStatus; // Faild
     }
 
-    async Task<List<LikeDto>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    async Task<List<MemberDto>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         // TODO replace with ObjectId
@@ -95,18 +93,18 @@ public class LikesRepository : ILikesRepository
 
         if (predicate.Equals("liked"))
         {
-            IEnumerable<Like> likes = await _collection.Find<Like>(like => like.LoggedInUser.Id == loggedInUserId)
-                .ToListAsync(cancellationToken);
+            // IEnumerable<Like> likes = await _collection.Find<Like>(like => like.LoggedInUser.Id == loggedInUserId)
+            //     .ToListAsync(cancellationToken);
 
-            return ConvertLikesToLikeDtos(likes);
+            // return ConvertLikesToLikeDtos(likes);
         }
 
         if (predicate.Equals("liked-by"))
         {
-            IEnumerable<Like> likes = await _collection.Find<Like>(like => like.TargetMember.Id == loggedInUserId)
-                .ToListAsync(cancellationToken);
+            // IEnumerable<Like> likes = await _collection.Find<Like>(like => like.TargetMember.Id == loggedInUserId)
+            //     .ToListAsync(cancellationToken);
 
-            return ConvertLikesToLikeDtos(likes);
+            // return ConvertLikesToLikeDtos(likes);
         }
 
         return [];
@@ -126,25 +124,5 @@ public class LikesRepository : ILikesRepository
 
         await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
                 appUser.Id == targetMemberId, updateLikedByCount, null, cancellationToken);
-    }
-
-    /// <summary>
-    /// Get the list of Likes and convert them to a list of LikeDto
-    /// </summary>
-    /// <param name="likes"></param>
-    /// <returns>LikeDtos</returns>
-    private static List<LikeDto> ConvertLikesToLikeDtos(IEnumerable<Like> likes)
-    {
-        List<LikeDto> likeDtos = [];
-
-        if (!likes.Any())
-            return [];
-
-        foreach (Like like in likes)
-        {
-            likeDtos.Add(Mappers.ConvertLikeToLikeDto(like));
-        }
-
-        return likeDtos;
     }
 }
