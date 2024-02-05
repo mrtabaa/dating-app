@@ -40,11 +40,12 @@ export class PhotoEditorComponent implements OnInit {
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
   }
-
+  
   ngOnInit(): void {
     this.initializeUploader();
   }
 
+  //#region Photo Upload using `ng2-file-upload`
   fileOverBase(event: boolean): void {
     this.hasBaseDropZoneOver = event;
   }
@@ -52,13 +53,13 @@ export class PhotoEditorComponent implements OnInit {
   initializeUploader(): void {
     if (this.loggedInUser) {
       this.uploader = new FileUploader({
-        url: environment.apiUrl + 'user/add-photo',
+        url: this.basePhotoUrl + 'user/add-photo',
         authToken: 'Bearer ' + this.loggedInUser.token,
         isHTML5: true,
         allowedFileType: ['image'],
         removeAfterUpload: true,
         autoUpload: false,
-        maxFileSize: 40_000_000, // 8 * 5MB
+        maxFileSize: 4_000_000, // 4MB
       });
 
       this.uploader.onAfterAddingFile = (file) => {
@@ -77,17 +78,17 @@ export class PhotoEditorComponent implements OnInit {
       }
     }
   }
+  //#endregion Photo Upload using `ng2-file-upload`
 
   /**
    * Set navbar profile photo ONLY when FIRST photo is uploaded.
    * @param url_165 
    */
   setNavbarProfilePhoto(url_165: string): void {
-    if (this.loggedInUser?.id) {
+    if (this.loggedInUser?.email) {
       const updatedLoggedInUser: LoggedInUser = {
-        id: this.loggedInUser?.id,
-        knownAs: this.loggedInUser.knownAs,
         email: this.loggedInUser.email,
+        knownAs: this.loggedInUser.knownAs,
         token: this.loggedInUser.token,
         gender: this.loggedInUser.gender,
         profilePhotoUrl: url_165 // set profile photo
