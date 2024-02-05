@@ -40,7 +40,7 @@ export class PhotoEditorComponent implements OnInit {
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
   }
-  
+
   ngOnInit(): void {
     this.initializeUploader();
   }
