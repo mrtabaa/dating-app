@@ -17,8 +17,9 @@ public class TokenService : ITokenService
     {
         _ = _key ?? throw new ArgumentNullException("_key cannot be null", nameof(_key));
 
+        // TODO Generate the Claim with Guid.New and associate it with the AppUser so the email is not exposed to the client through the token.
         var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.UniqueName, user.Email) 
+            new(JwtRegisteredClaimNames.UniqueName, user.Email)
         };
 
         var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
