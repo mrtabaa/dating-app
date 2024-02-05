@@ -1,5 +1,5 @@
 @if (member) {
-<mat-card class="card" [routerLink]="['/member/' + member.id]">
+<mat-card class="card">
     <div class="card-img-wrapper">
         @if (member.photos.length === 0) {
         <img ngSrc="/assets/images/defaults/user.png" width="128" height="128" priority alt="{{member.knownAs}} photo"
@@ -15,12 +15,12 @@
 
         <ul class="user-icons">
             <li>
-                <button [routerLink]="['/member/' + member.id]" mat-mini-fab color="warn">
+                <button [routerLink]="['/member/' + member.email]" mat-mini-fab color="warn">
                     <mat-icon color="primary">person_add</mat-icon>
                 </button>
             </li>
             <li>
-                <button mat-mini-fab color="warn">
+                <button (click)="addLike()" mat-mini-fab color="warn">
                     <mat-icon color="warn">favorite</mat-icon>
                 </button>
             </li>
