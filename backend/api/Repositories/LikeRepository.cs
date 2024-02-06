@@ -1,4 +1,3 @@
-
 namespace api.Repositories;
 
 public class LikeRepository : ILikeRepository
@@ -7,12 +6,11 @@ public class LikeRepository : ILikeRepository
     private readonly IMongoClient _client; // used for Session
     private readonly IMongoCollection<Like> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
-    private readonly ILogger<LikeRepository> _logger; // TODO fix type
+    private readonly ILogger<LikeRepository> _logger;
 
     // constructor - dependency injections
     public LikeRepository(
-        IMongoClient client, IMongoDbSettings dbSettings,
-        IUserRepository userRepository, ILogger<LikeRepository> logger
+        IMongoClient client, IMongoDbSettings dbSettings, ILogger<LikeRepository> logger
         )
     {
         _client = client; // used for Session
@@ -24,65 +22,40 @@ public class LikeRepository : ILikeRepository
     }
     #endregion
 
-    async Task<LikeStatus> ILikeRepository.AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
+    public async Task<LikeStatus> AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
     {
-        // TODO break down to functions
         LikeStatus likeStatus = new();
 
         AppUser? loggedInAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == loggedInUserEmail).FirstOrDefaultAsync(cancellationToken);
         AppUser? targetMemberAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == targetMemberEmail).FirstOrDefaultAsync(cancellationToken);
 
-        // TODO implement already likes
-        bool doesExist = await _collection.Find<Like>(like =>
-            like.LoggedInUserId == loggedInAppUser.Id
-            && like.TargetMemberId == targetMemberAppUser.Id)
-            .AnyAsync(cancellationToken: cancellationToken);
-
-        if (doesExist)
-        {
-            likeStatus.IsAlreadyLiked = true;
-            return likeStatus;
-        }
-
         if (!(loggedInAppUser.Id is null || targetMemberAppUser.Id is null))
         {
+            bool IsAlreadyLiked = await _collection.Find<Like>(like =>
+            like.LoggedInUserId == loggedInAppUser.Id && like.TargetMemberId == targetMemberAppUser.Id).AnyAsync(cancellationToken);
+
+            if (IsAlreadyLiked)
+            {
+                likeStatus.IsAlreadyLiked = true;
+                return likeStatus;
+            }
+
             // likes.Add()
             Like? like = Mappers.ConvertAppUsertoLike(loggedInAppUser.Id, targetMemberAppUser.Id);
 
-            //// Session is NOT supported in MongoDb Standalone servers!
-            // Create a session object that is used when leveraging transactions
-            using var session = await _client.StartSessionAsync(null, cancellationToken);
-
-            // Begin transaction
-            session.StartTransaction();
-
             if (like is not null)
-                try
-                {
-                    // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
-                    await _collection.InsertOneAsync(session, like, null, cancellationToken);
+            {
+                bool isSuccess = await SaveInDbWithSession(like, targetMemberAppUser.Id, cancellationToken);
 
-                    await UpdateLikedByCount(session, targetMemberAppUser.Id, cancellationToken);
+                likeStatus.IsSuccess = isSuccess;
+            }
 
-                    await session.CommitTransactionAsync(cancellationToken);
-
-                    likeStatus.IsSuccess = true;
-                    return likeStatus; // success
-                }
-                catch (System.Exception ex)
-                {
-                    await session.AbortTransactionAsync(cancellationToken);
-
-                    _logger.LogError("Like failed. Error writing to MongoDB" + ex.Message);
-
-                    return likeStatus; // all false
-                }
         }
 
         return likeStatus; // Faild
     }
 
-    async Task<List<MemberDto>> ILikeRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    public async Task<List<MemberDto>> GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         // TODO replace with ObjectId
@@ -108,6 +81,45 @@ public class LikeRepository : ILikeRepository
         }
 
         return [];
+    }
+
+    /// <summary>
+    /// InsertOneAsync the 'like'.
+    /// Increase Member's LikedCount by 1.
+    /// Use MongoDb Transaction/Session to rollback if Update Member fails.
+    /// </summary>
+    /// <param name="like"></param>
+    /// <param name="targetMemberId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>bool isSuccess</returns>
+    private async Task<bool> SaveInDbWithSession(Like like, string targetMemberId, CancellationToken cancellationToken)
+    {
+        //// Session is NOT supported in MongoDb Standalone servers!
+        // Create a session object that is used when leveraging transactions
+        using var session = await _client.StartSessionAsync(null, cancellationToken);
+
+        // Begin transaction
+        session.StartTransaction();
+
+        try
+        {
+            // TODO add session to this part so if UpdateLikedByCount failed, undo the InsertOnce.
+            await _collection.InsertOneAsync(session, like, null, cancellationToken);
+
+            await UpdateLikedByCount(session, targetMemberId, cancellationToken);
+
+            await session.CommitTransactionAsync(cancellationToken);
+
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            await session.AbortTransactionAsync(cancellationToken);
+
+            _logger.LogError("Like failed. Error writing to MongoDB" + ex.Message);
+
+            return false;
+        }
     }
 
     /// <summary>
