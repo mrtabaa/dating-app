@@ -35,7 +35,7 @@ public class LikeController(ILikeRepository _likesRepository) : BaseApiControlle
 
         if (string.IsNullOrEmpty(loggedInUserEmail)) return BadRequest("No user is logged-in!");
 
-        IEnumerable<MemberDto> memberDtos = await _likesRepository.GetLikedMembersAsync(loggedInUserEmail, predicate, cancellationToken);
+        IEnumerable<MemberDto> memberDtos = await _likesRepository.GetLikeMembersAsync(loggedInUserEmail, predicate, cancellationToken);
 
         if (!memberDtos.Any()) return NoContent();
 

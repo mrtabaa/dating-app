@@ -54,7 +54,7 @@ public class LikeRepository : ILikeRepository
         return likeStatus; // Faild
     }
 
-    public async Task<IEnumerable<MemberDto>> GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    public async Task<IEnumerable<MemberDto>> GetLikeMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         ObjectId? loggedInUserId = await _collectionUsers.AsQueryable<AppUser>()
