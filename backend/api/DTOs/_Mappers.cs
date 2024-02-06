@@ -10,7 +10,7 @@ namespace api.DTOs
 
             return new AppUser(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: null,
+                Id: ObjectId.GenerateNewId(),
                 Email: userInput.Email.ToLower().Trim(),
                 PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password)),
                 PasswordSalt: hmac.Key,
@@ -31,7 +31,7 @@ namespace api.DTOs
 
         public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser)
         {
-            if (!(appUser.Id is null || appUser.Schema is null))
+            if (appUser.Schema is not null)
                 return new MemberDto(
                     Schema: appUser.Schema,
                     Email: appUser.Email,
@@ -53,18 +53,13 @@ namespace api.DTOs
 
         public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
         {
-            if (appUser.Id is not null)
-            {
-                return new LoggedInDto(
-                    Token: token,
-                    KnownAs: appUser.KnownAs,
-                    Email: appUser.Email,
-                    Gender: appUser.Gender,
-                    ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
-                );
-            }
-
-            return null;
+            return new LoggedInDto(
+                Token: token,
+                KnownAs: appUser.KnownAs,
+                Email: appUser.Email,
+                Gender: appUser.Gender,
+                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
+            );
         }
 
         public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain)
@@ -87,13 +82,13 @@ namespace api.DTOs
             );
         }
 
-        public static Like? ConvertAppUsertoLike(string loggedInUserId, string targetMemberId)
+        public static Like? ConvertAppUsertoLike(ObjectId? likerId, ObjectId? likedId)
         {
             return new Like(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Id: null,
-                    LoggedInUserId: loggedInUserId,
-                    TargetMemberId: targetMemberId
+                    Id: ObjectId.GenerateNewId(),
+                    LikerId: likerId,
+                    LikedId: likedId
                 );
         }
 

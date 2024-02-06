@@ -87,7 +87,7 @@ public class UserRepository : IUserRepository
         }
 
         AppUser? appUser = await GetByEmailAsync(userEmail, cancellationToken);
-        if (appUser is null || appUser.Id is null)
+        if (appUser is null)
         {
             _logger.LogError("user is Null / not found");
             return null;
