@@ -20,10 +20,10 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
     /// <returns>ADD: array of filePaths. DELETE: boolean</returns>
-    public async Task<string[]?> AddPhotoToDisk(IFormFile formFile, string userId)
+    public async Task<string[]?> AddPhotoToDisk(IFormFile formFile, string? userId)
     {
         // copy file/s to the folder
-        if (formFile.Length > 0)
+        if (formFile.Length > 0 && !string.IsNullOrEmpty(userId))
         {
             #region Resize and/or Store Images to Disk
             string? filePath_165_sq; // navbar & thumbnail
