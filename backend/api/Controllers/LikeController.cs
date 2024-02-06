@@ -29,16 +29,16 @@ public class LikeController(ILikeRepository _likesRepository) : BaseApiControlle
     }
 
     [HttpGet("{predicate}")]
-    public async Task<ActionResult<IEnumerable<MemberDto>?>> GetLikes(string predicate, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetLikes(string predicate, CancellationToken cancellationToken)
     {
         string? loggedInUserEmail = User.GetUserEmail();
 
         if (string.IsNullOrEmpty(loggedInUserEmail)) return BadRequest("No user is logged-in!");
 
-        List<MemberDto> memberDtos = await _likesRepository.GetLikedMembersAsync(loggedInUserEmail, predicate, cancellationToken);
+        IEnumerable<MemberDto> memberDtos = await _likesRepository.GetLikedMembersAsync(loggedInUserEmail, predicate, cancellationToken);
 
-        if (memberDtos?.Count == 0) return NoContent();
+        if (!memberDtos.Any()) return NoContent();
 
-        return memberDtos;
+        return Ok(memberDtos);
     }
 }
