@@ -34,7 +34,6 @@ namespace api.DTOs
             if (!(appUser.Id is null || appUser.Schema is null))
                 return new MemberDto(
                     Schema: appUser.Schema,
-                    Id: appUser.Id,
                     Email: appUser.Email,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                     KnownAs: appUser.KnownAs,
