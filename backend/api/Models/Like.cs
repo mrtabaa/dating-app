@@ -2,7 +2,7 @@ namespace api.Models;
 
 public record Like(
     string? Schema,
-    [property: BsonId, BsonRepresentation(BsonType.ObjectId)] string? Id,
-    string LoggedInUserId, // loggedInUser who likes others
-    string TargetMemberId // the user who's liked by loggedInUser
+    ObjectId? Id,
+    ObjectId? LoggedInUserId, // loggedInUser who likes others
+    ObjectId? TargetMemberId // the user who's liked by loggedInUser
 );

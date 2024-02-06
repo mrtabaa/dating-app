@@ -25,7 +25,7 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetByIdAsync(string? userId, CancellationToken cancellationToken)
+    public async Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken)
     {
         if (userId is not null)
         {
@@ -94,7 +94,7 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userEmail makes the folder name
-        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id);
+        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id.ToString());
 
         if (photoUrls is not null)
         {

@@ -2,7 +2,7 @@ namespace api.Models;
 
 public record AppUser(
     string? Schema,
-    [property: BsonId, BsonRepresentation(BsonType.ObjectId)] string? Id,
+    ObjectId? Id,
     string Email,
     byte[]? PasswordHash,
     byte[]? PasswordSalt,

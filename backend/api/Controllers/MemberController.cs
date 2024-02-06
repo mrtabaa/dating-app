@@ -39,10 +39,12 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
     [HttpGet("id/{memberId}")]
     public async Task<ActionResult<MemberDto>> GetMemberById(string memberId, CancellationToken cancellationToken)
     {
-        if (memberId is null || memberId.Length != 24)
+        bool isValid = ObjectId.TryParse(memberId, out ObjectId memberObjectId);
+
+        if (!isValid)
             return BadRequest("Invalid memberId. Contact the admin.");
 
-        MemberDto? memberDto = await _memberRepository.GetMemberByIdAsync(memberId, cancellationToken);
+        MemberDto? memberDto = await _memberRepository.GetMemberByIdAsync(memberObjectId, cancellationToken);
 
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }

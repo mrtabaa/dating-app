@@ -42,7 +42,7 @@ public class MemberRepository : IMemberRepository
         return pagedAppUsers;
     }
 
-    public async Task<MemberDto?> GetMemberByIdAsync(string? memberId, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetMemberByIdAsync(ObjectId? memberId, CancellationToken cancellationToken)
     {
         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == memberId).FirstOrDefaultAsync(cancellationToken);
 
