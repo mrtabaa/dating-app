@@ -7,12 +7,12 @@ public class LikeRepository : ILikeRepository
     private readonly IMongoClient _client; // used for Session
     private readonly IMongoCollection<Like> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
-    private readonly ILogger<UserRepository> _logger; // TODO fix type
+    private readonly ILogger<LikeRepository> _logger; // TODO fix type
 
     // constructor - dependency injections
     public LikeRepository(
         IMongoClient client, IMongoDbSettings dbSettings,
-        IUserRepository userRepository, ILogger<UserRepository> logger
+        IUserRepository userRepository, ILogger<LikeRepository> logger
         )
     {
         _client = client; // used for Session
