@@ -3,7 +3,7 @@ namespace api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class LikeController(ILikesRepository _likesRepository) : BaseApiController
+public class LikeController(ILikeRepository _likesRepository) : BaseApiController
 {
     [HttpPost("{targetMemberEmail}")]
     public async Task<ActionResult> AddLike(string targetMemberEmail, CancellationToken cancellationToken)

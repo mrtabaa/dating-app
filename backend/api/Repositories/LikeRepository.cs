@@ -1,7 +1,7 @@
 
 namespace api.Repositories;
 
-public class LikesRepository : ILikesRepository
+public class LikeRepository : ILikeRepository
 {
     #region Db and Token Settings
     private readonly IMongoClient _client; // used for Session
@@ -10,7 +10,7 @@ public class LikesRepository : ILikesRepository
     private readonly ILogger<UserRepository> _logger; // TODO fix type
 
     // constructor - dependency injections
-    public LikesRepository(
+    public LikeRepository(
         IMongoClient client, IMongoDbSettings dbSettings,
         IUserRepository userRepository, ILogger<UserRepository> logger
         )
@@ -24,7 +24,7 @@ public class LikesRepository : ILikesRepository
     }
     #endregion
 
-    async Task<LikeStatus> ILikesRepository.AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
+    async Task<LikeStatus> ILikeRepository.AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
     {
         // TODO break down to functions
         LikeStatus likeStatus = new();
@@ -82,7 +82,7 @@ public class LikesRepository : ILikesRepository
         return likeStatus; // Faild
     }
 
-    async Task<List<MemberDto>> ILikesRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    async Task<List<MemberDto>> ILikeRepository.GetLikedMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for likes by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         // TODO replace with ObjectId
