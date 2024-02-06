@@ -24,12 +24,16 @@ public class LikeRepository : ILikeRepository
 
     public async Task<LikeStatus> AddLikeAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
     {
-        //TODO Prevent from entering wrong email
-
         LikeStatus likeStatus = new();
 
         AppUser? likerAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == loggedInUserEmail).FirstOrDefaultAsync(cancellationToken);
         AppUser? likedAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == targetMemberEmail).FirstOrDefaultAsync(cancellationToken);
+
+        if (likedAppUser is null)
+        {
+            likeStatus.IsTargetMemberEmailWrong = true;
+            return likeStatus;
+        }
 
         bool IsAlreadyLiked = await _collection.Find<Like>(like =>
         like.LikerId == likerAppUser.Id && like.LikedId == likedAppUser.Id).AnyAsync(cancellationToken);

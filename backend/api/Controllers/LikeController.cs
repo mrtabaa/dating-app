@@ -22,6 +22,9 @@ public class LikeController(ILikeRepository _likesRepository) : BaseApiControlle
             if (likeStatus.IsAlreadyLiked)
                 return BadRequest("The user is already liked.");
 
+            if (likeStatus.IsTargetMemberEmailWrong)
+                return BadRequest("Wrong target email is given.");
+
             return BadRequest("Liking the member failed. Try agian.");
         }
 
