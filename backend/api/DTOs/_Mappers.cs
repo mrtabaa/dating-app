@@ -51,6 +51,36 @@ namespace api.DTOs
             return null;
         }
 
+        public static IEnumerable<MemberDto> ConvertAppUsersToMemberDtos(IEnumerable<AppUser> appUsers)
+        {
+            if (!appUsers.Any()) return [];
+
+            List<MemberDto> memberDtos = [];
+
+            foreach (AppUser appUser in appUsers)
+            {
+                if (appUser.Schema is not null)
+                    memberDtos.Add(
+                        new MemberDto(
+                            Schema: appUser.Schema,
+                            Email: appUser.Email,
+                            Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
+                            KnownAs: appUser.KnownAs,
+                            Created: appUser.Created,
+                            LastActive: appUser.LastActive,
+                            Gender: appUser.Gender,
+                            Introduction: appUser.Introduction,
+                            LookingFor: appUser.LookingFor,
+                            Interests: appUser.Interests,
+                            City: appUser.City,
+                            Country: appUser.Country,
+                            Photos: appUser.Photos
+                ));
+            }
+
+            return memberDtos;
+        }
+
         public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
         {
             return new LoggedInDto(
