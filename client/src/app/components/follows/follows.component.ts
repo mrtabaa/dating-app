@@ -23,26 +23,34 @@ export class FollowsComponent implements OnInit {
 
   members$: Observable<Member[]> | undefined;
   predicate: string = 'followings';
-  memberCount: number | undefined;
+  isMembersValid: boolean = true;
 
   ngOnInit(): void {
-    this.getLikes();
+    this.getFollows();
   }
 
-  getLikes(): void {
+  getFollows(): void {
+    this.isMembersValid = true; // reset to default.
+    
     this.members$ = this.followService.getLikes(this.predicate).pipe(
-      tap(members => this.memberCount = members.length)
+      tap(member => {
+        this.isMembersValid = member ? true : false;
+      })
     );
   }
 
+  /**
+   * Set predicate based on each tab then call getFollows()
+   * @param event 
+   */
   onTabChange(event: MatTabChangeEvent) { // called on tab change
     if (event.tab.textLabel == "Following") {
       this.predicate = 'followings';
-      this.getLikes();
+      this.getFollows();
     }
     else {
       this.predicate = 'followers';
-      this.getLikes()
+      this.getFollows()
     }
   }
 }

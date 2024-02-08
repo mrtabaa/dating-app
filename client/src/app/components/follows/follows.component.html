@@ -4,13 +4,13 @@
             @if(predicate === 'followings')
             {
             <div class="members">
-                @if(memberCount === 0) {
-                <p>You've not followed anyone so far.</p>
-                }
-                @else{
+                @if(isMembersValid) {
                 @for (member of members$ | async; track $index;) {
                 <app-member-card [memberInput]="member" />
                 }
+                }
+                @else{
+                <p>You've not followed anyone so far.</p>
                 }
             </div>
             }
@@ -19,13 +19,13 @@
             @if(predicate === 'followers')
             {
             <div class="members">
-                @if(memberCount === 0) {
-                <p>Your follwoing list is empty. Better days to come!</p>
-                }
-                @else{
+                @if(isMembersValid) {
                 @for (member of members$ | async; track $index;) {
                 <app-member-card [memberInput]="member" />
                 }
+                }
+                @else{
+                <p>Your follwoing list is empty. Better days to come!</p>
                 }
             </div>
             }
