@@ -69,11 +69,11 @@ export class UserEditComponent implements OnDestroy {
   }
 
   userEditFg: FormGroup = this.fb.group({
-    introductionCtrl: ['', [Validators.required, Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
-    lookingForCtrl: ['', [Validators.required, Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
-    interestsCtrl: ['', [Validators.minLength(this.minTextAreaChars), Validators.maxLength(this.maxTextAreaChars)]],
-    cityCtrl: ['', [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    countryCtrl: ['', [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
+    introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
+    lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
+    interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
+    cityCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
+    countryCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
   });
 
   get IntroductionCtrl(): AbstractControl {
