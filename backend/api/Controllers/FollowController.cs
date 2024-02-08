@@ -1,7 +1,7 @@
 namespace api.Controllers;
 
 [Authorize]
-public class FollowController(IFollowRepository _followRepository) : BaseApiController
+public class FollowController(IFollowRepository _followRepository, IUserRepository _userRepository) : BaseApiController
 {
     [HttpPost("{targetMemberEmail}")]
     public async Task<ActionResult> AddFollow(string targetMemberEmail, CancellationToken cancellationToken)
@@ -18,7 +18,11 @@ public class FollowController(IFollowRepository _followRepository) : BaseApiCont
                 return Ok();
 
             if (followStatus.IsAlreadyFollowed)
-                return BadRequest("The user is already followed.");
+            {
+                string? knownAs = await _userRepository.GetKnownAsByEmailAsync(targetMemberEmail, cancellationToken);
+                if (knownAs is not null)
+                    return BadRequest($"{knownAs} is already followed.");
+            }
 
             if (followStatus.IsTargetMemberEmailWrong)
                 return BadRequest("Wrong target email is given.");
@@ -29,14 +33,14 @@ public class FollowController(IFollowRepository _followRepository) : BaseApiCont
         return BadRequest("Operation failed. Contact the admin.");
     }
 
-    [HttpGet("{predicate}")]
-    public async Task<ActionResult<IEnumerable<MemberDto>>> GetFollows(string predicate, CancellationToken cancellationToken)
+    [HttpGet()]
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetFollows(FollowParams followParams, CancellationToken cancellationToken)
     {
         string? loggedInUserEmail = User.GetUserEmail();
 
         if (string.IsNullOrEmpty(loggedInUserEmail)) return BadRequest("No user is logged-in!");
 
-        IEnumerable<MemberDto> memberDtos = await _followRepository.GetFollowMembersAsync(loggedInUserEmail, predicate, cancellationToken);
+        IEnumerable<MemberDto> memberDtos = await _followRepository.GetFollowMembersAsync(loggedInUserEmail, followParams, cancellationToken);
 
         if (!memberDtos.Any()) return NoContent();
 
