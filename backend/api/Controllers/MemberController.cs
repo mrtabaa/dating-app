@@ -11,7 +11,10 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
 
         List<MemberDto?> memberDtos = [];
 
-        AppUser? appUser = await _userRepository.GetByEmailAsync(User.GetUserEmail(), cancellationToken);
+        string? LoggedInUserEmail = User.GetUserEmail();
+        if(string.IsNullOrEmpty(LoggedInUserEmail)) return BadRequest("User is not loggedIn or has no email set.");
+        
+        AppUser? appUser = await _userRepository.GetByEmailAsync(LoggedInUserEmail, cancellationToken);
 
         if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
