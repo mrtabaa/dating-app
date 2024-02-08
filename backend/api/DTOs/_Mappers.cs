@@ -25,7 +25,7 @@ namespace api.DTOs
                 City: userInput.City.Trim(),
                 Country: userInput.Country.Trim(),
                 Photos: [],
-                Liked_byCount: 0
+                FollowersCount: 0
             );
         }
 
@@ -112,13 +112,13 @@ namespace api.DTOs
             );
         }
 
-        public static Like? ConvertAppUsertoLike(ObjectId? likerId, ObjectId? likedId)
+        public static Follow? ConvertAppUsertoFollow(ObjectId? followerId, ObjectId? followedId)
         {
-            return new Like(
+            return new Follow(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                     Id: ObjectId.GenerateNewId(),
-                    LikerId: likerId,
-                    LikedId: likedId
+                    FollowerId: followerId,
+                    FollowedId: followedId
                 );
         }
 
