@@ -1,17 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LikeService {
+export class FollowService {
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl + 'like/';
+  private baseUrl = environment.apiUrl + 'follow/';
 
-  addLike(email: string): Observable<object> {
+  addFollow(email: string): Observable<object> {
     return this.http.post(this.baseUrl + email, {});
   }
 

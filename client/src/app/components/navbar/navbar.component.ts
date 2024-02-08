@@ -30,7 +30,7 @@ export class NavbarComponent implements OnInit {
 
   loggedInUserSig: Signal<LoggedInUser | null> | undefined;
 
-  links = ['members', 'lists', 'messages'];
+  links = ['members', 'friends', 'messages'];
 
   ngOnInit(): void {
     this.loggedInUserSig = this.accountService.loggedInUserSig;

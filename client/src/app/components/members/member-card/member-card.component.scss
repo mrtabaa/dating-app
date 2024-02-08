@@ -10,6 +10,8 @@ $min_card_size: 9rem;
     }
 
     &:hover {
+        // background-color: rgb(255, 228, 255);
+
         img {
             transform: scale(1.2, 1.2);
             transition-duration: 500ms;
@@ -61,6 +63,11 @@ $min_card_size: 9rem;
         flex-direction: column-reverse;
         align-items: center;
         padding: 0.5rem 0;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgb(255, 228, 255);
+        }
     }
 
     .title {

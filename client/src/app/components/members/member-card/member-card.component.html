@@ -8,30 +8,26 @@
         @else {
         @for (photo of member.photos; track $index) {
         @if (photo.isMain) {
-        <img ngSrc="{{apiPhotoUrl + photo.url_165}}" width="128" height="128" priority alt="{{member.knownAs}}" mat-card-image>
+        <img ngSrc="{{apiPhotoUrl + photo.url_165}}" width="128" height="128" priority alt="{{member.knownAs}}"
+            mat-card-image>
         }
         }
         }
 
         <ul class="user-icons">
             <li>
-                <button [routerLink]="['/member/' + member.email]" mat-mini-fab color="warn">
+                <button (click)="addLike()" mat-mini-fab>
                     <mat-icon color="primary">person_add</mat-icon>
                 </button>
             </li>
             <li>
-                <button (click)="addLike()" mat-mini-fab color="warn">
-                    <mat-icon color="warn">favorite</mat-icon>
-                </button>
-            </li>
-            <li>
-                <button mat-mini-fab color="warn">
-                    <mat-icon color="accent">mail</mat-icon>
+                <button mat-mini-fab>
+                    <mat-icon color="primary">mail</mat-icon>
                 </button>
             </li>
         </ul>
     </div>
-    <mat-card-header>
+    <mat-card-header [routerLink]="['/member/' + member.email]">
         <div class="title">
             @switch (member.gender) {
             @case ('male') {

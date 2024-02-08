@@ -6,7 +6,6 @@ import { NotFoundComponent } from './components/errors/not-found/not-found.compo
 import { ServerErrorComponent } from './components/errors/server-error/server-error.component';
 import { TestErrorComponent } from './components/errors/test-error/test-error.component';
 import { HomeComponent } from './components/home/home.component';
-import { ListsComponent } from './components/lists/lists.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
 import { MemberListComponent } from './components/members/member-list/member-list.component';
@@ -14,6 +13,7 @@ import { UserEditComponent } from './components/user/user-edit/user-edit.compone
 import { authGuard } from './guards/auth.guard';
 import { authLoggedInGuard } from './guards/auth-logged-in.guard';
 import { preventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
+import { FollowsComponent } from './components/follows/follows.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -25,7 +25,7 @@ export const routes: Routes = [
             { path: 'members', component: MemberListComponent },
             { path: 'member/:id', component: MemberDetailComponent },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
-            { path: 'lists', component: ListsComponent },
+            { path: 'friends', component: FollowsComponent },
             { path: 'messages', component: MessagesComponent },
         ]
     },
