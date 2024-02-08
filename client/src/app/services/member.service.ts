@@ -6,6 +6,7 @@ import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
 import { MemberParams } from '../models/helpers/member-params';
 import { AccountService } from './account.service';
+import { PaginationHandler } from '../extensions/paginationHandler';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +14,8 @@ import { AccountService } from './account.service';
 export class MemberService {
   private http = inject(HttpClient);
   private accountService = inject(AccountService);
+
+  private paginationHandler = new PaginationHandler();
 
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
@@ -60,7 +63,7 @@ export class MemberService {
 
     const params = this.getHttpParams();
 
-    return this.getPaginatedResult<Member[]>(this.baseUrl, params).pipe(
+    return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params).pipe(
       map(response => {
         if (this.memberParams)
           this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
@@ -108,29 +111,6 @@ export class MemberService {
     }
 
     return params;
-  }
-
-  /**
-   * A reusable pagination method with generic type
-   * @param url 
-   * @param params 
-   * @returns Observable<PaginatedResult<T>>
-   */
-  getPaginatedResult<T>(url: string, params: HttpParams): Observable<PaginatedResult<T>> {
-    const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>;
-
-    return this.http.get<T>(url, { observe: 'response', params }).pipe(
-      map(response => {
-        if (response.body)
-          paginatedResult.result = response.body // api's response body
-
-        const pagination = response.headers.get('Pagination');
-        if (pagination)
-          paginatedResult.pagination = JSON.parse(pagination); // api's response pagination values
-
-        return paginatedResult;
-      })
-    );
   }
   //#endregion
 }
