@@ -25,42 +25,32 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken)
+    public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken)
     {
-        if (userId is not null)
-        {
-            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-
-            return appUser is null ? null : appUser;
-        }
-
-        return null;
+            return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<AppUser?> GetByEmailAsync(string? userEmail, CancellationToken cancellationToken)
+    public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
-        if (userEmail is not null)
-        {
             AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
 
             return appUser is null ? null : appUser;
-        }
-
-        return null;
     }
 
-    public async Task<ObjectId?> GetIdByEmailAsync(string? userEmail, CancellationToken cancellationToken)
+    public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
-        if (userEmail is not null)
-        {
-            ObjectId appUserId = await _collection.AsQueryable<AppUser>()
-                .Where(appUser => appUser.Email == userEmail)
-                .Select(appUser => appUser.Id).FirstOrDefaultAsync(cancellationToken);
+        return await _collection.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Email == userEmail)
+            .Select(appUser => appUser.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 
-            return appUserId;
-        }
-
-        return null;
+    public async Task<string?> GetKnownAsByEmailAsync(string userEmail, CancellationToken cancellationToken)
+    {
+        return await _collection.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Email == userEmail)
+            .Select(appUser => appUser.KnownAs)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userEmail, CancellationToken cancellationToken)
