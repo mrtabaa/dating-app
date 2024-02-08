@@ -32,6 +32,7 @@ export class PhotoEditorComponent implements OnInit {
 
   loggedInUser: LoggedInUser | null | undefined;
   errorGlob: string | undefined;
+  baseApiUrl: string = environment.apiUrl;
   basePhotoUrl: string = environment.apiPhotoUrl;
 
   uploader: FileUploader | undefined;
@@ -53,7 +54,7 @@ export class PhotoEditorComponent implements OnInit {
   initializeUploader(): void {
     if (this.loggedInUser) {
       this.uploader = new FileUploader({
-        url: this.basePhotoUrl + 'user/add-photo',
+        url: this.baseApiUrl + 'user/add-photo',
         authToken: 'Bearer ' + this.loggedInUser.token,
         isHTML5: true,
         allowedFileType: ['image'],
