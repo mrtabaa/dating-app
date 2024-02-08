@@ -51,7 +51,7 @@ export class MemberService {
 
   getMembers(): Observable<PaginatedResult<Member[]>> {
     let response: PaginatedResult<Member[]> | undefined;
-    console.log('getMembers()', this.memberParams);
+    // console.log('getMembers()', this.memberParams);
 
     if (this.memberParams)
       response = this.memberCache.get(Object.values(this.memberParams).join('-'));

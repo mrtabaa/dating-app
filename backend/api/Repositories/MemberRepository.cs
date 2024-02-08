@@ -20,6 +20,7 @@ public class MemberRepository : IMemberRepository
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
 
+        #region Filters
         // calculate DOB based on user's selected Age
         var MinDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
         var MaxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
@@ -36,7 +37,8 @@ public class MemberRepository : IMemberRepository
             "created" => query.OrderByDescending(appUser => appUser.Created).ThenBy(appUser => appUser.Id),
             _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
         };
-
+        #endregion Filters
+        
         PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
 
         return pagedAppUsers;
