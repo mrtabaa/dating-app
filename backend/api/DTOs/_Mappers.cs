@@ -118,7 +118,7 @@ namespace api.DTOs
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                     Id: ObjectId.GenerateNewId(),
                     FollowerId: followerId,
-                    FollowedId: followedId
+                    FollowedMemberId: followedId
                 );
         }
 
