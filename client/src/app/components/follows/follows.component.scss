@@ -1,7 +1,15 @@
 main {
-    mat-tab-group {
+    // background-color: yellow;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
 
+    mat-tab-group {
         .members {
+            // background-color: red;
+            padding-top: 2rem;
+            min-height: 50dvh;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -13,5 +21,10 @@ main {
                 color: rgb(66, 66, 66);
             }
         }
+    }
+
+    .paginator {
+        display: flex;
+        align-self: center;
     }
 }

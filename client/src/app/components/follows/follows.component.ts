@@ -2,10 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
-import { Observable, tap } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
 import { Member } from '../../models/member.model';
 import { MemberCardComponent } from '../members/member-card/member-card.component';
 import { FollowService } from '../../services/follow.service';
+import { PaginatedResult, Pagination } from '../../models/helpers/pagination';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-follows',
@@ -13,7 +15,7 @@ import { FollowService } from '../../services/follow.service';
   imports: [
     CommonModule, FormsModule,
     MemberCardComponent,
-    MatTabsModule
+    MatTabsModule, MatPaginatorModule
   ],
   templateUrl: './follows.component.html',
   styleUrl: './follows.component.scss'
@@ -21,9 +23,20 @@ import { FollowService } from '../../services/follow.service';
 export class FollowsComponent implements OnInit {
   private followService = inject(FollowService);
 
-  members$: Observable<Member[]> | undefined;
   predicate: string = 'followings';
   isMembersValid: boolean = true;
+  subscribed: Subscription | undefined;
+  members: Member[] | undefined;
+
+  pagination: Pagination | undefined;
+  pageNumber = 1;
+  pageSize = 5;
+  pageSizeOptions = [5, 10, 25];
+  hidePageSize = false;
+  showPageSizeOptions = true;
+  showFirstLastButtons = true;
+  disabled = false;
+  pageEvent: PageEvent | undefined;
 
   ngOnInit(): void {
     this.getFollows();
@@ -31,11 +44,16 @@ export class FollowsComponent implements OnInit {
 
   getFollows(): void {
     this.isMembersValid = true; // reset to default.
-    
-    this.members$ = this.followService.getLikes(this.predicate).pipe(
-      tap(member => {
-        this.isMembersValid = member ? true : false;
-      })
+
+    this.subscribed = this.followService.getFollows(this.predicate).subscribe({
+      next: (response: PaginatedResult<Member[]>) => {
+        if (response.result && response.pagination) {
+          this.members = response.result;
+          this.pagination = response.pagination;
+          this.isMembersValid = this.members ? true : false;
+        }
+      }
+    }
     );
   }
 
@@ -52,5 +70,13 @@ export class FollowsComponent implements OnInit {
       this.predicate = 'followers';
       this.getFollows()
     }
+  }
+
+  handlePageEvent(e: PageEvent) {
+    this.pageEvent = e;
+    this.pageSize = e.pageSize;
+    this.pageNumber = e.pageIndex + 1;
+
+    this.getFollows();
   }
 }

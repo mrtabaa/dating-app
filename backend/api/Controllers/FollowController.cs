@@ -33,17 +33,31 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
         return BadRequest("Operation failed. Contact the admin.");
     }
 
-    [HttpGet()]
-    public async Task<ActionResult<IEnumerable<MemberDto>>> GetFollows(FollowParams followParams, CancellationToken cancellationToken)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
     {
         string? loggedInUserEmail = User.GetUserEmail();
 
         if (string.IsNullOrEmpty(loggedInUserEmail)) return BadRequest("No user is logged-in!");
 
-        IEnumerable<MemberDto> memberDtos = await _followRepository.GetFollowMembersAsync(loggedInUserEmail, followParams, cancellationToken);
+        PagedList<AppUser>? pagedAppUsers = await _followRepository.GetFollowMembersAsync(loggedInUserEmail, followParams, cancellationToken);
 
-        if (!memberDtos.Any()) return NoContent();
+        if (pagedAppUsers is null) return NoContent();
 
-        return Ok(memberDtos);
+        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
+                If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
+        */
+        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalCount, pagedAppUsers.TotalPages));
+
+        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
+                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+        List<MemberDto?> memberDtos = [];
+
+        foreach (AppUser pagedAppUser in pagedAppUsers)
+        {
+            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
+        }
+
+        return memberDtos;
     }
 }

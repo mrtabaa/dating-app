@@ -30,6 +30,12 @@ public class FollowRepository : IFollowRepository
     {
         FolowStatus followStatus = new();
 
+        if (string.IsNullOrEmpty(loggedInUserEmail))
+        {
+            followStatus.IsLoggedInUserEmailInvalid = true;
+            return followStatus;
+        }
+
         ObjectId? loggedInUserId = await _userRepository.GetIdByEmailAsync(loggedInUserEmail, cancellationToken);
         ObjectId? followedUserId = await _userRepository.GetIdByEmailAsync(followedMemberEmail, cancellationToken);
 
@@ -61,14 +67,14 @@ public class FollowRepository : IFollowRepository
         return followStatus; // Faild
     }
 
-    public async Task<IEnumerable<MemberDto>> GetFollowMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>> GetFollowMembersAsync(string loggedInUserEmail, FollowParams followParams, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for follows by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
         ObjectId? loggedInUserId = await _userRepository.GetIdByEmailAsync(loggedInUserEmail, cancellationToken);
 
-        IEnumerable<AppUser> appUsers = await GetAllFollowsFromDBAsync(loggedInUserId, predicate, cancellationToken);
+        followParams.LoggedInUserId = loggedInUserId;
 
-        return Mappers.ConvertAppUsersToMemberDtos(appUsers);
+        return await GetAllFollowsFromDBAsync(followParams, cancellationToken);
     }
 
     /// <summary>
@@ -116,29 +122,30 @@ public class FollowRepository : IFollowRepository
     /// <param name="loggedInUserId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>appUsers</returns>
-    private async Task<IEnumerable<AppUser>> GetAllFollowsFromDBAsync(ObjectId? loggedInUserId, string predicate, CancellationToken cancellationToken)
+    private async Task<PagedList<AppUser>> GetAllFollowsFromDBAsync(FollowParams followParams, CancellationToken cancellationToken)
     {
-        if (predicate.Equals("followings"))
+        if (followParams.Predicate.Equals("followings"))
         {
-            return await _collection.AsQueryable<Follow>()
-                        .Where(follow => follow.FollowerId == loggedInUserId) // filter by Lisa's id
+            var query = _collection.AsQueryable<Follow>()
+                        .Where(follow => follow.FollowerId == followParams.LoggedInUserId) // filter by Lisa's id
                         .Join(_collectionUsers.AsQueryable<AppUser>(), // get follows list which are followed by the followerId/loggedInUserId
                             follow => follow.FollowedMemberId, // map each followedId user with their AppUser Id bellow
                             appUser => appUser.Id,
-                            (follow, appUser) => appUser).ToListAsync(cancellationToken); // project the AppUser
-        }
+                            (follow, appUser) => appUser); // project the AppUser
 
-        if (predicate.Equals("followers"))
+            return await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+        }
+        else //(followParams.Predicate.Equals("followers"))
         {
-            return await _collection.AsQueryable<Follow>()
-                .Where(follow => follow.FollowedMemberId == loggedInUserId)
+            var query = _collection.AsQueryable<Follow>()
+                .Where(follow => follow.FollowedMemberId == followParams.LoggedInUserId)
                 .Join(_collectionUsers.AsQueryable<AppUser>(),
                     follow => follow.FollowerId,
                     appUser => appUser.Id,
-                    (follow, appUser) => appUser).ToListAsync(cancellationToken);
-        }
+                    (follow, appUser) => appUser);
 
-        return [];
+            return await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+        }
     }
 
     /// <summary>
