@@ -9,11 +9,9 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
-        List<MemberDto?> memberDtos = [];
-
         string? LoggedInUserEmail = User.GetUserEmail();
-        if(string.IsNullOrEmpty(LoggedInUserEmail)) return BadRequest("User is not loggedIn or has no email set.");
-        
+        if (string.IsNullOrEmpty(LoggedInUserEmail)) return BadRequest("User is not loggedIn or has no email set.");
+
         AppUser? appUser = await _userRepository.GetByEmailAsync(LoggedInUserEmail, cancellationToken);
 
         if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
@@ -31,6 +29,8 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+        List<MemberDto?> memberDtos = [];
+        
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
             memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
