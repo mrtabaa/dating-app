@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
-import { Pagination } from '../../../models/helpers/pagination';
+import { PaginatedResult, Pagination } from '../../../models/helpers/pagination';
 import { Member } from '../../../models/member.model';
 import { MemberCardComponent } from '../member-card/member-card.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -78,7 +78,7 @@ export class MemberListComponent implements OnInit, OnDestroy {
     this.setMemberParams();
 
     this.subscribed = this.memberService.getMembers().subscribe({
-      next: response => {
+      next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
           this.members = response.result;
           this.pagination = response.pagination;
@@ -107,10 +107,10 @@ export class MemberListComponent implements OnInit, OnDestroy {
       this.memberService.setMemberParams(this.memberParams);
 
     else {
-      const memberParams = localStorage.getItem('memberParams'); 
-      
+      const memberParams = localStorage.getItem('memberParams');
+
       if (memberParams)
-      this.memberParams = JSON.parse(memberParams);
+        this.memberParams = JSON.parse(memberParams);
     }
   }
 }
