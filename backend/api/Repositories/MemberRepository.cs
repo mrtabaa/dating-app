@@ -39,9 +39,7 @@ public class MemberRepository : IMemberRepository
         };
         #endregion Filters
         
-        PagedList<AppUser> pagedAppUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
-
-        return pagedAppUsers;
+        return await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
     }
 
     public async Task<MemberDto?> GetMemberByIdAsync(ObjectId? memberId, CancellationToken cancellationToken)
