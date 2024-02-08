@@ -49,6 +49,20 @@ public class UserRepository : IUserRepository
         return null;
     }
 
+    public async Task<ObjectId?> GetIdByEmailAsync(string? userEmail, CancellationToken cancellationToken)
+    {
+        if (userEmail is not null)
+        {
+            ObjectId appUserId = await _collection.AsQueryable<AppUser>()
+                .Where(appUser => appUser.Email == userEmail)
+                .Select(appUser => appUser.Id).FirstOrDefaultAsync(cancellationToken);
+
+            return appUserId;
+        }
+
+        return null;
+    }
+
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userEmail, CancellationToken cancellationToken)
     {
         if (userEmail is not null)

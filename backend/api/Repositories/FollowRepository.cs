@@ -1,3 +1,4 @@
+
 namespace api.Repositories;
 
 public class FollowRepository : IFollowRepository
@@ -6,11 +7,12 @@ public class FollowRepository : IFollowRepository
     private readonly IMongoClient _client; // used for Session
     private readonly IMongoCollection<Follow> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
+    private readonly IUserRepository _userRepository;
     private readonly ILogger<FollowRepository> _logger;
 
     // constructor - dependency injections
     public FollowRepository(
-        IMongoClient client, IMongoDbSettings dbSettings, ILogger<FollowRepository> logger
+        IMongoClient client, IMongoDbSettings dbSettings, IUserRepository userRepository, ILogger<FollowRepository> logger
         )
     {
         _client = client; // used for Session
@@ -18,25 +20,27 @@ public class FollowRepository : IFollowRepository
         _collection = dbName.GetCollection<Follow>("follows");
         _collectionUsers = dbName.GetCollection<AppUser>("users");
 
+        _userRepository = userRepository;
+
         _logger = logger;
     }
     #endregion
 
-    public async Task<FolowStatus> AddFollowAsync(string? loggedInUserEmail, string targetMemberEmail, CancellationToken cancellationToken)
+    public async Task<FolowStatus> AddFollowAsync(string? loggedInUserEmail, string followedMemberEmail, CancellationToken cancellationToken)
     {
         FolowStatus followStatus = new();
 
-        AppUser? followerAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == loggedInUserEmail).FirstOrDefaultAsync(cancellationToken);
-        AppUser? followedAppUser = await _collectionUsers.Find<AppUser>(appUser => appUser.Email == targetMemberEmail).FirstOrDefaultAsync(cancellationToken);
+        ObjectId? loggedInUserId = await _userRepository.GetIdByEmailAsync(loggedInUserEmail, cancellationToken);
+        ObjectId? followedUserId = await _userRepository.GetIdByEmailAsync(followedMemberEmail, cancellationToken);
 
-        if (followedAppUser is null)
+        if (followedUserId.Equals(ObjectId.Empty))
         {
             followStatus.IsTargetMemberEmailWrong = true;
             return followStatus;
         }
 
         bool IsAlreadyFollowed = await _collection.Find<Follow>(follow =>
-        follow.FollowerId == followerAppUser.Id && follow.FollowedId == followedAppUser.Id).AnyAsync(cancellationToken);
+        follow.FollowerId == loggedInUserId && follow.FollowedMemberId == followedUserId).AnyAsync(cancellationToken);
 
         if (IsAlreadyFollowed)
         {
@@ -44,12 +48,11 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-
-        Follow? follow = Mappers.ConvertAppUsertoFollow(followerAppUser.Id, followedAppUser.Id);
+        Follow? follow = Mappers.ConvertAppUsertoFollow(loggedInUserId, followedUserId);
 
         if (follow is not null)
         {
-            bool isSuccess = await SaveInDbWithSessionAsync(follow, followedAppUser.Id, cancellationToken);
+            bool isSuccess = await SaveInDbWithSessionAsync(follow, followedUserId, cancellationToken);
 
             followStatus.IsSuccess = isSuccess;
         }
@@ -61,10 +64,7 @@ public class FollowRepository : IFollowRepository
     public async Task<IEnumerable<MemberDto>> GetFollowMembersAsync(string? loggedInUserEmail, string predicate, CancellationToken cancellationToken)
     {
         // First get appUser Id then look for follows by Id instead of Email to improve performance. Searching by ObjectId is more secure and performant than string.
-        ObjectId? loggedInUserId = await _collectionUsers.AsQueryable<AppUser>()
-            .Where(appUser => appUser.Email == loggedInUserEmail)
-            .Select(appUser => appUser.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+        ObjectId? loggedInUserId = await _userRepository.GetIdByEmailAsync(loggedInUserEmail, cancellationToken);
 
         IEnumerable<AppUser> appUsers = await GetAllFollowsFromDBAsync(loggedInUserId, predicate, cancellationToken);
 
@@ -123,7 +123,7 @@ public class FollowRepository : IFollowRepository
             return await _collection.AsQueryable<Follow>()
                         .Where(follow => follow.FollowerId == loggedInUserId) // filter by Lisa's id
                         .Join(_collectionUsers.AsQueryable<AppUser>(), // get follows list which are followed by the followerId/loggedInUserId
-                            follow => follow.FollowedId, // map each followedId user with their AppUser Id bellow
+                            follow => follow.FollowedMemberId, // map each followedId user with their AppUser Id bellow
                             appUser => appUser.Id,
                             (follow, appUser) => appUser).ToListAsync(cancellationToken); // project the AppUser
         }
@@ -131,7 +131,7 @@ public class FollowRepository : IFollowRepository
         if (predicate.Equals("followers"))
         {
             return await _collection.AsQueryable<Follow>()
-                .Where(follow => follow.FollowedId == loggedInUserId)
+                .Where(follow => follow.FollowedMemberId == loggedInUserId)
                 .Join(_collectionUsers.AsQueryable<AppUser>(),
                     follow => follow.FollowerId,
                     appUser => appUser.Id,
