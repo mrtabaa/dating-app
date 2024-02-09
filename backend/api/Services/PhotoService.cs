@@ -58,15 +58,22 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
     /// <summary>
     /// Delete all files of the requested photo to be deleted.
     /// </summary>
-    /// <param name="filePaths"></param>
+    /// <param name="photo"></param>
     /// <returns>bool</returns>
-    public bool DeletePhotoFromDisk(IEnumerable<string> filePaths)
+    public async Task<bool> DeletePhotoFromDisk(Photo photo)
     {
-        foreach (string filePath in filePaths)
+        List<string> photoPaths = [];
+
+        photoPaths.Add(photo.Url_165);
+        photoPaths.Add(photo.Url_256);
+        photoPaths.Add(photo.Url_enlarged);
+
+        foreach (string photoPath in photoPaths)
         {
-            if (File.Exists(wwwRootUrl + filePath))
+            if (File.Exists(wwwRootUrl + photoPath))
             {
-                File.Delete(wwwRootUrl + filePath);
+                // Delete the file on a background thread and await the task
+                await Task.Run(() => File.Delete(wwwRootUrl + photoPath));
             }
             else
                 return false;

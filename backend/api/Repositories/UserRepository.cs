@@ -27,14 +27,14 @@ public class UserRepository : IUserRepository
     #region User Management
     public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken)
     {
-            return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken)
     {
-            AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
 
-            return appUser is null ? null : appUser;
+        return appUser is null ? null : appUser;
     }
 
     public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken)
@@ -129,45 +129,6 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    // TODO test this in linux with Postman
-    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
-    {
-        List<string> photoUrls = [];
-
-        List<Photo>? photos = await _collection.AsQueryable().Where<AppUser>(appUser => appUser.Email == userEmail).Select(elem => elem.Photos).SingleOrDefaultAsync(cancellationToken);
-
-        if (photos is null || photos.Count < 2)
-        {
-            _logger.LogError("Album is empty OR the requested photo is the MainPhoto. No photo to delete.");
-            return null;
-        }
-
-        foreach (Photo photo in photos)
-        {
-            if (photo.Url_165 == url_165_In)
-            {
-                if (photo.IsMain is true) // Prevent Main photo from deletion
-                {
-                    _logger.LogError("Main photo cannot be deleted!");
-                    return null;
-                }
-
-                photoUrls.Add(photo.Url_165);
-                photoUrls.Add(photo.Url_256);
-                photoUrls.Add(photo.Url_enlarged);
-            }
-        }
-
-        bool isDeleteSuccess = _photoService.DeletePhotoFromDisk(photoUrls);
-        if (!isDeleteSuccess)
-            _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
-
-        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
-
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
-    }
-
-    // TODO test this in linux with Postman
     public async Task<UpdateResult?> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
     {
         // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
@@ -181,6 +142,32 @@ public class UserRepository : IUserRepository
                                                     && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
         var updateNew = Builders<AppUser>.Update.Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
+    }
+
+
+    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
+    {
+        // Find the photo in AppUser
+        Photo photo = await _collection.AsQueryable()
+            .Where(appUser => appUser.Email == userEmail) // filter by user email
+            .SelectMany(appUser => appUser.Photos) // flatten the Photos array
+            .Where(photo => photo.Url_165 == url_165_In) // filter by photo url
+            .FirstOrDefaultAsync(cancellationToken); // return the photo or null
+
+        // Prevent deleting main photo
+        if (photo.IsMain)
+        {
+            _logger.LogError("Main photo cannot be deleted!");
+            return null;
+        }
+
+        bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
+        if (!isDeleteSuccess)
+            _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
+
+        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
+
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
     }
     #endregion Photo Management
 
