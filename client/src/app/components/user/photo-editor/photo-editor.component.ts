@@ -116,7 +116,7 @@ export class PhotoEditorComponent implements OnInit {
             if (photo.url_165 === url_165In) {
               photo.isMain = true;
 
-              // update navbar photos
+              // update navbar photo
               this.loggedInUser!.profilePhotoUrl = url_165In;
               this.accountService.setCurrentUser(this.loggedInUser!);
             }
@@ -125,7 +125,7 @@ export class PhotoEditorComponent implements OnInit {
 
         this.errorGlob = undefined;
       },
-      error: err => this.errorGlob = err.message // if set fails
+      error: (err: Error) => this.errorGlob = err.message // if set fails
     });
   }
 

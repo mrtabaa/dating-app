@@ -21,10 +21,18 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
+        /*                          ** Photo Upload Steps/Process **
+            UserController => UserRepository: GetById() => PhotoService => PhotoModifySaveService
+            PhotoService => UserRepository: MongoDb, return Photo => UserController
+        */
         Photo? photo = await _userRepository.UploadPhotoAsync(file, User.GetUserEmail(), cancellationToken);
 
         return photo is null ? BadRequest("Add photo failed. See logger") : photo;
     }
+
+    [HttpPut("set-main-photo")]
+    public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
+        await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
 
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
@@ -33,9 +41,5 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         return result is null ? BadRequest("Delete photo failed. See logger") : result;
     }
-
-    [HttpPut("set-main-photo")]
-    public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
-        await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
     #endregion Photo Management
 }
