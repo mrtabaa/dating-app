@@ -131,19 +131,30 @@ public class UserRepository : IUserRepository
 
     public async Task<UpdateResult?> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
     {
-        // UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
-        var filterOld = Builders<AppUser>.Filter.Where(appUser => appUser.Email == userEmail
-                                                    && appUser.Photos.Any<Photo>(photo => photo.IsMain == true));
-        var updateOld = Builders<AppUser>.Update.Set(user => user.Photos.FirstMatchingElement().IsMain, false);
-        await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
+         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
+        // set query
+        FilterDefinition<AppUser> filterOld = Builders<AppUser>.Filter
+            .Where(appUser =>
+                appUser.Email == userEmail && appUser.Photos.Any<Photo>(photo => photo.IsMain == true));
 
-        // SET the new main photo: find new photo by its Url_128; update IsMain to True
-        var filterNew = Builders<AppUser>.Filter.Where(appUser => appUser.Email == userEmail
-                                                    && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
-        var updateNew = Builders<AppUser>.Update.Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
+        UpdateDefinition<AppUser> updateOld = Builders<AppUser>.Update
+            .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, false);
+
+        // UpdateOneAsync(appUser => appUser.Photos.IsMain, false, null, cancellationToken);
+        await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
+        #endregion
+
+        #region  SET the new main photo: find new photo by its Url_128; update IsMain to True
+        FilterDefinition<AppUser> filterNew = Builders<AppUser>.Filter
+            .Where(appUser =>
+                appUser.Email == userEmail && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
+
+        UpdateDefinition<AppUser> updateNew = Builders<AppUser>.Update
+            .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
+        #endregion
+
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
-
 
     public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
     {
