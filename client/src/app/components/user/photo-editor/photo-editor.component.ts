@@ -86,16 +86,11 @@ export class PhotoEditorComponent implements OnInit {
    * @param url_165 
    */
   setNavbarProfilePhoto(url_165: string): void {
-    if (this.loggedInUser?.email) {
-      const updatedLoggedInUser: LoggedInUser = {
-        email: this.loggedInUser.email,
-        knownAs: this.loggedInUser.knownAs,
-        token: this.loggedInUser.token,
-        gender: this.loggedInUser.gender,
-        profilePhotoUrl: url_165 // set profile photo
-      }
+    if (this.loggedInUser) {
 
-      this.accountService.loggedInUserSig.set(updatedLoggedInUser)
+      this.loggedInUser.profilePhotoUrl = url_165;
+
+      this.accountService.loggedInUserSig.set(this.loggedInUser)
     }
   }
 
