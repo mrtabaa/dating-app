@@ -6,11 +6,14 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 {
     #region User Management
     [HttpPut]
-    public async Task<ActionResult<UpdateResult?>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<string>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        UpdateResult? result = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserEmail(), cancellationToken);
+        UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserEmail(), cancellationToken);
 
-        return result is null ? BadRequest("Update failed. See logger") : result;
+        return updateResult is null || updateResult.ModifiedCount == 0
+            ? BadRequest("Update failed. Try again later.")
+            : "User has been updated successfully.";
+
     }
     #endregion User Management
 
@@ -31,11 +34,23 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpPut("set-main-photo")]
-    public async Task<ActionResult<string>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
-        await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
+    public async Task<ActionResult<string>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
+    {
+        UpdateResult? updateResult = await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
+
+        return updateResult is null || updateResult.ModifiedCount == 0
+            ? BadRequest("Set as main photo failed. Try again in a few moments. If the issue persists contact the admin.")
+            : "Set this photo as main succeeded.";
+    }
 
     [HttpDelete("delete-one-photo")]
-    public async Task<ActionResult<string>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken) =>
-        await _userRepository.DeleteOnePhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
+    public async Task<ActionResult<string>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
+    {
+        UpdateResult? updateResult = await _userRepository.DeleteOnePhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
+
+        return updateResult is null || updateResult.ModifiedCount == 0
+            ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the admin.")
+            : "Photo deleted successfully.";
+    }
     #endregion Photo Management
 }
