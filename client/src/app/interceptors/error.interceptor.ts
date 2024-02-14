@@ -22,11 +22,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               throw modelStateErrors;
             }
             else {
-              snack.open(err.status.toString() + ': ' + err.error, 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
+              snack.open(err.status.toString() + ': ' + err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             }
             break;
           case 401:
-            snack.open('Unuthorized', 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
+            snack.open('Unuthorized', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             break;
           case 404:
             router.navigate(['/not-found']);
@@ -36,7 +36,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             router.navigate(['/server-error'], navigationExtras);
             break;
           default:
-            snack.open('Something unexpected went wrong.', 'Close', { horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000 });
+            snack.open('Something unexpected went wrong.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             console.log(err);
             break;
         }
