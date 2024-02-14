@@ -5,18 +5,12 @@
             @if (member.photos.length === 0) {
             <mat-error>Your album is empty. You may upload some photos.</mat-error>
             }
-            @if (errorGlob) {
-            <mat-error>
-                This update has failed for this reason:
-                <br> {{errorGlob}}
-                <br> Please try again or contact the admin.
-            </mat-error>
-            }
         </div>
         <div class="gallery">
             @for (photo of member.photos; track $index) {
             <div class="photos">
-                <img ngSrc="{{basePhotoUrl + photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
+                <img ngSrc="{{basePhotoUrl + photo.url_165}}" width="165" height="165" priority
+                    alt="{{member.knownAs}} photo">
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Set profile</button>

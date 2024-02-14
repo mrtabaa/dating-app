@@ -2,7 +2,6 @@ namespace api.Repositories;
 public class UserRepository : IUserRepository
 {
     #region Db and Token Settings
-    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser> _collection;
     private readonly ILogger<UserRepository> _logger;
     private readonly IPhotoService _photoService;
@@ -14,7 +13,7 @@ public class UserRepository : IUserRepository
         )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = dbName.GetCollection<AppUser>(_collectionName);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _photoService = photoService;
 
@@ -81,7 +80,6 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    // TODO test this in linux with Postman
     public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userEmail, CancellationToken cancellationToken)
     {
         if (userEmail is null)
@@ -129,9 +127,9 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<string> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
     {
-         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
+        #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
         // set query
         FilterDefinition<AppUser> filterOld = Builders<AppUser>.Filter
             .Where(appUser =>
@@ -140,7 +138,6 @@ public class UserRepository : IUserRepository
         UpdateDefinition<AppUser> updateOld = Builders<AppUser>.Update
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, false);
 
-        // UpdateOneAsync(appUser => appUser.Photos.IsMain, false, null, cancellationToken);
         await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
         #endregion
 
@@ -153,10 +150,18 @@ public class UserRepository : IUserRepository
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
         #endregion
 
-        return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
+
+        if (updateResult.MatchedCount == 0)
+            return "Photo is deleted and cannot be set as Main";
+
+        if (updateResult.ModifiedCount == 0)
+            return "Set as main failed. Try again in a few moment.";
+
+        return "Set this photo as main succeeded.";
     }
 
-    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
+    public async Task<string> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
     {
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()
@@ -165,20 +170,24 @@ public class UserRepository : IUserRepository
             .Where(photo => photo.Url_165 == url_165_In) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
 
-        // Prevent deleting main photo
+        if (photo is null)
+            return "The photo is already deleted.";
+
         if (photo.IsMain)
-        {
-            _logger.LogError("Main photo cannot be deleted!");
-            return null;
-        }
+            return "You cannot delete the main photo.";
 
         bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
         if (!isDeleteSuccess)
-            _logger.LogError("Delete from disk failed. e.g. No photo found by this filePath.");
+            return "Delete from disk failed. Try again or contact the admin.";
 
         var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
+        UpdateResult? updateResult = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
+
+        if (updateResult.ModifiedCount == 0)
+            return "Deletion failed. Try again in a few moments.";
+
+        return "Photo deleted successfully.";
     }
     #endregion Photo Management
 

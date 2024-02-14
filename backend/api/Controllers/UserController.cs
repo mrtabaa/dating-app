@@ -31,15 +31,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpPut("set-main-photo")]
-    public async Task<ActionResult<UpdateResult?>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
+    public async Task<ActionResult<string>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken) =>
         await _userRepository.SetMainPhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
 
     [HttpDelete("delete-one-photo")]
-    public async Task<ActionResult<UpdateResult>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
-    {
-        UpdateResult? result = await _userRepository.DeleteOnePhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
-
-        return result is null ? BadRequest("Delete photo failed. See logger") : result;
-    }
+    public async Task<ActionResult<string>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken) =>
+        await _userRepository.DeleteOnePhotoAsync(User.GetUserEmail(), photoUrlIn, cancellationToken);
     #endregion Photo Management
 }

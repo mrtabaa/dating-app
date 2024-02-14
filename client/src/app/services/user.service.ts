@@ -27,15 +27,25 @@ export class UserService {
     );
   }
 
-  setMainPhoto(url_128In: string): Observable<UpdateResult> {
+  setMainPhoto(url_128In: string): Observable<string> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
+    
+    const requestOptions: Object = {
+      params: queryParams,
+      responseType: 'text' // default is json
+    }
 
-    return this.http.put<UpdateResult>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
+    return this.http.put<string>(this.baseUrl + '/set-main-photo', null, requestOptions);
   }
 
-  deletePhoto(url_128In: string): Observable<UpdateResult> {
+  deletePhoto(url_128In: string): Observable<string> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    return this.http.delete<UpdateResult>(this.baseUrl + '/delete-one-photo', { params: queryParams });
+    const requestOptions: Object = {
+      params: queryParams,
+      responseType: 'text' // default is json
+    }
+
+    return this.http.delete<string>(this.baseUrl + '/delete-one-photo', requestOptions);
   }
 }

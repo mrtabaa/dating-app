@@ -8,11 +8,11 @@ import { Member } from '../../../models/member.model';
 import { environment } from '../../../../environments/environment';
 import { AccountService } from '../../../services/account.service';
 import { UserService } from '../../../services/user.service';
-import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Photo } from '../../../models/photo.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-photo-editor',
@@ -29,9 +29,9 @@ export class PhotoEditorComponent implements OnInit {
   @Input('member') member: Member | undefined;
   private accountService = inject(AccountService);
   private userService = inject(UserService);
+  private snackBar = inject(MatSnackBar);
 
   loggedInUser: LoggedInUser | null | undefined;
-  errorGlob: string | undefined;
   baseApiUrl: string = environment.apiUrl;
   basePhotoUrl: string = environment.apiPhotoUrl;
 
@@ -100,8 +100,9 @@ export class PhotoEditorComponent implements OnInit {
    */
   setMainPhoto(url_165In: string): void {
     this.userService.setMainPhoto(url_165In).pipe(take(1)).subscribe({
-      next: (updateResult: UpdateResult) => {
-        if (updateResult.modifiedCount === 1 && this.loggedInUser && this.member) {
+      next: (response: string) => {
+        if (response && this.member) {
+
           this.member.photos.forEach(photo => {
             // unset previous main
             if (photo.isMain === true)
@@ -116,19 +117,20 @@ export class PhotoEditorComponent implements OnInit {
               this.accountService.setCurrentUser(this.loggedInUser!);
             }
           })
-        }
 
-        this.errorGlob = undefined;
-      },
-      error: (err: Error) => this.errorGlob = err.message // if set fails
+          this.snackBar.open(response, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+        }
+      }
     });
   }
 
   deletePhoto(url_128In: string, index: number): void {
     this.userService.deletePhoto(url_128In).pipe(take(1)).subscribe({
-      next: (updateResult: UpdateResult) => {
-        if (updateResult.modifiedCount === 1 && this.member) {
+      next: (response: string) => {
+        if (response && this.member) {
           this.member.photos.splice(index, 1);
+
+          this.snackBar.open(response, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
         }
       }
     })
