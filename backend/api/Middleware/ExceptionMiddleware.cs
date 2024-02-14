@@ -7,14 +7,20 @@ namespace api.Middleware;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionMiddleware> _logger;
     private readonly IHostEnvironment _env;
+    private readonly IMongoCollection<ApiException> _collection;
+    private readonly ILogger<ExceptionMiddleware> _logger;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
+    public ExceptionMiddleware(
+        RequestDelegate next, IHostEnvironment env,
+        IMongoClient client, IMongoDbSettings dbSettings, ILogger<ExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
         _env = env;
+
+        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -26,12 +32,27 @@ public class ExceptionMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, ex.Message);
+
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = _env.IsDevelopment()
-            ? new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString())
-            : new ApiException(context.Response.StatusCode, ex.Message, "Internal Server Error");
+            ApiException response = _env.IsDevelopment()
+            ? new ApiException(
+                    Id: ObjectId.Empty, 
+                    StatusCode: context.Response.StatusCode, 
+                    Message: ex.Message, 
+                    Details: ex.StackTrace?.ToString(), 
+                    Time: DateTime.Now
+                )
+            : new ApiException(
+                    Id: ObjectId.Empty, 
+                    StatusCode: context.Response.StatusCode, 
+                    Message: ex.Message, 
+                    Details: "Internal Server Error", 
+                    Time: DateTime.Now
+                );
+
+            await _collection.InsertOneAsync(response);
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
