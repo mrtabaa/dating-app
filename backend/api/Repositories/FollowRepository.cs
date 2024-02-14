@@ -17,8 +17,8 @@ public class FollowRepository : IFollowRepository
     {
         _client = client; // used for Session
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = dbName.GetCollection<Follow>("follows");
-        _collectionUsers = dbName.GetCollection<AppUser>("users");
+        _collection = dbName.GetCollection<Follow>(AppVariablesExtensions.collectionFollows);
+        _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _userRepository = userRepository;
 

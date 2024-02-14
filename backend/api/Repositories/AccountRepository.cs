@@ -4,7 +4,6 @@ public class AccountRepository : IAccountRepository
 {
 
     #region Db and Token Settings
-    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly ITokenService _tokenService; // save user credential as a token
 
@@ -12,7 +11,7 @@ public class AccountRepository : IAccountRepository
     public AccountRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = database.GetCollection<AppUser>(_collectionName);
+        _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _tokenService = tokenService;
     }
     #endregion

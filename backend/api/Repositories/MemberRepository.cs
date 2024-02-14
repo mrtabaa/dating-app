@@ -3,14 +3,13 @@ namespace api.Repositories;
 public class MemberRepository : IMemberRepository
 {
     #region Db and Token Settings
-    const string _collectionName = "users";
     private readonly IMongoCollection<AppUser> _collection;
 
     // constructor - dependency injections
     public MemberRepository(IMongoClient client, IMongoDbSettings dbSettings)
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = dbName.GetCollection<AppUser>(_collectionName);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
     }
     #endregion
 
@@ -38,7 +37,7 @@ public class MemberRepository : IMemberRepository
             _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
         };
         #endregion Filters
-        
+
         return await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
     }
 
