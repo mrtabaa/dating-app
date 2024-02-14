@@ -112,23 +112,11 @@ export class UserEditComponent implements OnDestroy {
       }
 
       this.subscribedMember = this.userService.updateUser(updatedUser).subscribe({
-        next: (updateResult: UpdateResult) => {
-          if (updateResult.isAcknowledged && updateResult.modifiedCount > 0) {
-            this.matSnak.open("Successfully updated.", "Close", {
+        next: (response: string) => {
+          if (response) {
+            this.matSnak.open(response, "Close", {
               horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
             });
-          }
-          else {
-            this.matSnak.open("Update failed.", "Close", {
-              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
-            });
-          }
-        },
-        error: (errors: any[]) => {
-          for (const errorCategory of errors) {
-            for (const error of errorCategory) {
-              console.log(error);
-            }
           }
         }
       });

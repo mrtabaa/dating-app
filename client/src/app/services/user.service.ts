@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaderResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 import { UserUpdate } from '../models/user-update.model';
@@ -15,10 +15,15 @@ export class UserService {
   baseUrl: string = environment.apiUrl + 'user';
   members: Member[] = [];
 
-  updateUser(userUpdate: UserUpdate): Observable<UpdateResult> {
-    return this.http.put<UpdateResult>(this.baseUrl, userUpdate).pipe(
+  updateUser(userUpdate: UserUpdate): Observable<string> {
+    const requestOptions: object = {
+      responseType: 'text'
+    }
+
+    return this.http.put<string>(this.baseUrl, userUpdate, requestOptions).pipe(
       finalize(() => {
         const user = this.members.find(user => user.email === userUpdate.email);
+
         if (user) {
           const index = this.members.indexOf(user);
           this.members[index] = { ...this.members[index], ...userUpdate } // copy userUpdate to the list's user
@@ -29,7 +34,7 @@ export class UserService {
 
   setMainPhoto(url_128In: string): Observable<string> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
-    
+
     const requestOptions: Object = {
       params: queryParams,
       responseType: 'text' // default is json
