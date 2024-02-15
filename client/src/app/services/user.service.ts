@@ -40,7 +40,7 @@ export class UserService {
       responseType: 'text' // default is json
     }
 
-    return this.http.put<string>(this.baseUrl + '/set-main-photo', null, requestOptions);
+    return this.http.put<string>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
   }
 
   deletePhoto(url_128In: string): Observable<string> {
@@ -51,6 +51,6 @@ export class UserService {
       responseType: 'text' // default is json
     }
 
-    return this.http.delete<string>(this.baseUrl + '/delete-one-photo', requestOptions);
+    return this.http.delete<string>(this.baseUrl + '/delete-one-photo', { params: queryParams });
   }
 }

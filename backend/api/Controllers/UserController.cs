@@ -40,7 +40,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Set as main photo failed. Try again in a few moments. If the issue persists contact the admin.")
-            : "Set this photo as main succeeded.";
+            : Ok(new { message = "Set this photo as main succeeded." });
     }
 
     [HttpDelete("delete-one-photo")]
@@ -50,7 +50,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the admin.")
-            : "Photo deleted successfully.";
+            : Ok(new { message = "Photo deleted successfully." });
     }
     #endregion Photo Management
 }
