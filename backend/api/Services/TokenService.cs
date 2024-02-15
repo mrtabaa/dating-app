@@ -1,10 +1,14 @@
 namespace api.Services;
 public class TokenService : ITokenService
 {
+    private readonly IMongoCollection<AppUser> _collection;
     private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
 
-    public TokenService(IConfiguration config)
+    public TokenService(IConfiguration config, IMongoClient client, IMyMongoDbSettings dbSettings)
     {
+        var database = client.GetDatabase(dbSettings.DatabaseName);
+        _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+
         string? tokenValue = config[AppVariablesExtensions.TokenKey];
 
         // throw exception if tokenValue is null
@@ -13,28 +17,63 @@ public class TokenService : ITokenService
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue!));
     }
 
-    public string CreateToken(AppUser user)
+    public async Task<string?> CreateToken(AppUser user, CancellationToken cancellationToken)
     {
-        _ = _key ?? throw new ArgumentNullException("_key cannot be null", nameof(_key));
+        string jtiValue = Guid.NewGuid().ToString();
 
-        // TODO Generate the Claim with Guid.New and associate it with the AppUser so the email is not exposed to the client through the token.
-        var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.UniqueName, user.Email)
-        };
+        string? identifierHash = await InsertEncryptedUserId(user.Id, jtiValue, cancellationToken); // this securedId is stored in users collection to associate with the AppUser.
 
-        var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+        if (!string.IsNullOrEmpty(identifierHash))
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7), // Set expiration days
-            SigningCredentials = creds
-        };
+            var claims = new List<Claim> {
+            new(JwtRegisteredClaimNames.Sub, identifierHash), // unique user Id for identification.
+            new(JwtRegisteredClaimNames.Jti, jtiValue), // store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
+            };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
-        var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddDays(7), // Set expiration days
+                SigningCredentials = creds,
+            };
 
-        return tokenHandler.WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
+        }
+
+        return null;
+    }
+
+    private async Task<string?> InsertEncryptedUserId(ObjectId userId, string jtiValue, CancellationToken cancellationToken)
+    {
+        string newObjectId = ObjectId.GenerateNewId().ToString();
+
+        string identifierHash = BCrypt.Net.BCrypt.HashPassword(newObjectId);
+
+        UpdateDefinition<AppUser> updatedSecuredToken = Builders<AppUser>.Update
+            .Set(appUser => appUser.IdentifierHash, identifierHash)
+            .Set(appUser => appUser.JtiValue, jtiValue);
+
+        UpdateResult updateResult = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken);
+
+        if (updateResult.ModifiedCount == 1)
+            return identifierHash;
+
+        return null;
+    }
+
+    public async Task<ObjectId?> GetDecryptedUserId(string tokenIdentifierHash, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _collection.AsQueryable()
+            .Where(appUser => appUser.IdentifierHash == tokenIdentifierHash)
+            .Select(appUser => appUser.Id)
+            .SingleOrDefaultAsync(cancellationToken);
+
+        return userId is not null ? userId : null;
     }
 }
