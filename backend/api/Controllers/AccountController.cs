@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace api.Controllers;
 
 [Produces("application/json")]
@@ -11,7 +13,9 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return loggedInDto is null ? BadRequest("Email is already registered.") : loggedInDto;
+        if (loggedInDto.IsAlreadyExist) return BadRequest("Email is already taken.");
+
+        return loggedInDto.IsFailed ? BadRequest("Registration has failed. Try again.") : loggedInDto;
     }
 
     [AllowAnonymous]
@@ -20,10 +24,12 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     {
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);
 
-        return loggedInDto is null ? Unauthorized("Invalid username or password.") : loggedInDto;
+        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid username or password.");
+
+        return loggedInDto.IsFailed ? BadRequest("Login has failed. Try again.") : loggedInDto;
     }
 
-    [Authorize] //TODO Test it in client on refresh. Add to teach if works
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<LoggedInDto>> GetLoggedInUser(CancellationToken cancellationToken)
     {
@@ -38,8 +44,6 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpDelete("delete-user")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
-        var temp = User.GetUserEmail();
-
         DeleteResult? result = await _accountRepository.DeleteUserAsync(User.GetUserEmail(), cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }

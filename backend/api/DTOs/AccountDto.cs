@@ -29,7 +29,10 @@ public record LoginDto(
 public record LoggedInDto(
     string Token,
     string KnownAs,
-    string Email,
+    string? Email,
     string Gender,
-    string? ProfilePhotoUrl
+    string? ProfilePhotoUrl,
+    bool IsAlreadyExist,
+    bool IsWrongCreds,
+    bool IsFailed
 );
