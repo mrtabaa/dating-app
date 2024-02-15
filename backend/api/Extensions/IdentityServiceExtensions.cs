@@ -20,11 +20,11 @@ public static class IdentityServiceExtensions
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue)),
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidIssuer = "https://localhost:5101",
-                        ValidAudience = "https://localhost:5101",
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true
+                        // ValidIssuer = "https://localhost:5101",
+                        // ValidAudience = "https://localhost:5101",
 
                     };
                 });
