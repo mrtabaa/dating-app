@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace api.DTOs
 {
     public static class Mappers
@@ -5,28 +7,23 @@ namespace api.DTOs
         #region Generator Methods
         public static AppUser ConvertUserRegisterDtoToAppUser(UserRegisterDto userInput) //, int likedCount, int likedByCount
         {
-            // manually dispose HMACSHA512 after being done
-            using var hmac = new HMACSHA512();
-
-            return new AppUser(
-                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: ObjectId.GenerateNewId(),
-                Email: userInput.Email.ToLower().Trim(),
-                PasswordHash: hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password)),
-                PasswordSalt: hmac.Key,
-                DateOfBirth: userInput.DateOfBirth,
-                KnownAs: userInput.KnownAs.Trim(),
-                Created: DateTime.UtcNow,
-                LastActive: DateTime.UtcNow,
-                Gender: userInput.Gender.ToLower(),
-                Introduction: userInput.Introduction?.Trim(),
-                LookingFor: userInput.LookingFor?.Trim(),
-                Interests: userInput.Interests?.Trim(),
-                City: userInput.City.Trim(),
-                Country: userInput.Country.Trim(),
-                Photos: [],
-                FollowersCount: 0
-            );
+            return new AppUser
+            {
+                Schema = AppVariablesExtensions.AppVersions.Last<string>(),
+                Email = userInput.Email, // required by AspNet Identity
+                UserName = userInput.Email, // required by AspNet Identity
+                DateOfBirth = userInput.DateOfBirth,
+                KnownAs = userInput.KnownAs.Trim(),
+                LastActive = DateTime.UtcNow,
+                Gender = userInput.Gender.ToLower(),
+                Introduction = userInput.Introduction?.Trim(),
+                LookingFor = userInput.LookingFor?.Trim(),
+                Interests = userInput.Interests?.Trim(),
+                City = userInput.City.Trim(),
+                Country = userInput.Country.Trim(),
+                Photos = [],
+                FollowersCount = 0
+            };
         }
 
         public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser)
@@ -37,7 +34,7 @@ namespace api.DTOs
                     Email: appUser.Email,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                     KnownAs: appUser.KnownAs,
-                    Created: appUser.Created,
+                    Created: appUser.CreatedOn,
                     LastActive: appUser.LastActive,
                     Gender: appUser.Gender,
                     Introduction: appUser.Introduction,
@@ -66,7 +63,7 @@ namespace api.DTOs
                             Email: appUser.Email,
                             Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                             KnownAs: appUser.KnownAs,
-                            Created: appUser.Created,
+                            Created: appUser.CreatedOn,
                             LastActive: appUser.LastActive,
                             Gender: appUser.Gender,
                             Introduction: appUser.Introduction,
@@ -81,14 +78,19 @@ namespace api.DTOs
             return memberDtos;
         }
 
-        public static LoggedInDto? ConvertAppUserToLoggedInDto(AppUser appUser, string token)
+        public static LoggedInDto ConvertAppUserToLoggedInDto(
+            [Optional] AppUser appUser, [Optional] string token, [Optional] bool isWrongCreds,
+            [Optional] bool isAlreadyExist, [Optional] bool isFailed)
         {
             return new LoggedInDto(
                 Token: token,
                 KnownAs: appUser.KnownAs,
                 Email: appUser.Email,
                 Gender: appUser.Gender,
-                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
+                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165,
+                IsAlreadyExist: isAlreadyExist,
+                IsWrongCreds: isWrongCreds,
+                IsFailed: isFailed
             );
         }
 

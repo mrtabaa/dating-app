@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+
+
 namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
@@ -5,53 +8,54 @@ public class AccountRepository : IAccountRepository
 
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly RoleManager<AppRole> _roleManager;
     private readonly ITokenService _tokenService; // save user credential as a token
 
     // constructor - dependency injection
-    public AccountRepository(IMongoClient client, IMongoDbSettings dbSettings, ITokenService tokenService)
+    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, ITokenService tokenService)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        _userManager = userManager;
+        _roleManager = roleManager;
         _tokenService = tokenService;
     }
     #endregion
 
     #region CRUD
-    public async Task<LoggedInDto?> CreateAsync(UserRegisterDto userInput, CancellationToken cancellationToken)
+    public async Task<LoggedInDto> CreateAsync(UserRegisterDto registerDto, CancellationToken cancellationToken)
     {
-        bool userExist = await _collection.Find<AppUser>(appUser => appUser.Email == userInput.Email).AnyAsync(cancellationToken);
+        // _userManager.Users doesn't have AnyAsync so use MongoDriver here
+        bool userExist = await _collection.Find<AppUser>(appUser => appUser.Email == registerDto.Email.ToLower().Trim()).AnyAsync(cancellationToken);
 
-        if (userExist) return null;
+        if (userExist) return Mappers.ConvertAppUserToLoggedInDto(isAlreadyExist: true);
 
-        AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(userInput);
+        AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
 
-        // Insertion successful OR throw an exception
-        await _collection!.InsertOneAsync(appUser, null, cancellationToken); // mark ! after _collection! tells compiler it's nullable
+        var userCreated = _userManager.CreateAsync(appUser, registerDto.Password);
 
-        if (appUser.Email is null)
-            _ = appUser.Email ?? throw new ArgumentException("appUser.Email cannot be null", nameof(appUser.Email));
+        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
+        if (!userCreated.Result.Succeeded || string.IsNullOrEmpty(token))
+            return Mappers.ConvertAppUserToLoggedInDto(isFailed: true);
+
+        return Mappers.ConvertAppUserToLoggedInDto(appUser, token); // success
     }
 
-    public async Task<LoggedInDto?> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
-        var appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userInput.Email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
+        AppUser? appUser = await _userManager.FindByEmailAsync(userInput.Email);
 
-        if (appUser is null) return null;
+        if (appUser is null || !await _userManager.CheckPasswordAsync(appUser, userInput.Password)) 
+            return Mappers.ConvertAppUserToLoggedInDto(isWrongCreds: true);
 
-        if (appUser.Email is null)
-            _ = appUser.Email ?? throw new ArgumentException("appUser.Id cannot be null", nameof(appUser.Email));
+        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        using var hmac = new HMACSHA512(appUser.PasswordSalt!);
-        var ComputedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userInput.Password));
+        if (string.IsNullOrEmpty(token))
+            return Mappers.ConvertAppUserToLoggedInDto(isFailed: true);
 
-        if (appUser.PasswordHash is not null && appUser.PasswordHash.SequenceEqual(ComputedHash))
-        {
-            return Mappers.ConvertAppUserToLoggedInDto(appUser, _tokenService.CreateToken(appUser));
-        }
-
-        return null;
+        return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
     }
 
     public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userEmail, string? token, CancellationToken cancellationToken)
@@ -60,7 +64,7 @@ public class AccountRepository : IAccountRepository
         {
             AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
 
-            return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+            return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token, true);
         }
 
         return null;
@@ -69,4 +73,6 @@ public class AccountRepository : IAccountRepository
     public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion CRUD
+
+    // private async Task<string> GetToken(string token)
 }

@@ -7,7 +7,7 @@ public class BuggyController : BaseApiController
     const string _collectionName = "Users";
     private readonly IMongoCollection<AppUser>? _collection;
 
-    public BuggyController(IMongoClient client, IMongoDbSettings dbSettings)
+    public BuggyController(IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(_collectionName);

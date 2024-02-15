@@ -8,7 +8,7 @@ public class UserRepository : IUserRepository
 
     // constructor - dependency injections
     public UserRepository(
-        IMongoClient client, IMongoDbSettings dbSettings,
+        IMongoClient client, IMyMongoDbSettings dbSettings,
         ILogger<UserRepository> logger, IPhotoService photoService
         )
     {

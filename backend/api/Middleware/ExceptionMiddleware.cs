@@ -13,7 +13,7 @@ public class ExceptionMiddleware
 
     public ExceptionMiddleware(
         RequestDelegate next, IHostEnvironment env,
-        IMongoClient client, IMongoDbSettings dbSettings, ILogger<ExceptionMiddleware> logger)
+        IMongoClient client, IMyMongoDbSettings dbSettings, ILogger<ExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -38,17 +38,17 @@ public class ExceptionMiddleware
 
             ApiException response = _env.IsDevelopment()
             ? new ApiException(
-                    Id: ObjectId.Empty, 
-                    StatusCode: context.Response.StatusCode, 
-                    Message: ex.Message, 
-                    Details: ex.StackTrace?.ToString(), 
+                    Id: ObjectId.Empty,
+                    StatusCode: context.Response.StatusCode,
+                    Message: ex.Message,
+                    Details: ex.StackTrace?.ToString(),
                     Time: DateTime.Now
                 )
             : new ApiException(
-                    Id: ObjectId.Empty, 
-                    StatusCode: context.Response.StatusCode, 
-                    Message: ex.Message, 
-                    Details: "Internal Server Error", 
+                    Id: ObjectId.Empty,
+                    StatusCode: context.Response.StatusCode,
+                    Message: ex.Message,
+                    Details: "Internal Server Error",
                     Time: DateTime.Now
                 );
 

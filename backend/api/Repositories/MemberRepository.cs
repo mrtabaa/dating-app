@@ -6,7 +6,7 @@ public class MemberRepository : IMemberRepository
     private readonly IMongoCollection<AppUser> _collection;
 
     // constructor - dependency injections
-    public MemberRepository(IMongoClient client, IMongoDbSettings dbSettings)
+    public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
@@ -33,7 +33,7 @@ public class MemberRepository : IMemberRepository
         query = memberParams.OrderBy switch
         { // sort users based on Created or LastActive
             "age" => query.OrderByDescending(appUser => appUser.DateOfBirth).ThenBy(appUser => appUser.Id),
-            "created" => query.OrderByDescending(appUser => appUser.Created).ThenBy(appUser => appUser.Id),
+            "created" => query.OrderByDescending(appUser => appUser.CreatedOn).ThenBy(appUser => appUser.Id),
             _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
         };
         #endregion Filters

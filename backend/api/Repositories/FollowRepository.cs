@@ -12,7 +12,7 @@ public class FollowRepository : IFollowRepository
 
     // constructor - dependency injections
     public FollowRepository(
-        IMongoClient client, IMongoDbSettings dbSettings, IUserRepository userRepository, ILogger<FollowRepository> logger
+        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository, ILogger<FollowRepository> logger
         )
     {
         _client = client; // used for Session

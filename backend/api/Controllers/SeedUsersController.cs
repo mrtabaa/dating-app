@@ -7,7 +7,7 @@ public class SeedUsersController : BaseApiController
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
 
-    public SeedUsersController(IMongoClient client, IMongoDbSettings dbSettings)
+    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = _database.GetCollection<AppUser>(_collectionName);
