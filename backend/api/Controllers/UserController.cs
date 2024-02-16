@@ -12,7 +12,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Update failed. Try again later.")
-            : "User has been updated successfully.";
+            : Ok(new { message = "User has been updated successfully." });
 
     }
     #endregion User Management
