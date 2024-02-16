@@ -37,13 +37,13 @@ public class UserRepository : IUserRepository
 
     public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
          await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.Email == userEmail.ToUpper().Trim())
+            .Where(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim())
             .Select(appUser => appUser.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<string?> GetKnownAsByIdAsync(string? userEmail, CancellationToken cancellationToken) =>
+    public async Task<string?> GetKnownAsByIdAsync(string userEmail, CancellationToken cancellationToken) =>
         await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.Email == userEmail)
+            .Where(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim())
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
 
