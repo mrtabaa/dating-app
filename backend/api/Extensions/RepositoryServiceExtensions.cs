@@ -4,7 +4,6 @@ public static class RepositoryServiceExtensions
 {
     public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
     {
-        services.AddScoped<LogUserActivity>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

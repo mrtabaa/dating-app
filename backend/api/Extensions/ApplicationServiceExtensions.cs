@@ -6,7 +6,6 @@ public static class ApplicationServiceExtensions
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
-
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
         // get section
@@ -33,6 +32,8 @@ public static class ApplicationServiceExtensions
             options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
                 .AllowAnyMethod().WithOrigins("http://localhost:4300"));
         });
+
+        services.AddScoped<LogUserActivity>(); // monitor/log userActivity
 
         #endregion Others
 
