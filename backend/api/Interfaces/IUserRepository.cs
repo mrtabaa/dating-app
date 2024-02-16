@@ -7,7 +7,7 @@ public interface IUserRepository
 
     public Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken);
 
-    public Task<string?> GetKnownAsByIdAsync(string? userId, CancellationToken cancellationToken);
+    public Task<string?> GetKnownAsByIdAsync(string userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken);
 
