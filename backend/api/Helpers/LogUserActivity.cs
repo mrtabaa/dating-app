@@ -12,19 +12,22 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
         // return if User is not authenticated
         if (resultContext.HttpContext.User.Identity is not null && !resultContext.HttpContext.User.Identity.IsAuthenticated) return;
 
-        string? loggedInUserEmail = resultContext.HttpContext.User.GetUserEmail();
+        string? loggedInUserIdHashed = resultContext.HttpContext.User.GetUserIdHashed();
 
         IUserRepository userRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
 
-        if (!string.IsNullOrEmpty(loggedInUserEmail))
+        if (string.IsNullOrEmpty(loggedInUserIdHashed))
         {
-            UpdateResult? updateResult = await userRepository.UpdateLastActive(loggedInUserEmail, cancellationToken);
-
-            if (updateResult?.ModifiedCount == 0)
-                _logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");
+            _ = loggedInUserIdHashed ?? throw new ArgumentException("Parameter cannot be null", nameof(loggedInUserIdHashed));
+            return;
         }
+
+        UpdateResult? updateResult = await userRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
+
+        if (updateResult?.ModifiedCount == 0)
+            _logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");
         else
             _logger.LogError("loggedInUserId is null which is not allowed here.");
     }

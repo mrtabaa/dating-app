@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace api.Repositories;
 public class UserRepository : IUserRepository
 {
@@ -5,18 +7,19 @@ public class UserRepository : IUserRepository
     private readonly IMongoCollection<AppUser> _collection;
     private readonly ILogger<UserRepository> _logger;
     private readonly IPhotoService _photoService;
+    private readonly ITokenService _tokenService;
 
     // constructor - dependency injections
     public UserRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        ILogger<UserRepository> logger, IPhotoService photoService
+        ILogger<UserRepository> logger, IPhotoService photoService, ITokenService tokenService
         )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _photoService = photoService;
-
+        _tokenService = tokenService;
         _logger = logger;
     }
     #endregion
@@ -24,38 +27,31 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken)
-    {
-        return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-    }
+    public async Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken) =>
+       userId.HasValue
+       ? await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken)
+       : null;
 
-    public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken)
-    {
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
+    public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
+         await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
-        return appUser is null ? null : appUser;
-    }
-
-    public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken)
-    {
-        return await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.Email == userEmail)
+    public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
+         await _collection.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Email == userEmail.ToUpper().Trim())
             .Select(appUser => appUser.Id)
             .FirstOrDefaultAsync(cancellationToken);
-    }
 
-    public async Task<string?> GetKnownAsByEmailAsync(string userEmail, CancellationToken cancellationToken)
-    {
-        return await _collection.AsQueryable<AppUser>()
+    public async Task<string?> GetKnownAsByIdAsync(string? userEmail, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable<AppUser>()
             .Where(appUser => appUser.Email == userEmail)
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
-    }
 
-    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userEmail, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userIdHashed, CancellationToken cancellationToken)
     {
-        if (userEmail is null)
-            return null;
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue) return null;
 
         var updatedUser = Builders<AppUser>.Update
         .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
@@ -65,31 +61,33 @@ public class UserRepository : IUserRepository
         .Set(appUser => appUser.City, userUpdateDto.City.Trim())
         .Set(appUser => appUser.Country, userUpdateDto.Country.Trim());
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, updatedUser, null, cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> UpdateLastActive(string loggedInUserEmail, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
     {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue) return null;
+
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == loggedInUserEmail, updatedUserLastActive, null, cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
     }
     #endregion User Management
 
     #region Photo Management
-    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userEmail, CancellationToken cancellationToken)
+    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userIdHashed, CancellationToken cancellationToken)
     {
-        if (userEmail is null)
-        {
-            _logger.LogError("userEmail is Null");
-            return null;
-        }
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        AppUser? appUser = await GetByEmailAsync(userEmail, cancellationToken);
+        if (!userId.HasValue) return null;
+
+        AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
         {
-            _logger.LogError("user is Null / not found");
+            _logger.LogError("appUser is Null / not found");
             return null;
         }
 
@@ -115,7 +113,7 @@ public class UserRepository : IUserRepository
                 .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
                 .Set(doc => doc.Photos, appUser.Photos);
 
-            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, updatedUser, null, cancellationToken);
+            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
 
             // return the save photo if save on disk and DB
             return photoUrls is not null && result.ModifiedCount == 1 ? photo : null;
@@ -125,13 +123,17 @@ public class UserRepository : IUserRepository
         return null;
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(string? userEmail, string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string photoUrlIn, CancellationToken cancellationToken)
     {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue) return null;
+
         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
         // set query
         FilterDefinition<AppUser> filterOld = Builders<AppUser>.Filter
             .Where(appUser =>
-                appUser.Email == userEmail && appUser.Photos.Any<Photo>(photo => photo.IsMain == true));
+                appUser.Id == userId && appUser.Photos.Any<Photo>(photo => photo.IsMain == true));
 
         UpdateDefinition<AppUser> updateOld = Builders<AppUser>.Update
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, false);
@@ -142,7 +144,7 @@ public class UserRepository : IUserRepository
         #region  SET the new main photo: find new photo by its Url_128; update IsMain to True
         FilterDefinition<AppUser> filterNew = Builders<AppUser>.Filter
             .Where(appUser =>
-                appUser.Email == userEmail && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
+                appUser.Id == userId && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
 
         UpdateDefinition<AppUser> updateNew = Builders<AppUser>.Update
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
@@ -151,11 +153,15 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> DeleteOnePhotoAsync(string? userEmail, string? url_165_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeletePhotoAsync(string? userIdHashed, string? url_165_In, CancellationToken cancellationToken)
     {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue) return null;
+
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()
-            .Where(appUser => appUser.Email == userEmail) // filter by user email
+            .Where(appUser => appUser.Id == userId) // filter by user email
             .SelectMany(appUser => appUser.Photos) // flatten the Photos array
             .Where(photo => photo.Url_165 == url_165_In) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
@@ -169,9 +175,13 @@ public class UserRepository : IUserRepository
 
         var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Email == userEmail, update, null, cancellationToken);
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, update, null, cancellationToken);
     }
     #endregion Photo Management
 
     #endregion CRUD
+
+    #region Helpers
+
+    #endregion
 }

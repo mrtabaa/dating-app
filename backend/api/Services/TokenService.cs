@@ -26,7 +26,7 @@ public class TokenService : ITokenService
         if (!string.IsNullOrEmpty(identifierHash))
         {
             var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, identifierHash), // unique user Id for identification.
+            new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
             new(JwtRegisteredClaimNames.Jti, jtiValue), // store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 
@@ -67,13 +67,17 @@ public class TokenService : ITokenService
         return null;
     }
 
-    public async Task<ObjectId?> GetDecryptedUserId(string tokenIdentifierHash, CancellationToken cancellationToken)
-    {
-        ObjectId? userId = await _collection.AsQueryable()
-            .Where(appUser => appUser.IdentifierHash == tokenIdentifierHash)
+    /// <summary>
+    /// Get a hashed ObjecdId of the AppUser and return the user's actual ObjectId from DB.
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Decrypted AppUser ObjedId</returns>
+    public async Task<ObjectId?> GetActualUserId(string? userIdHashed, CancellationToken cancellationToken) =>
+        string.IsNullOrEmpty(userIdHashed)
+        ? null
+        : await _collection.AsQueryable()
+            .Where(appUser => appUser.IdentifierHash == userIdHashed)
             .Select(appUser => appUser.Id)
             .SingleOrDefaultAsync(cancellationToken);
-
-        return userId is not null ? userId : null;
-    }
 }

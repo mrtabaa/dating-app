@@ -35,7 +35,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     {
         string? token = Response.HttpContext.GetTokenAsync("access_token").Result;
 
-        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserEmail(), token, cancellationToken);
+        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserIdHashed(), token, cancellationToken);
 
         return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
     }
@@ -44,7 +44,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpDelete("delete-user")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
-        DeleteResult? result = await _accountRepository.DeleteUserAsync(User.GetUserEmail(), cancellationToken);
+        DeleteResult? result = await _accountRepository.DeleteUserAsync(User.GetUserIdHashed(), cancellationToken);
         return result is null ? BadRequest("Delete user failed!") : result;
     }
 }
