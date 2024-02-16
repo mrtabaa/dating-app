@@ -6,43 +6,40 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
     [HttpPost("{targetMemberEmail}")]
     public async Task<ActionResult> AddFollow(string targetMemberEmail, CancellationToken cancellationToken)
     {
-        string? loggedInUserEmail = User.GetUserEmail();
+        string? userIdHashed = User.GetUserIdHashed();
 
-        if (!string.IsNullOrEmpty(loggedInUserEmail))
+        if (!string.IsNullOrEmpty(userIdHashed))
         {
-            if (loggedInUserEmail == targetMemberEmail)
-                return BadRequest("Following yourself is great but is not stored!");
-
-            FolowStatus followStatus = await _followRepository.AddFollowAsync(loggedInUserEmail, targetMemberEmail, cancellationToken);
+            FolowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberEmail, cancellationToken);
             if (followStatus.IsSuccess)
                 return Ok();
 
+            if (followStatus.IsFollowingThemself)
+                return BadRequest("Following yourself is great but is not stored!");
+
             if (followStatus.IsAlreadyFollowed)
             {
-                string? knownAs = await _userRepository.GetKnownAsByEmailAsync(targetMemberEmail, cancellationToken);
+                string? knownAs = await _userRepository.GetKnownAsByIdAsync(targetMemberEmail, cancellationToken);
                 if (knownAs is not null)
                     return BadRequest($"{knownAs} is already followed.");
             }
-
-            if (followStatus.IsTargetMemberEmailWrong)
-                return BadRequest("Wrong target email is given.");
-
-            return BadRequest("Following the member failed. Try agian.");
         }
 
-        return BadRequest("Operation failed. Contact the admin.");
+        return BadRequest("Following the member failed. Try again or contact the admin.");
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
     {
-        string? loggedInUserEmail = User.GetUserEmail();
+        string? userIdHashed = User.GetUserIdHashed();
 
-        if (string.IsNullOrEmpty(loggedInUserEmail)) return BadRequest("No user is logged-in!");
+        if (string.IsNullOrEmpty(userIdHashed)) return BadRequest("No user is logged-in!");
 
-        PagedList<AppUser>? pagedAppUsers = await _followRepository.GetFollowMembersAsync(loggedInUserEmail, followParams, cancellationToken);
+        PagedList<AppUser>? pagedAppUsers = await _followRepository.GetFollowMembersAsync(userIdHashed, followParams, cancellationToken);
 
-        if (pagedAppUsers is null) return NoContent();
+        if (pagedAppUsers is null) return BadRequest("Getting members faild");
+
+        if (pagedAppUsers.Count == 0) return NoContent();
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
