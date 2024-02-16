@@ -85,7 +85,7 @@ namespace api.DTOs
             return new LoggedInDto(
                 Token: token,
                 KnownAs: appUser.KnownAs,
-                Email: appUser.Email,
+                Email: appUser.NormalizedEmail,
                 Gender: appUser.Gender,
                 ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165,
                 IsAlreadyExist: isAlreadyExist,
