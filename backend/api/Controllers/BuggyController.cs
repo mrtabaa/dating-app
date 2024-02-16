@@ -32,9 +32,11 @@ public class BuggyController : BaseApiController
     }
 
     [HttpGet("server-error")]
-    public ActionResult<string> GetServerError()
+    public ActionResult<string>? GetServerError()
     {
         AppUser thing = _collection.Find<AppUser>(user => user.Email == "no email").FirstOrDefault();
+
+        if (string.IsNullOrEmpty(thing.Email)) return null;
 
         return thing.Email.ToUpper(); //return 500
     }
