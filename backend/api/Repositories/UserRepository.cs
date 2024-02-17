@@ -51,7 +51,7 @@ public class UserRepository : IUserRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         var updatedUser = Builders<AppUser>.Update
         .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
@@ -68,7 +68,7 @@ public class UserRepository : IUserRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
@@ -82,7 +82,7 @@ public class UserRepository : IUserRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
@@ -127,7 +127,7 @@ public class UserRepository : IUserRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
         // set query
@@ -157,7 +157,7 @@ public class UserRepository : IUserRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()
