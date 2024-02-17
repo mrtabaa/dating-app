@@ -81,12 +81,15 @@ public class AccountRepository : IAccountRepository
         return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
     }
 
-    // TODO convert userEmail to userId
-    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userEmail, string? token, CancellationToken cancellationToken)
+    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userIdHashed, string? token, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(token)) return null;
+        if (string.IsNullOrEmpty(userIdHashed) || string.IsNullOrEmpty(token)) return null;
 
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == userEmail).FirstOrDefaultAsync(cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if(!userId.HasValue || userId.Equals(ObjectId.Empty)) return null;
+
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
     }
