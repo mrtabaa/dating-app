@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace api.Controllers;
 
 [Produces("application/json")]
