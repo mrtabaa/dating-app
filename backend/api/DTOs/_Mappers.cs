@@ -78,20 +78,16 @@ namespace api.DTOs
             return memberDtos;
         }
 
-        public static LoggedInDto ConvertAppUserToLoggedInDto(
-            [Optional] AppUser appUser, [Optional] string token, [Optional] bool isWrongCreds,
-            [Optional] bool isAlreadyExist, [Optional] bool isFailed)
+        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token)
         {
-            return new LoggedInDto(
-                Token: token,
-                KnownAs: appUser.KnownAs,
-                Email: appUser.NormalizedEmail,
-                Gender: appUser.Gender,
-                ProfilePhotoUrl: appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165,
-                IsAlreadyExist: isAlreadyExist,
-                IsWrongCreds: isWrongCreds,
-                IsFailed: isFailed
-            );
+            return new LoggedInDto
+            {
+                Token = token,
+                KnownAs = appUser.KnownAs,
+                Email = appUser.NormalizedEmail,
+                Gender = appUser.Gender,
+                ProfilePhotoUrl = appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
+            };
         }
 
         public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain)

@@ -26,13 +26,15 @@ public record LoginDto(
     [Length(7, 20)] string Password
 );
 
-public record LoggedInDto(
-    string Token,
-    string KnownAs,
-    string? Email,
-    string Gender,
-    string? ProfilePhotoUrl,
-    bool IsAlreadyExist,
-    bool IsWrongCreds,
-    bool IsFailed
-);
+public class LoggedInDto
+{
+    public string? Token { get; set; }
+    public string? KnownAs { get; set; }
+    public string? Email { get; set; }
+    public string? Gender { get; set; }
+    public string? ProfilePhotoUrl { get; set; }
+    public bool IsAlreadyExist { get; set; }
+    public bool IsWrongCreds { get; set; }
+    public bool IsFailed { get; set; }
+}
+
