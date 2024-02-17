@@ -29,7 +29,8 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         // _userManager.Users doesn't have AnyAsync so use MongoDriver here
-        bool userExist = await _collection.Find<AppUser>(appUser => appUser.Email == registerDto.Email.ToLower().Trim()).AnyAsync(cancellationToken);
+        // TODO change all Email to UserName
+        bool userExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == registerDto.Email.ToUpper().Trim()).AnyAsync(cancellationToken);
 
         if (userExist)
         {
