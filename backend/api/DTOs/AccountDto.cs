@@ -37,4 +37,3 @@ public class LoggedInDto
     public bool IsWrongCreds { get; set; }
     public bool IsFailed { get; set; }
 }
-
