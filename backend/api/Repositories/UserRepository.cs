@@ -28,9 +28,20 @@ public class UserRepository : IUserRepository
 
     #region User Management
     public async Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken) =>
-       userId.HasValue
+       userId.HasValue && !userId.Value.Equals(ObjectId.Empty)
        ? await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken)
        : null;
+
+    public async Task<AppUser?> GetByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(userIdHashed)) return null;
+
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+    }
 
     public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
          await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
@@ -166,8 +177,7 @@ public class UserRepository : IUserRepository
             .Where(photo => photo.Url_165 == url_165_In) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
 
-        if (photo is null)
-            return null;
+        if (photo is null) return null;
 
         bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
         if (!isDeleteSuccess)
