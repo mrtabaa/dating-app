@@ -40,32 +40,28 @@ export class LoginComponent implements OnInit, OnDestroy {
 
 
   loginFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]]
+    emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]]
   });
 
-
-  get EmailCtrl(): FormControl {
-    return this.loginFg.get('emailCtrl') as FormControl;
+  get EmailUsernameCtrl(): FormControl {
+    return this.loginFg.get('emailUsernameCtrl') as FormControl;
   }
   get PasswordCtrl(): FormControl {
     return this.loginFg.get('passwordCtrl') as FormControl;
   }
 
-  loginEmail(): void {
+  loginEmailUsername(): void {
     let userLoginInput: UserLogin = {
-      email: this.EmailCtrl.value,
+      emailUsername: this.EmailUsernameCtrl.value,
       password: this.PasswordCtrl.value
     };
 
     this.subscrition = this.accountService.login(userLoginInput)
       .subscribe({
         next: res => {
-          // console.log('User:', res)
-        },
-        error: err => this.snackBar.open(err.error, "Close", {
-          horizontalPosition: 'end', verticalPosition: 'bottom', duration: 7000
-        }),
+          this.snackBar.open("You logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+        }
         // complete: () => console.log('Login successful.')
       });
 
