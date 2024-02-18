@@ -11,7 +11,9 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        if (loggedInDto.IsAlreadyExist) return BadRequest("Email is already taken.");
+        if (loggedInDto.EmailAlreadyExist) return BadRequest("This Email is already registered.");
+
+        if (loggedInDto.UserNameAlreadyExist) return BadRequest("This Username is already taken.");
 
         return loggedInDto.IsFailed ? BadRequest("Registration has failed. Try again.") : loggedInDto;
     }
@@ -20,9 +22,12 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
+        if(string.IsNullOrEmpty(userInput.UsernameEmail))
+            return BadRequest("Email or Username is required");
+
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);
 
-        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid username or password.");
+        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid Username or password.");
 
         return loggedInDto.IsFailed ? BadRequest("Login has failed. Try again.") : loggedInDto;
     }

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -29,12 +30,17 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         // _userManager.Users doesn't have AnyAsync so use MongoDriver here
-        // TODO change all Email to UserName
-        bool userExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == registerDto.Email.ToUpper().Trim()).AnyAsync(cancellationToken);
-
-        if (userExist)
+        bool emailExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == registerDto.Email.ToUpper().Trim()).AnyAsync(cancellationToken);
+        if (emailExist)
         {
-            loggedInDto.IsAlreadyExist = true;
+            loggedInDto.EmailAlreadyExist = true;
+            return loggedInDto;
+        }
+
+        bool userNameExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == registerDto.UserName.ToUpper().Trim()).AnyAsync(cancellationToken);
+        if (userNameExist)
+        {
+            loggedInDto.UserNameAlreadyExist = true;
             return loggedInDto;
         }
 
@@ -57,7 +63,13 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        AppUser? appUser = await _userManager.FindByEmailAsync(userInput.Email);
+        AppUser? appUser = new();
+
+        // Find appUser by Email or UserName
+        if (Regex.IsMatch(userInput.UsernameEmail, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$"))
+            appUser = await _userManager.FindByEmailAsync(userInput.UsernameEmail);
+        else
+            appUser = await _userManager.FindByNameAsync(userInput.UsernameEmail);
 
         if (appUser is null)
         {
@@ -88,7 +100,7 @@ public class AccountRepository : IAccountRepository
 
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if(!userId.HasValue || userId.Equals(ObjectId.Empty)) return null;
+        if (!userId.HasValue || userId.Equals(ObjectId.Empty)) return null;
 
         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
