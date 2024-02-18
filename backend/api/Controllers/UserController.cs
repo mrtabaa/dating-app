@@ -6,7 +6,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
 {
     #region User Management
     [HttpPut]
-    public async Task<ActionResult<string>> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
+    public async Task<ActionResult> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
         UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserIdHashed(), cancellationToken);
 
@@ -34,7 +34,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpPut("set-main-photo")]
-    public async Task<ActionResult<string>> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<ActionResult> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
         UpdateResult? updateResult = await _userRepository.SetMainPhotoAsync(User.GetUserIdHashed(), photoUrlIn, cancellationToken);
 
@@ -44,7 +44,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     }
 
     [HttpDelete("delete-one-photo")]
-    public async Task<ActionResult<string>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<ActionResult> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
         UpdateResult? updateResult = await _userRepository.DeletePhotoAsync(User.GetUserIdHashed(), photoUrlIn, cancellationToken);
 
