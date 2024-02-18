@@ -2,9 +2,9 @@ import { HttpClient, HttpHeaderResponse, HttpHeaders, HttpParams, HttpResponse }
 import { Injectable, inject } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 import { UserUpdate } from '../models/user-update.model';
-import { UpdateResult } from '../models/helpers/update-result.model';
 import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
+import { ApiResponseMessage } from '../models/helpers/api-response-message';
 
 @Injectable({
   providedIn: 'root'
@@ -15,42 +15,29 @@ export class UserService {
   baseUrl: string = environment.apiUrl + 'user';
   members: Member[] = [];
 
-  updateUser(userUpdate: UserUpdate): Observable<string> {
-    const requestOptions: object = {
-      responseType: 'text'
-    }
+  updateUser(userUpdate: UserUpdate): Observable<ApiResponseMessage> {
+    return this.http.put<ApiResponseMessage>(this.baseUrl, userUpdate)
+      .pipe(
+        finalize(() => {
+          const user = this.members.find(user => user.email === userUpdate.email);
 
-    return this.http.put<string>(this.baseUrl, userUpdate, requestOptions).pipe(
-      finalize(() => {
-        const user = this.members.find(user => user.email === userUpdate.email);
-
-        if (user) {
-          const index = this.members.indexOf(user);
-          this.members[index] = { ...this.members[index], ...userUpdate } // copy userUpdate to the list's user
-        }
-      })
-    );
+          if (user) {
+            const index = this.members.indexOf(user);
+            this.members[index] = { ...this.members[index], ...userUpdate } // copy userUpdate to the list's user
+          }
+        })
+      );
   }
 
-  setMainPhoto(url_128In: string): Observable<string> {
+  setMainPhoto(url_128In: string): Observable<ApiResponseMessage> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    const requestOptions: Object = {
-      params: queryParams,
-      responseType: 'text' // default is json
-    }
-
-    return this.http.put<string>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
+    return this.http.put<ApiResponseMessage>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
   }
 
-  deletePhoto(url_128In: string): Observable<string> {
+  deletePhoto(url_128In: string): Observable<ApiResponseMessage> {
     let queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    const requestOptions: Object = {
-      params: queryParams,
-      responseType: 'text' // default is json
-    }
-
-    return this.http.delete<string>(this.baseUrl + '/delete-one-photo', { params: queryParams });
+    return this.http.delete<ApiResponseMessage>(this.baseUrl + '/delete-one-photo', { params: queryParams });
   }
 }

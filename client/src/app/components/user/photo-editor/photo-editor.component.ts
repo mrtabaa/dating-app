@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Photo } from '../../../models/photo.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 
 @Component({
   selector: 'app-photo-editor',
@@ -99,40 +100,44 @@ export class PhotoEditorComponent implements OnInit {
    * @param url_165In 
    */
   setMainPhoto(url_165In: string): void {
-    this.userService.setMainPhoto(url_165In).pipe(take(1)).subscribe({
-      next: (response: string) => {
-        if (response && this.member) {
+    this.userService.setMainPhoto(url_165In)
+      .pipe(take(1))
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          if (response && this.member) {
 
-          this.member.photos.forEach(photo => {
-            // unset previous main
-            if (photo.isMain === true)
-              photo.isMain = false;
+            this.member.photos.forEach(photo => {
+              // unset previous main
+              if (photo.isMain === true)
+                photo.isMain = false;
 
-            // set new selected main
-            if (photo.url_165 === url_165In) {
-              photo.isMain = true;
+              // set new selected main
+              if (photo.url_165 === url_165In) {
+                photo.isMain = true;
 
-              // update navbar photo
-              this.loggedInUser!.profilePhotoUrl = url_165In;
-              this.accountService.setCurrentUser(this.loggedInUser!);
-            }
-          })
+                // update navbar photo
+                this.loggedInUser!.profilePhotoUrl = url_165In;
+                this.accountService.setCurrentUser(this.loggedInUser!);
+              }
+            })
 
-          this.snackBar.open(response, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+            this.snackBar.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+          }
         }
-      }
-    });
+      });
   }
 
   deletePhoto(url_128In: string, index: number): void {
-    this.userService.deletePhoto(url_128In).pipe(take(1)).subscribe({
-      next: (response: string) => {
-        if (response && this.member) {
-          this.member.photos.splice(index, 1);
+    this.userService.deletePhoto(url_128In)
+      .pipe(take(1))
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          if (response && this.member) {
+            this.member.photos.splice(index, 1);
 
-          this.snackBar.open(response, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+            this.snackBar.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+          }
         }
-      }
-    })
+      })
   }
 }

@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MemberService } from '../../../services/member.service';
 import { UserService } from '../../../services/user.service';
 import { IntlModule } from 'angular-ecmascript-intl';
+import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 
 @Component({
   selector: 'app-user-edit',
@@ -110,15 +111,15 @@ export class UserEditComponent implements OnDestroy {
         country: this.CountryCtrl.value
       }
 
-      this.subscribedMember = this.userService.updateUser(updatedUser).subscribe({
-        next: (response: string) => {
-          if (response) {
-            this.matSnak.open(response, "Close", {
-              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000
-            });
+      this.userService.updateUser(updatedUser)
+        .pipe(take(1))
+        .subscribe({
+          next: (response: ApiResponseMessage) => {
+            if (response.message) {
+              this.matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
+            }
           }
-        }
-      });
+        });
 
       this.userEditFg.markAsPristine();
     }
