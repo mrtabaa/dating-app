@@ -82,7 +82,7 @@ namespace api.DTOs
             {
                 Token = token,
                 KnownAs = appUser.KnownAs,
-                UserName = appUser.NormalizedUserName,
+                UserName = appUser.UserName,
                 Gender = appUser.Gender,
                 ProfilePhotoUrl = appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
             };
