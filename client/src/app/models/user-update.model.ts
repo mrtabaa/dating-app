@@ -1,5 +1,5 @@
 export interface UserUpdate {
-    email: string | undefined,
+    username: string | undefined,
     introduction: string,
     lookingFor: string,
     interests: string,

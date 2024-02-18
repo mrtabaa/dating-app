@@ -1,6 +1,6 @@
 export interface LoggedInUser {
     hashedId: string;
-    email: string;
+    username: string;
     knownAs: string;
     token: string;
     gender: string

@@ -57,7 +57,7 @@ export class UserEditComponent implements OnDestroy {
   getMember(): void {
     this.accountService.getLoggedInUser().pipe(take(1)).subscribe(loggedInUser => {
       if (loggedInUser) {
-        this.memberService.getMemberByEmail(loggedInUser.email)?.pipe(take(1)).subscribe(member => {
+        this.memberService.getMemberByUsername(loggedInUser.username)?.pipe(take(1)).subscribe(member => {
           if (member) {
             this.member = member;
 
@@ -103,7 +103,7 @@ export class UserEditComponent implements OnDestroy {
   updateUser(member: Member): void {
     if (member) {
       let updatedUser: UserUpdate = {
-        email: member.email,
+        username: member.username,
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,

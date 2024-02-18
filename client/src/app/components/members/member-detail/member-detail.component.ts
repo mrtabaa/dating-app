@@ -44,10 +44,10 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   }
 
   getMember(): void {
-    const email: string | null = this.route.snapshot.paramMap.get('email');
+    const username: string | null = this.route.snapshot.paramMap.get('username');
 
-    if (email) {
-      this.member$ = this.memberService.getMemberByEmail(email);
+    if (username) {
+      this.member$ = this.memberService.getMemberByUsername(username);
     }
   }
 

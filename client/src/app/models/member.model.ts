@@ -2,7 +2,7 @@ import { Photo } from "./photo.model";
 
 export interface Member {
     schema: string | undefined,
-    email: string | undefined,
+    username: string | undefined,
     age: number | undefined,
     knownAs: string | undefined,
     created: Date | undefined,

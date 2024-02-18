@@ -19,7 +19,7 @@ export class UserService {
     return this.http.put<ApiResponseMessage>(this.baseUrl, userUpdate)
       .pipe(
         finalize(() => {
-          const user = this.members.find(user => user.email === userUpdate.email);
+          const user = this.members.find(user => user.username === userUpdate.username);
 
           if (user) {
             const index = this.members.indexOf(user);
