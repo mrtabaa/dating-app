@@ -10,7 +10,10 @@
             </mat-radio-group>
         </div>
         <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-            [hint]="'Your email will be used as your username'" [isFocused]="true">
+            [hint]="'Privately used for account management. (e.g. Reset password, Login)'" [isFocused]="true">
+        </app-input-cva>
+        <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
+            [hint]="'Will be shown to other members.'">
         </app-input-cva>
         <app-input-cva [formControl]="KnownAsCtrl" [label]="'Known As'" [placeHolder]="'Your name/nickname'"
             [hint]="'Enter your name or nickname'">
