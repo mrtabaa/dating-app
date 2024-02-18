@@ -179,6 +179,8 @@ public class UserRepository : IUserRepository
 
         if (photo is null) return null;
 
+        if(photo.IsMain) return null; // prevent from deleting main photo!
+
         bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
         if (!isDeleteSuccess)
             _logger.LogError("Delete from disk failed. See the logs.");
