@@ -2,7 +2,7 @@ namespace api.DTOs;
 
 public record MemberDto(
     string Schema,
-    string? Email,
+    string? UserName,
     int Age,
     string KnownAs,
     DateTime Created,

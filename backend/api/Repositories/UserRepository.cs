@@ -43,18 +43,18 @@ public class UserRepository : IUserRepository
         return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
-         await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+    public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
+         await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken) =>
+    public async Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken) =>
          await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim())
+            .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
             .Select(appUser => appUser.Id)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<string?> GetKnownAsByIdAsync(string userEmail, CancellationToken cancellationToken) =>
+    public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>
         await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.NormalizedEmail == userEmail.ToUpper().Trim())
+            .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
 

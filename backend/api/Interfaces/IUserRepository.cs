@@ -5,11 +5,11 @@ public interface IUserRepository
 
     public Task<AppUser?> GetByHashedIdAsync(string? userId, CancellationToken cancellationToken);
 
-    public Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken);
+    public Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken);
 
-    public Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken);
+    public Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken);
 
-    public Task<string?> GetKnownAsByIdAsync(string userId, CancellationToken cancellationToken);
+    public Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken);
 

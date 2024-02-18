@@ -48,9 +48,9 @@ public class MemberRepository : IMemberRepository
         return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
     }
 
-    public async Task<MemberDto?> GetMemberByEmailAsync(string email, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetMemberByUserNameAsync(string userName, CancellationToken cancellationToken)
     {
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == email.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
     }

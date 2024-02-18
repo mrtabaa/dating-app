@@ -11,7 +11,7 @@ namespace api.DTOs
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Email = userInput.Email, // required by AspNet Identity
-                UserName = userInput.Email, // required by AspNet Identity
+                UserName = userInput.UserName, // required by AspNet Identity
                 DateOfBirth = userInput.DateOfBirth,
                 KnownAs = userInput.KnownAs.Trim(),
                 LastActive = DateTime.UtcNow,
@@ -31,7 +31,7 @@ namespace api.DTOs
             if (appUser.Schema is not null)
                 return new MemberDto(
                     Schema: appUser.Schema,
-                    Email: appUser.Email,
+                    UserName: appUser.UserName,
                     Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                     KnownAs: appUser.KnownAs,
                     Created: appUser.CreatedOn,
@@ -60,7 +60,7 @@ namespace api.DTOs
                     memberDtos.Add(
                         new MemberDto(
                             Schema: appUser.Schema,
-                            Email: appUser.Email,
+                            UserName: appUser.UserName,
                             Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
                             KnownAs: appUser.KnownAs,
                             Created: appUser.CreatedOn,
@@ -84,7 +84,7 @@ namespace api.DTOs
             {
                 Token = token,
                 KnownAs = appUser.KnownAs,
-                Email = appUser.NormalizedEmail,
+                UserName = appUser.NormalizedUserName,
                 Gender = appUser.Gender,
                 ProfilePhotoUrl = appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
             };

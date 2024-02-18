@@ -3,14 +3,14 @@ namespace api.Controllers;
 [Authorize]
 public class FollowController(IFollowRepository _followRepository, IUserRepository _userRepository) : BaseApiController
 {
-    [HttpPost("{targetMemberEmail}")]
-    public async Task<ActionResult> AddFollow(string targetMemberEmail, CancellationToken cancellationToken)
+    [HttpPost("{targetMemberUserName}")]
+    public async Task<ActionResult> AddFollow(string targetMemberUserName, CancellationToken cancellationToken)
     {
         string? userIdHashed = User.GetUserIdHashed();
 
         if (!string.IsNullOrEmpty(userIdHashed))
         {
-            FolowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberEmail, cancellationToken);
+            FolowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
             if (followStatus.IsSuccess)
                 return Ok();
 
@@ -19,7 +19,7 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
 
             if (followStatus.IsAlreadyFollowed)
             {
-                string? knownAs = await _userRepository.GetKnownAsByIdAsync(targetMemberEmail, cancellationToken);
+                string? knownAs = await _userRepository.GetKnownAsByUserNameAsync(targetMemberUserName, cancellationToken);
                 if (knownAs is not null)
                     return BadRequest($"{knownAs} is already followed.");
             }

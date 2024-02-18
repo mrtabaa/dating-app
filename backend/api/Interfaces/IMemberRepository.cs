@@ -6,5 +6,5 @@ public interface IMemberRepository
 
     public Task<MemberDto?> GetMemberByIdAsync(ObjectId? memberId, CancellationToken cancellationToken);
 
-    public Task<MemberDto?> GetMemberByEmailAsync(string email, CancellationToken cancellationToken);
+    public Task<MemberDto?> GetMemberByUserNameAsync(string userName, CancellationToken cancellationToken);
 }

@@ -37,8 +37,7 @@ public class FollowRepository : IFollowRepository
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
-        // TODO Change Emails to UserNames for privacy
-        ObjectId? followedId = await _userRepository.GetIdByEmailAsync(followedMemberEmail, cancellationToken);
+        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberEmail, cancellationToken);
 
         if (followedId.Equals(ObjectId.Empty))
             return followStatus;

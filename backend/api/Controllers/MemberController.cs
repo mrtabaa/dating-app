@@ -51,16 +51,11 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
 
-    // TODO change it to UserName
-    [HttpGet("email/{email}")]
-    public async Task<ActionResult<MemberDto>> GetMemberByEmail(
-            [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format. Contact the admin if persists.")]
-            string email,
-            CancellationToken cancellationToken
-        )
+    [HttpGet("username/{userName}")]
+    public async Task<ActionResult<MemberDto>> GetMemberByUserName(string userName, CancellationToken cancellationToken)
     {
-        MemberDto? memberDto = await _memberRepository.GetMemberByEmailAsync(email, cancellationToken);
+        MemberDto? memberDto = await _memberRepository.GetMemberByUserNameAsync(userName, cancellationToken);
 
-        return memberDto is null ? BadRequest("No user found by this Email.") : memberDto;
+        return memberDto is null ? BadRequest("No user found by this username.") : memberDto;
     }
 }
