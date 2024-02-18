@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaderResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, finalize } from 'rxjs';
 import { UserUpdate } from '../models/user-update.model';
