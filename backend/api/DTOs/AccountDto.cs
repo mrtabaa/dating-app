@@ -24,19 +24,6 @@ public record LoginDto(
     [Length(7, 20)] string Password
 );
 
-// TODO seperate it
-public class RegisterResponseDto
-{
-    public string? Token { get; set; }
-    public string? KnownAs { get; set; }
-    public string? UserName { get; set; }
-    public string? Gender { get; set; }
-    public string? ProfilePhotoUrl { get; set; }
-    public bool EmailAlreadyExist { get; set; }
-    public bool UserNameAlreadyExist { get; set; }
-    public bool IsFailed { get; set; }
-}
-
 public class LoggedInDto
 {
     public string? Token { get; set; }
