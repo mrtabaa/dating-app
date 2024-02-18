@@ -3,7 +3,6 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, Reac
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Subscription, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { UpdateResult } from '../../../models/helpers/update-result.model';
 import { UserUpdate } from '../../../models/user-update.model';
 import { Member } from '../../../models/member.model';
 import { AccountService } from '../../../services/account.service';
