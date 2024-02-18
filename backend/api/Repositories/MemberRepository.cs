@@ -27,11 +27,11 @@ public class MemberRepository : IMemberRepository
         // set query to AsQuerable to use it agains MongoDB later
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
-        query = query.Where(appUser => appUser.Id != memberParams.LoggedInUserId); // don't request/show the currentUser in the list
+        query = query.Where(appUser => appUser.Id != memberParams.UserId); // don't request/show the currentUser in the list
         query = query.Where(appUser => appUser.Gender == memberParams.Gender); // get the opposite gender by default. It's set in MemberController
         query = query.Where(appUser => appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob); // get ages between 2 age inputs
         query = memberParams.OrderBy switch
-        { // sort users based on Created or LastActive
+        { // sort users based on Age, Created or LastActive
             "age" => query.OrderByDescending(appUser => appUser.DateOfBirth).ThenBy(appUser => appUser.Id),
             "created" => query.OrderByDescending(appUser => appUser.CreatedOn).ThenBy(appUser => appUser.Id),
             _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
@@ -50,7 +50,7 @@ public class MemberRepository : IMemberRepository
 
     public async Task<MemberDto?> GetMemberByEmailAsync(string email, CancellationToken cancellationToken)
     {
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Email == email.ToLower().Trim()).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == email.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
     }
