@@ -46,7 +46,7 @@ public static class IdentityServiceExtensions
                 IdentityOptionsAction = options =>
                 {
                     options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 7;
+                    options.Password.RequiredLength = 8;
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequireLowercase = false;
 

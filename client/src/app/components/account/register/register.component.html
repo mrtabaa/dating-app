@@ -27,11 +27,11 @@
             [hint]="'Enter your country'">
         </app-input-cva>
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
-            [placeHolder]="'Enter a password'" [hint]="'Between 7 to 20 characters'">
+            [placeHolder]="'Enter a password'" [hint]="'8 to 20 characters, a special character, an uppercase character.'">
         </app-input-cva>
         <div>
             <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
-                [placeHolder]="'Confirm your password'" [hint]="'Between 7 to 20 characters'">
+                [placeHolder]="'Confirm your password'" [hint]="'Confirm above password'">
             </app-input-cva>
             @if(PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
             <mat-error>Password entries don't match.</mat-error>

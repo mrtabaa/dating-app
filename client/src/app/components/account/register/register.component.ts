@@ -54,8 +54,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   registerFg = this.fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(20)]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]],
     dateOfBirthCtrl: ['', [Validators.required]],
     knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
     genderCtrl: ['female', [Validators.required]],
@@ -116,7 +116,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .subscribe({
         next: res => {
           this.router.navigate(['/members']);
-          console.log(res);
+          // this.snackBar.open("You logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
         },
         error: err => this.emailExistsErrorMessage = err.error,
         complete: () => console.log('Register successful.')

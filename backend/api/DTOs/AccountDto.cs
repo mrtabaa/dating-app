@@ -6,8 +6,9 @@ public record RegisterDto(
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
     ] string Email,
     [Length(1, 50)] string UserName,
-    [DataType(DataType.Password), Length(7, 20)] string Password,
-    [DataType(DataType.Password), Length(7, 20)] string ConfirmPassword,
+    [DataType(DataType.Password), Length(8, 20), RegularExpression(@"^(?=.*[A-Z])(?=.*[^\w\s]).*$")]
+    string Password,
+    [DataType(DataType.Password), Length(8, 20)] string ConfirmPassword,
     [Length(1, 50)] string KnownAs,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
@@ -21,7 +22,7 @@ public record RegisterDto(
 
 public record LoginDto(
     [MaxLength(50)] string EmailUsername,
-    [Length(7, 20)] string Password
+    [DataType(DataType.Password), Length(8, 20), RegularExpression(@"^(?=.*[A-Z])(?=.*[^\w\s]).*$")] string Password
 );
 
 public class LoggedInDto
