@@ -20,7 +20,7 @@ public record RegisterDto(
 );
 
 public record LoginDto(
-    [MaxLength(50)] string UsernameEmail,
+    [MaxLength(50)] string EmailUsername,
     [Length(7, 20)] string Password
 );
 

@@ -22,7 +22,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(userInput.UsernameEmail))
+        if (string.IsNullOrEmpty(userInput.EmailUsername))
             return BadRequest("Email or Username is required");
 
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);
