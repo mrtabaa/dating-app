@@ -66,9 +66,9 @@ public class UserRepository : IUserRepository
 
         var updatedUser = Builders<AppUser>.Update
         .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-        .Set(appUser => appUser.Introduction, userUpdateDto.Introduction.Trim())
-        .Set(appUser => appUser.LookingFor, userUpdateDto.LookingFor.Trim())
-        .Set(appUser => appUser.Interests, userUpdateDto.Interests.Trim())
+        .Set(appUser => appUser.Introduction, userUpdateDto.Introduction?.Trim())
+        .Set(appUser => appUser.LookingFor, userUpdateDto.LookingFor?.Trim())
+        .Set(appUser => appUser.Interests, userUpdateDto.Interests?.Trim())
         .Set(appUser => appUser.City, userUpdateDto.City.Trim())
         .Set(appUser => appUser.Country, userUpdateDto.Country.Trim());
 
