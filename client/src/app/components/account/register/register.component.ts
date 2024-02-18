@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-register',
@@ -27,6 +28,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private snackBar = inject(MatSnackBar);
 
   minDate = new Date();
   maxDate = new Date();
@@ -116,7 +118,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       .subscribe({
         next: res => {
           this.router.navigate(['/members']);
-          // this.snackBar.open("You logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+          this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
         },
         error: err => this.emailExistsErrorMessage = err.error,
         complete: () => console.log('Register successful.')
