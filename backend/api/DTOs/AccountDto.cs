@@ -1,6 +1,6 @@
 namespace api.DTOs;
 
-public record UserRegisterDto(
+public record RegisterDto(
     [
         MaxLength(50),
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")

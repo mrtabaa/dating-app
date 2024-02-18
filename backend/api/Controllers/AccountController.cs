@@ -5,7 +5,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 {
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<LoggedInDto>> Register(UserRegisterDto userIn, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoggedInDto>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
@@ -22,7 +22,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
-        if(string.IsNullOrEmpty(userInput.UsernameEmail))
+        if (string.IsNullOrEmpty(userInput.UsernameEmail))
             return BadRequest("Email or Username is required");
 
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);

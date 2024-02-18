@@ -5,7 +5,7 @@ namespace api.DTOs
     public static class Mappers
     {
         #region Generator Methods
-        public static AppUser ConvertUserRegisterDtoToAppUser(UserRegisterDto userInput) //, int likedCount, int likedByCount
+        public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) //, int likedCount, int likedByCount
         {
             return new AppUser
             {

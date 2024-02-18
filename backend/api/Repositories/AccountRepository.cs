@@ -25,7 +25,7 @@ public class AccountRepository : IAccountRepository
     #endregion
 
     #region CRUD
-    public async Task<LoggedInDto> CreateAsync(UserRegisterDto registerDto, CancellationToken cancellationToken)
+    public async Task<LoggedInDto> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
 
