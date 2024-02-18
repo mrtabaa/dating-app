@@ -3,6 +3,8 @@ public interface IUserRepository
 {
     public Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken);
 
+    public Task<AppUser?> GetByHashedIdAsync(string? userId, CancellationToken cancellationToken);
+
     public Task<AppUser?> GetByEmailAsync(string userEmail, CancellationToken cancellationToken);
 
     public Task<ObjectId?> GetIdByEmailAsync(string userEmail, CancellationToken cancellationToken);

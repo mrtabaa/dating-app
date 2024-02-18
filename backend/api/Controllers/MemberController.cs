@@ -9,14 +9,13 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
-        string? LoggedInUserEmail = User.GetUserEmail();
-        if (string.IsNullOrEmpty(LoggedInUserEmail)) return BadRequest("User is not loggedIn or has no email set.");
+        string? userIdHashed = User.GetUserIdHashed();
 
-        AppUser? appUser = await _userRepository.GetByEmailAsync(LoggedInUserEmail, cancellationToken);
+        AppUser? appUser = await _userRepository.GetByHashedIdAsync(userIdHashed, cancellationToken);
 
         if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
-            memberParams.LoggedInUserId = appUser.Id;
+            memberParams.UserId = appUser.Id;
             memberParams.Gender = appUser.Gender == "male" ? "female" : "male";
         }
 
@@ -30,7 +29,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
         List<MemberDto?> memberDtos = [];
-        
+
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
             memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
@@ -52,6 +51,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
 
+    // TODO change it to UserName
     [HttpGet("email/{email}")]
     public async Task<ActionResult<MemberDto>> GetMemberByEmail(
             [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format. Contact the admin if persists.")]
