@@ -15,8 +15,8 @@ export class FollowService {
   private baseUrl = environment.apiUrl + 'follow/';
   private paginationHandler = new PaginationHandler();
 
-  addFollow(email: string): Observable<object> {
-    return this.http.post(this.baseUrl + email, {});
+  addFollow(username: string): Observable<object> {
+    return this.http.post(this.baseUrl + username, {});
   }
 
   getFollows(predicate: string): Observable<PaginatedResult<Member[]>> {
