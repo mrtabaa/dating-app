@@ -4,6 +4,7 @@ namespace api.Helpers;
 
 public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFilter
 {
+    // TODO fix fails
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var resultContext = await next(); // After api's processing is done. 
