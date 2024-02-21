@@ -12,17 +12,14 @@ public record RegisterDto(
     [Length(1, 50)] string KnownAs,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
-    [MaxLength(1000)] string? Introduction,
-    [MaxLength(1000)] string? LookingFor,
-    [MaxLength(1000)] string? Interests,
     [Length(3, 30)] string City,
-    [Length(3, 30)] string Country,
-    List<Photo>? Photos
+    [Length(3, 30)] string Country
 );
 
 public record LoginDto(
     [MaxLength(50)] string EmailUsername,
-    [DataType(DataType.Password), Length(8, 20), RegularExpression(@"^(?=.*[A-Z])(?=.*[^\w\s]).*$")] string Password
+    [DataType(DataType.Password), Length(8, 20), RegularExpression(@"^(?=.*[A-Z])(?=.*[^\w\s]).*$")] // Uppercase + Special char + 8 chars
+     string Password
 );
 
 public class LoggedInDto
