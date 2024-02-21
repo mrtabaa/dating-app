@@ -1,4 +1,3 @@
-<!-- TODO fix getFollows conditions -->
 <main>
     <mat-tab-group (selectedTabChange)="onTabChange($event)">
         <mat-tab label="Following">
@@ -10,7 +9,7 @@
                 <app-member-card [memberInput]="member" />
                 }
                 }
-                @else{
+                @else {
                 <p>You've not followed anyone so far.</p>
                 }
             </div>
@@ -26,7 +25,7 @@
                 }
                 }
                 @else{
-                <p>Your follwoing list is empty. Better days to come!</p>
+                <p>Your follwers list is empty. Communication brings better days!</p>
                 }
             </div>
             }

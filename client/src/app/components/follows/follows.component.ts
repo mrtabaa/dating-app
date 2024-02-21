@@ -44,6 +44,7 @@ export class FollowsComponent implements OnInit {
 
   getFollows(): void {
     this.isMembersValid = true; // reset to default.
+    this.members = []; // reset on each tab select
 
     this.subscribed = this.followService.getFollows(this.predicate).subscribe({
       next: (response: PaginatedResult<Member[]>) => {
