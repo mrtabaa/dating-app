@@ -3,7 +3,6 @@ namespace api.Controllers;
 [Produces("application/json")]
 public class AccountController(IAccountRepository _accountRepository) : BaseApiController
 {
-    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<LoggedInDto>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
@@ -18,7 +17,6 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return loggedInDto.IsFailed ? BadRequest("Registration has failed. Try again.") : loggedInDto;
     }
 
-    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
     {
@@ -27,7 +25,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);
 
-        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid Username or password.");
+        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid username or password.");
 
         return loggedInDto.IsFailed ? BadRequest("Login has failed. Try again.") : loggedInDto;
     }
@@ -43,7 +41,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
     }
 
-    // its Authorized
+    [Authorize]
     [HttpDelete("delete-user")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
