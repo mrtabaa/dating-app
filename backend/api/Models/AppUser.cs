@@ -19,6 +19,6 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public string City { get; init; } = string.Empty;
     public string Country { get; init; } = string.Empty;
     public List<Photo> Photos { get; init; } = []; // TODO limit to 100 photos
+    public int FollowingsCount { get; init; }
     public int FollowersCount { get; init; }
-    public int FriendsCount { get; init; } // TODO pre-calc number of friends
 }

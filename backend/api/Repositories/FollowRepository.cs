@@ -61,7 +61,7 @@ public class FollowRepository : IFollowRepository
 
         if (follow is not null)
         {
-            bool isSuccess = await SaveInDbWithSessionAsync(follow, followedId, cancellationToken);
+            bool isSuccess = await SaveInDbWithSessionAsync(follow, userId, followedId, cancellationToken);
 
             followStatus.IsSuccess = isSuccess;
         }
@@ -89,7 +89,7 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>bool isSuccess</returns>
-    private async Task<bool> SaveInDbWithSessionAsync(Follow follow, ObjectId? followedId, CancellationToken cancellationToken)
+    private async Task<bool> SaveInDbWithSessionAsync(Follow follow, ObjectId? userId, ObjectId? followedId, CancellationToken cancellationToken)
     {
         //// Session is NOT supported in MongoDb Standalone servers!
         // Create a session object that is used when leveraging transactions
@@ -103,7 +103,9 @@ public class FollowRepository : IFollowRepository
             // added session to this part so if UpdateFollowedByCount failed, undo the InsertOnce.
             await _collection.InsertOneAsync(session, follow, null, cancellationToken);
 
-            await UpdateFollowedByCount(session, followedId, cancellationToken);
+            await UpdateFollowingsCount(session, userId, cancellationToken);
+
+            await UpdateFollowersCount(session, followedId, cancellationToken);
 
             await session.CommitTransactionAsync(cancellationToken);
 
@@ -152,18 +154,34 @@ public class FollowRepository : IFollowRepository
     }
 
     /// <summary>
+    /// Increament FollowingsCount of the member who followed another member. (Follower member)
+    /// This is part of a MondoDb session. MongoDb will undo Insert and Update if any fails. So we don't need to verify the completion of the db process.
+    /// </summary>
+    /// <param name="followerId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId? followerId, CancellationToken cancellationToken)
+    {
+        UpdateDefinition<AppUser> updateFollowedByCount = Builders<AppUser>.Update
+        .Inc(appUser => appUser.FollowingsCount, 1); // Increament by 1 for each follow
+
+        await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
+                appUser.Id == followerId, updateFollowedByCount, null, cancellationToken);
+    }
+
+    /// <summary>
     /// Increament FollowersCount of the member who was followed. (TargetMember)
     /// This is part of a MondoDb session. MongoDb will undo Insert and Update if any fails. So we don't need to verify the completion of the db process.
     /// </summary>
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowedByCount(IClientSessionHandle session, ObjectId? followedId, CancellationToken cancellationToken)
+    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId? followedId, CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> updateFollowedByCount = Builders<AppUser>.Update
+        UpdateDefinition<AppUser> updateFollowerCount = Builders<AppUser>.Update
         .Inc(appUser => appUser.FollowersCount, 1); // Increament by 1 for each follow
 
         await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
-                appUser.Id == followedId, updateFollowedByCount, null, cancellationToken);
+                appUser.Id == followedId, updateFollowerCount, null, cancellationToken);
     }
 }
