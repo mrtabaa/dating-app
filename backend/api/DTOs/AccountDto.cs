@@ -12,9 +12,9 @@ public record RegisterDto(
     [Length(1, 50)] string KnownAs,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
-    [Length(10, 500)] string? Introduction,
-    [Length(10, 500)] string? LookingFor,
-    [Length(10, 500)] string? Interests,
+    [MaxLength(1000)] string? Introduction,
+    [MaxLength(1000)] string? LookingFor,
+    [MaxLength(1000)] string? Interests,
     [Length(3, 30)] string City,
     [Length(3, 30)] string Country,
     List<Photo>? Photos

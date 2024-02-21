@@ -42,7 +42,7 @@ export class UserEditComponent implements OnDestroy {
   member: Member | undefined;
 
   readonly minTextAreaChars: number = 10;
-  readonly maxTextAreaChars: number = 500;
+  readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 30;
 
