@@ -104,6 +104,12 @@ public class UserRepository : IUserRepository
             return photoUploadStatus;
         }
 
+        if(appUser.Photos.Count >= photoUploadStatus.MaxPhotosLimit)
+        {
+            photoUploadStatus.IsMaxPhotoReached = true;
+            return photoUploadStatus;
+        }
+
         // save file in Storage using PhotoService / userEmail makes the folder name
         string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id.ToString());
 

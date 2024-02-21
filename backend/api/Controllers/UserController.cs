@@ -30,6 +30,9 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
         */
         PhotoUploadStatus photoUploadStatus = await _userRepository.UploadPhotoAsync(file, User.GetUserIdHashed(), cancellationToken);
 
+        if (photoUploadStatus.IsMaxPhotoReached) 
+            return BadRequest($"You've reach the limit of {photoUploadStatus.MaxPhotosLimit} photos. Delete some photos to add more.");
+
         return photoUploadStatus.Photo is null ? BadRequest("Add photo failed. See logger") : photoUploadStatus.Photo;
     }
 
