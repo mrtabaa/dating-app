@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace api.Controllers;
 
 public class SeedUsersController : BaseApiController
@@ -6,17 +8,20 @@ public class SeedUsersController : BaseApiController
     private readonly IMongoDatabase _database;
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
+    private readonly UserManager<AppUser> _userManager;
 
-    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings)
+    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = _database.GetCollection<AppUser>(_collectionName);
+
+        _userManager = userManager;
     }
     #endregion
 
     #region Add Dummy users to DB
     [HttpPost]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(IEnumerable<RegisterDto> inputUsersDummy)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(IEnumerable<DummyRegisterDto> inputUsersDummy)
     {
         #region If databaseExists
         // check if database already exists using its status
@@ -43,24 +48,25 @@ public class SeedUsersController : BaseApiController
 
         #region Import db seed
         // add each user to DB
+        List<AppUser> appUsers = [];
+
         foreach (var userInput in inputUsersDummy)
         {
-            AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(userInput);
+            AppUser appUser = Mappers.ConvertDummyRegisterDtoToAppUser(userInput);
 
-            await _collection!.InsertOneAsync(appUser);
+            await _userManager.CreateAsync(appUser, userInput.Password);
+
+            appUsers.Add(appUser);
         }
 
-        // get all users from DB
-        IEnumerable<AppUser> appUsers = await _collection.Find(new BsonDocument()).ToListAsync();
-
-        // convert AppUser to UserDto
-        List<MemberDto?> userDtos = [];
+        // convert AppUser to MemberDto
+        List<MemberDto?> memberDtos = [];
         foreach (AppUser appuser in appUsers)
         {
-            userDtos.Add(Mappers.ConvertAppUserToMemberDto(appuser));
+            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(appuser));
         }
 
-        return userDtos;
+        return memberDtos;
         #endregion
     }
     #endregion

@@ -3,6 +3,27 @@ namespace api.DTOs
     public static class Mappers
     {
         #region Generator Methods
+        public static AppUser ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) //, int likedCount, int likedByCount
+        {
+            return new AppUser
+            {
+                Schema = AppVariablesExtensions.AppVersions.Last<string>(),
+                Email = userInput.Email, // required by AspNet Identity
+                UserName = userInput.UserName, // required by AspNet Identity
+                DateOfBirth = userInput.DateOfBirth,
+                KnownAs = userInput.KnownAs.Trim(),
+                LastActive = DateTime.UtcNow,
+                Gender = userInput.Gender.ToLower(),
+                City = userInput.City.Trim(),
+                Country = userInput.Country.Trim(),
+                Introduction = userInput.Introduction,
+                LookingFor = userInput.LookingFor,
+                Interests = userInput.Interests,
+                Photos = [],
+                FollowersCount = 0
+            };
+        }
+
         public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) //, int likedCount, int likedByCount
         {
             return new AppUser
@@ -14,9 +35,6 @@ namespace api.DTOs
                 KnownAs = userInput.KnownAs.Trim(),
                 LastActive = DateTime.UtcNow,
                 Gender = userInput.Gender.ToLower(),
-                Introduction = userInput.Introduction?.Trim(),
-                LookingFor = userInput.LookingFor?.Trim(),
-                Interests = userInput.Interests?.Trim(),
                 City = userInput.City.Trim(),
                 Country = userInput.Country.Trim(),
                 Photos = [],
