@@ -63,10 +63,10 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        AppUser? appUser = new();
+        AppUser? appUser;
 
         // Find appUser by Email or UserName
-        if (Regex.IsMatch(userInput.EmailUsername, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$"))
+        if (Regex.IsMatch(userInput.EmailUsername, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$")) // If input is email
             appUser = await _userManager.FindByEmailAsync(userInput.EmailUsername);
         else
             appUser = await _userManager.FindByNameAsync(userInput.EmailUsername);
