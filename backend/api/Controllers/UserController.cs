@@ -28,9 +28,9 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
             UserController => UserRepository: GetById() => PhotoService => PhotoModifySaveService
             PhotoService => UserRepository: MongoDb, return Photo => UserController
         */
-        Photo? photo = await _userRepository.UploadPhotoAsync(file, User.GetUserIdHashed(), cancellationToken);
+        PhotoUploadStatus photoUploadStatus = await _userRepository.UploadPhotoAsync(file, User.GetUserIdHashed(), cancellationToken);
 
-        return photo is null ? BadRequest("Add photo failed. See logger") : photo;
+        return photoUploadStatus.Photo is null ? BadRequest("Add photo failed. See logger") : photoUploadStatus.Photo;
     }
 
     [HttpPut("set-main-photo")]

@@ -89,49 +89,52 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    public async Task<Photo?> UploadPhotoAsync(IFormFile file, string? userIdHashed, CancellationToken cancellationToken)
+    public async Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, string? userIdHashed, CancellationToken cancellationToken)
     {
+        PhotoUploadStatus photoUploadStatus = new();
+
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return photoUploadStatus;
 
         AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
         {
             _logger.LogError("appUser is Null / not found");
-            return null;
+            return photoUploadStatus;
         }
 
         // save file in Storage using PhotoService / userEmail makes the folder name
         string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id.ToString());
 
-        if (photoUrls is not null)
+        if (photoUrls is null)
+            return photoUploadStatus;
+
+        Photo photo;
+        if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
         {
-            Photo photo;
-            if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
-            {
-                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: true);
-            }
-            else // user's album is not empty
-            {
-                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: false);
-            }
-
-            // save to DB
-            appUser.Photos.Add(photo);
-
-            var updatedUser = Builders<AppUser>.Update
-                .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                .Set(doc => doc.Photos, appUser.Photos);
-
-            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
-
-            // return the save photo if save on disk and DB
-            return photoUrls is not null && result.ModifiedCount == 1 ? photo : null;
+            photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: true);
+        }
+        else // user's album is not empty
+        {
+            photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: false);
         }
 
-        _logger.LogError("PhotoService saving photo to disk failed.");
-        return null;
+        // save to DB
+        appUser.Photos.Add(photo);
+
+        var updatedUser = Builders<AppUser>.Update
+            .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+            .Set(doc => doc.Photos, appUser.Photos);
+
+        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+
+        if (result.ModifiedCount == 0)
+            return photoUploadStatus;
+
+        // return the save photo if save on disk and DB
+        photoUploadStatus.Photo = photo;
+        return photoUploadStatus;
     }
 
     public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string photoUrlIn, CancellationToken cancellationToken)
@@ -179,7 +182,7 @@ public class UserRepository : IUserRepository
 
         if (photo is null) return null;
 
-        if(photo.IsMain) return null; // prevent from deleting main photo!
+        if (photo.IsMain) return null; // prevent from deleting main photo!
 
         bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
         if (!isDeleteSuccess)

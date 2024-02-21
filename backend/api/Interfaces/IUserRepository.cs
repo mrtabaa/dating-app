@@ -15,7 +15,7 @@ public interface IUserRepository
 
     public Task<UpdateResult?> UpdateLastActive(string loggedInUserIdHashed, CancellationToken cancellationToken);
 
-    public Task<Photo?> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
+    public Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> SetMainPhotoAsync(string? userId, string photoUrlIn, CancellationToken cancellationToken);
 
