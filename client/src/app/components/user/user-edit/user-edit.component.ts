@@ -103,7 +103,7 @@ export class UserEditComponent implements OnDestroy {
   updateUser(member: Member): void {
     if (member) {
       let updatedUser: UserUpdate = {
-        username: member.username,
+        username: member.userName,
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,

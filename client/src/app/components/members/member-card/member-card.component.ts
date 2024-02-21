@@ -30,8 +30,8 @@ export class MemberCardComponent {
   apiPhotoUrl = environment.apiPhotoUrl;
 
   addFollow(): void {
-    if (this.member?.username) {
-      this.followService.addFollow(this.member.username).pipe(take(1)).subscribe({
+    if (this.member?.userName) {
+      this.followService.addFollow(this.member.userName).pipe(take(1)).subscribe({
         next: () =>
           this.snackBar.open("You've followed " + this.member?.knownAs + '.', "Close", {
             horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000

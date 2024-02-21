@@ -84,7 +84,7 @@ export class MemberService {
 
     this.memberCache.forEach((value: PaginatedResult<Member[]>) =>
       value.result?.forEach((result: Member) => {
-        if (result && result.username === usernameIn) {
+        if (result && result.userName === usernameIn) {
           member = result;
         }
       }
