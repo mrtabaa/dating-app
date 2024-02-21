@@ -26,7 +26,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
             break;
           case 401:
-            snack.open('Unuthorized', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+            snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             break;
           case 404:
             router.navigate(['/not-found']);
