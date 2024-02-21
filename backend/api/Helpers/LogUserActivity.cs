@@ -4,7 +4,6 @@ namespace api.Helpers;
 
 public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFilter
 {
-    // TODO fix fails
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var resultContext = await next(); // After api's processing is done. 
@@ -29,7 +28,5 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
 
         if (updateResult?.ModifiedCount == 0)
             _logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");
-        else
-            _logger.LogError("loggedInUserId is null which is not allowed here.");
     }
 }
