@@ -78,6 +78,11 @@ export class PhotoEditorComponent implements OnInit {
             this.setNavbarProfilePhoto(photo.url_165)
         }
       }
+
+      this.uploader.onErrorItem = (item, error, status, headers) => {
+        if (error)
+        this.snackBar.open(error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+      }
     }
   }
   //#endregion Photo Upload using `ng2-file-upload`
