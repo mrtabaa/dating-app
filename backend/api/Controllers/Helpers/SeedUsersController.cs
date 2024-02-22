@@ -9,13 +9,15 @@ public class SeedUsersController : BaseApiController
     const string _collectionName = "users";
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
+    private readonly RoleManager<AppRole> _roleManager;
 
-    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
+    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = _database.GetCollection<AppUser>(_collectionName);
 
         _userManager = userManager;
+        _roleManager = roleManager;
     }
     #endregion
 
@@ -50,14 +52,36 @@ public class SeedUsersController : BaseApiController
         // add each user to DB
         List<AppUser> appUsers = [];
 
+        List<AppRole> roles = [
+            new() {Name = "admin"},
+            new() {Name = "moderator"},
+            new() {Name = "member"}
+        ];
+
+        foreach (AppRole role in roles)
+        {
+            await _roleManager.CreateAsync(role);
+        }
+
         foreach (var userInput in inputUsersDummy)
         {
             AppUser appUser = Mappers.ConvertDummyRegisterDtoToAppUser(userInput);
 
             await _userManager.CreateAsync(appUser, userInput.Password);
 
+            await _userManager.AddToRoleAsync(appUser, roles[2].Name!); // if Name is null, place "error" as the arg value
+
             appUsers.Add(appUser);
         }
+
+        AppUser admin = new()
+        {
+            Email = "admin@a.com",
+            UserName = "admin"
+        };
+
+        await _userManager.CreateAsync(admin, "Aaaaaaa/");
+        await _userManager.AddToRolesAsync(admin, [roles[0].Name!, roles[1].Name!]);
 
         // convert AppUser to MemberDto
         List<MemberDto?> memberDtos = [];
