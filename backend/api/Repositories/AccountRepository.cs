@@ -10,16 +10,14 @@ public class AccountRepository : IAccountRepository
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
-    private readonly RoleManager<AppRole> _roleManager;
     private readonly ITokenService _tokenService; // save user credential as a token
 
     // constructor - dependency injection
-    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, ITokenService tokenService)
+    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _userManager = userManager;
-        _roleManager = roleManager;
         _tokenService = tokenService;
     }
     #endregion
@@ -29,6 +27,7 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
+        #region Check Email or Username already exist
         // _userManager.Users doesn't have AnyAsync so use MongoDriver here
         bool emailExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == registerDto.Email.ToUpper().Trim()).AnyAsync(cancellationToken);
         if (emailExist)
@@ -43,20 +42,31 @@ public class AccountRepository : IAccountRepository
             loggedInDto.UserNameAlreadyExist = true;
             return loggedInDto;
         }
+        #endregion Check Email or Username already exist
+
+        #region Create user, token and add role
 
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
 
-        var userCreated = _userManager.CreateAsync(appUser, registerDto.Password);
+        IdentityResult? userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
 
-        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
-
-        if (!userCreated.Result.Succeeded || string.IsNullOrEmpty(token))
+        if (userCreatedResult.Succeeded)
         {
-            loggedInDto.IsFailed = true;
-            return loggedInDto;
-        }
+            IdentityResult? roleResult = await _userManager.AddToRoleAsync(appUser, Roles.member.ToString());
 
-        return Mappers.ConvertAppUserToLoggedInDto(appUser, token); // success
+            if (!roleResult.Succeeded) // failed
+                return loggedInDto;
+
+            string? token = await _tokenService.CreateToken(appUser, cancellationToken);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+            }
+        }
+        #endregion Create user, token and role
+
+        return loggedInDto; // failed
     }
 
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
@@ -85,13 +95,12 @@ public class AccountRepository : IAccountRepository
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        if (string.IsNullOrEmpty(token))
+        if (!string.IsNullOrEmpty(token))
         {
-            loggedInDto.IsFailed = true;
-            return loggedInDto;
+            return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
         }
 
-        return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+        return loggedInDto;
     }
 
     public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userIdHashed, string? token, CancellationToken cancellationToken)
