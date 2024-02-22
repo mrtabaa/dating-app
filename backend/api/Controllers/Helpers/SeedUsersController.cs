@@ -52,11 +52,8 @@ public class SeedUsersController : BaseApiController
         // add each user to DB
         List<AppUser> appUsers = [];
 
-        List<AppRole> roles = [
-            new() {Name = "admin"},
-            new() {Name = "moderator"},
-            new() {Name = "member"}
-        ];
+        #region Roles Management
+        AppRole[] roles = AppVariablesExtensions.roles;
 
         foreach (AppRole role in roles)
         {
@@ -69,7 +66,7 @@ public class SeedUsersController : BaseApiController
 
             await _userManager.CreateAsync(appUser, userInput.Password);
 
-            await _userManager.AddToRoleAsync(appUser, roles[2].Name!); // if Name is null, place "error" as the arg value
+            await _userManager.AddToRoleAsync(appUser, Roles.member.ToString());
 
             appUsers.Add(appUser);
         }
@@ -81,7 +78,8 @@ public class SeedUsersController : BaseApiController
         };
 
         await _userManager.CreateAsync(admin, "Aaaaaaa/");
-        await _userManager.AddToRolesAsync(admin, [roles[0].Name!, roles[1].Name!]);
+        await _userManager.AddToRolesAsync(admin, [Roles.admin.ToString(), Roles.moderator.ToString()]);
+        #endregion Roles Management
 
         // convert AppUser to MemberDto
         List<MemberDto?> memberDtos = [];
