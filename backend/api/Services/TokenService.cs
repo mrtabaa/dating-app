@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace api.Services;
 public class TokenService : ITokenService
 {
     private readonly IMongoCollection<AppUser> _collection;
     private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
+    private readonly UserManager<AppUser> _userManager;
 
-    public TokenService(IConfiguration config, IMongoClient client, IMyMongoDbSettings dbSettings)
+    public TokenService(IConfiguration config, IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
@@ -15,6 +18,8 @@ public class TokenService : ITokenService
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
 
         _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue!));
+
+        _userManager = userManager;
     }
 
     public async Task<string?> CreateToken(AppUser user, CancellationToken cancellationToken)
@@ -29,6 +34,10 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
             new(JwtRegisteredClaimNames.Jti, jtiValue), // store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
+
+            // Get user's roles and add them all into claims
+            IList<string>? roles = await _userManager.GetRolesAsync(user);
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
