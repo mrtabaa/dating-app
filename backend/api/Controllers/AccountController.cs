@@ -14,7 +14,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         if (loggedInDto.UserNameAlreadyExist) return BadRequest("This Username is already taken.");
 
-        return loggedInDto.IsFailed ? BadRequest("Registration has failed. Try again.") : loggedInDto;
+        return loggedInDto.Token is null ? BadRequest("Registration has failed. Try again.") : loggedInDto;
     }
 
     [HttpPost("login")]
@@ -27,7 +27,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid username or password.");
 
-        return loggedInDto.IsFailed ? BadRequest("Login has failed. Try again.") : loggedInDto;
+        return loggedInDto.Token is null ? BadRequest("Login has failed. Try again.") : loggedInDto;
     }
 
     [Authorize]

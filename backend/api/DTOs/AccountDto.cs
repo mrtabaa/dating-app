@@ -32,5 +32,4 @@ public class LoggedInDto
     public bool EmailAlreadyExist { get; set; }
     public bool UserNameAlreadyExist { get; set; }
     public bool IsWrongCreds { get; set; }
-    public bool IsFailed { get; set; }
 }
