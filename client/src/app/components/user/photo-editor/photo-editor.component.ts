@@ -33,7 +33,7 @@ export class PhotoEditorComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   private readonly maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
-  private readonly minFileSize = 2 * 1024 * 1024; // 250KB in bytes
+  private readonly minFileSize = 500 * 500; // 250KB in bytes
 
   loggedInUser: LoggedInUser | null | undefined;
   baseApiUrl: string = environment.apiUrl;
@@ -69,15 +69,16 @@ export class PhotoEditorComponent implements OnInit {
 
       this.uploader.onAfterAddingFile = (file) => {
         file.withCredentials = false;
+
+        if (file.file.size < this.minFileSize) {
+          this.snackBar.open('Photo has to be Larger than ' + Math.floor(this.minFileSize / 1000) + 'KB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+          this.uploader?.clearQueue();
+        }
       }
 
       this.uploader.onWhenAddingFileFailed = (file) => {
         if (file.size > this.maxFileSize)
           this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
-
-        // TODO fix minFileSize
-        if (file.size < this.minFileSize)
-          this.snackBar.open('Photo has to be Larger than ' + this.minFileSize / 1000 + 'KB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
       }
 
       this.uploader.onSuccessItem = (item, response, status, headers) => {
