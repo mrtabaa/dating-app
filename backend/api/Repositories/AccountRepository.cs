@@ -116,9 +116,19 @@ public class AccountRepository : IAccountRepository
         return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
     }
 
+    public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
+            .Set(appUser => appUser.LastActive, DateTime.UtcNow);
+
+        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
+    }
+
     public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion CRUD
-
-    // private async Task<string> GetToken(string token)
 }

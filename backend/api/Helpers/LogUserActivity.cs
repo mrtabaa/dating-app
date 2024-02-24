@@ -14,7 +14,7 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
 
         string? loggedInUserIdHashed = resultContext.HttpContext.User.GetUserIdHashed();
 
-        IUserRepository userRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+        IAccountRepository accountRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IAccountRepository>();
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
 
@@ -24,7 +24,7 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
             return;
         }
 
-        UpdateResult? updateResult = await userRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
+        UpdateResult? updateResult = await accountRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
 
         if (updateResult?.ModifiedCount == 0)
             _logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");

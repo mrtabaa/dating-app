@@ -75,17 +75,6 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
-    {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
-
-        UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
-            .Set(appUser => appUser.LastActive, DateTime.UtcNow);
-
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
-    }
     #endregion User Management
 
     #region Photo Management
