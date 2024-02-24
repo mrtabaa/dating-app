@@ -7,7 +7,7 @@ namespace api.Models;
 public class AppUser : MongoIdentityUser<ObjectId>
 {
     public string? IdentifierHash { get; init; }
-    public string? JtiValue { get; set; }
+    public string? JtiValue { get; init; }
     public string? Schema { get; init; }
     public DateOnly DateOfBirth { get; init; }
     public string KnownAs { get; init; } = string.Empty;
