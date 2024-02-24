@@ -79,6 +79,16 @@ public class SeedUsersController : BaseApiController
 
         await _userManager.CreateAsync(admin, "Aaaaaaa/");
         await _userManager.AddToRolesAsync(admin, [Roles.admin.ToString(), Roles.moderator.ToString()]);
+
+        AppUser moderator = new()
+        {
+            Email = "moderator@a.com",
+            UserName = "moderator"
+        };
+
+        await _userManager.CreateAsync(moderator, "Aaaaaaa/");
+        await _userManager.AddToRolesAsync(moderator, [Roles.moderator.ToString()]);
+
         #endregion Roles Management
 
         // convert AppUser to MemberDto
