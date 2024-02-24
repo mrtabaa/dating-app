@@ -67,6 +67,14 @@ public static class IdentityServiceExtensions
         }
         #endregion
 
+        #region Policy
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.admin.ToString()));
+            options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.admin.ToString(), Roles.moderator.ToString()));
+        });
+        #endregion
+
         return services;
     }
 }
