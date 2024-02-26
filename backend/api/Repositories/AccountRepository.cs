@@ -17,6 +17,7 @@ public class AccountRepository : IAccountRepository
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        
         _userManager = userManager;
         _tokenService = tokenService;
     }

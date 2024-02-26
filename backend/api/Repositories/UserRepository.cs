@@ -93,7 +93,7 @@ public class UserRepository : IUserRepository
             return photoUploadStatus;
         }
 
-        if(appUser.Photos.Count >= photoUploadStatus.MaxPhotosLimit)
+        if (appUser.Photos.Count >= photoUploadStatus.MaxPhotosLimit)
         {
             photoUploadStatus.IsMaxPhotoReached = true;
             return photoUploadStatus;
