@@ -69,6 +69,9 @@ export class AccountService {
   setCurrentUser(loggedInUser: LoggedInUser): void {
     localStorage.setItem('token', loggedInUser.token);
 
+    this.setLoggedInUserRoles(loggedInUser);
+
+    // console.log(loggedInUser.roles);
     this.loggedInUserSig.set(loggedInUser);
   }
 
@@ -80,5 +83,13 @@ export class AccountService {
       : this.router.navigate(['members']);
 
     localStorage.removeItem('returnUrl');
+  }
+
+  setLoggedInUserRoles(loggedInUser: LoggedInUser): any {
+    loggedInUser.roles = [];
+
+    const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role; // get the token's 2nd part then select role
+
+    Array.isArray(roles) ? loggedInUser.roles = roles : loggedInUser.roles.push(roles);
   }
 }
