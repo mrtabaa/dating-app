@@ -14,6 +14,8 @@ import { authGuard } from './guards/auth.guard';
 import { authLoggedInGuard } from './guards/auth-logged-in.guard';
 import { preventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
 import { FollowsComponent } from './components/follows/follows.component';
+import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -27,6 +29,7 @@ export const routes: Routes = [
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
             { path: 'friends', component: FollowsComponent },
             { path: 'messages', component: MessagesComponent },
+            { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard] } // both authGuard and adminGuard applied
         ]
     },
     {
