@@ -32,7 +32,7 @@ public class TokenService : ITokenService
         {
             var claims = new List<Claim> {
             new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
-            new(JwtRegisteredClaimNames.Jti, jtiValue), // store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
+            new(JwtRegisteredClaimNames.Jti, jtiValue), // TODO store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 
             // Get user's roles and add them all into claims
