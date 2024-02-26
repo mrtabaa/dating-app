@@ -1,18 +1,26 @@
 namespace api.Controllers;
 
-public class AdminController : BaseApiController
+[Authorize(Policy = "RequiredAdminRole")]
+public class AdminController(IAdminRepository _adminRepository) : BaseApiController
 {
-    [Authorize(Policy = "RequiredAdminRole")]
     [HttpGet("users-with-roles")]
-    public ActionResult GetUsersWithRoles()
+    public async Task<ActionResult<IEnumerable<MemberWithRoleDto>>> GetUsersWithRoles()
     {
-        return Ok("Only Admins get users with roles.");
+        return Ok(await _adminRepository.GetUsersWithRolesAsync());
     }
 
-    [Authorize(Policy = "ModeratePhotoRole")]
-    [HttpGet("photos-to-moderate")]
-    public ActionResult GetPhotosForModeration()
+    [HttpPut("edit-roles/{userName}")]
+    public async Task<ActionResult<IList<string>>> EditRoles(string userName, [FromQuery] string newRoles)
     {
-        return Ok("Admins or Moderators can see this.");
+        IEnumerable<string>? result = await _adminRepository.EditMemberRole(userName, newRoles);
+
+        return result is null ? BadRequest("Edit roles failed") : Ok(result);
     }
+
+    // [Authorize(Policy = "ModeratePhotoRole")]
+    // [HttpGet("photos-to-moderate")]
+    // public async Task<ActionResult> GetPhotosForModeration()
+    // {
+    //     return Ok("Admins or Moderators can see this.");
+    // }
 }
