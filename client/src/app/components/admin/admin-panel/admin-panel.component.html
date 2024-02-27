@@ -1,6 +1,8 @@
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
     <mat-tab *dirHasRole="['admin']" label="User Management">
-        <app-member-management />
+        <div>
+            <app-member-management />
+        </div>
     </mat-tab>
     <mat-tab *dirHasRole="['admin', 'moderator']" label="Photo Management">
         <app-photo-management />
