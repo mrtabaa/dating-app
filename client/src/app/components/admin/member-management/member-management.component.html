@@ -23,18 +23,25 @@
     <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef> Edit Role </th>
         <td class="edit-role" mat-cell *matCellDef="let element; let i = index;">
-            <mat-form-field>
-                <mat-label>Edit</mat-label>
-                <mat-select multiple [formControl]="selectedArray.at(i)">
-                    @for (role of displayedRoles; track $index) {
-                    <mat-option [disabled]="element.userName === 'admin' && role === 'admin'" [value]="role">{{role
-                        |
-                        titlecase}}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-            <button [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString()"
-                (click)="updateRoles(i)" mat-stroked-button color="primary">Save</button>
+            @if(selectedArray.at(i).hasError('required')) {
+            <mat-error>One role is required.</mat-error>
+            }
+            <div class="roles-and-button">
+                <mat-form-field>
+                    <mat-label>Edit</mat-label>
+                    <mat-select multiple [formControl]="selectedArray.at(i)">
+                        @for (role of displayedRoles; track $index) {
+                        <mat-option [disabled]="element.userName === 'admin' && role === 'admin'" [value]="role">{{role
+                            |
+                            titlecase}}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <button [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString() || selectedArray.at(i).invalid"
+                    (click)="updateRoles(i)" mat-stroked-button color="primary">
+                    Save
+                </button>
+            </div>
         </td>
     </ng-container>
 

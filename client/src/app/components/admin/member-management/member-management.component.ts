@@ -4,7 +4,7 @@ import { MemberWithRole } from '../../../models/member-with-role.model';
 import { AdminService } from '../../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,11 +39,11 @@ export class MemberManagementComponent {
       .pipe(tap(members => members
         .forEach(member => {
           member.roles
-          this.selectedArray.push(this.fb.control(member.roles));
+          this.selectedArray.push(this.fb.control(member.roles, [Validators.required]));
         })));
   }
 
   updateRoles(i: number): void {
-    console.log(this.selectedArray.at(i).value);
+    console.log(this.selectedArray.at(i));
   }
 }
