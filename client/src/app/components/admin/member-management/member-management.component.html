@@ -1,0 +1,33 @@
+<table mat-table [dataSource]="members" class="mat-elevation-z8">
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="no">
+        <th mat-header-cell *matHeaderCellDef> # </th>
+        <td mat-cell *matCellDef="let element; let i = index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- UserName Column -->
+    <ng-container matColumnDef="username">
+        <th mat-header-cell *matHeaderCellDef> Username </th>
+        <td mat-cell *matCellDef="let element"> {{element.userName}} </td>
+    </ng-container>
+
+    <!-- Roles Column -->
+    <ng-container matColumnDef="active-roles">
+        <th mat-header-cell *matHeaderCellDef> Active role </th>
+        <td mat-cell *matCellDef="let element"> {{element.roles}} </td>
+    </ng-container>
+
+    <!-- Action Column -->
+    <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef> Edit Role </th>
+        <td mat-cell *matCellDef="let element">
+            <button mat-mini-fab color="primary">
+                <mat-icon>edit</mat-icon>
+            </button>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
