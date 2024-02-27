@@ -9,7 +9,6 @@ import { MemberWithRole } from '../models/member-with-role.model';
 })
 export class AdminService {
   private http = inject(HttpClient);
-
   private apiUrl: string = environment.apiUrl + 'admin/';
 
   getMembersWithRoles(): Observable<MemberWithRole[]> {
@@ -20,6 +19,6 @@ export class AdminService {
     let httpParams = new HttpParams();
     httpParams = httpParams.append('newRoles', JSON.stringify(selectedRoles))
 
-    return this.http.put<MemberWithRole>(this.apiUrl + '/' + userName, null, {params: httpParams})
+    return this.http.put<MemberWithRole>(this.apiUrl + '/' + userName, null, { params: httpParams })
   }
 }
