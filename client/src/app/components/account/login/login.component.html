@@ -7,6 +7,6 @@
         <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'" [placeHolder]="'Your password'"
             [hint]="'8 to 20 characters, a special character, an uppercase character.'">
         </app-input-cva>
-        <button (click)="loginEmailUsername()" class="submitBtn" mat-raised-button color="primary">Sign in</button>
+        <button (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn" mat-raised-button color="primary">Sign in</button>
     </div>
 </form>
