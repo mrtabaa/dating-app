@@ -29,7 +29,6 @@ public class AdminRepository : IAdminRepository
             _userManager.Users.ToList().ForEach(appUser =>
                users.Add(
                    new MemberWithRoleDto(
-                       Id: appUser.Id.ToString(),
                        UserName: appUser.UserName!,
                        Roles: _userManager.GetRolesAsync(appUser).Result
                    )
