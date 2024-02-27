@@ -8,12 +8,12 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const snackBar = inject(MatSnackBar);
 
-  if(accountService.loggedInUserSig()?.roles.includes("admin"))
+  if (accountService.loggedInUserSig()?.roles.some(role => role === "admin" || role === 'moderator'))
     return true;
 
-  snackBar.open("You're not allowed here. Only admins.", "Close", {verticalPosition: "top", horizontalPosition: "center", duration: 7000});
-  
+  snackBar.open("You're not allowed here. Only admins.", "Close", { verticalPosition: "top", horizontalPosition: "center", duration: 7000 });
+
   router.navigate(['no-access']);
-  
+
   return false;
 };

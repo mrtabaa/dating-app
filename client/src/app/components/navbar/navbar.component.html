@@ -10,7 +10,7 @@
         @if(loggedInUserSig && loggedInUserSig()) {
         <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
             @for (link of links; track $index) {
-            @if(loggedInUserSig()?.roles?.includes('admin')) {
+            @if(loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
                 [active]="rla.isActive">
                 {{link | titlecase}}
