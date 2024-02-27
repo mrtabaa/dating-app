@@ -15,17 +15,26 @@
 
     <!-- Roles Column -->
     <ng-container matColumnDef="active-roles">
-        <th mat-header-cell *matHeaderCellDef> Active role </th>
-        <td mat-cell *matCellDef="let element"> {{element.roles}} </td>
+        <th mat-header-cell *matHeaderCellDef> Active Role </th>
+        <td mat-cell *matCellDef="let element"> {{element.roles | json}} </td>
     </ng-container>
 
     <!-- Action Column -->
     <ng-container matColumnDef="action">
         <th mat-header-cell *matHeaderCellDef> Edit Role </th>
-        <td mat-cell *matCellDef="let element">
-            <button mat-mini-fab color="primary">
-                <mat-icon>edit</mat-icon>
-            </button>
+        <td class="edit-role" mat-cell *matCellDef="let element; let i = index;">
+            <mat-form-field>
+                <mat-label>Edit</mat-label>
+                <mat-select multiple [formControl]="selectedArray.at(i)">
+                    @for (role of displayedRoles; track $index) {
+                    <mat-option [disabled]="element.userName === 'admin' && role === 'admin'" [value]="role">{{role
+                        |
+                        titlecase}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <button [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString()"
+                (click)="updateRoles(i)" mat-stroked-button color="primary">Save</button>
         </td>
     </ng-container>
 
