@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { MemberWithRole } from '../../../models/member-with-role.model';
 import { AdminService } from '../../../services/admin.service';
@@ -17,25 +17,17 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './member-management.component.html',
   styleUrl: './member-management.component.scss'
 })
-export class MemberManagementComponent implements OnInit {
+export class MemberManagementComponent {
   private adminService = inject(AdminService);
-  members$: Observable<MemberWithRole[]> | undefined;
-  members!: MemberWithRole[];
 
-  displayedColumns = ['username', 'active-roles', 'action']
+  displayedColumns = ['no', 'username', 'active-roles', 'action']
+  members$: Observable<MemberWithRole[]> | undefined;
 
   ngOnInit(): void {
     this.getMembersWithRoles();
   }
 
   getMembersWithRoles(): void {
-    this.adminService.getMembersWithRoles().subscribe(
-      membersRes => {
-        if (membersRes) {
-          this.members = membersRes;
-          console.log(this.members);
-        }
-      }
-    );
+    this.members$ = this.adminService.getMembersWithRoles();
   }
 }

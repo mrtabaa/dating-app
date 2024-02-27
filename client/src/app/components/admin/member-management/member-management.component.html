@@ -1,3 +1,4 @@
+@if(members$ | async; as members) {
 <table mat-table [dataSource]="members" class="mat-elevation-z8">
 
     <!-- Position Column -->
@@ -31,3 +32,4 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+}
