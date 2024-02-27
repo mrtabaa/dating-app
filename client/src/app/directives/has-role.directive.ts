@@ -1,5 +1,4 @@
 import { Directive, Input, OnInit, TemplateRef, ViewContainerRef, inject } from '@angular/core';
-import { AccountService } from '../services/account.service';
 
 @Directive({
   selector: '[dirHasRole]',
@@ -10,12 +9,17 @@ export class HasRoleDirective implements OnInit {
 
   private viewcontainerRef = inject(ViewContainerRef);
   private templateRef = inject(TemplateRef<any>);
-  private accountService = inject(AccountService);
 
   ngOnInit(): void {
-    if(this.accountService.loggedInUserSig()?.roles.some(role => this.hasRole.includes(role)))
-      this.viewcontainerRef.createEmbeddedView(this.templateRef);
-    else
-      this.viewcontainerRef.clear();
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      const roles = JSON.parse(atob(token.split('.')[1])).role;
+
+      if (roles.some((role: string) => this.hasRole.includes(role)))
+        this.viewcontainerRef.createEmbeddedView(this.templateRef);
+      else
+        this.viewcontainerRef.clear();
+    }
   }
 }
