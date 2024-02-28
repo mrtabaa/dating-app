@@ -32,14 +32,8 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<LoggedInDto>> GetLoggedInUser(CancellationToken cancellationToken)
-    {
-        string? token = Response.HttpContext.GetTokenAsync("access_token").Result;
-
-        LoggedInDto? loggedInDto = await _accountRepository.GetLoggedInUserAsync(User.GetUserIdHashed(), token, cancellationToken);
-
-        return loggedInDto is null ? BadRequest("Trouble finding the user!") : loggedInDto;
-    }
+    public ActionResult AuthorizeLoggedInUser() =>
+        Ok(new { message = "token is still valid and user is authorized" });
 
     [Authorize]
     [HttpDelete("delete-user")]

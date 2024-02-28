@@ -104,19 +104,6 @@ public class AccountRepository : IAccountRepository
         return loggedInDto;
     }
 
-    public async Task<LoggedInDto?> GetLoggedInUserAsync(string? userIdHashed, string? token, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(userIdHashed) || string.IsNullOrEmpty(token)) return null;
-
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Equals(ObjectId.Empty)) return null;
-
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-
-        return appUser is null ? null : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
-    }
-
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
