@@ -9,10 +9,10 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
         return Ok(await _adminRepository.GetUsersWithRolesAsync());
     }
 
-    [HttpPut("edit-roles/{userName}")]
-    public async Task<ActionResult<IList<string>>> EditRoles(string userName, [FromQuery] string newRoles)
+    [HttpPut("edit-roles")]
+    public async Task<ActionResult<IList<string>>> EditRoles(MemberWithRoleDto memberWithRoleDto)
     {
-        IEnumerable<string>? result = await _adminRepository.EditMemberRole(userName, newRoles);
+        IEnumerable<string>? result = await _adminRepository.EditMemberRole(memberWithRoleDto);
 
         return result is null ? BadRequest("Edit roles failed") : Ok(result);
     }

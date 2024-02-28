@@ -39,23 +39,21 @@ public class AdminRepository : IAdminRepository
         return users;
     }
 
-    public async Task<IEnumerable<string>?> EditMemberRole(string userName, string newRoles)
+    public async Task<IEnumerable<string>?> EditMemberRole(MemberWithRoleDto memberWithRoleDto)
     {
-        AppUser? appUser = await _userManager.FindByNameAsync(userName.ToUpper());
+        AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());
 
         if (appUser is null) return null;
-
-        IEnumerable<string> selectedRoles = newRoles.Split(",").ToArray();
 
         IEnumerable<string> userRoles = _userManager.GetRolesAsync(appUser).Result;
 
         // Add selected roles
-        IdentityResult? result = await _userManager.AddToRolesAsync(appUser, selectedRoles.Except(userRoles));
+        IdentityResult? result = await _userManager.AddToRolesAsync(appUser, memberWithRoleDto.Roles.Except(userRoles));
 
         if (!result.Succeeded) return null;
 
         // Delete non-selected roles
-        result = await _userManager.RemoveFromRolesAsync(appUser, userRoles.Except(selectedRoles));
+        result = await _userManager.RemoveFromRolesAsync(appUser, userRoles.Except(memberWithRoleDto.Roles));
 
         if (!result.Succeeded) return null;
 
