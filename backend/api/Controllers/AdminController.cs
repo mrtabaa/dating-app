@@ -12,7 +12,7 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
     [HttpPut("edit-roles")]
     public async Task<ActionResult<IList<string>>> EditRoles(MemberWithRoleDto memberWithRoleDto)
     {
-        if (memberWithRoleDto.Roles.Contains("member"))
+        if (!memberWithRoleDto.Roles.Contains("member"))
             return BadRequest("Cannot remove member role!");
 
         IEnumerable<string>? result = await _adminRepository.EditMemberRole(memberWithRoleDto);
