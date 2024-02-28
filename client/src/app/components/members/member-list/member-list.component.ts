@@ -8,7 +8,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MemberService } from '../../../services/member.service';
 import { MemberParams } from '../../../models/helpers/member-params';
 import { MatSelectModule } from '@angular/material/select';
-import { FormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { range } from 'lodash';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,7 +18,7 @@ import { MatDividerModule } from '@angular/material/divider';
   selector: 'app-user-list',
   standalone: true,
   imports: [
-    MemberCardComponent, FormsModule,
+    MemberCardComponent, FormsModule, ReactiveFormsModule,
     MatPaginatorModule, MatSelectModule, MatButtonModule,
     MatIconModule, MatDividerModule
   ],
@@ -28,6 +28,7 @@ import { MatDividerModule } from '@angular/material/divider';
 export class MemberListComponent implements OnInit, OnDestroy {
   //#region Variables
   private memberService = inject(MemberService);
+  private fb = inject(FormBuilder);
 
   subscribed: Subscription | undefined;
 
@@ -51,16 +52,16 @@ export class MemberListComponent implements OnInit, OnDestroy {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent | undefined;
-
   //#endregion
 
   //#region auto-run methods
   constructor() {
     this.memberParams = this.memberService.getMemberParams();
+    this.GenderCtrl.setValue(this.memberParams?.gender)
   }
 
   ngOnInit(): void {
-    this.getMembers();
+    this.initResetFilter();
   }
 
   ngOnDestroy(): void {
@@ -68,13 +69,40 @@ export class MemberListComponent implements OnInit, OnDestroy {
   }
   //#endregion auto-run methods
 
-  resetFilter(): void {
+  //#region Reactive Form 
+  filterFg = this.fb.group({
+    orderByCtrl: [],
+    genderCtrl: [],
+    minAgeCtrl: [],
+    maxAgeCtrl: []
+  });
+
+  get OrderByCtrl(): AbstractControl {
+    return this.filterFg.get('orderByCtrl') as FormControl;
+  }
+  get GenderCtrl(): AbstractControl {
+    return this.filterFg.get('genderCtrl') as FormControl;
+  }
+  get MinAgeCtrl(): AbstractControl {
+    return this.filterFg.get('minAgeCtrl') as FormControl;
+  }
+  get MaxAgeCtrl(): AbstractControl {
+    return this.filterFg.get('maxAgeCtrl') as FormControl;
+  }
+  //#endregion Reactive form
+
+  initResetFilter(): void {
     this.memberParams = this.memberService.resetMemberParams();
+    this.OrderByCtrl.setValue(this.memberParams?.orderBy);
+    this.GenderCtrl.setValue(this.memberParams?.gender);
+    this.MinAgeCtrl.setValue(this.memberParams?.minAge);
+    this.MaxAgeCtrl.setValue(this.memberParams?.maxAge);
 
     this.getMembers();
   }
 
   getMembers(): void {
+    console.log(this.memberParams);
     this.subscribed = this.memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
@@ -93,6 +121,15 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
       this.memberService.setMemberParams(this.memberParams);
       this.getMembers();
+    }
+  }
+
+  updateMemberParams(): void {
+    if (this.memberParams) {
+      this.memberParams.orderBy = this.OrderByCtrl.value;
+      this.memberParams.gender = this.GenderCtrl.value;
+      this.memberParams.minAge = this.MinAgeCtrl.value;
+      this.memberParams.maxAge = this.MaxAgeCtrl.value;
     }
   }
 }
