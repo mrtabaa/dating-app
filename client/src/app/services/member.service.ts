@@ -23,13 +23,21 @@ export class MemberService {
   loggedInGender: string | undefined;
 
   constructor() {
+    this.initMemberParams();
+  }
+
+  initMemberParams(): void {
     const gender = this.accountService.loggedInUserSig()?.gender;
 
     if (gender) {
       this.memberParams = new MemberParams(gender);
       this.loggedInGender = gender;
-
       this.getMembers();
+    }
+    else {
+      this.memberParams = new MemberParams('male');
+      this.loggedInGender = 'male'
+      this.getMemberParams();
     }
   }
 
