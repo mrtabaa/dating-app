@@ -36,7 +36,7 @@
                         <mat-label>Edit</mat-label>
                         <mat-select multiple [formControl]="selectedArray.at(i)">
                             @for (role of displayedRoles; track $index) {
-                            <mat-option [disabled]="element.userName === 'admin' && role === 'admin'"
+                            <mat-option [disabled]="element.userName === 'admin' && role === 'admin' || role === 'member'"
                                 [value]="role">{{role
                                 |
                                 titlecase}}</mat-option>
@@ -44,7 +44,7 @@
                         </mat-select>
                     </mat-form-field>
                     <button
-                        [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString() || selectedArray.at(i).invalid || selectedArray.at(i).pristine"
+                        [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString() && selectedArray.at(i).invalid || selectedArray.at(i).pristine"
                         (click)="updateRoles(i, element.userName)" mat-stroked-button color="primary">
                         Save
                     </button>
