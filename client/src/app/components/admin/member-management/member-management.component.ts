@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, take, tap } from 'rxjs';
 import { MemberWithRole } from '../../../models/member-with-role.model';
 import { AdminService } from '../../../services/admin.service';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-member-management',
@@ -22,28 +23,44 @@ import { MatButtonModule } from '@angular/material/button';
 export class MemberManagementComponent {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private snackBar = inject(MatSnackBar);
 
   displayedColumns = ['no', 'username', 'active-roles', 'action'];
   displayedRoles = ['admin', 'moderator', 'member'];
 
-  members$: Observable<MemberWithRole[]> | undefined;
+  membersWithRole$: Observable<MemberWithRole[]> | undefined;
 
-  selectedArray = this.fb.array([]);
+  selectedArray = this.fb.array<string[] | null>([]);
 
   ngOnInit(): void {
     this.getMembersWithRoles();
   }
 
   getMembersWithRoles(): void {
-    this.members$ = this.adminService.getMembersWithRoles()
+    this.membersWithRole$ = this.adminService.getMembersWithRoles()
       .pipe(tap(members => members
         .forEach(member => {
           member.roles
-          this.selectedArray.push(this.fb.control(member.roles, [Validators.required]));
+          this.selectedArray.push(this.fb.control<string[]>(member.roles, [Validators.required]));
         })));
   }
 
-  updateRoles(i: number): void {
-    console.log(this.selectedArray.at(i));
+  updateRoles(i: number, userName: string): void {
+
+    this.adminService.editMemberRole(userName, this.selectedArray.at(i).value)
+      ?.pipe(
+        take(1)
+      ).subscribe(
+        {
+          next: savedRoles => {
+            if (savedRoles) {
+              this.selectedArray.at(i).setValue(savedRoles);
+
+              this.selectedArray.at(i).markAsPristine(); // disable the Save button
+
+              this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
+            }
+          },
+        });
   }
 }

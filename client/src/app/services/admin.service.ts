@@ -15,12 +15,16 @@ export class AdminService {
     return this.http.get<MemberWithRole[]>(this.apiUrl + 'users-with-roles')
   }
 
-  editMemberRole(username: string, selectedRoles: string[]): Observable<MemberWithRole> {
-    const memberWithRoles: MemberWithRole = {
-      userName: username,
-      roles: selectedRoles
+  editMemberRole(username: string, selectedRoles: string[] | null): Observable<string[]> | undefined {
+    if (selectedRoles) {
+      const memberWithRoles: MemberWithRole = {
+        userName: username,
+        roles: selectedRoles
+      }
+
+      return this.http.put<string[]>(this.apiUrl + 'edit-roles', memberWithRoles);
     }
 
-    return this.http.put<MemberWithRole>(this.apiUrl, memberWithRoles);
+    return undefined;
   }
 }
