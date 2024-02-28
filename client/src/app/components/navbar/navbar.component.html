@@ -81,10 +81,12 @@
             <mat-divider></mat-divider>
             <mat-list>
                 <mat-list-item>
-                    <div routerLink="user/edit" mat-button class="menu-items">
+                    @if(loggedInUserSig && loggedInUserSig()?.userName !== 'admin') {
+                    <div [hidden]="" routerLink="user/edit" mat-button class="menu-items">
                         <mat-icon>edit_note</mat-icon>
                         Edit Profile
                     </div>
+                    }
                 </mat-list-item>
                 <mat-list-item [routerLink]="['/admin/manage-orders']" routerLinkActive="router-link-active">
                     <div class="menu-items">
