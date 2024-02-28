@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 import { PaginatedResult, Pagination } from '../../../models/helpers/pagination';
@@ -25,7 +25,7 @@ import { MatDividerModule } from '@angular/material/divider';
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss']
 })
-export class MemberListComponent implements OnInit, OnDestroy {
+export class MemberListComponent implements OnDestroy {
   //#region Variables
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
@@ -56,11 +56,8 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
   //#region auto-run methods
   constructor() {
-    this.memberParams = this.memberService.getMemberParams();
-    this.GenderCtrl.setValue(this.memberParams?.gender)
-  }
+    this.memberParams = this.memberService.getFreshMemberParams();
 
-  ngOnInit(): void {
     this.initResetFilter();
   }
 
@@ -92,7 +89,8 @@ export class MemberListComponent implements OnInit, OnDestroy {
   //#endregion Reactive form
 
   initResetFilter(): void {
-    this.memberParams = this.memberService.resetMemberParams();
+    this.memberParams = this.memberService.getFreshMemberParams();
+
     this.OrderByCtrl.setValue(this.memberParams?.orderBy);
     this.GenderCtrl.setValue(this.memberParams?.gender);
     this.MinAgeCtrl.setValue(this.memberParams?.minAge);
@@ -102,7 +100,6 @@ export class MemberListComponent implements OnInit, OnDestroy {
   }
 
   getMembers(): void {
-    console.log(this.memberParams);
     this.subscribed = this.memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
@@ -130,6 +127,8 @@ export class MemberListComponent implements OnInit, OnDestroy {
       this.memberParams.gender = this.GenderCtrl.value;
       this.memberParams.minAge = this.MinAgeCtrl.value;
       this.memberParams.maxAge = this.MaxAgeCtrl.value;
+
+      this.memberService.setMemberParams(this.memberParams);
     }
   }
 }

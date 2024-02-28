@@ -20,42 +20,28 @@ export class MemberService {
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
   memberParams: MemberParams | undefined;
-  loggedInGender: string | undefined;
 
   constructor() {
-    this.initMemberParams();
-  }
-
-  initMemberParams(): void {
-    const gender = this.accountService.loggedInUserSig()?.gender;
-
-    if (gender) {
-      this.memberParams = new MemberParams(gender);
-      this.loggedInGender = gender;
-      this.getMembers();
-    }
-    else {
-      this.memberParams = new MemberParams('male');
-      this.loggedInGender = 'male'
-      this.getMemberParams();
-    }
+    this.getFreshMemberParams();
   }
 
   setMemberParams(memberParamsInput: MemberParams): void {
     this.memberParams = memberParamsInput;
   }
 
-  getMemberParams(): MemberParams | undefined {
-    return this.memberParams;
-  }
+  getFreshMemberParams(): MemberParams {
+    const gender = this.accountService.loggedInUserSig()?.gender;
 
-  resetMemberParams(): MemberParams | undefined {
-    if (this.loggedInGender) {
-      this.memberParams = new MemberParams(this.loggedInGender);
-      return this.memberParams;
+    if (gender) {
+      this.memberParams = new MemberParams(gender);
+      this.getMembers();
+    }
+    else { // for admin who doesn't have a gender
+      this.memberParams = new MemberParams('male');
+      this.getFreshMemberParams();
     }
 
-    return;
+    return this.memberParams;
   }
 
   getMembers(): Observable<PaginatedResult<Member[]>> {
