@@ -29,7 +29,7 @@ export class MemberService {
     this.memberParams = memberParamsInput;
   }
 
-  getFreshMemberParams(): MemberParams {
+  getFreshMemberParams(): MemberParams | undefined {
     const gender = this.accountService.loggedInUserSig()?.gender;
 
     if (gender) {
@@ -38,7 +38,7 @@ export class MemberService {
     }
     else { // for admin who doesn't have a gender
       this.memberParams = new MemberParams('male');
-      this.getFreshMemberParams();
+      this.getMembers();
     }
 
     return this.memberParams;
