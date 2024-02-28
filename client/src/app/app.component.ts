@@ -5,8 +5,6 @@ import { AccountService } from './services/account.service';
 import { NgxSpinnerModule } from "ngx-spinner";
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { UserService } from './services/user.service';
-import { take } from 'rxjs';
-import { LoggedInUser } from './models/logged-in-user.model';
 import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
@@ -27,24 +25,17 @@ export class AppComponent implements OnInit {
   isLoading: boolean = false;
 
   ngOnInit(): void {
-    this.getLocalStorageCurrentValues();
+    this.initUserOnPageRefresh();
   }
 
-  getLocalStorageCurrentValues() {
-    const token = localStorage.getItem('token');
+  initUserOnPageRefresh() {
+    const loggedInUserStr = localStorage.getItem('loggedInUser');
 
-    if (token) {
-      this.accountService.getLoggedInUser().pipe(take(1)).subscribe(
-        {
-          next: (loggedInUser: LoggedInUser | null) => {
-            if (loggedInUser)
-              this.accountService.setCurrentUser(loggedInUser);
-          },
-          error: (err) => { //if token is expired and api call is unauthorized.
-            console.log(err.error);
-            this.accountService.logout()
-          }
-        });
+    if (loggedInUserStr) {
+      this.accountService.setCurrentUser(JSON.parse(loggedInUserStr))
+
+      // check if user's token is not expired.
+      this.accountService.authorizeLoggedInUser();
     }
   }
 }

@@ -1,4 +1,5 @@
 import { Directive, Input, OnInit, TemplateRef, ViewContainerRef, inject } from '@angular/core';
+import { LoggedInUser } from '../models/logged-in-user.model';
 
 @Directive({
   selector: '[dirHasRole]',
@@ -11,10 +12,12 @@ export class HasRoleDirective implements OnInit {
   private templateRef = inject(TemplateRef<any>);
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    const loggedInUserStr = localStorage.getItem('loggedInUser');
 
-    if (token) {
-      const roles = JSON.parse(atob(token.split('.')[1])).role;
+    if (loggedInUserStr) {
+      const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
+
+      const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role;
 
       if (roles.some((role: string) => this.hasRole.includes(role)))
         this.viewcontainerRef.createEmbeddedView(this.templateRef);

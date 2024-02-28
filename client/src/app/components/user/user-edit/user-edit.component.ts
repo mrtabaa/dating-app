@@ -17,6 +17,7 @@ import { MemberService } from '../../../services/member.service';
 import { UserService } from '../../../services/user.service';
 import { IntlModule } from 'angular-ecmascript-intl';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
+import { LoggedInUser } from '../../../models/logged-in-user.model';
 
 @Component({
   selector: 'app-user-edit',
@@ -55,17 +56,19 @@ export class UserEditComponent implements OnDestroy {
   }
 
   getMember(): void {
-    this.accountService.getLoggedInUser().pipe(take(1)).subscribe(loggedInUser => {
-      if (loggedInUser) {
-        this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
-          if (member) {
-            this.member = member;
+    const loggedInUserStr = localStorage.getItem('loggedInUser');
 
-            this.initContollersValues(member);
-          }
-        });
-      }
-    });
+    if (loggedInUserStr) {
+      const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
+
+      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
+        if (member) {
+          this.member = member;
+
+          this.initContollersValues(member);
+        }
+      });
+    };
   }
 
   userEditFg: FormGroup = this.fb.group({

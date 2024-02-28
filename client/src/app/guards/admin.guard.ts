@@ -1,15 +1,18 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LoggedInUser } from '../models/logged-in-user.model';
 
 export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const snackBar = inject(MatSnackBar);
 
-  const token = localStorage.getItem('token');
-  if (!token) return false;
+  const loggedInUserStr = localStorage.getItem('loggedInUser');
+  if (!loggedInUserStr) return false;
 
-  const roles = JSON.parse(atob(token.split('.')[1])).role;
+  const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
+
+  const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role;
 
   if (roles?.some((role: string) => role === "admin" || role === 'moderator'))
     return true;

@@ -6,7 +6,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const snackbar = inject(MatSnackBar);
 
-  if (localStorage.getItem('token'))
+  if (localStorage.getItem('loggedInUser'))
     return true;
 
   localStorage.setItem('returnUrl', state.url);

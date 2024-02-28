@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
+import { map, Observable, take } from 'rxjs';
 import { UserLogin } from '../models/account/user-login.model';
 import { UserRegister } from '../models/account/user-register.model';
 import { environment } from '../../environments/environment';
 import { LoggedInUser } from '../models/logged-in-user.model';
+import { ApiResponseMessage } from '../models/helpers/api-response-message';
 
 @Injectable({
   providedIn: 'root'
@@ -47,12 +48,19 @@ export class AccountService {
   }
 
   /**
-   * Get logged-in user when browser is refreshed
+   * Check if user's token is still valid or log them out. 
    * Called in app.component.ts
    * @returns Observable<LoggedInUser | null>
    */
-  getLoggedInUser(): Observable<LoggedInUser | null> {
-    return this.http.get<LoggedInUser>(this.baseUrl);
+  authorizeLoggedInUser(): void {
+    this.http.get<ApiResponseMessage>(this.baseUrl)
+      .pipe(take(1)).subscribe({
+        next: res => console.log(res.message),
+        error: err => {
+          console.log(err.error);
+          this.logout()
+        }
+      });
   }
 
   logout(): void {
@@ -67,11 +75,10 @@ export class AccountService {
    * @param loggedInUser 
    */
   setCurrentUser(loggedInUser: LoggedInUser): void {
-    localStorage.setItem('token', loggedInUser.token);
+    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     this.setLoggedInUserRoles(loggedInUser);
 
-    // console.log(loggedInUser.roles);
     this.loggedInUserSig.set(loggedInUser);
   }
 
