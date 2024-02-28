@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { PaginatedResult } from '../models/helpers/pagination';
 import { Member } from '../models/member.model';
@@ -23,18 +23,14 @@ export class MemberService {
   loggedInGender: string | undefined;
 
   constructor() {
-    effect(() => {
-      const gender = this.accountService.loggedInUserSig()?.gender;
+    const gender = this.accountService.loggedInUserSig()?.gender;
 
-      if (gender) {
-        this.memberParams = new MemberParams(gender);
-        this.loggedInGender = gender;
+    if (gender) {
+      this.memberParams = new MemberParams(gender);
+      this.loggedInGender = gender;
 
-        localStorage.setItem('memberParams', JSON.stringify(this.memberParams));
-
-        this.getMembers(); // since it relies on memberParams and loggedInUserSig()?.gender, it has to be called in effect. 
-      }
-    });
+      this.getMembers();
+    }
   }
 
   setMemberParams(memberParamsInput: MemberParams): void {
@@ -46,15 +42,16 @@ export class MemberService {
   }
 
   resetMemberParams(): MemberParams | undefined {
-    if (this.loggedInGender)
-      return new MemberParams(this.loggedInGender);
+    if (this.loggedInGender) {
+      this.memberParams = new MemberParams(this.loggedInGender);
+      return this.memberParams;
+    }
 
     return;
   }
 
   getMembers(): Observable<PaginatedResult<Member[]>> {
     let response: PaginatedResult<Member[]> | undefined;
-    // console.log('getMembers()', this.memberParams);
 
     if (this.memberParams)
       response = this.memberCache.get(Object.values(this.memberParams).join('-'));

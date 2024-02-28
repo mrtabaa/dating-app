@@ -75,8 +75,6 @@ export class MemberListComponent implements OnInit, OnDestroy {
   }
 
   getMembers(): void {
-    this.setMemberParams();
-
     this.subscribed = this.memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
@@ -95,22 +93,6 @@ export class MemberListComponent implements OnInit, OnDestroy {
 
       this.memberService.setMemberParams(this.memberParams);
       this.getMembers();
-    }
-  }
-
-  /**
-   * Either send memberParams chosen by the user 
-   * Or load the stored memberParams from localStorage for the page refreshes. 
-   */
-  private setMemberParams(): void {
-    if (this.memberParams)
-      this.memberService.setMemberParams(this.memberParams);
-
-    else {
-      const memberParams = localStorage.getItem('memberParams');
-
-      if (memberParams)
-        this.memberParams = JSON.parse(memberParams);
     }
   }
 }
