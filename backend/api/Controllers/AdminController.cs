@@ -17,7 +17,7 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
 
         IEnumerable<string>? result = await _adminRepository.EditMemberRole(memberWithRoleDto);
 
-        return result is null ? BadRequest("Edit roles failed") : Ok(result);
+        return result is null ? BadRequest("Edit roles failed. Contact the admin if persists.") : Ok(result);
     }
 
     // [Authorize(Policy = "ModeratePhotoRole")]
