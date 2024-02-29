@@ -44,7 +44,7 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-         await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+      await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken) =>
          await _collection.AsQueryable<AppUser>()
@@ -57,6 +57,26 @@ public class UserRepository : IUserRepository
             .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
+
+    public async Task<IdAndStringValue?> GetGenderByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken)
+    {
+        IdAndStringValue idAndGender = new();
+
+        if (string.IsNullOrEmpty(userIdHashed)) return null;
+
+        idAndGender.Id = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!idAndGender.Id.HasValue || idAndGender.Id.Value.Equals(ObjectId.Empty)) return null;
+
+        idAndGender.Value = await _collection.AsQueryable()
+            .Where<AppUser>(appUser => appUser.Id == idAndGender.Id)
+            .Select(appUser => appUser.Gender)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (string.IsNullOrEmpty(idAndGender.Value)) return null;
+
+        return idAndGender;
+    }
 
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userIdHashed, CancellationToken cancellationToken)
     {

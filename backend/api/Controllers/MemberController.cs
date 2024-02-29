@@ -9,14 +9,12 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
-        string? userIdHashed = User.GetUserIdHashed();
+        IdAndStringValue? idAndGender = await _userRepository.GetGenderByHashedIdAsync(User.GetUserIdHashed(), cancellationToken);
 
-        AppUser? appUser = await _userRepository.GetByHashedIdAsync(userIdHashed, cancellationToken);
-
-        if (appUser is not null && string.IsNullOrEmpty(memberParams.Gender))
+        if (idAndGender is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
-            memberParams.UserId = appUser.Id;
-            memberParams.Gender = appUser.Gender == "male" ? "female" : "male";
+            memberParams.UserId = idAndGender.Id;
+            memberParams.Gender = idAndGender.Value == "male" ? "female" : "male"; // value is gender here
         }
 
         PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(memberParams, cancellationToken);
