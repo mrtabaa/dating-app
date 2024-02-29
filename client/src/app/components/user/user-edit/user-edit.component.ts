@@ -32,7 +32,6 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
   styleUrls: ['./user-edit.component.scss']
 })
 export class UserEditComponent implements OnDestroy {
-  private accountService = inject(AccountService);
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
