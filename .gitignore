@@ -9,6 +9,11 @@ ssl/
 #wwwroot
 storage/
 
+#Temp files
+format.cs
+format.html
+format.ts
+
 # User-specific files
 *.rsuser
 *.suo
