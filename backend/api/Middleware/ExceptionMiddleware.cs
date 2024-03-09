@@ -1,7 +1,3 @@
-using System.Net;
-using System.Text.Json;
-using api.Errors;
-
 namespace api.Middleware;
 
 public class ExceptionMiddleware
