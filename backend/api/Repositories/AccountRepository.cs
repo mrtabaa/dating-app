@@ -6,7 +6,6 @@ namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
-
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
