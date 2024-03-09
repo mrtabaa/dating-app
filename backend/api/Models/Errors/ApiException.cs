@@ -1,4 +1,4 @@
-namespace api.Errors;
+namespace api.Models.Errors;
 
 public record ApiException(
     [property: BsonId, BsonRepresentation(BsonType.ObjectId)] ObjectId Id,
