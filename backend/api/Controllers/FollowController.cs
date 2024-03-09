@@ -44,7 +44,7 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
-        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalCount, pagedAppUsers.TotalPages));
+        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
