@@ -14,7 +14,7 @@ public class MemberRepository : IMemberRepository
     #endregion
 
     #region CRUD
-    public async Task<PagedList<AppUser>> GetMembersAsync(MemberParams memberParams, CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>> GetAllAsync(MemberParams memberParams, CancellationToken cancellationToken)
     {
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
@@ -41,14 +41,14 @@ public class MemberRepository : IMemberRepository
         return await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
     }
 
-    public async Task<MemberDto?> GetMemberByIdAsync(ObjectId? memberId, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetByIdAsync(ObjectId? memberId, CancellationToken cancellationToken)
     {
         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == memberId).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
     }
 
-    public async Task<MemberDto?> GetMemberByUserNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
     {
         AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 

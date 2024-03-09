@@ -4,7 +4,7 @@ namespace api.Controllers;
 public class MemberController(IMemberRepository _memberRepository, IUserRepository _userRepository) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetMembers([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
     {
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
@@ -17,7 +17,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
             memberParams.Gender = idAndGender.Value == "male" ? "female" : "male"; // value is gender here
         }
 
-        PagedList<AppUser> pagedAppUsers = await _memberRepository.GetMembersAsync(memberParams, cancellationToken);
+        PagedList<AppUser> pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
@@ -37,22 +37,22 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
     }
 
     [HttpGet("id/{memberId}")]
-    public async Task<ActionResult<MemberDto>> GetMemberById(string memberId, CancellationToken cancellationToken)
+    public async Task<ActionResult<MemberDto>> GetById(string memberId, CancellationToken cancellationToken)
     {
         bool isValid = ObjectId.TryParse(memberId, out ObjectId memberObjectId);
 
         if (!isValid)
             return BadRequest("Invalid memberId. Contact the admin.");
 
-        MemberDto? memberDto = await _memberRepository.GetMemberByIdAsync(memberObjectId, cancellationToken);
+        MemberDto? memberDto = await _memberRepository.GetByIdAsync(memberObjectId, cancellationToken);
 
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
 
     [HttpGet("username/{userName}")]
-    public async Task<ActionResult<MemberDto>> GetMemberByUserName(string userName, CancellationToken cancellationToken)
+    public async Task<ActionResult<MemberDto>> GetByUserName(string userName, CancellationToken cancellationToken)
     {
-        MemberDto? memberDto = await _memberRepository.GetMemberByUserNameAsync(userName, cancellationToken);
+        MemberDto? memberDto = await _memberRepository.GetByUserNameAsync(userName, cancellationToken);
 
         return memberDto is null ? BadRequest("No user found by this username.") : memberDto;
     }
