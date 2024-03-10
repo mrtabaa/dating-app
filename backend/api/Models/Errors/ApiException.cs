@@ -1,9 +1,10 @@
 namespace api.Models.Errors;
 
-public record ApiException(
-    [property: BsonId, BsonRepresentation(BsonType.ObjectId)] ObjectId Id,
-    int StatusCode,
-    string Message,
-    string? Details,
-    DateTime Time
-);
+public class ApiException
+{
+    public ObjectId Id { get; set; }
+    public int StatusCode { get; set; }
+    public string? Message { get; set; }
+    public string? Details { get; set; }
+    public DateTime Time { get; set; }
+};
