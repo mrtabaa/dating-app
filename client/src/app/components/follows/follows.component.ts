@@ -6,8 +6,10 @@ import { Observable, Subscription, tap } from 'rxjs';
 import { Member } from '../../models/member.model';
 import { MemberCardComponent } from '../members/member-card/member-card.component';
 import { FollowService } from '../../services/follow.service';
-import { PaginatedResult, Pagination } from '../../models/helpers/pagination';
+import { Pagination } from '../../models/helpers/pagination';
+import { PaginatedResult } from "../../models/helpers/paginatedResult";
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-follows',
@@ -22,6 +24,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 })
 export class FollowsComponent implements OnInit {
   private followService = inject(FollowService);
+  loading = inject(LoadingService);
 
   predicate: string = 'followings';
   isMembersValid: boolean = true;

@@ -9,7 +9,7 @@
                 <app-member-card [memberInput]="member" />
                 }
                 }
-                @else {
+                @else if(!loading.isLoading) {
                 <p>You've not followed anyone so far.</p>
                 }
             </div>
@@ -24,7 +24,7 @@
                 <app-member-card [memberInput]="member" />
                 }
                 }
-                @else{
+                @else if(!loading.isLoading) {
                 <p>Your follwers list is empty. Communication brings better days!</p>
                 }
             </div>
