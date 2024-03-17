@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
-import { PaginatedResult } from '../models/helpers/pagination';
+import { PaginatedResult } from '../models/helpers/paginatedResult';
 import { PaginationHandler } from '../extensions/paginationHandler';
 
 @Injectable({

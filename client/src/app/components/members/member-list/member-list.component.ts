@@ -1,10 +1,10 @@
 import { Component, OnDestroy, inject } from '@angular/core';
-import { PageEvent } from '@angular/material/paginator';
+import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
-import { PaginatedResult, Pagination } from '../../../models/helpers/pagination';
+import { Pagination } from '../../../models/helpers/pagination';
+import { PaginatedResult } from "../../../models/helpers/paginatedResult";
 import { Member } from '../../../models/member.model';
 import { MemberCardComponent } from '../member-card/member-card.component';
-import { MatPaginatorModule } from '@angular/material/paginator';
 import { MemberService } from '../../../services/member.service';
 import { MemberParams } from '../../../models/helpers/member-params';
 import { MatSelectModule } from '@angular/material/select';

@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable, map } from "rxjs";
-import { PaginatedResult } from "../models/helpers/pagination";
+import { PaginatedResult } from "../models/helpers/paginatedResult";
 import { inject } from "@angular/core";
 
 export class PaginationHandler {
