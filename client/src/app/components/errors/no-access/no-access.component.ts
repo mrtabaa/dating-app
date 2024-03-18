@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-no-access',
@@ -6,11 +6,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './no-access.component.html',
   styleUrls: ['./no-access.component.scss']
 })
-export class NoAccessComponent implements OnInit {
+export class NoAccessComponent {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

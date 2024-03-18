@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoggedInUser } from '../models/logged-in-user.model';
 
-export const adminGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = () => {
   const router = inject(Router);
   const snackBar = inject(MatSnackBar);
 

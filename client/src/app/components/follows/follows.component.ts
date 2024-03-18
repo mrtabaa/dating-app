@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
-import { Observable, Subscription, tap } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Member } from '../../models/member.model';
 import { MemberCardComponent } from '../members/member-card/member-card.component';
 import { FollowService } from '../../services/follow.service';

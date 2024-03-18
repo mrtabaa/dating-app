@@ -5,7 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
 import { ConfirmComponent } from '../components/_modals/confirm/confirm.component';
 
-export const preventUnsavedChangesGuard: CanDeactivateFn<UserEditComponent> = (component, currentRoute, currentState, nextState) => {
+// TODO Use it for User Management
+export const preventUnsavedChangesGuard: CanDeactivateFn<UserEditComponent> = (component) => {
   const dialog = inject(MatDialog);
 
   if (component.userEditFg?.dirty) {
