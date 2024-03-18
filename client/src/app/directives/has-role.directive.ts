@@ -2,14 +2,14 @@ import { Directive, Input, OnInit, TemplateRef, ViewContainerRef, inject } from 
 import { LoggedInUser } from '../models/logged-in-user.model';
 
 @Directive({
-  selector: '[dirHasRole]',
+  selector: '[appHasRoleDir]',
   standalone: true
 })
 export class HasRoleDirective implements OnInit {
-  @Input('dirHasRole') hasRole: string[] = [];
+  @Input() appHasRoleDir: string[] = [];
 
   private viewcontainerRef = inject(ViewContainerRef);
-  private templateRef = inject(TemplateRef<any>);
+  private templateRef = inject(TemplateRef<unknown>);
 
   ngOnInit(): void {
     const loggedInUserStr = localStorage.getItem('loggedInUser');
@@ -19,7 +19,7 @@ export class HasRoleDirective implements OnInit {
 
       const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role;
 
-      if (roles.some((role: string) => this.hasRole.includes(role)))
+      if (roles.some((role: string) => this.appHasRoleDir.includes(role)))
         this.viewcontainerRef.createEmbeddedView(this.templateRef);
       else
         this.viewcontainerRef.clear();
