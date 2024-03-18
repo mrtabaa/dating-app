@@ -22,7 +22,7 @@ import { FollowService } from '../../../services/follow.service';
   styleUrls: ['./member-card.component.scss']
 })
 export class MemberCardComponent {
-  @Input('memberInput') member: Member | undefined;
+  @Input() member: Member | undefined;
 
   private followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);

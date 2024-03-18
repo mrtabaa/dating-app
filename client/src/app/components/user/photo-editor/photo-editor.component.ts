@@ -27,7 +27,7 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
   styleUrls: ['./photo-editor.component.scss']
 })
 export class PhotoEditorComponent implements OnInit {
-  @Input('member') member: Member | undefined;
+  @Input() member: Member | undefined;
   private accountService = inject(AccountService);
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
@@ -81,7 +81,7 @@ export class PhotoEditorComponent implements OnInit {
           this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
       }
 
-      this.uploader.onSuccessItem = (item, response, status, headers) => {
+      this.uploader.onSuccessItem = (item, response) => {
         if (response) {
           const photo: Photo = JSON.parse(response);
           this.member?.photos.push(photo);
@@ -92,7 +92,7 @@ export class PhotoEditorComponent implements OnInit {
         }
       }
 
-      this.uploader.onErrorItem = (item, error, status, headers) => {
+      this.uploader.onErrorItem = (item, error) => {
         if (error)
           this.snackBar.open(error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
       }

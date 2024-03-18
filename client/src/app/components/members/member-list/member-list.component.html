@@ -54,7 +54,7 @@
             <p>No user exists with this filter. Please change the filter values or Reset the filter.</p>
             }
             @for (member of members; track $index) {
-            <app-member-card [memberInput]="member"></app-member-card>
+            <app-member-card [member]="member"></app-member-card>
             }
         </div>
         @if (pagination && memberParams) {
