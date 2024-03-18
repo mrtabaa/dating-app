@@ -10,7 +10,6 @@ import { MemberParams } from '../../../models/helpers/member-params';
 import { MatSelectModule } from '@angular/material/select';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { range } from 'lodash';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 
@@ -36,9 +35,9 @@ export class MemberListComponent implements OnDestroy {
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
 
-  // installed lodash library
-  // TODO improve hard-coded numbers
-  ages: number[] = [...range(18, 100)]; // Add 1 since lodash excludes last number. 100 => 99
+  ages: number[] = [];
+  minAge: number = 18;
+  maxAge: number = 99;
 
   orderOptions: string[] = ['lastActive', 'created', 'age'];
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
@@ -56,6 +55,8 @@ export class MemberListComponent implements OnDestroy {
 
   //#region auto-run methods
   constructor() {
+    this.initAgesRange();
+
     this.memberParams = this.memberService.getFreshMemberParams();
 
     this.initResetFilter();
@@ -129,6 +130,12 @@ export class MemberListComponent implements OnDestroy {
       this.memberParams.maxAge = this.MaxAgeCtrl.value;
 
       this.memberService.setMemberParams(this.memberParams);
+    }
+  }
+
+  private initAgesRange(): void {
+    for (let i = this.minAge; i < this.maxAge + 1; i++) {
+      this.ages.push(i);
     }
   }
 }
