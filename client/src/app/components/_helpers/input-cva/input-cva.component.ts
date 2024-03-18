@@ -23,11 +23,14 @@ export class InputCvaComponent implements ControlValueAccessor {
     ngControl.valueAccessor = this;
   }
 
-  writeValue(obj: any): void {
+  writeValue(obj: unknown): void {
+    obj // avoiding lint error
   }
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: unknown): void {
+    fn // avoiding lint error
   }
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: unknown): void {
+    fn // avoiding lint error
   }
 
   get Control(): FormControl {

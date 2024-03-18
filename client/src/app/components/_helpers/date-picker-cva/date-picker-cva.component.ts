@@ -18,19 +18,22 @@ import { MatNativeDateModule } from '@angular/material/core';
 export class DatePickerCvaComponent implements ControlValueAccessor {
   @Input({ required: true }) label = '';
   @Input({ required: true }) placeHolder = '';
-  @Input('hint') hint = '';
-  @Input('minDate') minDate: Date | undefined;
-  @Input('maxDate') maxDate: Date | undefined;
+  @Input() hint = '';
+  @Input() minDate: Date | undefined;
+  @Input() maxDate: Date | undefined;
 
   constructor(@Self() public ngControl: NgControl) {
     ngControl.valueAccessor = this;
   }
 
-  writeValue(obj: any): void {
+  writeValue(obj: unknown): void {
+    obj // avoiding lint error
   }
-  registerOnChange(fn: any): void {
+  registerOnChange(fn: unknown): void {
+    fn // avoiding lint error
   }
-  registerOnTouched(fn: any): void {
+  registerOnTouched(fn: unknown): void {
+    fn // avoiding lint error
   }
 
   get Control(): FormControl {
