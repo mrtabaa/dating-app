@@ -30,13 +30,13 @@ export class UserService {
   }
 
   setMainPhoto(url_128In: string): Observable<ApiResponseMessage> {
-    let queryParams = new HttpParams().set('photoUrlIn', url_128In);
+    const queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
     return this.http.put<ApiResponseMessage>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
   }
 
   deletePhoto(url_128In: string): Observable<ApiResponseMessage> {
-    let queryParams = new HttpParams().set('photoUrlIn', url_128In);
+    const queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
     return this.http.delete<ApiResponseMessage>(this.baseUrl + '/delete-one-photo', { params: queryParams });
   }
