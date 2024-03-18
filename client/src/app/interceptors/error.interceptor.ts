@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NavigationExtras, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError } from 'rxjs';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -33,8 +33,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             router.navigate(['/not-found']);
             break;
           case 500:
-            const navigationExtras: NavigationExtras = { state: { error: err.error } };
-            router.navigate(['/server-error'], navigationExtras);
+            router.navigate(['/server-error'], { state: { error: err.error } });
             break;
           default:
             snack.open('Something unexpected went wrong.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
