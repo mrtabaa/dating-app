@@ -92,7 +92,7 @@ export class AccountService {
     localStorage.removeItem('returnUrl');
   }
 
-  setLoggedInUserRoles(loggedInUser: LoggedInUser): any {
+  setLoggedInUserRoles(loggedInUser: LoggedInUser): void {
     loggedInUser.roles = [];
 
     const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role; // get the token's 2nd part then select role
