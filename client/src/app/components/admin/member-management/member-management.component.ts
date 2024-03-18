@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Observable, take, tap } from 'rxjs';
 import { MemberWithRole } from '../../../models/member-with-role.model';
 import { AdminService } from '../../../services/admin.service';
@@ -20,7 +20,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './member-management.component.html',
   styleUrl: './member-management.component.scss'
 })
-export class MemberManagementComponent {
+export class MemberManagementComponent implements OnInit{
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);

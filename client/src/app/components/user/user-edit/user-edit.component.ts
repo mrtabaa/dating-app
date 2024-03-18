@@ -1,11 +1,10 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Subscription, take } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { UserUpdate } from '../../../models/user-update.model';
 import { Member } from '../../../models/member.model';
-import { AccountService } from '../../../services/account.service';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -31,7 +30,7 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
-export class UserEditComponent implements OnDestroy {
+export class UserEditComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
@@ -67,7 +66,7 @@ export class UserEditComponent implements OnDestroy {
           this.initContollersValues(member);
         }
       });
-    };
+    }
   }
 
   userEditFg: FormGroup = this.fb.group({
@@ -104,7 +103,7 @@ export class UserEditComponent implements OnDestroy {
 
   updateUser(member: Member): void {
     if (member) {
-      let updatedUser: UserUpdate = {
+      const updatedUser: UserUpdate = {
         username: member.userName,
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
