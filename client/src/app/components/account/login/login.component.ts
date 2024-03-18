@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]]
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]]
   });
 
   get EmailUsernameCtrl(): FormControl {
@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   loginEmailUsername(): void {
-    let userLoginInput: UserLogin = {
+    const userLoginInput: UserLogin = {
       emailUsername: this.EmailUsernameCtrl.value,
       password: this.PasswordCtrl.value
     };

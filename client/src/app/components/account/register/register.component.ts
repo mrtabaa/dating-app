@@ -54,10 +54,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$/)]],
+    emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^\w\s]).*$")]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
     dateOfBirthCtrl: ['', [Validators.required]],
     knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
     genderCtrl: ['female', [Validators.required]],
@@ -102,7 +102,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   registerUser(): void {
     const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
-    let userRegisterInput: UserRegister = {
+    const userRegisterInput: UserRegister = {
       email: this.EmailCtrl.value,
       username: this.UsernameCtrl.value,
       password: this.PasswordCtrl.value,
@@ -131,7 +131,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private getDateOnly(dob: string | null): string | undefined {
     if (!dob) return undefined;
 
-    let theDob = new Date(dob);
+    const theDob = new Date(dob);
     return new Date(theDob.setMinutes(theDob.getMinutes() - theDob.getTimezoneOffset())).toISOString().slice(0, 10);
   }
 
