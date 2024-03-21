@@ -2,6 +2,8 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddUserSecrets<Program>(); // Register User Secrets
+
 // AUTO-GENERATED CODES //
 builder.Services.AddControllers();
 
@@ -17,7 +19,8 @@ var app = builder.Build();
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// app.UseHttpsRedirection(); // disable https for development
+if (app.Environment.IsProduction()) // https for production only
+    app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 
