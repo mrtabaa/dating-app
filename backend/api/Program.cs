@@ -2,8 +2,6 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddUserSecrets<Program>(); // Register User Secrets
-
 // AUTO-GENERATED CODES //
 builder.Services.AddControllers();
 
@@ -11,6 +9,16 @@ builder.Services.AddControllers();
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
+#endregion
+
+#region Production
+builder.Configuration.AddUserSecrets<Program>(); // Register User Secrets
+
+// Production: Set the URLs the app will listen on
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenLocalhost(5100); // Listen for incoming HTTP connections on port 5100
+});
 #endregion
 
 #region Configure the HTTP request pipeline.
