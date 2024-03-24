@@ -4,7 +4,9 @@ namespace api.Extensions;
 public static class ApplicationServiceExtensions
 {
 
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddApplicationServices(
+        this IServiceCollection services, IConfiguration config, IWebHostEnvironment env
+    )
     {
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
@@ -26,11 +28,14 @@ public static class ApplicationServiceExtensions
         #endregion MongoDbSettings
 
         #region Others
-        // with ssl 
         services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
-                .AllowAnyMethod().WithOrigins("http://localhost:4300"));
+            if (env.IsDevelopment())
+                options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
+                    .AllowAnyMethod().WithOrigins("http://localhost:4300"));
+            else
+                options.AddDefaultPolicy(policy => policy.AllowAnyHeader()
+                        .AllowAnyMethod().WithOrigins("http://localhost:7101")); // production
         });
 
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
