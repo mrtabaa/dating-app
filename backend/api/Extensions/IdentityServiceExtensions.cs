@@ -1,6 +1,5 @@
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
-using Microsoft.AspNetCore.Identity;
 
 namespace api.Extensions;
 
@@ -9,7 +8,7 @@ public static class IdentityServiceExtensions
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
         #region Token
-        string? tokenValue = config[AppVariablesExtensions.TokenKey];
+        string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 
         if (tokenValue is not null)
         {
@@ -59,7 +58,6 @@ public static class IdentityServiceExtensions
             };
 
             services.ConfigureMongoDbIdentity<AppUser, AppRole, ObjectId>(mongoDbIdentityConfig)
-            // .AddRoles<AppRole>()
             .AddUserManager<UserManager<AppUser>>()
             .AddSignInManager<SignInManager<AppUser>>()
             .AddRoleManager<RoleManager<AppRole>>()
@@ -68,11 +66,9 @@ public static class IdentityServiceExtensions
         #endregion
 
         #region Policy
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.admin.ToString()));
-            options.AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.admin.ToString(), Roles.moderator.ToString()));
-        });
+        services.AddAuthorizationBuilder()
+            .AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.admin.ToString()))
+            .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.admin.ToString(), Roles.moderator.ToString()));
         #endregion
 
         return services;
