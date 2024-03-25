@@ -14,15 +14,12 @@ builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
 #endregion
 
-#region Production
-
 // Production: Set the URLs the app will listen on
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     if (builder.Environment.IsProduction())
         serverOptions.ListenLocalhost(7100); // Listen for incoming HTTP connections on port 7100
 });
-#endregion
 
 #region Configure the HTTP request pipeline.
 var app = builder.Build();
