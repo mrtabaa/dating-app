@@ -1,0 +1,57 @@
+trigger:
+  branches:
+    include:
+      - main
+
+  paths:
+    include:
+      - api/*
+      - client/*
+
+stages:
+  - stage: BuildAPI
+  - stage: BuildClient
+  - stage: DeployAPI
+    condition: eq(variables['API_DEPLOYMENT'], 'true')  # Run only for API deployments
+  - stage: DeployClient
+    condition: eq(variables['CLIENT_DEPLOYMENT'], 'true')  # Run only for client deployments
+
+jobs:
+  - job: Build
+
+    steps:
+      - script: dotnet build $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        displayName: 'Build .NET API'
+
+  - job: Build
+
+    steps:
+      - script: npm install --legacy-peer-deps && npm run build --prod
+        workingDirectory: client
+        displayName: 'Build Angular Client'
+
+  - deployment: Deploy (API)  # Use descriptive deployment names
+
+    environment: 'production'  # Replace with your desired environment name (e.g., development, staging, production)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AzureAppServiceDeploy@4  # Consider this for API deployments (Comment)
+              inputs:
+                azureSubscription: 'Free Trial'  # Replace with your actual subscription name (Comment)
+                appName: 'da-api-mr'  # Replace with your API app service name (Comment)
+                package: $(Build.ArtifactStagingDirectory)
+
+  - deployment: Deploy (Client)  # Use descriptive deployment names
+
+    environment: 'production'  # Replace with your desired environment name (e.g., development, staging, production)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AzureWebApp@1  # Might work for both API & client depending on your setup (Comment)
+              inputs:
+                azureSubscription: 'Free Trial'  # Replace with your actual subscription name (Comment)
+                appName: 'da-client-mr'  # Replace with your client app service name (Comment)
+                package: $(Build.ArtifactStagingDirectory)/client/dist  # Adjust if needed (Comment)
