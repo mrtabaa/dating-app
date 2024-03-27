@@ -20,7 +20,7 @@ jobs:
   - job: Build
 
     steps:
-      - script: dotnet build $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+      - script: dotnet build dating-app.sln -c Release  # Specify the solution file and configuration
         workingDirectory: backend  # Added this line to specify the working directory
         displayName: 'Build .NET API'  # Update display name (optional)
 
