@@ -21,14 +21,15 @@ jobs:
 
     steps:
       - script: dotnet build $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-        displayName: 'Build .NET API'
+        workingDirectory: backend  # Added this line to specify the working directory
+        displayName: 'Build .NET API'  # Update display name (optional)
 
   - job: Build
 
     steps:
       - script: npm install --legacy-peer-deps && npm run build --prod
         workingDirectory: client
-        displayName: 'Build Angular Client'
+        displayName: 'Build Angular Client'  # Update display name (optional)
 
   - deployment: Deploy (API)  # Use descriptive deployment names
 
@@ -41,7 +42,7 @@ jobs:
               inputs:
                 azureSubscription: 'Free Trial'  # Replace with your actual subscription name (Comment)
                 appName: 'da-api-mr'  # Replace with your API app service name (Comment)
-                package: $(Build.ArtifactStagingDirectory)
+                package: $(Build.ArtifactStagingDirectory)  # Output of BuildAPI job
 
   - deployment: Deploy (Client)  # Use descriptive deployment names
 
