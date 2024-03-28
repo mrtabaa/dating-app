@@ -26,13 +26,13 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp/backend
+        run: dotnet build ./backend/dating-app.sln --configuration Release
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp/backend
+          path: ${{env.DOTNET_ROOT}}/backend
 
   deploy:
     runs-on: ubuntu-latest
