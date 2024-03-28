@@ -1,57 +1,79 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+name: Build and Deploy Dating App (API & Client)
 
-name: Build and deploy ASP.Net Core app to Azure Web App - da-api-mr
-
+# Trigger workflow on push to main branch
 on:
   push:
     branches:
-      - master
-  workflow_dispatch:
+      - main
+
+# Track changes in specific paths (optional, adjust as needed)
+paths:
+  include:
+    - api/*
+    - client/*
+
+# Workflow Stages (optional)
+stages:
+  - stage: BuildAPI
+  - stage: BuildClient
+  - stage: DeployAPI
+    condition: eq(variables['API_DEPLOYMENT'], 'true')  # Run only for API deployments
+  - stage: DeployClient
+    condition: eq(variables['CLIENT_DEPLOYMENT'], 'true')  # Run only for client deployments
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  - job: Build
 
     steps:
-      - uses: actions/checkout@v4
+      - script: dotnet build dating-app.sln -c Release  # Specify the solution file and configuration
+        workingDirectory: backend  # Change directory to where the solution file resides
+        displayName: 'Build .NET API'  # Update display name (optional)
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '8.x'
-          include-prerelease: true
+  - job: Build
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
-
-      - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
-      
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'da-api-mr'
-          slot-name: 'Production'
-          package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2706DEB79BA64D12BFFB60412AC994FA }}
+      - script: npm install --legacy-peer-deps && npm run build --prod
+        workingDirectory: client
+        displayName: 'Build Angular Client'  # Update display name (optional)
+
+  - deployment: Deploy (API)  # Use descriptive deployment names
+
+    environment: 'production'  # Replace with your desired environment name (e.g., development, staging, production)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - name: Download artifact from BuildAPI job (if building separately)
+              uses: actions/download-artifact@v3
+              with:
+                name: .net-app  # Adjust if your artifact name is different
+
+            - name: Deploy to Azure Web App (API)
+              id: deploy-to-webapp-api
+              uses: azure/webapps-deploy@v2
+              with:
+                app-name: 'da-api-mr'  # Replace with your API app service name
+                slot-name: 'Production'  # Replace if deploying to a different slot
+                package: .  # Package location relative to the deployment step
+                publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2706DEB79BA64D12BFFB60412AC994FA }}
+
+  - deployment: Deploy (Client)  # Use descriptive deployment names
+
+    environment: 'production'  # Replace with your desired environment name (e.g., development, staging, production)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - name: Download artifact from BuildClient job (if building separately)
+              uses: actions/download-artifact@v3
+              with:
+                name: client-artifact  # Adjust if your artifact name is different
+
+            - name: Deploy to Azure Web App (Client)
+              id: deploy-to-webapp-client
+              uses: azure/webapps-deploy@v2
+              with:
+                app-name: 'da-client-mr'  # Replace with your client app service name
+                slot-name: 'Production'  # Replace if deploying to a different slot
+                package: ./client/dist  # Adjust path if needed
+                publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2706DEB79BA64D12BFFB60412AC994FA }}
