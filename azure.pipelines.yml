@@ -1,0 +1,71 @@
+name: Build and Deploy Dating App (API & Client)
+
+on:
+push:
+branches:
+•  main
+
+paths:
+•  'api/[**'
+
+•  'client/**](https://www.bing.com/search?form=SKPBOT&q=%26apos%3B%0D%0A%0D%0A%E2%80%A2%20%20%26apos%3Bclient%2F)'
+
+
+jobs:
+build_api:
+runs-on: ubuntu-latest
+steps:
+•  uses: actions/checkout@v2
+
+•  name: Set up .NET Core
+
+uses: actions/setup-dotnet@v1
+with:
+dotnet-version: '3.1.301' # Replace with your .NET Core version
+•  name: Build .NET API
+
+run: dotnet build ./api/dating-app.sln -c Release # Update the solution path
+
+build_client:
+runs-on: ubuntu-latest
+steps:
+•  uses: actions/checkout@v2
+
+•  name: Set up Node.js
+
+uses: actions/setup-node@v1
+with:
+node-version: '12.x' # Replace with your Node.js version
+•  name: Build Angular Client
+
+run: |
+cd client
+npm install --legacy-peer-deps
+npm run build -- --prod
+
+deploy_api:
+needs: build_api
+runs-on: ubuntu-latest
+steps:
+•  uses: actions/checkout@v2
+
+•  name: Deploy to Azure Web App (API)
+
+uses: azure/webapps-deploy@v2
+with:
+app-name: 'da-api-mr' # Your API App Service name
+publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} # Use the secret key without the specific ID
+
+deploy_client:
+needs: build_client
+runs-on: ubuntu-latest
+steps:
+•  uses: actions/checkout@v2
+
+•  name: Deploy to Azure Web App (Client)
+
+uses: azure/webapps-deploy@v2
+with:
+app-name: 'da-client-mr' # Your Client App Service name
+publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} # Use the secret key without the specific ID
+package: ./client/dist # Update the path to your client build artifacts
