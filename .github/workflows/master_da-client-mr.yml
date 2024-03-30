@@ -22,8 +22,9 @@
             node-version: '20.x'
 
         - name: npm install
-          run: npm install --legacy-peer-deps
           working-directory: client
+          run: |
+            cd client && npm install --legacy-peer-deps
             npm run build --configuration=production
   # npm run test
 
