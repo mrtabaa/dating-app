@@ -24,7 +24,7 @@
         - name: npm install
           working-directory: client
           run: |
-            cd client && npm install --legacy-peer-deps
+            npm install --legacy-peer-deps
             npm run build --configuration=production
   # npm run test
 
