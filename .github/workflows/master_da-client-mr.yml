@@ -28,7 +28,7 @@
   # npm run test
 
         - name: Zip artifact for deployment
-          run: zip -r release.zip ./client/dist/client/browser/* # zip only the client/dist folder
+          run: zip -r release.zip . # zip only the client/dist folder
 
         - name: Upload artifact for deployment job
           uses: actions/upload-artifact@v3
@@ -73,5 +73,5 @@
           with:
             app-name: 'da-client-mr'
             slot-name: 'Production'
-            package: ./deploy/client/dist/client/browser # Update the path to the unzipped deployment directory
+            package: ./deploy # Update the path to the unzipped deployment directory
             
