@@ -22,8 +22,8 @@
             node-version: '20.x'
 
         - name: npm install
-          run: |
-            cd client && npm install --legacy-peer-deps
+          run: npm install --legacy-peer-deps
+          working-directory: ./client
             npm run build --configuration=production
   # npm run test
 
@@ -65,7 +65,7 @@
           uses: azure/webapps-deploy@v2
           with:
             app-name: 'da-client-mr'
-            package: clean.zip
+            package: ../clean.zip
 
         - name: 'Deploy to Azure Web App'
           id: deploy-to-webapp
