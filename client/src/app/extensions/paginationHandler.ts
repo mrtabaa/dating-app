@@ -6,6 +6,8 @@ import { inject } from "@angular/core";
 export class PaginationHandler {
     private http = inject(HttpClient);
 
+    // TEST Client
+
     /**
      * A reusable pagination method with generic type
      * @param url 
