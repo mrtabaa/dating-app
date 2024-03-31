@@ -7,7 +7,14 @@
     push:
       branches:
         - master
-    workflow_dispatch:
+      paths:
+        - 'backend/api/**'
+        
+    pull_request:
+        branches:
+        - master
+        paths:
+        - 'backend/api/**'
 
   jobs:
     build:
