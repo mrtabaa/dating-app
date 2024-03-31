@@ -20,10 +20,14 @@ jobs:
           submodules: true
           lfs: false
 
-      - name: Set up Node.js version
+      - name: Check current Node.js version (optional)  # To verify environment
+        run: node -v
+
+      - name: Set up Node.js version (fallback if NVM unavailable)
+        if: ${{ failure() }}  # Run if previous step fails
         uses: actions/setup-node@v3
         with:
-          node-version: '20.0.0'
+          node-version: '20.x'
 
       - name: Build And Deploy
         id: builddeploy
