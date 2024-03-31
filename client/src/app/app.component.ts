@@ -28,6 +28,8 @@ export class AppComponent implements OnInit {
     this.initUserOnPageRefresh();
   }
 
+  // TEST Client yml
+
   initUserOnPageRefresh() {
     const loggedInUserStr = localStorage.getItem('loggedInUser');
 
