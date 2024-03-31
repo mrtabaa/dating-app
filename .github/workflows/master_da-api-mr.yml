@@ -62,3 +62,12 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2706DEB79BA64D12BFFB60412AC994FA }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Clean up artifacts and publish directory
+        uses: actions/checkout@v4
+        with:
+          clean: true
