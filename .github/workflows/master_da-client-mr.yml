@@ -8,13 +8,13 @@
       branches:
         - master
       paths:
-        - 'backend/api/**'
+        - 'client/**'
         
     pull_request:
         branches:
         - master
         paths:
-        - 'backend/api/**'
+        - 'client/**'
 
   jobs:
     build:
@@ -68,12 +68,6 @@
             client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7DD50A6A1CA249BAA26DBEC7AB5747D8 }}
             tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_24BB3DC3CE6741F49B494C7A4E9B24B7 }}
             subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_55DDB2BDA965455C9194781056630CE3 }}
-
-        # - name: Deploy clean.zip to clear wwwroot directory
-        #   uses: azure/webapps-deploy@v2
-        #   with:
-        #     app-name: 'da-client-mr'
-        #     package: clean.zip
 
         - name: 'Deploy to Azure Web App'
           id: deploy-to-webapp
