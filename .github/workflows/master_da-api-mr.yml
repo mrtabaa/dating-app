@@ -8,13 +8,13 @@ on:
     branches:
       - master
     paths:
-      - 'backend/api/**'
+      - 'backend/**'
       
   pull_request:
       branches:
       - master
       paths:
-      - 'backend/api/**'
+      - 'backend/**'
 
 jobs:
   build:
