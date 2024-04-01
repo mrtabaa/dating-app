@@ -11,10 +11,10 @@
     <PackageReference Include="SkiaSharp" Version="2.88.7" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.7" />
     
-    <!-- <Content Remove="appsettings.Development.json" />
+    <Content Remove="appsettings.Development.json" />
     <None Include="appsettings.Development.json">
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None> -->
+    </None>
   </ItemGroup>
   
 </Project>
