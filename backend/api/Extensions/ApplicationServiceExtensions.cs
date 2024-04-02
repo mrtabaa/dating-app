@@ -33,16 +33,18 @@ public static class ApplicationServiceExtensions
             if (env.IsDevelopment())
             {
                 options.AddDefaultPolicy(policy => policy
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .WithOrigins("http://localhost:4300"));
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:4300")
+                );
             }
             else
             {
                 options.AddDefaultPolicy(policy => policy
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .WithOrigins("da-client-mr.azurewebsites.net")); // production
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("da-client-mr.azurewebsites.net") // production
+                );
             }
         });
 
