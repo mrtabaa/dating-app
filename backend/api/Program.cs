@@ -21,7 +21,7 @@ builder.Services.AddRepositoryServices();
 //         serverOptions.ListenLocalhost(7100); // Listen for incoming HTTP connections on port 7100
 // });
 
-var port = Environment.GetEnvironmentVariable("WEBSITE_PORT") ?? "80";
+var port = Environment.GetEnvironmentVariable("WEBSITE_PORT") ?? "8080";
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(int.Parse(port));
