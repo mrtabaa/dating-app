@@ -29,9 +29,6 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build ./backend/dating-app.sln --configuration Release
-
       - name: dotnet publish
         run: dotnet publish ./backend/dating-app.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
