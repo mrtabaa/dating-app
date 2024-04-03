@@ -16,6 +16,8 @@ on:
       paths:
       - 'backend/**'
 
+  workflow_dispatch: # This line adds the manual trigger option
+
 jobs:
   build:
     runs-on: ubuntu-latest
