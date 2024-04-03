@@ -9,8 +9,8 @@ builder.Services.AddControllers();
 // From customized ServiceExtensions (Extensions folder) for a claen maintained code //
 builder.Configuration.AddUserSecrets<Program>(); // Register User Secrets
 
-builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
-builder.Services.AddIdentityServices(builder.Configuration);
+// builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
+// builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
 #endregion
 
