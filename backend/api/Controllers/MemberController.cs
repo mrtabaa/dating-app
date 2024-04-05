@@ -3,13 +3,6 @@ namespace api.Controllers;
 [Authorize]
 public class MemberController(IMemberRepository _memberRepository, IUserRepository _userRepository) : BaseApiController
 {
-    [AllowAnonymous]
-    [HttpGet("azure")]
-    public ActionResult TestAzure()
-    {
-        return Ok("Connected to Azure");
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
     {

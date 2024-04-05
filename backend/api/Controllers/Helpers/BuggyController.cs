@@ -3,7 +3,6 @@ namespace api.Controllers;
 [Produces("application/json")]
 public class BuggyController : BaseApiController
 {
-
     const string _collectionName = "Users";
     private readonly IMongoCollection<AppUser>? _collection;
 
@@ -11,6 +10,12 @@ public class BuggyController : BaseApiController
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(_collectionName);
+    }
+
+    [HttpGet("azure")]
+    public ActionResult AzureAccessTest()
+    {
+        return Ok("Connected to Azure");
     }
 
     [Authorize]
