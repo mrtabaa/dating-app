@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: '/da-api-mr.azurewebsites.net/api/',
-  apiPhotoUrl: '/da-api-mr.azurewebsites.net/'
+  apiUrl: 'https://da-api-mr.azurewebsites.net/api/',
+  apiPhotoUrl: 'https://da-api-mr.azurewebsites.net/'
 };
