@@ -1,14 +1,21 @@
-#region Add services to the container.
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region Setup Configurations
+// Register KeyVault for Azure
+var keyVault = new Uri(builder.Configuration.GetSection("KeyVaultUrl").Value!);
+var azureCredentials = new DefaultAzureCredential();
+builder.Configuration.AddAzureKeyVault(keyVault, azureCredentials);
 
-// AUTO-GENERATED CODES //
+// Register User Secrets for Nginx
+// builder.Configuration.AddUserSecrets<Program>();
+#endregion
+
+#region Add services to the container.
 builder.Services.AddControllers();
 
 // From customized ServiceExtensions (Extensions folder) for a claen maintained code //
-builder.Configuration.AddUserSecrets<Program>(); // Register User Secrets
-
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();

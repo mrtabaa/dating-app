@@ -1,3 +1,5 @@
+using Azure.Identity;
+
 
 namespace api.Extensions;
 
@@ -11,6 +13,7 @@ public static class ApplicationServiceExtensions
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
         // get section
+        // services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
         services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
 
         // get values
@@ -22,7 +25,8 @@ public static class ApplicationServiceExtensions
         {
             MyMongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
 
-            return new MongoClient(uri.ConnectionString);
+            // return new MongoClient(uri.ConnectionString);
+            return new MongoClient(config.GetValue<string>("AzureMongoDbConnectionString"));
         });
 
         #endregion MongoDbSettings

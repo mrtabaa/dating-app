@@ -8,7 +8,8 @@ public static class IdentityServiceExtensions
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
         #region Token
-        string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
+        // string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
+        string? tokenValue = config.GetValue<string>("AzureTokenKey");
 
         if (tokenValue is not null)
         {
