@@ -1,10 +1,16 @@
-using Azure.Identity;
-
 var builder = WebApplication.CreateBuilder(args);
 
-#region Setup Configurations
+#region Nginx
+// Production
+
 // Register User Secrets for Nginx
-builder.Configuration.AddUserSecrets<Program>();
+// builder.Configuration.AddUserSecrets<Program>();
+
+// builder.WebHost.ConfigureKestrel(serverOptions =>
+// {
+//     if (builder.Environment.IsProduction())
+//         serverOptions.ListenLocalhost(7100); // Listen for incoming HTTP connections on port 7100
+// });
 #endregion
 
 #region Add services to the container.
@@ -14,15 +20,6 @@ builder.Services.AddControllers();
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
-#endregion
-
-#region Nginx
-// Production: Set the URLs the app will listen on
-// builder.WebHost.ConfigureKestrel(serverOptions =>
-// {
-//     if (builder.Environment.IsProduction())
-//         serverOptions.ListenLocalhost(7100); // Listen for incoming HTTP connections on port 7100
-// });
 #endregion
 
 // Production Azure: If no WEBSITE_PORT exists set to 8080
