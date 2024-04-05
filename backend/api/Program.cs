@@ -4,12 +4,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 #region Setup Configurations
 // Register KeyVault for Azure
-var keyVault = new Uri(builder.Configuration.GetSection("KeyVaultUrl").Value!);
-var azureCredentials = new DefaultAzureCredential();
-builder.Configuration.AddAzureKeyVault(keyVault, azureCredentials);
+// var keyVault = new Uri(builder.Configuration.GetSection("KeyVaultUrl").Value!);
+// var azureCredentials = new DefaultAzureCredential();
+// builder.Configuration.AddAzureKeyVault(keyVault, azureCredentials);
 
 // Register User Secrets for Nginx
-// builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddUserSecrets<Program>();
 #endregion
 
 #region Add services to the container.
