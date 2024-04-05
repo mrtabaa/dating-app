@@ -42,7 +42,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("da-client-mr.azurewebsites.net") // production
+                    .WithOrigins("http://da-api-mr.azurewebsites.net/api", "https://da-api-mr.azurewebsites.net/api") // production
                 );
             }
         });
