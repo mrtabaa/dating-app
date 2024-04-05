@@ -29,22 +29,22 @@ public static class ApplicationServiceExtensions
         #region Others
         services.AddCors(options =>
         {
-            if (env.IsDevelopment())
-            {
-                options.AddDefaultPolicy(policy => policy
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .WithOrigins("http://localhost:4300")
-                );
-            }
-            else
-            {
-                options.AddDefaultPolicy(policy => policy
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin() // production
-                );
-            }
+            // if (env.IsDevelopment())
+            // {
+            //     options.AddDefaultPolicy(policy => policy
+            //         .AllowAnyHeader()
+            //         .AllowAnyMethod()
+            //         .WithOrigins("http://localhost:4300")
+            //     );
+            // }
+            // else
+            // {
+            options.AddDefaultPolicy(policy => policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin() // production
+            );
+            // }
         });
 
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
