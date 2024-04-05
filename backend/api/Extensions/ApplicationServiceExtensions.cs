@@ -42,7 +42,6 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowAnyOrigin()
                     .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net") // Nginx, Azure
                 );
             }
