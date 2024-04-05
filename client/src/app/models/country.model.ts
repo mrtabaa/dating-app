@@ -1,6 +1,8 @@
+import { NullableString } from "../types/nullable-string.type";
+
 export interface Country {
-    code: string | null,
-    acr: string | null,
-    name: string | null,
-    shortName: string | null,
+    code: NullableString,
+    acr: NullableString,
+    name: NullableString,
+    shortName: NullableString,
 }

@@ -1,17 +1,19 @@
+import { OptionalDate } from "../types/optional-date.type";
+import { OptionalString } from "../types/optional-string.type";
 import { Photo } from "./photo.model";
 
 export interface Member {
-    schema: string | undefined,
-    userName: string | undefined,
+    schema: OptionalString,
+    userName: OptionalString,
     age: number | undefined,
-    knownAs: string | undefined,
-    created: Date | undefined,
-    lastActive: Date | undefined,
-    gender: string | undefined,
-    introduction: string | undefined,
-    lookingFor: string | undefined,
-    interests: string | undefined,
-    city: string | undefined,
-    country: string | undefined,
+    knownAs: OptionalString,
+    created: OptionalDate,
+    lastActive: OptionalDate,
+    gender: OptionalString,
+    introduction: OptionalString,
+    lookingFor: OptionalString,
+    interests: OptionalString,
+    city: OptionalString,
+    country: OptionalString,
     photos: Photo[]
 }

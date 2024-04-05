@@ -1,4 +1,6 @@
+import { NullableString } from "../../types/nullable-string.type";
+
 export interface UserLogin {
-    emailUsername: string | null;
-    password: string | null;
+    emailUsername: NullableString;
+    password: NullableString;
 }
