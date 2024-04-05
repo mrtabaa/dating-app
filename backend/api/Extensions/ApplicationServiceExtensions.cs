@@ -1,6 +1,3 @@
-using Azure.Identity;
-
-
 namespace api.Extensions;
 
 public static class ApplicationServiceExtensions
