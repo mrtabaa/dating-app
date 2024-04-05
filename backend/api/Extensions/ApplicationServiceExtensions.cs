@@ -43,7 +43,7 @@ public static class ApplicationServiceExtensions
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin()
-            // .WithOrigins("https://da-api-mr.azurewebsites.net/api") // production
+                .WithOrigins("https://da-api-mr.azurewebsites.net") // production
             );
             // }
         });
