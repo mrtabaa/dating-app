@@ -29,11 +29,23 @@ public static class ApplicationServiceExtensions
         #region Others
         services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy => policy
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .WithOrigins("https://da-api-mr.azurewebsites.net") // production
-            );
+            if (env.IsDevelopment())
+            {
+                options.AddDefaultPolicy(policy => policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .WithOrigins("http://localhost:4300")
+                );
+            }
+            else if (env.IsProduction())
+            {
+                options.AddDefaultPolicy(policy => policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                    .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net") // Nginx, Azure
+                );
+            }
         });
 
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
