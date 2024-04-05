@@ -31,6 +31,7 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build
+        working-directory: client
         run: |
           npm install --legacy-peer-deps
           npm run build --configuration=production
