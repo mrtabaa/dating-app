@@ -67,7 +67,7 @@ jobs:
         with:
           app-name: 'da-client-mr'
           slot-name: 'Production'
-          package: .
+          package: ./deploy/client/dist/client/browser # Update the path to the unzipped deployment directory
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8F1DC86D13264061A3D563B6EF0C58BE }}
       
   cleanup:
