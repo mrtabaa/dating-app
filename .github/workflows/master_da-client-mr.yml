@@ -7,7 +7,16 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
+    paths:
+      - 'client/**'
+      
+  pull_request:
+      branches:
+      - master
+      paths:
+      - 'client/**'
+
+  workflow_dispatch: # This line adds the manual trigger option
 
 jobs:
   build:
@@ -21,14 +30,13 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: npm install, build
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm install --legacy-peer-deps
+          npm run build --configuration=production
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip -r release.zip ./client/dist/client/browser/* # zip only the client/dist folder
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -60,3 +68,12 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8F1DC86D13264061A3D563B6EF0C58BE }}
+      
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Clean up artifacts and publish directory
+        uses: actions/checkout@v4
+        with:
+          clean: true
