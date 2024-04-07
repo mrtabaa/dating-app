@@ -1,5 +1,3 @@
-import { OptionalDate } from "../types/optional-date.type";
-import { OptionalString } from "../types/optional-string.type";
 import { Photo } from "./photo.model";
 
 export interface Member {
