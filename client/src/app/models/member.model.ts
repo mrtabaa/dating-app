@@ -1,17 +1,17 @@
 import { Photo } from "./photo.model";
 
 export interface Member {
-    schema: string | undefined,
-    userName: string | undefined,
-    age: number | undefined,
-    knownAs: string | undefined,
-    created: Date | undefined,
-    lastActive: Date | undefined,
-    gender: string | undefined,
-    introduction: string | undefined,
-    lookingFor: string | undefined,
-    interests: string | undefined,
-    city: string | undefined,
-    country: string | undefined,
+    schema: string,
+    userName: string,
+    age: number,
+    knownAs: string,
+    created: Date,
+    lastActive: Date,
+    gender: string,
+    introduction: string,
+    lookingFor: string,
+    interests: string,
+    city: string,
+    country: string,
     photos: Photo[]
 }
