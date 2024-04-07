@@ -22,7 +22,7 @@ public static class IdentityServiceExtensions
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         ValidateLifetime = true
-                        // ValidIssuer = "https://localhost:5101",
+                        // ValidIssuer = "https://localhost:5101", // TODO Apply these
                         // ValidAudience = "https://localhost:5101",
 
                     };
