@@ -3,17 +3,17 @@ import { OptionalString } from "../types/optional-string.type";
 import { Photo } from "./photo.model";
 
 export interface Member {
-    schema: OptionalString,
-    userName: OptionalString,
-    age: number | undefined,
-    knownAs: OptionalString,
-    created: OptionalDate,
-    lastActive: OptionalDate,
-    gender: OptionalString,
-    introduction: OptionalString,
-    lookingFor: OptionalString,
-    interests: OptionalString,
-    city: OptionalString,
-    country: OptionalString,
+    schema: string;
+    userName: string;
+    age: number;
+    knownAs: string;
+    created: Date;
+    lastActive: Date;
+    gender: string;
+    introduction: string;
+    lookingFor: string;
+    interests: string;
+    city: string;
+    country: string;
     photos: Photo[]
 }

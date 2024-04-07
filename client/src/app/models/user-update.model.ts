@@ -1,7 +1,7 @@
 import { OptionalString } from "../types/optional-string.type";
 
 export interface UserUpdate {
-    username: OptionalString,
+    userName: string,
     introduction: string,
     lookingFor: string,
     interests: string,
