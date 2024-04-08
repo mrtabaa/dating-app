@@ -59,7 +59,7 @@ public class AccountRepository : IAccountRepository
 
             if (!string.IsNullOrEmpty(token))
             {
-                return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+                return Mappers.ConvertAppUserToLoggedInDto(appUser, token); // returns LoggedInDto
             }
         }
         #endregion Create user, token and role

@@ -44,16 +44,18 @@ public static class IdentityServiceExtensions
                 },
                 IdentityOptionsAction = options =>
                 {
+                    // Unique email
+                    options.User.RequireUniqueEmail = true;
+
+                    // Password requirements
                     options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 8;
+                    options.Password.RequiredLength = 7;
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequireLowercase = false;
 
-                    // lockout
+                    // Lockout
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
                     options.Lockout.MaxFailedAccessAttempts = 5;
-
-                    options.User.RequireUniqueEmail = true;
                 }
             };
 
