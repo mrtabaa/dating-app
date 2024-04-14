@@ -25,23 +25,6 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        #region Check Email or Username already exist
-        // _userManager.Users doesn't have AnyAsync so use MongoDriver here
-        bool emailExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedEmail == registerDto.Email.ToUpper().Trim()).AnyAsync(cancellationToken);
-        if (emailExist)
-        {
-            loggedInDto.EmailAlreadyExist = true;
-            return loggedInDto;
-        }
-
-        bool userNameExist = await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == registerDto.UserName.ToUpper().Trim()).AnyAsync(cancellationToken);
-        if (userNameExist)
-        {
-            loggedInDto.UserNameAlreadyExist = true;
-            return loggedInDto;
-        }
-        #endregion Check Email or Username already exist
-
         #region Create user, token and add role
 
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
@@ -60,6 +43,13 @@ public class AccountRepository : IAccountRepository
             if (!string.IsNullOrEmpty(token))
             {
                 return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+            }
+        }
+        else // Store and return userCreatedResult errors if failed. 
+        {
+            foreach (IdentityError error in userCreatedResult.Errors)
+            {
+                loggedInDto.Errors.Add(error.Description);
             }
         }
         #endregion Create user, token and role

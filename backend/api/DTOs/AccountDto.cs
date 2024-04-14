@@ -29,7 +29,6 @@ public class LoggedInDto
     public string? UserName { get; set; }
     public string? Gender { get; set; }
     public string? ProfilePhotoUrl { get; set; }
-    public bool EmailAlreadyExist { get; set; }
-    public bool UserNameAlreadyExist { get; set; }
     public bool IsWrongCreds { get; set; }
+    public List<string> Errors { get; set; } = [];
 }

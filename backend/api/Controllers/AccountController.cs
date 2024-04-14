@@ -10,10 +10,6 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        if (loggedInDto.EmailAlreadyExist) return BadRequest("This Email is already registered.");
-
-        if (loggedInDto.UserNameAlreadyExist) return BadRequest("This Username is already taken.");
-
         return loggedInDto.Token is null ? BadRequest("Registration has failed. Try again.") : loggedInDto;
     }
 
