@@ -23,8 +23,8 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
     [HttpDelete("delete-user/{userName}")]
     public async Task<ActionResult> DeleteUser(string userName) =>
         await _adminRepository.DeleteUserAsync(userName) is null
-        ? BadRequest($"No user exists with the username: {userName}.")
-        : Ok($""" "{userName}" got deleted sucessfully.""");
+            ? BadRequest($"No user exists with the username: {userName}.")
+            : Ok(new Response(Message: $""" "{userName}" got deleted sucessfully."""));
 
     // [Authorize(Policy = "ModeratePhotoRole")]
     // [HttpGet("photos-to-moderate")]

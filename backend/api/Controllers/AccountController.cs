@@ -29,7 +29,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [Authorize]
     [HttpGet]
     public ActionResult AuthorizeLoggedInUser() =>
-        Ok(new { message = "token is still valid and user is authorized" });
+        Ok(new Response(Message: "token is still valid and user is authorized"));
 
     [Authorize]
     [HttpDelete("delete-user")]
