@@ -60,5 +60,8 @@ public class AdminRepository : IAdminRepository
         return await _userManager.GetRolesAsync(appUser);
     }
 
+    public async Task<AppUser?> DeleteUserAsync(string userName) =>
+        await _collection.FindOneAndDeleteAsync(user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
+
     #endregion
 }

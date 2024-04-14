@@ -20,6 +20,12 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
         return result is null ? BadRequest("Edit roles failed. Contact the admin if persists.") : Ok(result);
     }
 
+    [HttpDelete("delete-user/{userName}")]
+    public async Task<ActionResult> DeleteUser(string userName) =>
+        await _adminRepository.DeleteUserAsync(userName) is null
+        ? BadRequest($"No user exists with the username: {userName}.")
+        : Ok($""" "{userName}" got deleted sucessfully.""");
+
     // [Authorize(Policy = "ModeratePhotoRole")]
     // [HttpGet("photos-to-moderate")]
     // public async Task<ActionResult> GetPhotosForModeration()
