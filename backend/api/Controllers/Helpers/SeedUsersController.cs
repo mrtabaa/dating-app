@@ -1,20 +1,15 @@
-using Microsoft.AspNetCore.Identity;
-
 namespace api.Controllers;
 
 public class SeedUsersController : BaseApiController
 {
     #region Db Settings
     private readonly IMongoDatabase _database;
-    const string _collectionName = "users";
-    private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<AppRole> _roleManager;
 
     public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = _database.GetCollection<AppUser>(_collectionName);
 
         _userManager = userManager;
         _roleManager = roleManager;
