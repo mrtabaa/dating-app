@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MemberWithRole } from '../models/member-with-role.model';
+import { ApiResponseMessage } from '../models/helpers/api-response-message';
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,9 @@ export class AdminService {
     }
 
     return undefined;
+  }
+
+  deleteMember(userName: string): Observable<ApiResponseMessage> {
+    return this.http.delete<ApiResponseMessage>(this.apiUrl + 'delete-member/' + userName);
   }
 }

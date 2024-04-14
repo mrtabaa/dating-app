@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { Observable, take, tap } from 'rxjs';
+import { take } from 'rxjs';
 import { MemberWithRole } from '../../../models/member-with-role.model';
 import { AdminService } from '../../../services/admin.service';
 import { CommonModule } from '@angular/common';
@@ -9,13 +9,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-member-management',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    MatTableModule, MatFormFieldModule, MatSelectModule, MatButtonModule
+    MatTableModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatIconModule
   ],
   templateUrl: './member-management.component.html',
   styleUrl: './member-management.component.scss'
@@ -25,10 +27,10 @@ export class MemberManagementComponent implements OnInit {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
-  displayedColumns = ['no', 'username', 'active-roles', 'action'];
+  displayedColumns = ['no', 'username', 'edit-role', 'active-roles', 'delete-member'];
   displayedRoles = ['admin', 'moderator', 'member'];
 
-  membersWithRole$: Observable<MemberWithRole[]> | undefined;
+  membersWithRole: MemberWithRole[] | undefined;
 
   selectedRoles = this.fb.array<string[] | null>([]);
 
@@ -37,13 +39,18 @@ export class MemberManagementComponent implements OnInit {
   }
 
   getMembersWithRoles(): void {
-    this.membersWithRole$ = this.adminService.getMembersWithRoles()
+    this.adminService.getMembersWithRoles()
       .pipe(
-        tap(members =>
+        take(1)
+      ).subscribe({
+        next: (members: MemberWithRole[]) => {
           members.forEach(member => {
-            member.roles
             this.selectedRoles.push(this.fb.control<string[]>(member.roles, [Validators.required]));
-          })));
+          });
+
+          this.membersWithRole = members;
+        }
+      });
   }
 
   updateRoles(i: number, userName: string): void {
@@ -60,7 +67,23 @@ export class MemberManagementComponent implements OnInit {
 
               this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
             }
-          },
+          }
         });
+  }
+
+  deleteMember(i: number, userName: string): void {
+    this.adminService.deleteMember(userName)
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          this.snackBar.open(response.message, "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
+
+          // Slice and copy the array to trigger the change detection to update the mat-table
+          if (this.membersWithRole)
+            this.membersWithRole = [
+              ...this.membersWithRole.slice(0, i),
+              ...this.membersWithRole.slice(i + 1)
+            ];
+        }
+      });
   }
 }
