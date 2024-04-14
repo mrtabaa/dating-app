@@ -20,7 +20,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './member-management.component.html',
   styleUrl: './member-management.component.scss'
 })
-export class MemberManagementComponent implements OnInit{
+export class MemberManagementComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -30,7 +30,7 @@ export class MemberManagementComponent implements OnInit{
 
   membersWithRole$: Observable<MemberWithRole[]> | undefined;
 
-  selectedArray = this.fb.array<string[] | null>([]);
+  selectedRoles = this.fb.array<string[] | null>([]);
 
   ngOnInit(): void {
     this.getMembersWithRoles();
@@ -38,25 +38,25 @@ export class MemberManagementComponent implements OnInit{
 
   getMembersWithRoles(): void {
     this.membersWithRole$ = this.adminService.getMembersWithRoles()
-      .pipe(tap(members => members
-        .forEach(member => {
-          member.roles
-          this.selectedArray.push(this.fb.control<string[]>(member.roles, [Validators.required]));
-        })));
+      .pipe(
+        tap(members =>
+          members.forEach(member => {
+            member.roles
+            this.selectedRoles.push(this.fb.control<string[]>(member.roles, [Validators.required]));
+          })));
   }
 
   updateRoles(i: number, userName: string): void {
-
-    this.adminService.editMemberRole(userName, this.selectedArray.at(i).value)
+    this.adminService.editMemberRole(userName, this.selectedRoles.at(i).value)
       ?.pipe(
         take(1)
       ).subscribe(
         {
-          next: savedRoles => {
+          next: (savedRoles: string[]) => {
             if (savedRoles) {
-              this.selectedArray.at(i).setValue(savedRoles);
+              this.selectedRoles.at(i).setValue(savedRoles);
 
-              this.selectedArray.at(i).markAsPristine(); // disable the Save button
+              this.selectedRoles.at(i).markAsPristine(); // disable the Save button
 
               this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
             }
