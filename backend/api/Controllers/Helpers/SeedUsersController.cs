@@ -4,12 +4,14 @@ public class SeedUsersController : BaseApiController
 {
     #region Db Settings
     private readonly IMongoDatabase _database;
+    private readonly IMongoClient _client;
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<AppRole> _roleManager;
 
     public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
     {
         _database = client.GetDatabase(dbSettings.DatabaseName);
+        _client = client;
 
         _userManager = userManager;
         _roleManager = roleManager;
@@ -39,13 +41,14 @@ public class SeedUsersController : BaseApiController
         }
 
         if (databaseExists == true)
-            return BadRequest("Database already exists");
-        // await _database.DropCollectionAsync(_collectionName);
+            // return BadRequest("Database already exists");
+            // await _database.DropCollectionAsync(_collectionName);
+            await _client.DropDatabaseAsync("dating-app");
         #endregion
 
         #region Import db seed
         // add each user to DB
-        List<AppUser> appUsers = [];
+        List < AppUser > appUsers = [];
 
         #region Roles Management
         AppRole[] roles = AppVariablesExtensions.roles;
