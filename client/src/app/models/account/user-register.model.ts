@@ -1,11 +1,11 @@
 export interface UserRegister{
-    email: string | null;
-    username: string | null;
-    password: string | null;
-    confirmPassword: string | null;
-    dateOfBirth: string | undefined,
-    knownAs: string,
-    gender: string,
-    city: string,
-    country: string
+    email: string;
+    username: string;
+    password: string;
+    confirmPassword: string;
+    dateOfBirth: string | undefined;
+    knownAs: string;
+    gender: string;
+    city: string;
+    country: string;
 }
