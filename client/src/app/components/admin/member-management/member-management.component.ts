@@ -68,7 +68,8 @@ export class MemberManagementComponent implements OnInit {
               this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
             }
           }
-        });
+        }
+      );
   }
 
   deleteMember(i: number, userName: string): void {
@@ -84,6 +85,7 @@ export class MemberManagementComponent implements OnInit {
               ...this.membersWithRole.slice(i + 1)
             ];
         }
-      });
+      }
+    );
   }
 }
