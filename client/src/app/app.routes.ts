@@ -5,7 +5,7 @@ import { NoAccessComponent } from './components/errors/no-access/no-access.compo
 import { NotFoundComponent } from './components/errors/not-found/not-found.component';
 import { ServerErrorComponent } from './components/errors/server-error/server-error.component';
 import { TestErrorComponent } from './components/errors/test-error/test-error.component';
-import { HomeComponent } from './components/home/home.component';
+// import { HomeComponent } from './components/home/home.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
 import { MemberListComponent } from './components/members/member-list/member-list.component';
@@ -18,7 +18,7 @@ import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.
 import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
+    { path: '', component: LoginComponent },
     {
         path: '',
         runGuardsAndResolvers: 'always',
