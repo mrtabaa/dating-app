@@ -7,11 +7,11 @@ export const authLoggedInGuard: CanActivateFn = () => {
   const snackbar = inject(MatSnackBar);
 
   if (localStorage.getItem('loggedInUser')) {
-    snackbar.open('You are already logged in', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 })
+    snackbar.open('You are already logged in.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
     router.navigate(['members']);
 
-    return true;
+    return false;
   }
-  
-  return false;
+
+  return true;
 };
