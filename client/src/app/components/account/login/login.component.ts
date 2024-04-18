@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   enterAdminCreds(): void {
-    this.EmailUsernameCtrl.setValue('admin');
+    this.EmailUsernameCtrl.setValue('admin@a.com');
     this.PasswordCtrl.setValue('Aaaaaaa/')
   }
   enterMemberCreds(): void {
