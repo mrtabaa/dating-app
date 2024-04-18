@@ -6,13 +6,13 @@ name: Build and deploy ASP.Net Core app to Azure Web App - da-api-mr
 on:
   push:
     branches:
-      - master
+      - feature/azure-storage
     paths:
       - 'backend/**'
       
   pull_request:
       branches:
-      - master
+      - feature/azure-storage
       paths:
       - 'backend/**'
 
