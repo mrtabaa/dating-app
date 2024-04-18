@@ -22,7 +22,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
               throw modelStateErrors;
             }
             else {
-              snack.open(err.status.toString() + ': ' + err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+              snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             }
             break;
           case 401:

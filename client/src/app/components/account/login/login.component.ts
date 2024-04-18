@@ -38,7 +38,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.subscrition.unsubscribe();
   }
 
-
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]]
@@ -66,5 +65,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
 
     this.loginFg.markAllAsTouched();
+  }
+
+  enterAdminCreds(): void {
+    this.EmailUsernameCtrl.setValue('admin@a.com');
+    this.PasswordCtrl.setValue('Aaaaaaa/')
+  }
+  enterMemberCreds(): void {
+    this.EmailUsernameCtrl.setValue('a');
+    this.PasswordCtrl.setValue('Aaaaaaa/')
   }
 }

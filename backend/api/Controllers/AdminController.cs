@@ -20,6 +20,16 @@ public class AdminController(IAdminRepository _adminRepository) : BaseApiControl
         return result is null ? BadRequest("Edit roles failed. Contact the admin if persists.") : Ok(result);
     }
 
+    [HttpDelete("delete-member/{userName}")]
+    public async Task<ActionResult> DeleteMember(string userName)
+    {
+        if (userName.ToLower() == "admin") return BadRequest("Admin cannot be deleted.");
+
+        return await _adminRepository.DeleteMemberAsync(userName) is null
+                ? BadRequest($"""No user exists with the username "{userName}".""")
+                : Ok(new Response(Message: $""" "{userName}" got deleted sucessfully."""));
+    }
+
     // [Authorize(Policy = "ModeratePhotoRole")]
     // [HttpGet("photos-to-moderate")]
     // public async Task<ActionResult> GetPhotosForModeration()

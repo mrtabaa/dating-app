@@ -1,12 +1,25 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
-    <div class="container">
+    <section class="container">
         <h2>Login</h2>
-        <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'" [placeHolder]="'Email or Username'" [isFocused]="true"
-            [hint]="'Your registered email or username'">
-        </app-input-cva>
-        <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'" [placeHolder]="'Your password'"
-            [hint]="'8 to 20 characters, a special character, an uppercase character.'">
-        </app-input-cva>
-        <button (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn" mat-raised-button color="primary">Sign in</button>
-    </div>
+        <div class="inputs">
+            <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
+                [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
+            </app-input-cva>
+            <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
+                [placeHolder]="'Your password'"
+                [hint]="'8 to 20 characters, a special character, an uppercase character.'">
+            </app-input-cva>
+        </div>
+        <div class="buttons">
+            <div class="demo">
+                <button (click)="enterAdminCreds()" mat-stroked-button>As Admin</button>
+                <button (click)="enterMemberCreds()" mat-stroked-button>As Member</button>
+            </div>
+            <button (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn" mat-raised-button
+                color="primary">
+                Sign in
+            </button>
+        </div>
+    </section>
+
 </form>

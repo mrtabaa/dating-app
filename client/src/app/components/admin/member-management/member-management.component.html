@@ -1,6 +1,6 @@
 <section class="content">
-    @if(membersWithRole$ | async; as membersWithRole) {
-    <mat-error [style.visibility]="selectedArray.dirty ? 'visible' : 'hidden'">
+    @if(membersWithRole) {
+    <mat-error [style.visibility]="selectedRoles.dirty ? 'visible' : 'hidden'">
         You have unsaved changes. Make sure they are
         all saved.
     </mat-error>
@@ -18,25 +18,20 @@
             <td mat-cell *matCellDef="let element"> {{element.userName}} </td>
         </ng-container>
 
-        <!-- Roles Column -->
-        <ng-container matColumnDef="active-roles">
-            <th mat-header-cell *matHeaderCellDef> Active Role </th>
-            <td mat-cell *matCellDef="let element; let i = index"> {{selectedArray.at(i).value}} </td>
-        </ng-container>
-
-        <!-- Action Column -->
-        <ng-container matColumnDef="action">
+        <!-- Edit Role Column -->
+        <ng-container matColumnDef="edit-role">
             <th mat-header-cell *matHeaderCellDef> Edit Role </th>
             <td class="edit-role" mat-cell *matCellDef="let element; let i = index;">
-                @if(selectedArray.at(i).hasError('required')) {
+                @if(selectedRoles.at(i).hasError('required')) {
                 <mat-error>One role is required.</mat-error>
                 }
                 <div class="roles-and-button">
                     <mat-form-field>
                         <mat-label>Edit</mat-label>
-                        <mat-select multiple [formControl]="selectedArray.at(i)">
+                        <mat-select multiple [formControl]="selectedRoles.at(i)">
                             @for (role of displayedRoles; track $index) {
-                            <mat-option [disabled]="element.userName === 'admin' && role === 'admin' || role === 'member'"
+                            <mat-option
+                                [disabled]="element.userName === 'admin' && role === 'admin' || role === 'member'"
                                 [value]="role">{{role
                                 |
                                 titlecase}}</mat-option>
@@ -44,11 +39,27 @@
                         </mat-select>
                     </mat-form-field>
                     <button
-                        [disabled]="selectedArray.at(i).value?.toString() === element.roles.toString() && selectedArray.at(i).invalid || selectedArray.at(i).pristine"
+                        [disabled]="selectedRoles.at(i).value?.toString() === element.roles.toString() && selectedRoles.at(i).invalid || selectedRoles.at(i).pristine"
                         (click)="updateRoles(i, element.userName)" mat-stroked-button color="primary">
                         Save
                     </button>
                 </div>
+            </td>
+        </ng-container>
+
+        <!-- Roles Column -->
+        <ng-container matColumnDef="active-roles">
+            <th mat-header-cell *matHeaderCellDef> Active Role </th>
+            <td mat-cell *matCellDef="let element; let i = index"> {{selectedRoles.at(i).value}} </td>
+        </ng-container>
+
+        <!-- Delete User Column -->
+        <ng-container matColumnDef="delete-member">
+            <th mat-header-cell *matHeaderCellDef> Delete Member </th>
+            <td mat-cell *matCellDef="let element; let i = index">
+                <button mat-mini-fab (click)="deleteMember(i, element.userName)">
+                    <mat-icon color="warn">delete</mat-icon>
+                </button>
             </td>
         </ng-container>
 
