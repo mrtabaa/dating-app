@@ -2,6 +2,7 @@ using image_processing.Interfaces;
 using image_processing.Helpers;
 using SkiaSharp;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 
 namespace image_processing.Services;
 
@@ -369,8 +370,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
 
-            //TODO handle result success
-            var result = await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
+            await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
         }
 
         return blobPathName;
@@ -402,7 +402,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
 
-            var result = await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
+            await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
         }
 
         return blobPathName;
@@ -428,7 +428,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         BlobClient blobClient = _blobContainerClient.GetBlobClient(blobPathName);
 
         // Upload the file stream to the blob
-        var result = await blobClient.UploadAsync(formFile.OpenReadStream(), overwrite: true, cancellationToken);
+        await blobClient.UploadAsync(formFile.OpenReadStream(), overwrite: true, cancellationToken);
 
         return blobPathName;
     }
