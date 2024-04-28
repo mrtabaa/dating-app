@@ -4,8 +4,6 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
 {
     #region Constructor and variables
 
-    const string wwwRootUrl = "wwwroot/";
-
     #endregion
 
     /// <summary>
@@ -45,9 +43,9 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
             #region Create the photo URLs and return the result
             // // generate "storage/photos/user-id/resize-pixel-square/128x128/my-photo.jpg"
             return [
-                filePath_165_sq.Split(wwwRootUrl)[1],
-                filePath_256_sq.Split(wwwRootUrl)[1],
-                filePath_enlarged.Split(wwwRootUrl)[1]
+                filePath_165_sq,
+                filePath_256_sq,
+                filePath_enlarged
             ];
             #endregion
         }
@@ -70,10 +68,10 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
 
         foreach (string photoPath in photoPaths)
         {
-            if (File.Exists(wwwRootUrl + photoPath))
+            if (File.Exists(photoPath))
             {
                 // Delete the file on a background thread and await the task
-                await Task.Run(() => File.Delete(wwwRootUrl + photoPath));
+                await Task.Run(() => File.Delete(photoPath));
             }
             else
                 return false;
