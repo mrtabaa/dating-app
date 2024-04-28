@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.19.1" />
     <PackageReference Include="SkiaSharp" Version="2.88.7" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.7" />
     

@@ -120,7 +120,7 @@ public class UserRepository : IUserRepository
         }
 
         // save file in Storage using PhotoService / userEmail makes the folder name
-        string[]? photoUrls = await _photoService.AddPhotoToDisk(file, appUser.Id.ToString());
+        string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
 
         if (photoUrls is null)
             return photoUploadStatus;
@@ -199,7 +199,7 @@ public class UserRepository : IUserRepository
 
         if (photo.IsMain) return null; // prevent from deleting main photo!
 
-        bool isDeleteSuccess = await _photoService.DeletePhotoFromDisk(photo);
+        bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
         if (!isDeleteSuccess)
             _logger.LogError("Delete from disk failed. See the logs.");
 
