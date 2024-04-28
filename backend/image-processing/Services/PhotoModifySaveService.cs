@@ -356,7 +356,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
     /// <returns>string: saved path on the blob</returns>
     private async Task<string> SaveImage(SKData sKData, string userId, string fileName, int operation, int width, int height, CancellationToken cancellationToken)
     {
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(fileName);
 
         // Combine path and uniqueFileName
         string blobPathName = Path.Combine(userId + "/" + operations[operation] + "/" +
@@ -394,7 +394,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(fileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -402,10 +402,6 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
             await sKData.AsStream().CopyToAsync(fileStream, cancellationToken);
-
-            // TODO remove these on both branches
-            fileStream.Flush();
-            fileStream.Close();
         }
 
         return filePath;
@@ -427,7 +423,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(formFile.FileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(formFile.FileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -448,8 +444,7 @@ public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, Blob
     /// </summary>
     /// <param name="fileNameInput"></param>
     /// <returns>my-photo.webp</returns>
-    //TODO Rename method name to ChangeFileNameToWebp on both branches
-    private static string? GenerateFileNameToWebp(string fileNameInput)
+    private static string? ChangeFileNameToWebp(string fileNameInput)
     {
         return fileNameInput.Split(".")[0] + ".webp";
     }
