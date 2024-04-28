@@ -358,7 +358,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(fileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -392,7 +392,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(fileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(fileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -400,9 +400,6 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
         {
             sKData.AsStream().Seek(0, SeekOrigin.Begin);
             await sKData.AsStream().CopyToAsync(fileStream);
-
-            fileStream.Flush();
-            fileStream.Close();
         }
 
         return filePath;
@@ -424,7 +421,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
         if (!Directory.Exists(uploadsFolder)) // create folder
             Directory.CreateDirectory(uploadsFolder);
 
-        string uniqueFileName = Guid.NewGuid().ToString() + "_" + GenerateFileNameToWebp(formFile.FileName);
+        string uniqueFileName = Guid.NewGuid().ToString() + "_" + ChangeFileNameToWebp(formFile.FileName);
 
         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -445,7 +442,7 @@ public class PhotoModifySaveService(IWebHostEnvironment _webHostEnvironment) : P
     /// </summary>
     /// <param name="fileNameInput"></param>
     /// <returns>my-photo.webp</returns>
-    private static string? GenerateFileNameToWebp(string fileNameInput)
+    private static string? ChangeFileNameToWebp(string fileNameInput)
     {
         return fileNameInput.Split(".")[0] + ".webp";
     }
