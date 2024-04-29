@@ -29,6 +29,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
             router.navigate(['account/login'])
             break;
+          case 403:
+            router.navigate(['/no-access']);
+            break;
           case 404:
             router.navigate(['/not-found']);
             break;
