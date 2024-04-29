@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace api.Repositories;
 public class UserRepository : IUserRepository
@@ -152,6 +153,21 @@ public class UserRepository : IUserRepository
         return photoUploadStatus;
     }
 
+    /// <summary>
+    /// Get all user's photos from PhotoService and return them. 
+    /// Return null if loading photos failed.
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<string>?> GetAllPhotosAsync(string? userIdHashed, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        return await _photoService.GetAllPhotosAsync(userId.ToString()!, cancellationToken);
+    }
     public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string photoUrlIn, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);

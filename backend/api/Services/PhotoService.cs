@@ -1,10 +1,12 @@
+using Azure.Storage;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
+
 namespace api.Services;
 
-public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<IPhotoModifySaveService> _logger) : PhotoStandardSize, IPhotoService
+public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServiceClient _blobServiceClient, IConfiguration _configuration, ILogger<IPhotoModifySaveService> _logger) : PhotoStandardSize, IPhotoService
 {
-    #region Constructor and variables
-
-    #endregion
+    private readonly BlobContainerClient _blobContainerClient = _blobServiceClient.GetBlobContainerClient("photos");
 
     /// <summary>
     /// ADD PHOTO TO BLOB
@@ -53,6 +55,64 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<string>?> GetAllPhotosAsync(string userId, CancellationToken cancellationToken)
+    {
+        // List to hold all the Base64 strings
+        List<string> photoUrls = [];
+
+        // Get all blobs with userId
+        await foreach (BlobItem photoBlob in _blobContainerClient.GetBlobsAsync(prefix: userId, cancellationToken: cancellationToken))
+        {
+            // Create a SAS token that's valid for one hour
+            BlobSasBuilder blobSasBuilder = new()
+            {
+                BlobName = photoBlob.Name,
+                Resource = "b",
+                StartsOn = DateTimeOffset.UtcNow,
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
+            };
+            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
+            if (string.IsNullOrEmpty(connectionString)) return null;
+
+            // Parse the connection string
+            var connectionStringParts = new Dictionary<string, string>();
+
+            // Split the connection string into parts
+            foreach (var part in connectionString.Split(';'))
+            {
+                var keyValue = part.Split(['='], 2);
+                if (keyValue.Length == 2)
+                {
+                    connectionStringParts[keyValue[0]] = keyValue[1];
+                }
+            }
+
+            // Extract the account name and key
+            connectionStringParts.TryGetValue("AccountName", out string? accountName);
+            connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
+
+            if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
+
+            // Generate the SAS token using the BlobServiceClient's key
+            string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
+
+            string blobUrlWithSas = $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{photoBlob.Name}?{sasToken}";
+
+            // Add the Base64 string to the list
+            photoUrls.Add(blobUrlWithSas);
+        }
+
+        return photoUrls;
+    }
+
+    /// <summary>
     /// Delete all files of the requested photo to be deleted.
     /// </summary>
     /// <param name="photo"></param>
@@ -70,7 +130,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, ILogger<I
             if (File.Exists(photoPath))
             {
                 // Delete the file on a background thread and await the task
-                await Task.Run(() => File.Delete(photoPath));
+                await Task.Run(() => File.Delete(photoPath), cancellationToken);
             }
             else
                 return false;
