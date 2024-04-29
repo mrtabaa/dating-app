@@ -62,50 +62,34 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
     /// <returns></returns>
     public async Task<IEnumerable<string>?> GetAllPhotosAsync(string userId, CancellationToken cancellationToken)
     {
-        // List to hold all the Base64 strings
+        // Initialize the list to hold the photo URLs
         List<string> photoUrls = [];
 
-        // Get all blobs with userId
-        await foreach (BlobItem photoBlob in _blobContainerClient.GetBlobsAsync(prefix: userId, cancellationToken: cancellationToken))
+        // Get all blobs with the specified userId prefix
+        await foreach (BlobItem blob in _blobContainerClient.GetBlobsAsync(prefix: userId, cancellationToken: cancellationToken))
         {
             // Create a SAS token that's valid for one hour
-            BlobSasBuilder blobSasBuilder = new()
+            BlobSasBuilder sasBuilder = new()
             {
-                BlobName = photoBlob.Name,
-                Resource = "b",
+                BlobContainerName = _blobContainerClient.Name,
+                BlobName = blob.Name,
+                Resource = "b", // 'b' for blob
                 StartsOn = DateTimeOffset.UtcNow,
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
+                ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
             };
-            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
-            if (string.IsNullOrEmpty(connectionString)) return null;
+            // Set permissions for the SAS token
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
-            // Parse the connection string
-            var connectionStringParts = new Dictionary<string, string>();
+            // Get AccountKey
+            string? AccountKey = _configuration.GetValue<string>("StorageAccountKey");
+            if (string.IsNullOrEmpty(AccountKey)) return null;
 
-            // Split the connection string into parts
-            foreach (var part in connectionString.Split(';'))
-            {
-                var keyValue = part.Split(['='], 2);
-                if (keyValue.Length == 2)
-                {
-                    connectionStringParts[keyValue[0]] = keyValue[1];
-                }
-            }
+            // Generate the SAS token
+            string sasToken = sasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(_blobServiceClient.AccountName, AccountKey)).ToString();
 
-            // Extract the account name and key
-            connectionStringParts.TryGetValue("AccountName", out string? accountName);
-            connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
-
-            if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
-
-            // Generate the SAS token using the BlobServiceClient's key
-            string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
-
-            string blobUrlWithSas = $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{photoBlob.Name}?{sasToken}";
-
-            // Add the Base64 string to the list
+            // Construct the full blob URL with the SAS token
+            string blobUrlWithSas = $"https://{_blobServiceClient.AccountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blob.Name}?{sasToken}";
             photoUrls.Add(blobUrlWithSas);
         }
 
