@@ -30,14 +30,13 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
-export class UserEditComponent implements OnInit, OnDestroy {
+export class UserEditComponent implements OnInit {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
   apiPhotoUrl = environment.apiPhotoUrl;
-  subscribedMember: Subscription | undefined;
   member: Member | undefined;
 
   readonly minTextAreaChars: number = 10;
@@ -49,21 +48,19 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.getMember();
   }
 
-  ngOnDestroy(): void {
-    this.subscribedMember?.unsubscribe();
-  }
-
   getMember(): void {
     const loggedInUserStr = localStorage.getItem('loggedInUser');
 
     if (loggedInUserStr) {
       const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
 
-      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
-        if (member) {
-          this.member = member;
+      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe({
+        next: member => {
+          if (member) {
+            this.member = member;
 
-          this.initContollersValues(member);
+            this.initContollersValues(member);
+          }
         }
       });
     }
@@ -112,15 +109,13 @@ export class UserEditComponent implements OnInit, OnDestroy {
         country: this.CountryCtrl.value
       }
 
-      this.userService.updateUser(updatedUser)
-        .pipe(take(1))
-        .subscribe({
-          next: (response: ApiResponseMessage) => {
-            if (response.message) {
-              this.matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
-            }
+      this.userService.updateUser(updatedUser).pipe(take(1)).subscribe({
+        next: (response: ApiResponseMessage) => {
+          if (response.message) {
+            this.matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
           }
-        });
+        }
+      });
 
       this.userEditFg.markAsPristine();
     }
