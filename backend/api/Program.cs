@@ -1,18 +1,5 @@
 var builder = WebApplication.CreateBuilder(args);
 
-#region Nginx
-// Production
-
-// Register User Secrets for Nginx
-// builder.Configuration.AddUserSecrets<Program>();
-
-// builder.WebHost.ConfigureKestrel(serverOptions =>
-// {
-//     if (builder.Environment.IsProduction())
-//         serverOptions.ListenLocalhost(7100); // Listen for incoming HTTP connections on port 7100
-// });
-#endregion
-
 #region Add services to the container.
 builder.Services.AddControllers();
 
