@@ -4,13 +4,13 @@ namespace api.Controllers;
 public class AdminController(IAdminRepository _adminRepository) : BaseApiController
 {
     [HttpGet("users-with-roles")]
-    public async Task<ActionResult<IEnumerable<MemberWithRoleDto>>> GetUsersWithRoles()
+    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles()
     {
         return Ok(await _adminRepository.GetUsersWithRolesAsync());
     }
 
     [HttpPut("edit-roles")]
-    public async Task<ActionResult<IList<string>>> EditRoles(MemberWithRoleDto memberWithRoleDto)
+    public async Task<ActionResult<IList<string>>> EditRoles(UserWithRoleDto memberWithRoleDto)
     {
         if (!memberWithRoleDto.Roles.Contains("member"))
             return BadRequest("Cannot remove member role!");
