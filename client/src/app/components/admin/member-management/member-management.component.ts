@@ -53,41 +53,36 @@ export class MemberManagementComponent implements OnInit {
       });
   }
 
-  // TODO unsubscribe
   updateRoles(i: number, userName: string): void {
-    this.adminService.editMemberRole(userName, this.selectedRoles.at(i).value)
-      ?.pipe(
-        take(1)
-      ).subscribe(
-        {
-          next: (savedRoles: string[]) => {
-            if (savedRoles) {
-              this.selectedRoles.at(i).setValue(savedRoles);
+    this.adminService.editMemberRole(userName, this.selectedRoles.at(i).value)?.pipe(
+      take(1)
+    ).subscribe({
+      next: (savedRoles: string[]) => {
+        if (savedRoles) {
+          this.selectedRoles.at(i).setValue(savedRoles);
 
-              this.selectedRoles.at(i).markAsPristine(); // disable the Save button
+          this.selectedRoles.at(i).markAsPristine(); // disable the Save button
 
-              this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
-            }
-          }
-        }
-      );
-  }
-
-  // TODO unsubscribe
-  deleteMember(i: number, userName: string): void {
-    this.adminService.deleteMember(userName)
-      .subscribe({
-        next: (response: ApiResponseMessage) => {
-          this.snackBar.open(response.message, "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
-
-          // Slice and copy the array to trigger the change detection to update the mat-table
-          if (this.usersWithRole)
-            this.usersWithRole = [
-              ...this.usersWithRole.slice(0, i),
-              ...this.usersWithRole.slice(i + 1)
-            ];
+          this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
         }
       }
-      );
+    });
+  }
+
+  deleteMember(i: number, userName: string): void {
+    this.adminService.deleteMember(userName).pipe(
+      take(1)
+    ).subscribe({
+      next: (response: ApiResponseMessage) => {
+        this.snackBar.open(response.message, "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
+
+        // Slice and copy the array to trigger the change detection to update the mat-table
+        if (this.usersWithRole)
+          this.usersWithRole = [
+            ...this.usersWithRole.slice(0, i),
+            ...this.usersWithRole.slice(i + 1)
+          ];
+      }
+    });
   }
 }
