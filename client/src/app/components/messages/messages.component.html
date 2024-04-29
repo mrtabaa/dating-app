@@ -3,6 +3,5 @@
 TEST
 
 @for (photo of photos$ | async; track $index) {
-<img ngSrc="{{photo}}" alt="">
-{{photo}}
+<img ngSrc="{{photo}}" alt="" width="164" height="164" priority>
 }
