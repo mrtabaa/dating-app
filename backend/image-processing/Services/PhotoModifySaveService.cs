@@ -2,14 +2,12 @@ using image_processing.Interfaces;
 using image_processing.Helpers;
 using SkiaSharp;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 
 namespace image_processing.Services;
 
-public class PhotoModifySaveService(IWebHostEnvironment webHostEnvironment, BlobServiceClient blobServiceClient) : PhotoStandardSize, IPhotoModifySaveService
+public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : PhotoStandardSize, IPhotoModifySaveService
 {
     #region Vars
-    private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
     private readonly BlobContainerClient _blobContainerClient = blobServiceClient.GetBlobContainerClient("photos");
 
     readonly string[] operations = ["resize-scale", "resize-pixel", "resize-pixel-square", "crop", "original"];
