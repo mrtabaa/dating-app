@@ -78,22 +78,14 @@ namespace api.DTOs
 
         public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain)
         {
-            if (isMain)
-                return new Photo(
-                        Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                        Url_165: photoUrls[0],
-                        Url_256: photoUrls[1],
-                        Url_enlarged: photoUrls[2],
-                        IsMain: isMain
-                );
-
-            return new Photo(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Url_165: photoUrls[0],
-                    Url_256: photoUrls[1],
-                    Url_enlarged: photoUrls[2],
-                    IsMain: isMain
-            );
+            return new Photo
+            {
+                Schema = AppVariablesExtensions.AppVersions.Last<string>(),
+                Url_165 = photoUrls[0],
+                Url_256 = photoUrls[1],
+                Url_enlarged = photoUrls[2],
+                IsMain = isMain
+            };
         }
 
         public static Follow? ConvertAppUsertoFollow(ObjectId? followerId, ObjectId? followedId)
