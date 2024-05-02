@@ -102,7 +102,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
             BlobName = blobName,
             Resource = "b",
             StartsOn = DateTimeOffset.UtcNow,
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
+            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
         };
         blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
 
