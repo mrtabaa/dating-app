@@ -17,7 +17,9 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
             memberParams.Gender = idAndGender.Value == "male" ? "female" : "male"; // value is gender here
         }
 
-        PagedList<AppUser> pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
+        PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
+
+        if(pagedAppUsers is null) return BadRequest("Returning members has failed. Try again or contact the customer support.");
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.

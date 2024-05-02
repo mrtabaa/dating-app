@@ -55,61 +55,84 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
     }
 
     /// <summary>
-    /// 
+    /// Gets a list of appUser.Photos from db and completes all their links to the full blob format.
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<IEnumerable<string>?> GetAllPhotosAsync(string userId, CancellationToken cancellationToken)
+    /// <param name="photos"></param>
+    /// <returns>'IEnumerable<Photo> photos on success OR 'null' on fail</returns>
+    public IEnumerable<Photo>? ConvertAllPhotosToBlobLinkFormat(IEnumerable<Photo> photos)
     {
-        // List to hold all the Base64 strings
-        List<string> photoUrls = [];
+        List<Photo> blobPhotos = [];
 
-        // Get all blobs with userId
-        await foreach (BlobItem photoBlob in _blobContainerClient.GetBlobsAsync(prefix: userId, cancellationToken: cancellationToken))
+        foreach (Photo photo in photos)
         {
-            // Create a SAS token that's valid for one hour
-            BlobSasBuilder blobSasBuilder = new()
-            {
-                BlobName = photoBlob.Name,
-                Resource = "b",
-                StartsOn = DateTimeOffset.UtcNow,
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
-            };
-            blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+            string? url_165 = GetBlobFullLink(photo.Url_165);
+            string? url_256 = GetBlobFullLink(photo.Url_256);
+            string? url_enlarged = GetBlobFullLink(photo.Url_enlarged);
 
-            string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
-            if (string.IsNullOrEmpty(connectionString)) return null;
+            // Link conversion failed
+            if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
+                return null;
 
-            // Parse the connection string
-            var connectionStringParts = new Dictionary<string, string>();
-
-            // Split the connection string into parts
-            foreach (var part in connectionString.Split(';'))
-            {
-                var keyValue = part.Split(['='], 2);
-                if (keyValue.Length == 2)
+            blobPhotos.Add(
+                new Photo
                 {
-                    connectionStringParts[keyValue[0]] = keyValue[1];
+                    Schema = photo.Schema,
+                    Url_165 = url_165,
+                    Url_256 = url_256,
+                    Url_enlarged = url_enlarged,
+                    IsMain = photo.IsMain
                 }
-            }
-
-            // Extract the account name and key
-            connectionStringParts.TryGetValue("AccountName", out string? accountName);
-            connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
-
-            if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
-
-            // Generate the SAS token using the BlobServiceClient's key
-            string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
-
-            string blobUrlWithSas = $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{photoBlob.Name}?{sasToken}";
-
-            // Add the Base64 string to the list
-            photoUrls.Add(blobUrlWithSas);
+            );
         }
 
-        return photoUrls;
+        return blobPhotos;
+    }
+
+    /// <summary>
+    /// Gets a fileName (blobName), generate a fresh SasToken, form a full link of the blob, and return it. 
+    /// private function used in ConvertPhotoNameToBlobLinkFormat()
+    /// </summary>
+    /// <param name="blobName"></param>
+    /// <returns>A blob full link</returns>
+    private string? GetBlobFullLink(string blobName)
+    {
+        // Create a SAS token that's valid for one hour
+        BlobSasBuilder blobSasBuilder = new()
+        {
+            BlobName = blobName,
+            Resource = "b",
+            StartsOn = DateTimeOffset.UtcNow,
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
+        };
+        blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+        // Get the StorageConnectionString value
+        string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
+        if (string.IsNullOrEmpty(connectionString)) return null;
+
+        // Parse the connection string
+        var connectionStringParts = new Dictionary<string, string>();
+
+        // Split the connection string into parts
+        foreach (var part in connectionString.Split(';'))
+        {
+            var keyValue = part.Split(['='], 2);
+            if (keyValue.Length == 2)
+            {
+                connectionStringParts[keyValue[0]] = keyValue[1];
+            }
+        }
+
+        // Extract the account name and key
+        connectionStringParts.TryGetValue("AccountName", out string? accountName);
+        connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
+
+        if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
+
+        // Generate the SAS token using the BlobServiceClient's key
+        string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
+
+        return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
     }
 
     /// <summary>
