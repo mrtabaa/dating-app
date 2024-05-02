@@ -12,7 +12,7 @@ import { ApiResponseMessage } from '../models/helpers/api-response-message';
 export class UserService {
   private http = inject(HttpClient);
 
-  baseUrl: string = environment.apiUrl + 'user';
+  private baseUrl: string = environment.apiUrl + 'user';
   members: Member[] = [];
 
   updateUser(userUpdate: UserUpdate): Observable<ApiResponseMessage> {
@@ -27,6 +27,10 @@ export class UserService {
           }
         })
       );
+  }
+
+  getAllPhotos(): Observable<string[]> {
+    return this.http.get<string[]>(this.baseUrl + '/get-all-photos');
   }
 
   setMainPhoto(url_128In: string): Observable<ApiResponseMessage> {

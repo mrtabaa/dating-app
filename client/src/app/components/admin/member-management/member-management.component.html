@@ -1,10 +1,10 @@
 <section class="content">
-    @if(membersWithRole) {
+    @if(usersWithRole) {
     <mat-error [style.visibility]="selectedRoles.dirty ? 'visible' : 'hidden'">
         You have unsaved changes. Make sure they are
         all saved.
     </mat-error>
-    <table mat-table [dataSource]="membersWithRole" class="mat-elevation-z8">
+    <table mat-table [dataSource]="usersWithRole" class="mat-elevation-z8">
 
         <!-- Position Column -->
         <ng-container matColumnDef="no">

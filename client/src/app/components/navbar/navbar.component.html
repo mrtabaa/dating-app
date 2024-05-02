@@ -16,14 +16,12 @@
                 {{link | titlecase}}
             </a>
             }
-            @else {
-            @if(link !== 'admin')
+            @else if(link !== "admin")
             {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
                 [active]="rla.isActive">
                 {{link | titlecase}}
             </a>
-            }
             }
             }
         </nav>

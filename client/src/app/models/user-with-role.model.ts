@@ -1,4 +1,4 @@
-export interface MemberWithRole {
+export interface UserWithRole {
     userName: string;
     roles: string[];
 }

@@ -6,7 +6,6 @@ public class AdminRepository : IAdminRepository
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
-    private readonly ITokenService _tokenService; // save user credential as a token
 
     // constructor - dependency injection
     public AdminRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService)
@@ -15,31 +14,30 @@ public class AdminRepository : IAdminRepository
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _userManager = userManager;
-        _tokenService = tokenService;
     }
     #endregion
 
     #region CRUD
-    public async Task<IEnumerable<MemberWithRoleDto>> GetUsersWithRolesAsync()
+    public async Task<IEnumerable<UserWithRoleDto>> GetUsersWithRolesAsync()
     {
-        List<MemberWithRoleDto> users = [];
+        List<UserWithRoleDto> usersWithRoles = [];
 
-        await Task.Run(() =>
+        foreach (AppUser appUser in _userManager.Users)
         {
-            _userManager.Users.ToList().ForEach(appUser =>
-               users.Add(
-                   new MemberWithRoleDto(
-                       UserName: appUser.UserName!,
-                       Roles: _userManager.GetRolesAsync(appUser).Result
-                   )
-               )
-           );
-        });
+            var roles = await _userManager.GetRolesAsync(appUser);
 
-        return users;
+            usersWithRoles.Add(
+                new UserWithRoleDto(
+                    UserName: appUser.UserName!,
+                    Roles: roles
+                )
+            );
+        }
+
+        return usersWithRoles;
     }
 
-    public async Task<IEnumerable<string>?> EditMemberRole(MemberWithRoleDto memberWithRoleDto)
+    public async Task<IEnumerable<string>?> EditMemberRole(UserWithRoleDto memberWithRoleDto)
     {
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());
 

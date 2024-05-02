@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { take } from 'rxjs';
-import { MemberWithRole } from '../../../models/member-with-role.model';
+import { UserWithRole } from '../../../models/user-with-role.model';
 import { AdminService } from '../../../services/admin.service';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -30,7 +30,7 @@ export class MemberManagementComponent implements OnInit {
   displayedColumns = ['no', 'username', 'edit-role', 'active-roles', 'delete-member'];
   displayedRoles = ['admin', 'moderator', 'member'];
 
-  membersWithRole: MemberWithRole[] | undefined;
+  usersWithRole: UserWithRole[] | undefined;
 
   selectedRoles = this.fb.array<string[] | null>([]);
 
@@ -43,49 +43,46 @@ export class MemberManagementComponent implements OnInit {
       .pipe(
         take(1)
       ).subscribe({
-        next: (members: MemberWithRole[]) => {
-          members.forEach(member => {
-            this.selectedRoles.push(this.fb.control<string[]>(member.roles, [Validators.required]));
+        next: (users: UserWithRole[]) => {
+          users.forEach(user => {
+            this.selectedRoles.push(this.fb.control<string[]>(user.roles, [Validators.required]));
           });
 
-          this.membersWithRole = members;
+          this.usersWithRole = users;
         }
       });
   }
 
   updateRoles(i: number, userName: string): void {
-    this.adminService.editMemberRole(userName, this.selectedRoles.at(i).value)
-      ?.pipe(
-        take(1)
-      ).subscribe(
-        {
-          next: (savedRoles: string[]) => {
-            if (savedRoles) {
-              this.selectedRoles.at(i).setValue(savedRoles);
+    this.adminService.editMemberRole(userName, this.selectedRoles.at(i).value)?.pipe(
+      take(1)
+    ).subscribe({
+      next: (savedRoles: string[]) => {
+        if (savedRoles) {
+          this.selectedRoles.at(i).setValue(savedRoles);
 
-              this.selectedRoles.at(i).markAsPristine(); // disable the Save button
+          this.selectedRoles.at(i).markAsPristine(); // disable the Save button
 
-              this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
-            }
-          }
+          this.snackBar.open('The ' + userName + "'s new roles are saved successfully.", "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
         }
-      );
+      }
+    });
   }
 
   deleteMember(i: number, userName: string): void {
-    this.adminService.deleteMember(userName)
-      .subscribe({
-        next: (response: ApiResponseMessage) => {
-          this.snackBar.open(response.message, "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
+    this.adminService.deleteMember(userName).pipe(
+      take(1)
+    ).subscribe({
+      next: (response: ApiResponseMessage) => {
+        this.snackBar.open(response.message, "Close", { horizontalPosition: "center", verticalPosition: "bottom", duration: 7000 });
 
-          // Slice and copy the array to trigger the change detection to update the mat-table
-          if (this.membersWithRole)
-            this.membersWithRole = [
-              ...this.membersWithRole.slice(0, i),
-              ...this.membersWithRole.slice(i + 1)
-            ];
-        }
+        // Slice and copy the array to trigger the change detection to update the mat-table
+        if (this.usersWithRole)
+          this.usersWithRole = [
+            ...this.usersWithRole.slice(0, i),
+            ...this.usersWithRole.slice(i + 1)
+          ];
       }
-    );
+    });
   }
 }
