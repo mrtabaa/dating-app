@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Subscription, take } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { UserUpdate } from '../../../models/user-update.model';
 import { Member } from '../../../models/member.model';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
@@ -36,7 +35,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
-  apiPhotoUrl = environment.apiPhotoUrl;
   subscribedMember: Subscription | undefined;
   member: Member | undefined;
 

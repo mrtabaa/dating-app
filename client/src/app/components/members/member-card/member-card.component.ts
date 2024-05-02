@@ -1,7 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { environment } from '../../../../environments/environment';
 import { Member } from '../../../models/member.model';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -26,8 +25,6 @@ export class MemberCardComponent {
 
   private followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);
-
-  apiPhotoUrl = environment.apiPhotoUrl;
 
   addFollow(): void {
     if (this.member?.userName) {

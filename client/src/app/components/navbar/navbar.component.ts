@@ -2,7 +2,6 @@ import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { LoggedInUser } from '../../models/logged-in-user.model';
 import { AccountService } from '../../services/account.service';
-import { environment } from '../../../environments/environment';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -26,7 +25,6 @@ import { MatDividerModule } from '@angular/material/divider';
 export class NavbarComponent implements OnInit {
   private accountService = inject(AccountService);
 
-  basePhotoUrl = environment.apiPhotoUrl;
 
   loggedInUserSig: Signal<LoggedInUser | null> | undefined;
 

@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
-import { environment } from '../../../../environments/environment';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -30,7 +29,6 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   private gallery = inject(Gallery);
 
   member$: Observable<Member> | undefined;
-  apiPhotoUrl = environment.apiPhotoUrl;
   subscribed: Subscription | undefined;
   images: GalleryItem[] = [];
 
@@ -55,7 +53,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.subscribed = this.member$?.subscribe(
       (member: Member) => {
         for (const photo of member.photos) {
-          this.images.push(new ImageItem({ src: this.apiPhotoUrl + photo.url_enlarged, thumb: this.apiPhotoUrl + photo.url_165 }));
+          this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
         }
 
         // load ng-gallery and insert images

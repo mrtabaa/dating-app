@@ -37,7 +37,6 @@ export class PhotoEditorComponent implements OnInit {
 
   loggedInUser: LoggedInUser | null | undefined;
   baseApiUrl: string = environment.apiUrl;
-  basePhotoUrl: string = environment.apiPhotoUrl;
 
   uploader: FileUploader | undefined;
   hasBaseDropZoneOver = false;

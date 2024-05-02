@@ -15,7 +15,7 @@
             <mat-card>
                 @for (photo of member.photos; track $index) {
                 @if (photo.isMain) {
-                <img mat-card-image ngSrc="{{apiPhotoUrl + photo.url_165}}" width="240" height="240" priority
+                <img mat-card-image ngSrc="{{photo.url_165}}" width="240" height="240" priority
                     alt="Photo of {{member.knownAs}}">
                 }
                 }
