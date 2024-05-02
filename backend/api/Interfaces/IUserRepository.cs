@@ -9,7 +9,6 @@ public interface IUserRepository
     public Task<IdAndStringValue?> GetGenderByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken);
-    public Task<IEnumerable<string>?> GetAllPhotosAsync(string? userIdHashed, CancellationToken cancellationToken);
     public Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
     public Task<UpdateResult?> SetMainPhotoAsync(string? userId, string photoUrlIn, CancellationToken cancellationToken);
     public Task<UpdateResult?> DeletePhotoAsync(string? userId, string? urlIn, CancellationToken cancellationToken);

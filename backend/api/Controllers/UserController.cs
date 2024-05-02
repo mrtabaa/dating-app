@@ -36,14 +36,6 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
         return photoUploadStatus.Photo is null ? BadRequest("Add photo failed. See logger") : photoUploadStatus.Photo;
     }
 
-    [HttpGet("get-all-photos")]
-    public async Task<ActionResult<IEnumerable<string>>> GetAllPhotos(CancellationToken cancellationToken)
-    {
-        IEnumerable<string>? photos = await _userRepository.GetAllPhotosAsync(User.GetUserIdHashed(), cancellationToken);
-
-        return photos is null ? BadRequest("Loading photos failed.") : Ok(photos);
-    }
-
     [HttpPut("set-main-photo")]
     public async Task<ActionResult> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
