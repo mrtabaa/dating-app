@@ -73,6 +73,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
             if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
                 return null;
 
+            // Create Photo on link conversion success
             blobPhotos.Add(
                 new Photo
                 {
@@ -102,7 +103,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
             BlobName = blobName,
             Resource = "b",
             StartsOn = DateTimeOffset.UtcNow,
-            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1)
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
         };
         blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
 
@@ -132,7 +133,18 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
         // Generate the SAS token using the BlobServiceClient's key
         string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
 
-        return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
+        // Combine the full URI with the SAS token
+        UriBuilder fullUri = new UriBuilder
+        {
+            Scheme = "https",
+            Host = $"{accountName}.blob.core.windows.net",
+            Path = $"{_blobContainerClient.Name}/{blobName}",
+            Query = sasToken
+        };
+
+        return fullUri.ToString();
+
+        // return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
     }
 
     /// <summary>
