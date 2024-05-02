@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Subscription, take } from 'rxjs';
+import { take } from 'rxjs';
 import { UserUpdate } from '../../../models/user-update.model';
 import { Member } from '../../../models/member.model';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
@@ -29,13 +29,12 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
-export class UserEditComponent implements OnInit, OnDestroy {
+export class UserEditComponent implements OnInit {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
-  subscribedMember: Subscription | undefined;
   member: Member | undefined;
 
   readonly minTextAreaChars: number = 10;
@@ -45,10 +44,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getMember();
-  }
-
-  ngOnDestroy(): void {
-    this.subscribedMember?.unsubscribe();
   }
 
   getMember(): void {
