@@ -140,7 +140,8 @@ public class UserRepository : IUserRepository
             .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
             .Set(doc => doc.Photos, appUser.Photos);
 
-        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+        // removed cancellationToken since file is already saved on Azure so db has to be updated.
+        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, CancellationToken.None); 
 
         if (result.ModifiedCount == 0)
             return photoUploadStatus;
