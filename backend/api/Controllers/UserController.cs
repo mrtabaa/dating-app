@@ -11,7 +11,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
         UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserIdHashed(), cancellationToken);
 
         return updateResult is null || updateResult.ModifiedCount == 0
-            ? BadRequest("Update failed. Try again later.")
+            ? BadRequest("Update failed. Try again later or if the issue persists contact the support.")
             : Ok(new Response(Message: "Your information has been updated successfully."));
 
     }
@@ -33,7 +33,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
         if (photoUploadStatus.IsMaxPhotoReached)
             return BadRequest($"You've reach the limit of {photoUploadStatus.MaxPhotosLimit} photos. Delete some photos to add more.");
 
-        return photoUploadStatus.Photo is null ? BadRequest("Add photo failed. See logger") : photoUploadStatus.Photo;
+        return photoUploadStatus.Photo is null ? BadRequest("Photo upload failed. Try again later. If the issue persists contact the support.") : photoUploadStatus.Photo;
     }
 
     [HttpPut("set-main-photo")]
@@ -52,7 +52,7 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
         UpdateResult? updateResult = await _userRepository.DeletePhotoAsync(User.GetUserIdHashed(), photoUrlIn, cancellationToken);
 
         return updateResult is null || updateResult.ModifiedCount == 0
-            ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the admin.")
+            ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the support.")
             : Ok(new Response(Message: "Photo deleted successfully."));
     }
     #endregion Photo Management
