@@ -122,7 +122,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
         // Create a SAS token that's valid for one hour
         BlobSasBuilder blobSasBuilder = new()
         {
-            BlobContainerName = "photos",
+            // BlobContainerName = "photos",
             BlobName = blobName,
             Resource = "b", // for "c", do NOT provide the BlobName
             StartsOn = DateTimeOffset.UtcNow.AddMonths(-1),
