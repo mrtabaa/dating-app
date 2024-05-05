@@ -1,5 +1,4 @@
 using Azure.Storage;
-using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 
 namespace api.Services;
@@ -97,17 +96,9 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
     /// <returns>A blob full link</returns>
     private string? GetBlobFullLink(string blobName)
     {
-        // Create a SAS token that's valid for one hour
-        BlobSasBuilder blobSasBuilder = new()
-        {
-            BlobName = blobName,
-            Resource = "b",
-            StartsOn = DateTimeOffset.UtcNow,
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(7)
-        };
-        blobSasBuilder.SetPermissions(BlobSasPermissions.Read);
+        blobName = "66338553e869fa62ac7e4bf5/resize-pixel-square/165x165/783bb9d3-5262-44fb-a2ef-6c24ed9ab120_pexels-andre-furtado-1264210.webp";
 
-        // Get the StorageConnectionString value
+        #region Get the StorageConnectionString value
         string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
         if (string.IsNullOrEmpty(connectionString)) return null;
 
@@ -128,23 +119,24 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
         connectionStringParts.TryGetValue("AccountName", out string? accountName);
         connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
 
+        #endregion Get the StorageConnectionString value
+
+        // Create a SAS token that's valid for one hour
+        BlobSasBuilder blobSasBuilder = new()
+        {
+            BlobName = blobName,
+            Resource = "c",
+            StartsOn = DateTimeOffset.UtcNow.AddMonths(-1),
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
+        };
+        blobSasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.List);
+
         if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
 
         // Generate the SAS token using the BlobServiceClient's key
         string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
 
-        // Combine the full URI with the SAS token
-        UriBuilder fullUri = new UriBuilder
-        {
-            Scheme = "https",
-            Host = $"{accountName}.blob.core.windows.net",
-            Path = $"{_blobContainerClient.Name}/{blobName}",
-            Query = sasToken
-        };
-
-        return fullUri.ToString();
-
-        // return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
+        return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
     }
 
     /// <summary>
