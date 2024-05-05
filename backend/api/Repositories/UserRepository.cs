@@ -126,7 +126,7 @@ public class UserRepository : IUserRepository
         if (photoUrls is null)
             return photoUploadStatus;
 
-        Photo photo;
+        Photo? photo;
         if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
         {
             photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: true);
@@ -148,7 +148,9 @@ public class UserRepository : IUserRepository
         if (result.ModifiedCount == 0)
             return photoUploadStatus;
 
-        // return the save photo if save on disk and DB
+        photo = _photoService.ConvertPhotoToBlobLinkWithSas(photo);
+
+        // return the saved photo if save on Azure and DB
         photoUploadStatus.Photo = photo;
         return photoUploadStatus;
     }

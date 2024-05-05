@@ -3,7 +3,11 @@ using Azure.Storage.Sas;
 
 namespace api.Services;
 
-public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServiceClient _blobServiceClient, IConfiguration _configuration, ILogger<IPhotoModifySaveService> _logger) : PhotoStandardSize, IPhotoService
+public class PhotoService(
+    IPhotoModifySaveService _photoModifyService,
+    BlobServiceClient _blobServiceClient,
+    IConfiguration _configuration,
+    ILogger<IPhotoModifySaveService> _logger) : PhotoStandardSize, IPhotoService
 {
     private readonly BlobContainerClient _blobContainerClient = _blobServiceClient.GetBlobContainerClient("photos");
 
@@ -58,7 +62,33 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
     /// </summary>
     /// <param name="photos"></param>
     /// <returns>'IEnumerable<Photo> photos on success OR 'null' on fail</returns>
-    public IEnumerable<Photo>? ConvertAllPhotosToBlobLinkFormat(IEnumerable<Photo> photos)
+    public Photo? ConvertPhotoToBlobLinkWithSas(Photo photo)
+    {
+        string? url_165 = GetBlobFullLink(photo.Url_165);
+        string? url_256 = GetBlobFullLink(photo.Url_256);
+        string? url_enlarged = GetBlobFullLink(photo.Url_enlarged);
+
+        // Link conversion failed
+        if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
+            return null;
+
+        // Create Photo on link conversion success
+        return new Photo
+        {
+            Schema = photo.Schema,
+            Url_165 = url_165,
+            Url_256 = url_256,
+            Url_enlarged = url_enlarged,
+            IsMain = photo.IsMain
+        };
+    }
+
+    /// <summary>
+    /// Gets a list of appUser.Photos from db and completes all their links to the full blob format.
+    /// </summary>
+    /// <param name="photos"></param>
+    /// <returns>'IEnumerable<Photo> photos on success OR 'null' on fail</returns>
+    public IEnumerable<Photo>? ConvertAllPhotosToBlobLinkWithSas(IEnumerable<Photo> photos)
     {
         List<Photo> blobPhotos = [];
 
