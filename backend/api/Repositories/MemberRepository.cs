@@ -83,7 +83,7 @@ public class MemberRepository : IMemberRepository
 
     private AppUser? ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
     {
-        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkFormat(appUser.Photos)?.ToList();
+        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos)?.ToList();
         if (blobConvertedPhotos is null)
             return null;
 
