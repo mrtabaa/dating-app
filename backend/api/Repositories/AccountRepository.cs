@@ -43,11 +43,7 @@ public class AccountRepository : IAccountRepository
             string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
             if (!string.IsNullOrEmpty(token))
-            {
-                Photo? blobPhoto = _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain));
-
-                return Mappers.ConvertAppUserToLoggedInDto(appUser, token, blobPhoto?.Url_165); // returns LoggedInDto
-            }
+                return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)); // Return loggedInDto
         }
         else // Store and return userCreatedResult errors if failed. 
         {
@@ -88,13 +84,22 @@ public class AccountRepository : IAccountRepository
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
         if (!string.IsNullOrEmpty(token))
-        {
-            Photo? blobPhoto = _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain));
-
-            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, blobPhoto?.Url_165); // returns LoggedInDto
-        }
+            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)); // Return loggedInDto
 
         return loggedInDto;
+    }
+
+    public async Task<LoggedInDto?> ReloadLoggedInUser(string userIdHashed, string token, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+
+        return appUser is null
+            ? null
+            : Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser));
     }
 
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
@@ -112,4 +117,12 @@ public class AccountRepository : IAccountRepository
     public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
     #endregion CRUD
+
+    /// <summary>
+    /// This function gets appUser's main photo's Url_165 and convert it to blobUriWithSas
+    /// </summary>
+    /// <param name="appUser"></param>
+    /// <returns>string blobUriWithSas</returns>
+    private string? GetMainPhoto(AppUser appUser) =>
+     _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url_165;
 }

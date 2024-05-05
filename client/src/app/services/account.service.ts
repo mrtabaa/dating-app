@@ -6,7 +6,6 @@ import { UserLogin } from '../models/account/user-login.model';
 import { UserRegister } from '../models/account/user-register.model';
 import { environment } from '../../environments/environment';
 import { LoggedInUser } from '../models/logged-in-user.model';
-import { ApiResponseMessage } from '../models/helpers/api-response-message';
 
 @Injectable({
   providedIn: 'root'
@@ -52,14 +51,11 @@ export class AccountService {
    * Called in app.component.ts
    * @returns Observable<LoggedInUser | null>
    */
-  authorizeLoggedInUser(): void {
-    this.http.get<ApiResponseMessage>(this.baseUrl)
+  reloadLoggedInUser(): void {
+    this.http.get<LoggedInUser>(this.baseUrl)
       .pipe(take(1)).subscribe({
-        next: res => console.log(res.message),
-        error: err => {
-          console.log(err.error);
-          this.logout()
-        }
+        next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
+        error: () => this.logout()
       });
   }
 
