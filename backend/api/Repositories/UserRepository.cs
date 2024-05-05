@@ -140,11 +140,15 @@ public class UserRepository : IUserRepository
             .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
             .Set(doc => doc.Photos, appUser.Photos);
 
-        // removed cancellationToken since file is already saved on Azure so db has to be updated.
-        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, CancellationToken.None); 
+        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
 
-        if (result.ModifiedCount == 0)
+        // If db is not updated and cancellation is requested, delete the photo from Azure Blob Storage and stop proceeding.
+        // Consider using "Full Optimistic Locking / appUser Version comparison" if data integrity is required. 
+        if (result.ModifiedCount == 0 && cancellationToken.IsCancellationRequested)
+        {
+            await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
             return photoUploadStatus;
+        }
 
         photo = _photoService.ConvertPhotoToBlobLinkWithSas(photo);
 
