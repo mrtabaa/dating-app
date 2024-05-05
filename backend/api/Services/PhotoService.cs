@@ -57,6 +57,33 @@ public class PhotoService(
     }
 
     /// <summary>
+    /// Delete all files of the requested photo to be deleted.
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns>bool</returns>
+    public async Task<bool> DeletePhotoFromBlob(Photo photo, CancellationToken cancellationToken)
+    {
+        List<string> photoPaths = [];
+
+        photoPaths.Add(photo.Url_165);
+        photoPaths.Add(photo.Url_256);
+        photoPaths.Add(photo.Url_enlarged);
+
+        foreach (string photoPath in photoPaths)
+        {
+            // Get a reference to a blob
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(photoPath);
+
+            // Delete the blob and its snapshots if exists
+            if (!await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, null, cancellationToken))
+                return false; // if blob doesn't exist or deletion fails
+        }
+
+        return true;
+    }
+
+
+    /// <summary>
     /// Gets a list of appUser.Photos from db and completes all their links to the full blob format.
     /// </summary>
     /// <param name="photos"></param>
@@ -117,31 +144,5 @@ public class PhotoService(
         }
 
         return blobPhotos;
-    }
-
-    /// <summary>
-    /// Delete all files of the requested photo to be deleted.
-    /// </summary>
-    /// <param name="photo"></param>
-    /// <returns>bool</returns>
-    public async Task<bool> DeletePhotoFromBlob(Photo photo, CancellationToken cancellationToken)
-    {
-        List<string> photoPaths = [];
-
-        photoPaths.Add(photo.Url_165);
-        photoPaths.Add(photo.Url_256);
-        photoPaths.Add(photo.Url_enlarged);
-
-        foreach (string photoPath in photoPaths)
-        {
-            // Get a reference to a blob
-            BlobClient blobClient = _blobContainerClient.GetBlobClient(photoPath);
-
-            // Delete the blob and its snapshots if exists
-            if (!await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, null, cancellationToken))
-                return false; // if blob doesn't exist or deletion fails
-        }
-
-        return true;
     }
 }
