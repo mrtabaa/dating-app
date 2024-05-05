@@ -8,15 +8,17 @@ public class AccountRepository : IAccountRepository
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
+    private readonly IPhotoService _photoService;
 
     // constructor - dependency injection
-    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService)
+    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService, IPhotoService photoService)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-        
+
         _userManager = userManager;
         _tokenService = tokenService;
+        _photoService = photoService;
     }
     #endregion
 
@@ -42,7 +44,9 @@ public class AccountRepository : IAccountRepository
 
             if (!string.IsNullOrEmpty(token))
             {
-                return Mappers.ConvertAppUserToLoggedInDto(appUser, token); // returns LoggedInDto
+                Photo? blobPhoto = _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain));
+
+                return Mappers.ConvertAppUserToLoggedInDto(appUser, token, blobPhoto?.Url_165); // returns LoggedInDto
             }
         }
         else // Store and return userCreatedResult errors if failed. 
@@ -85,7 +89,9 @@ public class AccountRepository : IAccountRepository
 
         if (!string.IsNullOrEmpty(token))
         {
-            return Mappers.ConvertAppUserToLoggedInDto(appUser, token);
+            Photo? blobPhoto = _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain));
+
+            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, blobPhoto?.Url_165); // returns LoggedInDto
         }
 
         return loggedInDto;

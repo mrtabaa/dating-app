@@ -62,8 +62,10 @@ public class PhotoService(
     /// </summary>
     /// <param name="photos"></param>
     /// <returns>'IEnumerable<Photo> photos on success OR 'null' on fail</returns>
-    public Photo? ConvertPhotoToBlobLinkWithSas(Photo photo)
+    public Photo? ConvertPhotoToBlobLinkWithSas(Photo? photo)
     {
+        if(photo is null) return null;
+        
         string? url_165 = GetBlobFullLink(photo.Url_165);
         string? url_256 = GetBlobFullLink(photo.Url_256);
         string? url_enlarged = GetBlobFullLink(photo.Url_enlarged);

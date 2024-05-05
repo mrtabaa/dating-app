@@ -64,7 +64,7 @@ namespace api.DTOs
             return null;
         }
 
-        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token)
+        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl)
         {
             return new LoggedInDto
             {
@@ -72,7 +72,7 @@ namespace api.DTOs
                 KnownAs = appUser.KnownAs,
                 UserName = appUser.UserName,
                 Gender = appUser.Gender,
-                ProfilePhotoUrl = appUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165
+                ProfilePhotoUrl = blobPhotoUrl
             };
         }
 
