@@ -52,11 +52,12 @@ export class AccountService {
    * @returns Observable<LoggedInUser | null>
    */
   reloadLoggedInUser(): void {
-    this.http.get<LoggedInUser>(this.baseUrl)
-      .pipe(take(1)).subscribe({
-        next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
-        error: () => this.logout()
-      });
+    if (localStorage.getItem("loggedInUser"))
+      this.http.get<LoggedInUser>(this.baseUrl)
+        .pipe(take(1)).subscribe({
+          next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
+          error: () => this.logout()
+        });
   }
 
   logout(): void {

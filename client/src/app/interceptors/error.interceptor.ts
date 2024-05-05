@@ -26,10 +26,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
             break;
           case 401:
-            if (localStorage.getItem("loggedInUser")) {
-              snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
-              router.navigate(['account/login'])
-            }
+            snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+            router.navigate(['account/login'])
             break;
           case 403:
             router.navigate(['/no-access']);
