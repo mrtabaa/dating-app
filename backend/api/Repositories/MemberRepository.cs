@@ -46,11 +46,16 @@ public class MemberRepository : IMemberRepository
         #region Convert all members' appUser.Photos to BlobLinkFormat
         for (int i = 0; i < appUsers.Count; i++)
         {
-            AppUser? appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
+            AppUser? appUser = null;
 
-            if(appUser is null) return null;
+            if (appUsers[i].Photos.Count > 1) // skip if appUser has no photos
+            {
+                appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
 
-            appUsers[i] = appUser;
+                if (appUser is null) return null;
+
+                appUsers[i] = appUser;
+            }
         }
         #endregion Convert all members' appUser.Photos to BlobLinkFormat
 
