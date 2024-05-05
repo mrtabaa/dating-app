@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore.Http.HttpResults;
-
 namespace api.Repositories;
 public class UserRepository : IUserRepository
 {
@@ -191,11 +188,13 @@ public class UserRepository : IUserRepository
 
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
+        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(url_165_In);
+
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()
             .Where(appUser => appUser.Id == userId) // filter by user email
             .SelectMany(appUser => appUser.Photos) // flatten the Photos array
-            .Where(photo => photo.Url_165 == url_165_In) // filter by photo url
+            .Where(photo => photo.Url_165 == dbUri) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
 
         if (photo is null) return null;
@@ -204,9 +203,12 @@ public class UserRepository : IUserRepository
 
         bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
         if (!isDeleteSuccess)
+        {
             _logger.LogError("Delete from disk failed. See the logs.");
+            return null;
+        }
 
-        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == url_165_In);
+        var update = Builders<AppUser>.Update.PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == dbUri);
 
         return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, update, null, cancellationToken);
     }
@@ -215,6 +217,6 @@ public class UserRepository : IUserRepository
     #endregion CRUD
 
     #region Helpers
-
+    
     #endregion
 }
