@@ -152,11 +152,15 @@ public class UserRepository : IUserRepository
         return photoUploadStatus;
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string blob_url_165_In, CancellationToken cancellationToken)
     {
+        // Convert string userIdHashed to ObjectId userId
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        // Convert blobUri to dbUri
+        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In);
+        if (string.IsNullOrEmpty(dbUri)) return null;
 
         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
         // set query
@@ -173,7 +177,7 @@ public class UserRepository : IUserRepository
         #region  SET the new main photo: find new photo by its Url_128; update IsMain to True
         FilterDefinition<AppUser> filterNew = Builders<AppUser>.Filter
             .Where(appUser =>
-                appUser.Id == userId && appUser.Photos.Any<Photo>(photo => photo.Url_165 == photoUrlIn));
+                appUser.Id == userId && appUser.Photos.Any<Photo>(photo => photo.Url_165 == dbUri));
 
         UpdateDefinition<AppUser> updateNew = Builders<AppUser>.Update
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
@@ -182,13 +186,13 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> DeletePhotoAsync(string? userIdHashed, string? url_165_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeletePhotoAsync(string? userIdHashed, string? blob_url_165_In, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
-        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(url_165_In);
+        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In);
 
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()
@@ -217,6 +221,6 @@ public class UserRepository : IUserRepository
     #endregion CRUD
 
     #region Helpers
-    
+
     #endregion
 }
