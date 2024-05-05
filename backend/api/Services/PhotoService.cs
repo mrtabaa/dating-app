@@ -57,7 +57,7 @@ public class PhotoService(
     }
 
     /// <summary>
-    /// Delete all files of the requested photo to be deleted.
+    /// Delete all photo versions/sizes to be deleted.
     /// </summary>
     /// <param name="photo"></param>
     /// <returns>bool</returns>
@@ -81,7 +81,6 @@ public class PhotoService(
 
         return true;
     }
-
 
     /// <summary>
     /// Gets a list of appUser.Photos from db and completes all their links to the full blob format.
