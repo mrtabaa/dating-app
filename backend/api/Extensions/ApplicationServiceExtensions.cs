@@ -1,5 +1,3 @@
-using Azure.Storage.Blobs;
-
 namespace api.Extensions;
 
 public static class ApplicationServiceExtensions

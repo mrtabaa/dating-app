@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace api.Extensions;
 
 public static class HttpExtensions
