@@ -36,7 +36,7 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
             // if image processing fails
             if (filePath_165_sq is null || filePath_256_sq is null || filePath_enlarged is null)
             {
-                _logger.LogError("Photo addition failed. The returned filePath is null which is not allowed.");
+                _logger.LogError("Photo addition failed. The returned filePath is null which is not allowed. Photo is not uploaded on Azure storage");
                 return null;
             }
             #endregion Resize and Create Images to Blob
