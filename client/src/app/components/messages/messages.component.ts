@@ -1,6 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { UserService } from '../../services/user.service';
-import { Observable } from 'rxjs';
+import { Component } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 
 @Component({
@@ -10,15 +8,5 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
   templateUrl: './messages.component.html',
   styleUrls: ['./messages.component.scss']
 })
-export class MessagesComponent implements OnInit {
-  private userService = inject(UserService);
-  photos$: Observable<string[]> | undefined;
-
-  ngOnInit(): void {
-    this.getMemberPhotos();
-  }
-
-  getMemberPhotos(): void {
-    this.photos$ = this.userService.getAllPhotos();
-  }
+export class MessagesComponent {
 }
