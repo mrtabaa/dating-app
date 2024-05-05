@@ -48,7 +48,7 @@ public class MemberRepository : IMemberRepository
         {
             AppUser? appUser = null;
 
-            if (appUsers[i].Photos.Count > 1) // skip if appUser has no photos
+            if (appUsers[i].Photos.Count > 0) // skip if appUser has no photos
             {
                 appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
 
