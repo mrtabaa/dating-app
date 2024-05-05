@@ -159,7 +159,7 @@ public class UserRepository : IUserRepository
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
         // Convert blobUri to dbUri
-        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In);
+        string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In, containerName: "photos");
         if (string.IsNullOrEmpty(dbUri)) return null;
 
         #region  UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
@@ -192,7 +192,7 @@ public class UserRepository : IUserRepository
 
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
-        string? dbUri = BlobUriDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In);
+        string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In, containerName: "photos");
 
         // Find the photo in AppUser
         Photo photo = await _collection.AsQueryable()

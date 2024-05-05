@@ -65,9 +65,9 @@ public class PhotoService(
     {
         if (photo is null) return null;
 
-        string? url_165 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
-        string? url_256 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
-        string? url_enlarged = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
+        string? url_165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
+        string? url_256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
+        string? url_enlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
 
         // Link conversion failed
         if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
@@ -95,9 +95,9 @@ public class PhotoService(
 
         foreach (Photo photo in photos)
         {
-            string? url_165 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
-            string? url_256 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
-            string? url_enlarged = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
+            string? url_165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
+            string? url_256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
+            string? url_enlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
 
             // Link conversion failed
             if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
