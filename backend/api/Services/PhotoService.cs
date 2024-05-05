@@ -96,8 +96,6 @@ public class PhotoService(IPhotoModifySaveService _photoModifyService, BlobServi
     /// <returns>A blob full link</returns>
     private string? GetBlobFullLink(string blobName)
     {
-        blobName = "66338553e869fa62ac7e4bf5/resize-pixel-square/165x165/783bb9d3-5262-44fb-a2ef-6c24ed9ab120_pexels-andre-furtado-1264210.webp";
-
         #region Get the StorageConnectionString value
         string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
         if (string.IsNullOrEmpty(connectionString)) return null;
