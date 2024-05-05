@@ -1,5 +1,4 @@
-using Azure.Storage;
-using Azure.Storage.Sas;
+using Azure.Storage.Blobs.Models;
 
 namespace api.Services;
 
@@ -64,11 +63,11 @@ public class PhotoService(
     /// <returns>'IEnumerable<Photo> photos on success OR 'null' on fail</returns>
     public Photo? ConvertPhotoToBlobLinkWithSas(Photo? photo)
     {
-        if(photo is null) return null;
-        
-        string? url_165 = GetBlobFullLink(photo.Url_165);
-        string? url_256 = GetBlobFullLink(photo.Url_256);
-        string? url_enlarged = GetBlobFullLink(photo.Url_enlarged);
+        if (photo is null) return null;
+
+        string? url_165 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
+        string? url_256 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
+        string? url_enlarged = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
 
         // Link conversion failed
         if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
@@ -96,9 +95,9 @@ public class PhotoService(
 
         foreach (Photo photo in photos)
         {
-            string? url_165 = GetBlobFullLink(photo.Url_165);
-            string? url_256 = GetBlobFullLink(photo.Url_256);
-            string? url_enlarged = GetBlobFullLink(photo.Url_enlarged);
+            string? url_165 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_165, _configuration, _blobContainerClient);
+            string? url_256 = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_256, _configuration, _blobContainerClient);
+            string? url_enlarged = BlobUriDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url_enlarged, _configuration, _blobContainerClient);
 
             // Link conversion failed
             if (string.IsNullOrEmpty(url_165) || string.IsNullOrEmpty(url_256) || string.IsNullOrEmpty(url_enlarged))
@@ -121,56 +120,6 @@ public class PhotoService(
     }
 
     /// <summary>
-    /// Gets a fileName (blobName), generate a fresh SasToken, form a full link of the blob, and return it. 
-    /// private function used in ConvertPhotoNameToBlobLinkFormat()
-    /// </summary>
-    /// <param name="blobName"></param>
-    /// <returns>A blob full link</returns>
-    private string? GetBlobFullLink(string blobName)
-    {
-        #region Get the StorageConnectionString value
-        string? connectionString = _configuration.GetValue<string>("StorageConnectionString");
-        if (string.IsNullOrEmpty(connectionString)) return null;
-
-        // Parse the connection string
-        var connectionStringParts = new Dictionary<string, string>();
-
-        // Split the connection string into parts
-        foreach (var part in connectionString.Split(';'))
-        {
-            var keyValue = part.Split(['='], 2);
-            if (keyValue.Length == 2)
-            {
-                connectionStringParts[keyValue[0]] = keyValue[1];
-            }
-        }
-
-        // Extract the account name and key
-        connectionStringParts.TryGetValue("AccountName", out string? accountName);
-        connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
-
-        #endregion Get the StorageConnectionString value
-
-        // Create a SAS token that's valid for one hour
-        BlobSasBuilder blobSasBuilder = new()
-        {
-            BlobContainerName = "photos",
-            BlobName = blobName,
-            Resource = "b", // for "c", do NOT provide the BlobName
-            StartsOn = DateTimeOffset.UtcNow.AddMonths(-1),
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
-        };
-        blobSasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.List);
-
-        if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
-
-        // Generate the SAS token using the BlobServiceClient's key
-        string sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
-
-        return $"https://{accountName}.blob.core.windows.net/{_blobContainerClient.Name}/{blobName}?{sasToken}";
-    }
-
-    /// <summary>
     /// Delete all files of the requested photo to be deleted.
     /// </summary>
     /// <param name="photo"></param>
@@ -185,13 +134,12 @@ public class PhotoService(
 
         foreach (string photoPath in photoPaths)
         {
-            if (File.Exists(photoPath))
-            {
-                // Delete the file on a background thread and await the task
-                await Task.Run(() => File.Delete(photoPath), cancellationToken);
-            }
-            else
-                return false;
+            // Get a reference to a blob
+            BlobClient blobClient = _blobContainerClient.GetBlobClient(photoPath);
+
+            // Delete the blob and its snapshots if exists
+            if (!await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, null, cancellationToken))
+                return false; // if blob doesn't exist or deletion fails
         }
 
         return true;
