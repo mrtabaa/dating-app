@@ -1,11 +1,47 @@
-.container{
+main {
     display: flex;
-    flex-direction: column;
-    margin-top: 3rem;
     align-items: center;
-    
-    .buttons{
+
+    .left {
         display: flex;
-        gap: 1rem;
+        flex-direction: column;
+        align-items: center;
+        flex-grow: 1;
+
+        h1 {
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        app-login {
+            width: 100%;
+        }
+    }
+
+    .right {
+        display: flex;
+        justify-content: space-evenly;
+        gap: 2rem;
+        flex: 3;
+
+        img {
+            width: 45%;
+            /* Example width for the container */
+            height: 80dvh;
+            /* Example height for the container */
+            object-fit: cover;
+            /* Scales the image to cover the container */
+            object-position: 50% 50%;
+            /* Positions the center of the image within the container */
+            border-radius: 5rem;
+        }
+    }
+}
+
+@media only screen and (min-width: 40rem) {
+    .container {
+        border: 1px solid rgb(218, 218, 218);
+        padding-top: 1rem;
+        border-radius: 2rem;
     }
 }
