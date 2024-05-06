@@ -1,40 +1,73 @@
-form {
+main {
     display: flex;
-    flex-direction: column;
-    align-items: center;
 
-    .container {
+    .left {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 1.5rem;
-        width: 80%;
-        max-width: 34rem;
+        flex-grow: 1;
 
-        >* {
-            width: 80%;
+        h1 {
+            font-weight: bold;
+            letter-spacing: 2px;
         }
 
-        h2 {
-            width: auto;
-        }
-
-        .inputs {
+        form {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-        }
+            align-items: center;
+            width: 100%;
 
-        .buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-
-            .demo {
+            .container {
+                background-color: #e8ebee;
                 display: flex;
-                gap: 1rem;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+                width: 80%;
+                max-width: 34rem;
+
+                >* {
+                    width: 80%;
+                }
+
+                h2 {
+                    width: auto;
+                }
+
+                .inputs {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .buttons {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 1rem;
+                    gap: 1rem;
+
+                    .signin {
+                        display: flex;
+                        justify-content: space-between;
+                        gap: 1rem;
+                        width: 100%;
+                    }
+
+                    .signup {
+                        display: flex;
+                        gap: 1rem;  
+                        width: 100%;
+                    }
+                }
             }
         }
+    }
+
+    .right {
+        display: flex;
+        background-color: red;
+        flex: 3;
     }
 }
 
