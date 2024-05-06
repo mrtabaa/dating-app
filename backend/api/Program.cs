@@ -15,7 +15,7 @@ if (builder.Environment.IsProduction())
     var port = Environment.GetEnvironmentVariable("WEBSITE_PORT") ?? "8080";
     builder.WebHost.ConfigureKestrel(serverOptions =>
     {
-        serverOptions.ListenAnyIP(int.Parse(port));
+        serverOptions.ListenAnyIP(int.Parse(port)); // TODO set to an allowed ip only
     });
 }
 
