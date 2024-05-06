@@ -1,5 +1,6 @@
 main {
     display: flex;
+    align-items: center;
 
     .left {
         display: flex;
@@ -55,9 +56,9 @@ main {
                     }
 
                     .signup {
-                        display: flex;
-                        gap: 1rem;  
                         width: 100%;
+                        display: flex;
+                        justify-content: space-between;
                     }
                 }
             }
@@ -66,8 +67,17 @@ main {
 
     .right {
         display: flex;
-        background-color: red;
+        justify-content: space-evenly;
+        gap: 2rem;
         flex: 3;
+
+        img {
+            width: 45%; /* Example width for the container */
+            height: 80dvh; /* Example height for the container */
+            object-fit: cover; /* Scales the image to cover the container */
+            object-position: 50% 50%; /* Positions the center of the image within the container */
+            border-radius: 5rem;
+        }
     }
 }
 
