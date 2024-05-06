@@ -1,9 +1,10 @@
-<div class="container">
-    <h1>Find your match</h1>
-    <p class="lead">Come on in to find your matches... All you need to do is signup!</p>
-    <div class="buttons">
-        <button [routerLink]="['/register']" routerLinkActive="router-link-active"  mat-raised-button color="primary" type="input">Register</button>
-        <button mat-raised-button type="input">Learn more</button>
-        <button mat-stroked-button color="warn" [routerLink]="['/errors']">Errors</button>
-    </div>
-</div>
+<main>
+    <section class="left">
+        <h1>"Find your perfect match!"</h1>
+        <app-login />
+    </section>
+    <section class="right">
+        <img src="../../../../assets/images/login/single.webp" alt="Single girl">
+        <img src="../../../../assets/images/login/freindship.webp" alt="Frendship">
+    </section>
+</main>
