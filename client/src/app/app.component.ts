@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
   accountService = inject(AccountService);
   userService = inject(UserService);
 
-  title = 'Dating App';
+  title = 'Hallboard';
   isLoading: boolean = false;
 
   ngOnInit(): void {
