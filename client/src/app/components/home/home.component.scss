@@ -1,39 +1,135 @@
 main {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 3rem;
 
-    .left {
+    .row1 {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        flex-grow: 1;
 
-        h1 {
-            font-weight: bold;
-            letter-spacing: 2px;
+        .left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+
+            h1 {
+                font-weight: bold;
+                letter-spacing: 2px;
+            }
+
+            app-login {
+                width: 100%;
+            }
         }
 
-        app-login {
-            width: 100%;
+        .right {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 2rem;
+            flex: 3;
+
+            img {
+                width: 45%;
+                /* Example width for the container */
+                height: 80dvh;
+                /* Example height for the container */
+                object-fit: cover;
+                /* Scales the image to cover the container */
+                object-position: 50% 50%;
+                /* Positions the center of the image within the container */
+                border-radius: 5rem;
+            }
         }
     }
 
-    .right {
+    .row2 {
         display: flex;
+        flex-direction: column;
         justify-content: space-evenly;
-        gap: 2rem;
-        flex: 3;
+        align-content: space-evenly;
+        text-align: center;
 
-        img {
-            width: 45%;
-            /* Example width for the container */
-            height: 80dvh;
-            /* Example height for the container */
-            object-fit: cover;
-            /* Scales the image to cover the container */
-            object-position: 50% 50%;
-            /* Positions the center of the image within the container */
+        .join-container {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 3rem;
+
+            .join {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                justify-content: space-evenly;
+                align-items: center;
+                gap: 1rem;
+                padding: 2rem;
+
+                .mobile {
+                    background: linear-gradient(to right, #5270ff, #fc66c5);
+                    height: 45dvh;
+                    width: 60%;
+                    position: relative;
+                    border-radius: 3rem;
+
+                    img {
+                        width: 60%;
+                        height: 30dvh;
+                        position: absolute;
+                        top: 3rem;
+                        left: calc(50% - 30%);
+
+                        /* Example height for the container */
+                        object-fit: cover;
+                        /* Scales the image to cover the container */
+                        object-position: 50% 50%;
+                        /* Positions the center of the image within the container */
+                    }
+
+                    .circle {
+                        width: 3rem;
+                        height: 3rem;
+                        border-radius: 50%;
+                        background-color: #fff;
+                        position: absolute;
+                        bottom: 2rem;
+                        left: calc(50% - 1.5rem);
+                    }
+                }
+
+                .mobile.second {
+                    background: linear-gradient(to right, #fe5759, #9052f9);
+                }
+
+                button {
+                    width: fit-content;
+                }
+            }
+        }
+    }
+
+    .row3 {
+        display: flex;
+        justify-content: center;
+
+        .bg-image {
+            width: 90%;
+            height: 90dvh;
+            background-image: url('/assets/images/home/row3-1.webp');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
             border-radius: 5rem;
+            position: relative;
+
+            .text {
+                position: absolute;
+                top: 5%;
+                right: 5%;
+
+                h1 {
+                    letter-spacing: 2px;
+                }
+            }
         }
     }
 }

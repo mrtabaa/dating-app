@@ -1,10 +1,68 @@
 <main>
-    <section class="left">
-        <h1>"Find your perfect match!"</h1>
-        <app-login />
+    <section class="row1">
+        <div class="left">
+            <h1>"Find your perfect match!"</h1>
+            <app-login />
+        </div>
+        <div class="right">
+            <img src="../../../../assets/images/home/row1-1.webp" alt="Single girl">
+            <img src="../../../../assets/images/home/row1-2.webp" alt="Frendship">
+        </div>
     </section>
-    <section class="right">
-        <img src="../../../../assets/images/login/single.webp" alt="Single girl">
-        <img src="../../../../assets/images/login/freindship.webp" alt="Frendship">
+    <mat-divider></mat-divider>
+    <section class="row2">
+        <h1 class="title">
+            Hallboard is free to join and use, so what are you waiting for? Sign up today and start connecting with
+            people!
+        </h1>
+        <div class="join-container">
+            <div class="join">
+                <div class="mobile">
+                    <img src="../../../../assets/images/home/row2-1.webp" alt="Single girl">
+                    <div class="circle"></div>
+                </div>
+                <h3>
+                    Are you looking for new relationship, a special someone, or just someone to chat with?
+                </h3>
+                <button [routerLink]="['account/login']" mat-raised-button color="primary">Join</button>
+            </div>
+            <div class="join">
+                <div class="mobile second">
+                    <img src="../../../../assets/images/home/row2-2.webp" alt="Single girl">
+                    <div class="circle"></div>
+                </div>
+                <h3>
+                    Hallboard is the perfect place for you to meet like-minded people as a friend in your area.
+                </h3>
+                <button [routerLink]="['account/login']" mat-raised-button color="primary">Join</button>
+            </div>
+            <div class="join">
+                <div class="mobile">
+                    <img src="../../../../assets/images/home/row2-3.webp" alt="Single girl">
+                    <div class="circle"></div>
+                </div>
+                <h3>
+                    Hallboard has a variety of groups and events that you can join, which is a great way to meet new
+                    people in
+                    person.
+                </h3>
+                <button [routerLink]="['account/login']" mat-raised-button color="primary">Join</button>
+            </div>
+        </div>
+    </section>
+    <mat-divider></mat-divider>
+    <section class="row3">
+        <div class="bg-image">
+            <div class="text">
+                <h1>Why we're here!</h1>
+                <ul>
+                    <li>Browse profiles and connect with people who share your interests.</li>
+                    <li>Send messages and chat with other users.</li>
+                    <li>Join groups and events to meet people in person.</li>
+                    <li>Share your thoughts and experiences on our blog.</li>
+                    <li>Get involved in our community and help others find love and friendship.</li>
+                </ul>
+            </div>
+        </div>
     </section>
 </main>
