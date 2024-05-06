@@ -1,4 +1,5 @@
-.page {
+.page { // include ngx-spinner
+
     .container {
         min-height: 100dvh;
         display: flex;
@@ -11,11 +12,16 @@
         }
 
         main {
+            display: flex;
+            justify-content: center;
+            flex: 1;
             padding: 2% 4% 6%; // left/right 4%
+
+            >* { // router-outlet objects
+                width: 100%;
+            }
         }
 
-        footer {
-            
-        }
+        footer {}
     }
 }
