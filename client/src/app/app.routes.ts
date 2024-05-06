@@ -16,6 +16,8 @@ import { preventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.gua
 import { FollowsComponent } from './components/follows/follows.component';
 import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.component';
 import { adminGuard } from './guards/admin.guard';
+import { LoginDemoComponent } from './components/demo/login-demo/login-demo.component';
+import { RecoverComponent } from './components/account/recover/recover.component';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent },
@@ -39,6 +41,8 @@ export const routes: Routes = [
         children: [
             { path: 'account/login', component: LoginComponent },
             { path: 'account/register', component: RegisterComponent },
+            { path: 'account/recover', component: RecoverComponent },
+            { path: 'demo/login', component: LoginDemoComponent}, // DEMO
         ]
     },
     {
