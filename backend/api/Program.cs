@@ -28,8 +28,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsProduction()) // https for production only
     app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-
 app.UseCors();
 
 app.UseAuthentication();
