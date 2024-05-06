@@ -28,8 +28,25 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
     [Authorize]
     [HttpGet]
-    public ActionResult AuthorizeLoggedInUser() =>
-        Ok(new Response(Message: "token is still valid and user is authorized"));
+    public async Task<ActionResult<LoggedInDto>> AuthorizeLoggedInUser(CancellationToken cancellationToken)
+    {
+        string? userIdHashed = User.GetUserIdHashed();
+        if (string.IsNullOrEmpty(userIdHashed))
+            return BadRequest("No user was found with this user Id.");
+
+        // obtain token value
+        string? token = null;
+
+        if (HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+            token = authHeader.ToString().Split(' ').Last();
+
+        if (string.IsNullOrEmpty(token))
+            return BadRequest("Token is expired or invalid. Login again.");
+
+        LoggedInDto? loggedInDto = await _accountRepository.ReloadLoggedInUser(userIdHashed, token, cancellationToken);
+
+        return loggedInDto is null ? Unauthorized("User is logged out or unauthorized. Login again.") : loggedInDto;
+    }
 
     [Authorize]
     [HttpDelete("delete-user")]

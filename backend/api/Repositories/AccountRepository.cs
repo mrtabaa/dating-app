@@ -14,7 +14,7 @@ public class AccountRepository : IAccountRepository
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-        
+
         _userManager = userManager;
         _tokenService = tokenService;
     }
@@ -89,6 +89,19 @@ public class AccountRepository : IAccountRepository
         }
 
         return loggedInDto;
+    }
+
+    public async Task<LoggedInDto?> ReloadLoggedInUser(string userIdHashed, string token, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+
+        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+
+        return appUser is null
+            ? null
+            : Mappers.ConvertAppUserToLoggedInDto(appUser, token);
     }
 
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)

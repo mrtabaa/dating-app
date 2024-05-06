@@ -25,17 +25,6 @@ export class AppComponent implements OnInit {
   isLoading: boolean = false;
 
   ngOnInit(): void {
-    this.initUserOnPageRefresh();
-  }
-
-  initUserOnPageRefresh() {
-    const loggedInUserStr = localStorage.getItem('loggedInUser');
-
-    if (loggedInUserStr) {
-      this.accountService.setCurrentUser(JSON.parse(loggedInUserStr))
-
-      // check if user's token is not expired.
-      this.accountService.authorizeLoggedInUser();
-    }
+    this.accountService.reloadLoggedInUser();
   }
 }
