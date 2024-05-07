@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/account/login/login.component';
 import { RegisterComponent } from './components/account/register/register.component';
 import { NoAccessComponent } from './components/errors/no-access/no-access.component';
 import { NotFoundComponent } from './components/errors/not-found/not-found.component';
@@ -39,7 +38,7 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authLoggedInGuard],
         children: [
-            { path: 'account/login', component: LoginComponent },
+            { path: 'account/login', component: HomeComponent },
             { path: 'account/register', component: RegisterComponent },
             { path: 'account/recover', component: RecoverComponent },
             { path: 'demo/login', component: LoginDemoComponent}, // DEMO
