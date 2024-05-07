@@ -8,16 +8,19 @@ mat-toolbar {
         display: flex;
         gap: 2rem;
 
-        a {
-            color: white;
-            text-decoration: none;
-        }
-
         .brand {
             display: flex;
             align-items: center;
-            // background: red;
-            // padding: 0.5rem;
+            color: white;
+            text-decoration: none;
+
+            font-family: "Fredoka", sans-serif;
+            font-size: 28px;
+            font-optical-sizing: auto;
+            font-weight: bold;
+            font-style: normal;
+            font-variation-settings:
+                "wdth" 100;
         }
     }
 
