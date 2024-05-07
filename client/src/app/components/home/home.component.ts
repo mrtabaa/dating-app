@@ -1,22 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { LoginComponent } from '../account/login/login.component';
-import { MatDivider } from '@angular/material/divider';
+import { NgOptimizedImage } from '@angular/common';
+import { NavbarService } from '../../services/helpers/navbar.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     LoginComponent,
-    RouterLink,
-    MatButtonModule, MatDivider
+    RouterLink, NgOptimizedImage, MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit, OnDestroy {
+  navbarService = inject(NavbarService);
 
-  constructor() { }
-
+  ngOnInit(): void {
+    this.navbarService.showNavbarSig.set(false);
+  }
+  ngOnDestroy(): void {
+    this.navbarService.showNavbarSig.set(true);
+  }
 }

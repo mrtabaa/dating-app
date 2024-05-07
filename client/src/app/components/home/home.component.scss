@@ -3,15 +3,37 @@ main {
     flex-direction: column;
     gap: 3rem;
 
+    nav {
+        .brand {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+
+            font-family: "Fredoka", sans-serif;
+            font-size: 28px;
+            font-optical-sizing: auto;
+            font-weight: bold;
+            font-style: normal;
+            font-variation-settings:
+                "wdth" 100;
+        }
+    }
+
+    .main-bg-image {
+        z-index: -1;
+    }
+
     .row1 {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        align-items: flex-end;
 
-        .left {
+        .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-grow: 1;
 
             h1 {
                 font-weight: bold;
@@ -19,119 +41,91 @@ main {
             }
 
             app-login {
-                width: 100%;
-            }
-        }
-
-        .right {
-            display: flex;
-            justify-content: space-evenly;
-            gap: 2rem;
-            flex: 3;
-
-            img {
-                width: 45%;
-                /* Example width for the container */
-                height: 80dvh;
-                /* Example height for the container */
-                object-fit: cover;
-                /* Scales the image to cover the container */
-                object-position: 50% 50%;
-                /* Positions the center of the image within the container */
-                border-radius: 5rem;
+                width: 40rem;
             }
         }
     }
 
     .row2 {
+        margin-top: 15dvh;
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
         align-content: space-evenly;
         text-align: center;
+        gap: 5dvh;
 
-        .join-container {
+        .row2-title {
+            align-self: center;
+            background-color: rgba(124, 125, 117, 0.8);
+            border-radius: 8px;
+            padding: 1rem;
+            width: 80%;
+
+            h1 {
+                color: white;
+                margin: 0;
+            }
+        }
+
+        .middle-boxes {
             display: flex;
             justify-content: space-evenly;
             gap: 3rem;
 
-            .join {
+            .box {
                 display: flex;
-                flex: 1;
                 flex-direction: column;
-                justify-content: space-evenly;
                 align-items: center;
+                flex: 1;
                 gap: 1rem;
-                padding: 2rem;
+                padding: 1rem;
+                background-color: #f1f1f1;
+                border-radius: 8px;
 
-                .mobile {
-                    background: linear-gradient(to right, #5270ff, #fc66c5);
-                    height: 45dvh;
-                    width: 60%;
-                    position: relative;
-                    border-radius: 3rem;
+                .image {
+                    position: relative; // required for ngSrc fill
+                    width: 30rem;
+                    height: 30dvh;
+                    border-radius: 8px;
 
                     img {
-                        width: 60%;
-                        height: 30dvh;
-                        position: absolute;
-                        top: 3rem;
-                        left: calc(50% - 30%);
-
                         /* Example height for the container */
                         object-fit: cover;
                         /* Scales the image to cover the container */
                         object-position: 50% 50%;
                         /* Positions the center of the image within the container */
                     }
-
-                    .circle {
-                        width: 3rem;
-                        height: 3rem;
-                        border-radius: 50%;
-                        background-color: #fff;
-                        position: absolute;
-                        bottom: 2rem;
-                        left: calc(50% - 1.5rem);
-                    }
-                }
-
-                .mobile.second {
-                    background: linear-gradient(to right, #fe5759, #9052f9);
-                }
-
-                button {
-                    width: fit-content;
                 }
             }
         }
     }
 
-    .row3 {
-        display: flex;
-        justify-content: center;
+    // .row3 {
+    //     display: flex;
+    //     justify-content: center;
 
-        .bg-image {
-            width: 90%;
-            height: 90dvh;
-            background-image: url('/assets/images/home/row3-1.webp');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: center center;
-            border-radius: 5rem;
-            position: relative;
+    //     .bg-image {
+    //         width: 90%;
+    //         height: 90dvh;
+    //         background-image: url('/assets/images/home/row3-1.webp');
+    //         background-repeat: no-repeat;
+    //         background-size: cover;
+    //         background-position: center center;
+    //         border-radius: 5rem;
+    //         position: relative;
 
-            .text {
-                position: absolute;
-                top: 5%;
-                right: 5%;
+    //         .text {
+    //             position: absolute;
+    //             top: 5%;
+    //             right: 5%;
 
-                h1 {
-                    letter-spacing: 2px;
-                }
-            }
-        }
-    }
+    //             h1 {
+    //                 letter-spacing: 2px;
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 @media only screen and (min-width: 40rem) {
