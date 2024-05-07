@@ -4,11 +4,14 @@
   </ngx-spinner>
 
   <section class="container">
+    <!-- showNavbarSig() becomes true/false in the component which wants to remove the navbar. e.g. HomeComoponent -->
+    @if(showNavbarSig()){
     <header>
       <nav>
         <app-navbar />
       </nav>
     </header>
+    }
 
     <main>
       <div class="wrapper">
