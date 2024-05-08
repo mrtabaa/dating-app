@@ -69,6 +69,13 @@ public class FollowRepository : IFollowRepository
         return followStatus; // Faild for any other reason
     }
 
+    /// <summary>
+    /// Find only members which the loggedInUser is following. 
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="followParams"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>PagedList<AppUser>?. Return null if userIdHashed is invalid</returns>
     public async Task<PagedList<AppUser>?> GetFollowMembersAsync(string userIdHashed, FollowParams followParams, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
