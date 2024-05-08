@@ -28,19 +28,29 @@ public class FollowRepository : IFollowRepository
     }
     #endregion
 
-    public async Task<FolowStatus> AddFollowAsync(string? userIdHashed, string followedMemberEmail, CancellationToken cancellationToken)
+    /// <summary>
+    /// /// Gets a member UserName and follows the member. A Follow doc is added to the db "follows" collection.
+    /// The UpdateFollowingsCount() UpdateFollowersCount() are called to increment 1 in their AppUsers.
+    /// MongoDb Session/Transaction is used. 
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="followedMemberUserName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>FollowStatus</returns>
+    public async Task<FollowStatus> AddFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
     {
-        FolowStatus followStatus = new();
-
-        if (string.IsNullOrEmpty(userIdHashed)) return followStatus;
+        FollowStatus followStatus = new();
 
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
-        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberEmail, cancellationToken);
+        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
 
         if (followedId.Equals(ObjectId.Empty))
+        {
+            followStatus.IsTargetMemberNotFound = true;
             return followStatus;
+        }
 
         if (userId == followedId)
         {
@@ -61,12 +71,34 @@ public class FollowRepository : IFollowRepository
 
         if (follow is not null)
         {
-            bool isSuccess = await SaveInDbWithSessionAsync(follow, userId, followedId, cancellationToken);
+            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedId, FollowAddOrRemove.IsAdded, cancellationToken, follow);
 
             followStatus.IsSuccess = isSuccess;
         }
 
         return followStatus; // Faild for any other reason
+    }
+
+    /// <summary>
+    /// Gets the followed member UserName and unfollows the member. A Follow doc is removed from the db "follows" collection.
+    /// The UpdateFollowingsCount() UpdateFollowersCount() are called to decrement 1 from their AppUsers. 
+    /// MongoDb Session/Transaction is used. 
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="followedMemberUserName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>true: sucess. false: fail</returns>
+    public async Task<bool> RemoveFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return false;
+
+        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
+
+        if (followedId.Equals(ObjectId.Empty))
+            return false;
+
+        return await SaveInDbWithSessionAsync(userId, followedId, FollowAddOrRemove.IsRemoved, cancellationToken);
     }
 
     /// <summary>
@@ -108,7 +140,13 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>bool isSuccess</returns>
-    private async Task<bool> SaveInDbWithSessionAsync(Follow follow, ObjectId? userId, ObjectId? followedId, CancellationToken cancellationToken)
+    private async Task<bool> SaveInDbWithSessionAsync(
+        ObjectId? userId,
+        ObjectId? followedId,
+        FollowAddOrRemove followAddOrRemove,
+        CancellationToken cancellationToken,
+        Follow? follow = null
+    )
     {
         //// Session is NOT supported in MongoDb Standalone servers!
         // Create a session object that is used when leveraging transactions
@@ -119,12 +157,24 @@ public class FollowRepository : IFollowRepository
 
         try
         {
-            // added session to this part so if UpdateFollowedByCount failed, undo the InsertOnce.
-            await _collection.InsertOneAsync(session, follow, null, cancellationToken);
+            if (follow is not null && FollowAddOrRemove.IsAdded == followAddOrRemove) // Add follow
+                // added session to this part so if UpdateFollowedByCount failed, undo the InsertOnce.
+                await _collection.InsertOneAsync(session, follow, null, cancellationToken);
+            else // if (FollowAddOrRemove.IsRemoved == followAddOrRemove) // Remove follow
+            {
 
-            await UpdateFollowingsCount(session, userId, cancellationToken);
+                var filter = Builders<Follow>.Filter.Where(follow => follow.FollowerId == userId && follow.FollowedMemberId == followedId);
 
-            await UpdateFollowersCount(session, followedId, cancellationToken);
+                // follow doc doesn't exists. May be already deleted. 
+                if(!await _collection.Find<Follow>(filter).AnyAsync(cancellationToken))
+                    return false;
+
+                await _collection.DeleteOneAsync(session, filter, null, cancellationToken);
+            }
+
+            await UpdateFollowingsCount(session, userId, followAddOrRemove, cancellationToken);
+
+            await UpdateFollowersCount(session, followedId, followAddOrRemove, cancellationToken);
 
             await session.CommitTransactionAsync(cancellationToken);
 
@@ -179,10 +229,20 @@ public class FollowRepository : IFollowRepository
     /// <param name="followerId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId? followerId, CancellationToken cancellationToken)
+    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId? followerId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> updateFollowedByCount = Builders<AppUser>.Update
-        .Inc(appUser => appUser.FollowingsCount, 1); // Increament by 1 for each follow
+        UpdateDefinition<AppUser> updateFollowedByCount;
+
+        if (followAddOrRemove == FollowAddOrRemove.IsAdded)
+        {
+            updateFollowedByCount = Builders<AppUser>.Update
+                .Inc(appUser => appUser.FollowingsCount, 1); // Increament by 1 for each follow
+        }
+        else
+        {
+            updateFollowedByCount = Builders<AppUser>.Update
+                .Inc(appUser => appUser.FollowingsCount, -1); // Decreament by 1 for each unfollow
+        }
 
         await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
                 appUser.Id == followerId, updateFollowedByCount, null, cancellationToken);
@@ -195,10 +255,20 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId? followedId, CancellationToken cancellationToken)
+    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId? followedId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> updateFollowerCount = Builders<AppUser>.Update
-        .Inc(appUser => appUser.FollowersCount, 1); // Increament by 1 for each follow
+        UpdateDefinition<AppUser> updateFollowerCount;
+
+        if (followAddOrRemove == FollowAddOrRemove.IsAdded)
+        {
+            updateFollowerCount = Builders<AppUser>.Update
+                .Inc(appUser => appUser.FollowersCount, 1); // Increament by 1 for each follow
+        }
+        else
+        {
+            updateFollowerCount = Builders<AppUser>.Update
+                .Inc(appUser => appUser.FollowersCount, -1); // Decreament by 1 for each unfollow
+        }
 
         await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
                 appUser.Id == followedId, updateFollowerCount, null, cancellationToken);

@@ -29,3 +29,9 @@ public enum FollowPredicate
     Followings,
     Followers
 }
+
+public enum FollowAddOrRemove
+{
+    IsAdded,
+    IsRemoved
+}

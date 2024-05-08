@@ -30,6 +30,19 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
         return BadRequest("Follwoing has failed. Please try again later or contact the support");
     }
 
+    [HttpDelete("{targetMemberUserName}")]
+    public async Task<ActionResult> Delete(string targetMemberUserName, CancellationToken cancellationToken)
+    {
+        string? userIdHashed = User.GetUserIdHashed();
+
+        if (string.IsNullOrEmpty(userIdHashed)) return BadRequest("Your ID is not found. Login again.");
+
+        if (await _followRepository.RemoveFollowAsync(userIdHashed, targetMemberUserName, cancellationToken))
+            return Ok(new Response(Message: $"You've unfollowed '{targetMemberUserName}'."));
+
+        return BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support");
+    }
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
     {
