@@ -52,7 +52,12 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
 
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
-            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
+            if (followParams.Predicate == FollowPredicate.Followings)
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, following: true));
+            else
+            {
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, follower: true));
+            }
         }
 
         return memberDtos;

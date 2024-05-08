@@ -42,7 +42,7 @@ namespace api.DTOs
             };
         }
 
-        public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser)
+        public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser, bool following = false, bool follower = false)
         {
             if (appUser.Schema is not null)
                 return new MemberDto(
@@ -58,7 +58,9 @@ namespace api.DTOs
                     Interests: appUser.Interests,
                     City: appUser.City,
                     Country: appUser.Country,
-                    Photos: appUser.Photos
+                    Photos: appUser.Photos,
+                    Following: following,
+                    Follower: follower
                 );
 
             return null;

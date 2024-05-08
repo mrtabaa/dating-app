@@ -13,5 +13,7 @@ public record MemberDto(
     string? Interests,
     string City,
     string Country,
-    List<Photo> Photos
+    List<Photo> Photos,
+    bool Following,
+    bool Follower
 );

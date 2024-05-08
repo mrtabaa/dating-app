@@ -1,7 +1,11 @@
 namespace api.Controllers;
 
 [Authorize]
-public class MemberController(IMemberRepository _memberRepository, IUserRepository _userRepository) : BaseApiController
+public class MemberController(
+    IMemberRepository _memberRepository,
+    IUserRepository _userRepository,
+    IFollowRepository _followRepository,
+    ITokenService _tokenService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
@@ -19,7 +23,7 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
 
         PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
 
-        if(pagedAppUsers is null) return BadRequest("Returning members has failed. Try again or contact the customer support.");
+        if (pagedAppUsers is null) return BadRequest("Returning members has failed. Try again or contact the customer support.");
 
         /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
@@ -30,9 +34,17 @@ public class MemberController(IMemberRepository _memberRepository, IUserReposito
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
         List<MemberDto?> memberDtos = [];
 
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return BadRequest("User id is not valid. Login again.");
+
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
-            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
+            if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, following: true));
+            else
+            {
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
+            }
         }
 
         return memberDtos;

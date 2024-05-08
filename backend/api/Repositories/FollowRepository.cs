@@ -81,6 +81,18 @@ public class FollowRepository : IFollowRepository
     }
 
     /// <summary>
+    /// Check if the loggedIn user is following the specific member/appUser or not. 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="appUser"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>true: following; false: not following</returns>
+    public async Task<bool> CheckIsFollowing(ObjectId userId, AppUser appUser, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable<Follow>()
+            .Where(follow => follow.FollowerId == userId && appUser.Id == follow.FollowedMemberId)
+            .AnyAsync(cancellationToken);
+
+    /// <summary>
     /// InsertOneAsync the 'follow'.
     /// Increase Member's FollowdCount by 1.
     /// Use MongoDb Transaction/Session to rollback if Update Member fails.
@@ -129,7 +141,7 @@ public class FollowRepository : IFollowRepository
     /// <returns>appUsers</returns>
     private async Task<PagedList<AppUser>> GetAllFollowsFromDBAsync(FollowParams followParams, CancellationToken cancellationToken)
     {
-        if (followParams.Predicate.Equals("followings"))
+        if (followParams.Predicate == FollowPredicate.Followings)
         {
             var query = _collection.AsQueryable<Follow>()
                         .Where(follow => follow.FollowerId == followParams.UserId) // filter by Lisa's id
@@ -140,7 +152,7 @@ public class FollowRepository : IFollowRepository
 
             return await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
         }
-        else //(followParams.Predicate.Equals("followers"))
+        else // (followParams.Predicate == FollowPredicate.Followers)
         {
             var query = _collection.AsQueryable<Follow>()
                 .Where(follow => follow.FollowedMemberId == followParams.UserId)
