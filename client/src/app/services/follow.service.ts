@@ -6,6 +6,7 @@ import { Member } from '../models/member.model';
 import { PaginatedResult } from '../models/helpers/paginatedResult';
 import { PaginationHandler } from '../extensions/paginationHandler';
 import { FollowPredicate } from '../models/helpers/follow-predicate';
+import { ApiResponseMessage } from '../models/helpers/api-response-message';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class FollowService {
   private baseUrl = environment.apiUrl + 'follow/';
   private paginationHandler = new PaginationHandler();
 
-  addFollow(username: string): Observable<object> {
-    return this.http.post(this.baseUrl + username, {});
+  addFollow(username: string): Observable<ApiResponseMessage> {
+    return this.http.post<ApiResponseMessage>(this.baseUrl + username, {});
   }
 
   getFollows(predicate: FollowPredicate): Observable<PaginatedResult<Member[]>> {

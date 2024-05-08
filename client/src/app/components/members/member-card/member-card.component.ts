@@ -8,6 +8,7 @@ import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 import { take } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FollowService } from '../../../services/follow.service';
+import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 
 @Component({
   selector: 'app-member-card',
@@ -29,14 +30,10 @@ export class MemberCardComponent {
   addFollow(): void {
     if (this.member?.userName) {
       this.followService.addFollow(this.member.userName).pipe(take(1)).subscribe({
-        next: () =>
-          this.snackBar.open("You've followed " + this.member?.knownAs + '.', "Close", {
+        next: (response: ApiResponseMessage) => 
+          this.snackBar.open(response.message, "Close", {
             horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
           })
-        ,
-        error: err => this.snackBar.open(err.error, "Close", {
-          horizontalPosition: 'center', verticalPosition: 'top', duration: 7000
-        })
       });
     }
   }

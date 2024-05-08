@@ -4,28 +4,30 @@ namespace api.Controllers;
 public class FollowController(IFollowRepository _followRepository, IUserRepository _userRepository) : BaseApiController
 {
     [HttpPost("{targetMemberUserName}")]
-    public async Task<ActionResult> AddFollow(string targetMemberUserName, CancellationToken cancellationToken)
+    public async Task<ActionResult> Add(string targetMemberUserName, CancellationToken cancellationToken)
     {
         string? userIdHashed = User.GetUserIdHashed();
 
-        if (!string.IsNullOrEmpty(userIdHashed))
+        if (string.IsNullOrEmpty(userIdHashed)) return BadRequest("Your ID is not found. Login again.");
+
+        FollowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
+        if (followStatus.IsSuccess)
+            return Ok(new Response(Message: $"You are now following '{targetMemberUserName}'."));
+
+        if (followStatus.IsTargetMemberNotFound)
+            return BadRequest("Target member is not found.");
+
+        if (followStatus.IsFollowingThemself)
+            return BadRequest("Following yourself is great but is not stored!");
+
+        if (followStatus.IsAlreadyFollowed)
         {
-            FollowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
-            if (followStatus.IsSuccess)
-                return Ok();
-
-            if (followStatus.IsFollowingThemself)
-                return BadRequest("Following yourself is great but is not stored!");
-
-            if (followStatus.IsAlreadyFollowed)
-            {
-                string? knownAs = await _userRepository.GetKnownAsByUserNameAsync(targetMemberUserName, cancellationToken);
-                if (knownAs is not null)
-                    return BadRequest($"{knownAs} is already followed.");
-            }
+            string? knownAs = await _userRepository.GetKnownAsByUserNameAsync(targetMemberUserName, cancellationToken);
+            if (knownAs is not null)
+                return BadRequest($"{knownAs} is already followed.");
         }
 
-        return BadRequest("Following the member failed. Try again or contact the admin.");
+        return BadRequest("Follwoing has failed. Please try again later or contact the support");
     }
 
     [HttpGet]
