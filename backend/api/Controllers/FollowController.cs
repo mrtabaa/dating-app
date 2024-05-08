@@ -10,7 +10,7 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
 
         if (!string.IsNullOrEmpty(userIdHashed))
         {
-            FolowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
+            FollowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
             if (followStatus.IsSuccess)
                 return Ok();
 

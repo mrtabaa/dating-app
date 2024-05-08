@@ -1,6 +1,6 @@
 namespace api.Models.Helpers;
 
-public class FolowStatus
+public class FollowStatus
 {
     public bool IsSuccess { get; set; }
     public bool IsAlreadyFollowed { get; set; }
