@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
 import { PaginatedResult } from '../models/helpers/paginatedResult';
 import { PaginationHandler } from '../extensions/paginationHandler';
+import { FollowPredicate } from '../models/helpers/follow-predicate';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class FollowService {
     return this.http.post(this.baseUrl + username, {});
   }
 
-  getFollows(predicate: string): Observable<PaginatedResult<Member[]>> {
+  getFollows(predicate: FollowPredicate): Observable<PaginatedResult<Member[]>> {
     let params = new HttpParams();
     params = params.append('predicate', predicate);
 

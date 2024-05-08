@@ -23,3 +23,9 @@ public enum Roles
     moderator,
     member
 }
+
+public enum FollowPredicate
+{
+    Followings,
+    Followers
+}

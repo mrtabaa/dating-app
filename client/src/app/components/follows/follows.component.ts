@@ -10,6 +10,7 @@ import { Pagination } from '../../models/helpers/pagination';
 import { PaginatedResult } from "../../models/helpers/paginatedResult";
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { LoadingService } from '../../services/loading.service';
+import { FollowPredicate } from '../../models/helpers/follow-predicate';
 
 @Component({
   selector: 'app-follows',
@@ -26,7 +27,8 @@ export class FollowsComponent implements OnInit {
   private followService = inject(FollowService);
   loading = inject(LoadingService);
 
-  predicate: string = 'followings';
+  defautlPredicate = FollowPredicate;
+  predicate: FollowPredicate = FollowPredicate.followings;
   isMembersValid: boolean = true;
   subscribed: Subscription | undefined;
   members: Member[] | undefined;
@@ -67,11 +69,11 @@ export class FollowsComponent implements OnInit {
    */
   onTabChange(event: MatTabChangeEvent) { // called on tab change
     if (event.tab.textLabel == "Following") {
-      this.predicate = 'followings';
+      this.predicate = FollowPredicate.followings;
       this.getFollows();
     }
     else {
-      this.predicate = 'followers';
+      this.predicate = FollowPredicate.followers;
       this.getFollows()
     }
   }
