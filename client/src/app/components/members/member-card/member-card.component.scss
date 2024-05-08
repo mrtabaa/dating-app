@@ -64,9 +64,22 @@ $min_card_size: 9rem;
         align-items: center;
         padding: 0.5rem 0;
         cursor: pointer;
-
+        
         &:hover {
             background-color: rgb(255, 228, 255);
+        }
+
+        mat-card-subtitle {
+            width: $min_card_size;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            .more {
+                margin-bottom: 3px;
+                margin-right: 3px;
+                align-self: flex-end;
+            }
         }
     }
 
