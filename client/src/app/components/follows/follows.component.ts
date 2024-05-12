@@ -29,7 +29,6 @@ export class FollowsComponent implements OnInit {
 
   defautlPredicate = FollowPredicate;
   predicate: FollowPredicate = FollowPredicate.followings;
-  isMembersValid: boolean = true;
   subscribed: Subscription | undefined;
   members: Member[] | undefined;
 
@@ -47,8 +46,15 @@ export class FollowsComponent implements OnInit {
     this.getFollows();
   }
 
+  getMemberCardItemAndRemove($event: Member): void {
+    if (this.members) {
+      const index: number = this.members.indexOf($event);
+
+      this.members.splice(index, 1);
+    }
+  }
+
   getFollows(): void {
-    this.isMembersValid = true; // reset to default.
     this.members = []; // reset on each tab select
 
     this.subscribed = this.followService.getFollows(this.predicate).subscribe({
@@ -56,7 +62,6 @@ export class FollowsComponent implements OnInit {
         if (response.result && response.pagination) {
           this.members = response.result;
           this.pagination = response.pagination;
-          this.isMembersValid = this.members ? true : false;
         }
       }
     }

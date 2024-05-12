@@ -21,6 +21,10 @@ export class FollowService {
     return this.http.post<ApiResponseMessage>(this.baseUrl + username, {});
   }
 
+  removeFollow(username: string): Observable<ApiResponseMessage> {
+    return this.http.delete<ApiResponseMessage>(this.baseUrl + username, {});
+  }
+
   getFollows(predicate: FollowPredicate): Observable<PaginatedResult<Member[]>> {
     let params = new HttpParams();
     params = params.append('predicate', predicate);

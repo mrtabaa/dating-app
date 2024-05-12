@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Member } from '../../../models/member.model';
@@ -22,19 +22,40 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
   styleUrls: ['./member-card.component.scss']
 })
 export class MemberCardComponent {
-  @Input() member: Member | undefined;
+  @Input() memberIn: Member | undefined;
+  @Output() memberUserNameOut = new EventEmitter<Member>();
 
   private followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);
 
   addFollow(): void {
-    if (this.member?.userName) {
-      this.followService.addFollow(this.member.userName).pipe(take(1)).subscribe({
-        next: (response: ApiResponseMessage) => 
-          this.snackBar.open(response.message, "Close", {
-            horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
-          })
-      });
+    if (this.memberIn?.userName) {
+      this.followService.addFollow(this.memberIn.userName)
+        .pipe(
+          take(1))
+        .subscribe({
+          next: (response: ApiResponseMessage) =>
+            this.snackBar.open(response.message, "Close", {
+              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
+            })
+        });
+    }
+  }
+
+  removeFollow(): void {
+    if (this.memberIn?.userName) {
+      this.followService.removeFollow(this.memberIn.userName)
+        .pipe(
+          take(1))
+        .subscribe({
+          next: (response: ApiResponseMessage) => {
+            this.snackBar.open(response.message, "Close", {
+              horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
+            })
+
+            this.memberUserNameOut.emit(this.memberIn);
+          }
+        });
     }
   }
 }

@@ -1,30 +1,29 @@
-@if (member) {
+@if (memberIn) {
 <mat-card class="card">
     <div class="card-img-wrapper">
-        @if (member.photos.length === 0) {
-        <img ngSrc="/assets/images/defaults/user.png" width="128" height="128" priority alt="{{member.knownAs}} photo"
+        @if (memberIn.photos.length === 0) {
+        <img ngSrc="/assets/images/defaults/user.png" width="128" height="128" priority alt="{{memberIn.knownAs}} photo"
             mat-card-image>
         }
         @else {
-        @for (photo of member.photos; track $index) {
+        @for (photo of memberIn.photos; track $index) {
         @if (photo.isMain) {
-        <img ngSrc="{{photo.url_165}}" width="128" height="128" priority alt="{{member.knownAs}}"
-            mat-card-image>
+        <img ngSrc="{{photo.url_165}}" width="128" height="128" priority alt="{{memberIn.knownAs}}" mat-card-image>
         }
         }
         }
 
         <ul class="user-icons">
             <li>
-                @if(!member.following){
-                    <button (click)="addFollow()" mat-mini-fab>
-                        <mat-icon color="primary">person_add</mat-icon>
-                    </button>
+                @if(!memberIn.following){
+                <button (click)="addFollow()" mat-mini-fab>
+                    <mat-icon color="primary">person_add</mat-icon>
+                </button>
                 }
                 @else {
-                    <button (click)="addFollow()" mat-mini-fab>
-                        <mat-icon color="primary">person_remove</mat-icon>
-                    </button>
+                <button (click)="removeFollow()" mat-mini-fab>
+                    <mat-icon color="primary">person_remove</mat-icon>
+                </button>
                 }
             </li>
             <li>
@@ -34,23 +33,23 @@
             </li>
         </ul>
     </div>
-    <mat-card-header [routerLink]="['/member/' + member.userName]">
+    <mat-card-header [routerLink]="['/member/' + memberIn.userName]">
         <div class="title">
-            @switch (member.gender) {
-                @case ('male') {
-                    <mat-icon color="primary">boy</mat-icon>
-                }
-                @case ('female') {
-                    <mat-icon color="primary">girl</mat-icon>
-                }
-                @default {
-                    <mat-icon color="primary">group_add</mat-icon>
-                }
+            @switch (memberIn.gender) {
+            @case ('male') {
+            <mat-icon color="primary">boy</mat-icon>
             }
-            <mat-card-title>{{member.knownAs | shortenString:7 | titlecase}}, {{member.age}}</mat-card-title>
+            @case ('female') {
+            <mat-icon color="primary">girl</mat-icon>
+            }
+            @default {
+            <mat-icon color="primary">group_add</mat-icon>
+            }
+            }
+            <mat-card-title>{{memberIn.knownAs | shortenString:7 | titlecase}}, {{memberIn.age}}</mat-card-title>
         </div>
         <mat-card-subtitle>
-            {{member.city | titlecase}}
+            {{memberIn.city | titlecase}}
             <mat-icon class="more" color="primary" mat-min-fab>read_more</mat-icon>
         </mat-card-subtitle>
     </mat-card-header>
