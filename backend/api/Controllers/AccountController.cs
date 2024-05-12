@@ -12,7 +12,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+        return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
@@ -25,7 +25,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     {
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userIn, cancellationToken);
 
-        return (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+        return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
