@@ -1,8 +1,10 @@
 namespace api.Controllers;
 
+[Authorize]
 [Produces("application/json")]
 public class AccountController(IAccountRepository _accountRepository) : BaseApiController
 {
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<LoggedInDto>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
@@ -10,30 +12,33 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return loggedInDto.Token is null ? BadRequest("Registration has failed. Try again.") : loggedInDto;
+        if (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+            return Ok(loggedInDto);
+        else if (loggedInDto.Errors.Count != 0)
+            return BadRequest(loggedInDto.Errors);
+        else
+            return BadRequest("Registration has failed. Try again or contact the support.");
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<LoggedInDto>> Login(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<ActionResult<LoggedInDto>> Login(LoginDto userIn, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(userInput.EmailUsername))
-            return BadRequest("Email or Username is required");
+        LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userIn, cancellationToken);
 
-        LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userInput, cancellationToken);
-
-        if (loggedInDto.IsWrongCreds) return Unauthorized("Invalid username or password.");
-
-        return loggedInDto.Token is null ? BadRequest("Login has failed. Try again.") : loggedInDto;
+        if (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+            return Ok(loggedInDto);
+        else if (loggedInDto.IsWrongCreds)
+            return Unauthorized("Invalid username or password.");
+        else if (loggedInDto.Errors.Count != 0)
+            return BadRequest(loggedInDto.Errors);
+        else
+            return BadRequest("Login has failed. Try again or contact the support.");
     }
 
-    [Authorize]
     [HttpGet]
-    public async Task<ActionResult<LoggedInDto>> AuthorizeLoggedInUser(CancellationToken cancellationToken)
+    public async Task<ActionResult<LoggedInDto>> ReloadLoggedInUser(CancellationToken cancellationToken)
     {
-        string? userIdHashed = User.GetUserIdHashed();
-        if (string.IsNullOrEmpty(userIdHashed))
-            return BadRequest("No user was found with this user Id.");
-
         // obtain token value
         string? token = null;
 
@@ -43,12 +48,15 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         if (string.IsNullOrEmpty(token))
             return BadRequest("Token is expired or invalid. Login again.");
 
-        LoggedInDto? loggedInDto = await _accountRepository.ReloadLoggedInUser(userIdHashed, token, cancellationToken);
+        string? userIdHashed = User.GetUserIdHashed();
+        if (string.IsNullOrEmpty(userIdHashed))
+            return BadRequest("No user was found with this user Id.");
+
+        LoggedInDto? loggedInDto = await _accountRepository.ReloadLoggedInUserAsync(userIdHashed, token, cancellationToken);
 
         return loggedInDto is null ? Unauthorized("User is logged out or unauthorized. Login again.") : loggedInDto;
     }
 
-    [Authorize]
     [HttpDelete("delete-user")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {

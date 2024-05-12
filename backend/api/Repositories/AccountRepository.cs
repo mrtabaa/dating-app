@@ -89,7 +89,7 @@ public class AccountRepository : IAccountRepository
         return loggedInDto;
     }
 
-    public async Task<LoggedInDto?> ReloadLoggedInUser(string userIdHashed, string token, CancellationToken cancellationToken)
+    public async Task<LoggedInDto?> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
 
