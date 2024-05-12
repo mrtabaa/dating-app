@@ -1,7 +1,7 @@
 namespace api.Controllers;
 
 [Authorize]
-public class FollowController(IFollowRepository _followRepository, IUserRepository _userRepository) : BaseApiController
+public class FollowController(IFollowRepository _followRepository) : BaseApiController
 {
     [HttpPost("{targetMemberUserName}")]
     public async Task<ActionResult> Add(string targetMemberUserName, CancellationToken cancellationToken)
@@ -11,36 +11,32 @@ public class FollowController(IFollowRepository _followRepository, IUserReposito
         if (string.IsNullOrEmpty(userIdHashed)) return BadRequest("Your ID is not found. Login again.");
 
         FollowStatus followStatus = await _followRepository.AddFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
-        if (followStatus.IsSuccess)
-            return Ok(new Response(Message: $"You are now following '{targetMemberUserName}'."));
 
-        if (followStatus.IsTargetMemberNotFound)
-            return BadRequest("Target member is not found.");
-
-        if (followStatus.IsFollowingThemself)
-            return BadRequest("Following yourself is great but is not stored!");
-
-        if (followStatus.IsAlreadyFollowed)
-        {
-            string? knownAs = await _userRepository.GetKnownAsByUserNameAsync(targetMemberUserName, cancellationToken);
-            if (knownAs is not null)
-                return BadRequest($"{knownAs} is already followed.");
-        }
-
-        return BadRequest("Follwoing has failed. Please try again later or contact the support");
+        return followStatus.IsSuccess // success
+            ? Ok(new Response(Message: $"You are now following '{followStatus.KnownAs}'."))
+            : followStatus.IsTargetMemberNotFound
+            ? BadRequest($"'{followStatus.KnownAs}' is not found.")
+            : followStatus.IsFollowingThemself
+            ? BadRequest("Following yourself is great but is not stored!")
+            : followStatus.IsAlreadyFollowed
+            ? BadRequest($"{followStatus.KnownAs} is already followed.")
+            : BadRequest("Follwoing has failed. Please try again later or contact the support");
     }
 
     [HttpDelete("{targetMemberUserName}")]
     public async Task<ActionResult> Delete(string targetMemberUserName, CancellationToken cancellationToken)
     {
         string? userIdHashed = User.GetUserIdHashed();
+        if (string.IsNullOrEmpty(userIdHashed))
+            return BadRequest("Your not authorized. Please login again.");
 
-        if (string.IsNullOrEmpty(userIdHashed)) return BadRequest("Your ID is not found. Login again.");
+        FollowStatus followStatus = await _followRepository.RemoveFollowAsync(userIdHashed, targetMemberUserName, cancellationToken);
 
-        if (await _followRepository.RemoveFollowAsync(userIdHashed, targetMemberUserName, cancellationToken))
-            return Ok(new Response(Message: $"You've unfollowed '{targetMemberUserName}'."));
-
-        return BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support");
+        return string.IsNullOrEmpty(userIdHashed)
+            ? BadRequest("Your ID is not found. Login again.")
+            : followStatus.IsSuccess
+            ? Ok(new Response(Message: $"You've unfollowed '{followStatus.KnownAs}'."))
+            : BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support");
     }
 
     [HttpGet]

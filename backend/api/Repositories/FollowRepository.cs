@@ -44,22 +44,26 @@ public class FollowRepository : IFollowRepository
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
-        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
+        AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
 
-        if (followedId.Equals(ObjectId.Empty))
+        if (followedMember is null)
         {
             followStatus.IsTargetMemberNotFound = true;
             return followStatus;
         }
 
-        if (userId == followedId)
+        if (userId == followedMember.Id)
         {
             followStatus.IsFollowingThemself = true;
             return followStatus;
         }
 
         bool IsAlreadyFollowed = await _collection.Find<Follow>(follow =>
-        follow.FollowerId == userId && follow.FollowedMemberId == followedId).AnyAsync(cancellationToken);
+            follow.FollowerId == userId && follow.FollowedMemberId == followedMember.Id)
+            .AnyAsync(cancellationToken);
+
+        // set knownAs to show in controller's messages
+        followStatus.KnownAs = followedMember.KnownAs;
 
         if (IsAlreadyFollowed)
         {
@@ -67,11 +71,11 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-        Follow? follow = Mappers.ConvertAppUsertoFollow(userId, followedId);
+        Follow? follow = Mappers.ConvertAppUsertoFollow(userId, followedMember);
 
         if (follow is not null)
         {
-            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedId, FollowAddOrRemove.IsAdded, cancellationToken, follow);
+            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMember.Id, FollowAddOrRemove.IsAdded, cancellationToken, follow);
 
             followStatus.IsSuccess = isSuccess;
         }
@@ -88,17 +92,30 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedMemberUserName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>true: sucess. false: fail</returns>
-    public async Task<bool> RemoveFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
+    public async Task<FollowStatus> RemoveFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
     {
+        FollowStatus followStatus = new();
+
         ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return false;
+        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
-        ObjectId? followedId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
+        AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
 
-        if (followedId.Equals(ObjectId.Empty))
-            return false;
+        if (followedMember is null)
+        {
+            followStatus.IsTargetMemberNotFound = true;
+            return followStatus;
+        }
 
-        return await SaveInDbWithSessionAsync(userId, followedId, FollowAddOrRemove.IsRemoved, cancellationToken);
+        // set knownAs to show in controller's messages
+        followStatus.KnownAs = followedMember.KnownAs;
+
+        bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMember.Id, FollowAddOrRemove.IsRemoved, cancellationToken);
+
+        if (isSuccess)
+            followStatus.IsSuccess = true;
+
+        return followStatus;
     }
 
     /// <summary>
@@ -166,7 +183,7 @@ public class FollowRepository : IFollowRepository
                 var filter = Builders<Follow>.Filter.Where(follow => follow.FollowerId == userId && follow.FollowedMemberId == followedId);
 
                 // follow doc doesn't exists. May be already deleted. 
-                if(!await _collection.Find<Follow>(filter).AnyAsync(cancellationToken))
+                if (!await _collection.Find<Follow>(filter).AnyAsync(cancellationToken))
                     return false;
 
                 await _collection.DeleteOneAsync(session, filter, null, cancellationToken);
