@@ -12,12 +12,11 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        if (!string.IsNullOrEmpty(loggedInDto.Token)) // success
-            return Ok(loggedInDto);
-        else if (loggedInDto.Errors.Count != 0)
-            return BadRequest(loggedInDto.Errors);
-        else
-            return BadRequest("Registration has failed. Try again or contact the support.");
+        return (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+            ? Ok(loggedInDto)
+            : (loggedInDto.Errors.Count != 0)
+            ? BadRequest(loggedInDto.Errors)
+            : BadRequest("Registration has failed. Try again or contact the support.");
     }
 
     [AllowAnonymous]
@@ -26,14 +25,11 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     {
         LoggedInDto? loggedInDto = await _accountRepository.LoginAsync(userIn, cancellationToken);
 
-        if (!string.IsNullOrEmpty(loggedInDto.Token)) // success
-            return Ok(loggedInDto);
-        else if (loggedInDto.IsWrongCreds)
-            return Unauthorized("Invalid username or password.");
-        else if (loggedInDto.Errors.Count != 0)
-            return BadRequest(loggedInDto.Errors);
-        else
-            return BadRequest("Login has failed. Try again or contact the support.");
+        return (!string.IsNullOrEmpty(loggedInDto.Token)) // success
+            ? Ok(loggedInDto)
+            : (loggedInDto.Errors.Count != 0)
+            ? BadRequest(loggedInDto.Errors)
+            : BadRequest("Registration has failed. Try again or contact the support.");
     }
 
     [HttpGet]
