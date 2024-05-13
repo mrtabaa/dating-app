@@ -17,7 +17,7 @@ public class MemberController(
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
-        string? gender = await _userRepository.GetGenderByHashedIdAsync(userId.Value, cancellationToken);
+        string? gender = await _userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
 
         if (gender is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
