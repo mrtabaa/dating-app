@@ -11,6 +11,7 @@ import { PaginatedResult } from "../../models/helpers/paginatedResult";
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { LoadingService } from '../../services/loading.service';
 import { FollowPredicate } from '../../models/helpers/follow-predicate';
+import { FollowModifiedEmit } from '../../models/helpers/follow-modified-emit';
 
 @Component({
   selector: 'app-follows',
@@ -46,14 +47,6 @@ export class FollowsComponent implements OnInit {
     this.getFollows();
   }
 
-  getMemberCardItemAndRemove($event: Member): void {
-    if (this.members) {
-      const index: number = this.members.indexOf($event);
-
-      this.members.splice(index, 1);
-    }
-  }
-
   getFollows(): void {
     this.members = []; // reset on each tab select
 
@@ -68,12 +61,17 @@ export class FollowsComponent implements OnInit {
     );
   }
 
+  modifyFollowUnfollowIcon($event: FollowModifiedEmit): void {
+    if (this.members)
+      this.members = this.followService.modifyFollowUnfollowIcon(this.members, $event);
+  }
+
   /**
    * Set predicate based on each tab then call getFollows()
    * @param event 
    */
   onTabChange(event: MatTabChangeEvent) { // called on tab change
-    if (event.tab.textLabel == "Following") {
+    if (event.tab.textLabel === "Following") {
       this.predicate = FollowPredicate.followings;
       this.getFollows();
     }

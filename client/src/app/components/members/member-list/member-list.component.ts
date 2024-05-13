@@ -12,6 +12,8 @@ import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsMo
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
+import { FollowService } from '../../../services/follow.service';
 
 @Component({
   selector: 'app-user-list',
@@ -27,6 +29,7 @@ import { MatDividerModule } from '@angular/material/divider';
 export class MemberListComponent implements OnDestroy {
   //#region Variables
   private memberService = inject(MemberService);
+  private followService = inject(FollowService);
   private fb = inject(FormBuilder);
 
   subscribed: Subscription | undefined;
@@ -131,6 +134,11 @@ export class MemberListComponent implements OnDestroy {
 
       this.memberService.setMemberParams(this.memberParams);
     }
+  }
+
+  modifyFollowUnfollowIcon($event: FollowModifiedEmit): void {
+    if (this.members)
+      this.members = this.followService.modifyFollowUnfollowIcon(this.members, $event);
   }
 
   private initAgesRange(): void {

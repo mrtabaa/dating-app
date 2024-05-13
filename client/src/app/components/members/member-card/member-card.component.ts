@@ -9,6 +9,7 @@ import { take } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FollowService } from '../../../services/follow.service';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
+import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
 
 @Component({
   selector: 'app-member-card',
@@ -23,7 +24,7 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
 })
 export class MemberCardComponent {
   @Input() memberIn: Member | undefined;
-  @Output() memberUserNameOut = new EventEmitter<Member>();
+  @Output() memberUserNameOut = new EventEmitter<FollowModifiedEmit>();
 
   private followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);
@@ -34,10 +35,13 @@ export class MemberCardComponent {
         .pipe(
           take(1))
         .subscribe({
-          next: (response: ApiResponseMessage) =>
+          next: (response: ApiResponseMessage) => {
             this.snackBar.open(response.message, "Close", {
               horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
-            })
+            });
+
+            this.setFollowModifiedEmit(true);
+          }
         });
     }
   }
@@ -51,11 +55,22 @@ export class MemberCardComponent {
           next: (response: ApiResponseMessage) => {
             this.snackBar.open(response.message, "Close", {
               horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
-            })
+            });
 
-            this.memberUserNameOut.emit(this.memberIn);
+            this.setFollowModifiedEmit(false);
           }
         });
+    }
+  }
+
+  private setFollowModifiedEmit(isFollowing: boolean): void {
+    if (this.memberIn) {
+      const followModifiedEmit: FollowModifiedEmit = {
+        member: this.memberIn,
+        isFollowing: isFollowing
+      };
+
+      this.memberUserNameOut.emit(followModifiedEmit);
     }
   }
 }

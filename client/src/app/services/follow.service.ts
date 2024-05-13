@@ -7,6 +7,7 @@ import { PaginatedResult } from '../models/helpers/paginatedResult';
 import { PaginationHandler } from '../extensions/paginationHandler';
 import { FollowPredicate } from '../models/helpers/follow-predicate';
 import { ApiResponseMessage } from '../models/helpers/api-response-message';
+import { FollowModifiedEmit } from '../models/helpers/follow-modified-emit';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,15 @@ export class FollowService {
     params = params.append('predicate', predicate);
 
     return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params);
+  }
+
+  modifyFollowUnfollowIcon(members: Member[], followEmit: FollowModifiedEmit): Member[] {
+    for (const member of members) {
+      if (member === followEmit.member) {
+        member.following = followEmit.isFollowing;
+      }
+    }
+
+    return members;
   }
 }

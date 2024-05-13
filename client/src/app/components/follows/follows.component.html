@@ -6,7 +6,7 @@
             <div class="members">
                 @if(members && members.length > 0) {
                 @for (member of members; track $index;) {
-                <app-member-card [memberIn]="member" (memberUserNameOut)="getMemberCardItemAndRemove($event)" />
+                <app-member-card [memberIn]="member" (memberUserNameOut)="modifyFollowUnfollowIcon($event)" />
                 }
                 }
                 @else if(!loading.isLoading) {
@@ -21,7 +21,7 @@
             <div class="members">
                 @if(members && members.length > 0) {
                 @for (member of members; track $index;) {
-                <app-member-card [memberIn]="member" />
+                <app-member-card [memberIn]="member" (memberUserNameOut)="modifyFollowUnfollowIcon($event)" />
                 }
                 }
                 @else if(!loading.isLoading) {
