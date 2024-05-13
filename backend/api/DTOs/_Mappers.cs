@@ -42,27 +42,24 @@ namespace api.DTOs
             };
         }
 
-        public static MemberDto? ConvertAppUserToMemberDto(AppUser appUser, bool following = false)
+        public static MemberDto ConvertAppUserToMemberDto(AppUser appUser, bool following = false)
         {
-            if (appUser.Schema is not null)
-                return new MemberDto(
-                    Schema: appUser.Schema,
-                    UserName: appUser.UserName,
-                    Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
-                    KnownAs: appUser.KnownAs,
-                    Created: appUser.CreatedOn,
-                    LastActive: appUser.LastActive,
-                    Gender: appUser.Gender,
-                    Introduction: appUser.Introduction,
-                    LookingFor: appUser.LookingFor,
-                    Interests: appUser.Interests,
-                    City: appUser.City,
-                    Country: appUser.Country,
-                    Photos: appUser.Photos,
-                    Following: following
-                );
-
-            return null;
+            return new MemberDto(
+                Schema: appUser.Schema,
+                UserName: appUser.UserName,
+                Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
+                KnownAs: appUser.KnownAs,
+                Created: appUser.CreatedOn,
+                LastActive: appUser.LastActive,
+                Gender: appUser.Gender,
+                Introduction: appUser.Introduction,
+                LookingFor: appUser.LookingFor,
+                Interests: appUser.Interests,
+                City: appUser.City,
+                Country: appUser.Country,
+                Photos: appUser.Photos,
+                Following: following
+            );
         }
 
         public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl)

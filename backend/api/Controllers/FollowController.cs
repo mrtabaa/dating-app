@@ -38,7 +38,7 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
@@ -57,7 +57,7 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
-        List<MemberDto?> memberDtos = [];
+        List<MemberDto> memberDtos = [];
 
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
