@@ -2,13 +2,17 @@ namespace api.Controllers;
 
 [Authorize]
 // [Produces("application/json")]
-public class UserController(IUserRepository _userRepository) : BaseApiController
+public class UserController(IUserRepository _userRepository, ITokenService _tokenService) : BaseApiController
 {
     #region User Management
     [HttpPut]
     public async Task<ActionResult> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
+        UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, userId.Value, cancellationToken);
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Update failed. Try again later or if the issue persists contact the support.")
@@ -24,11 +28,15 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
         /*                          ** Photo Upload Steps/Process **
             UserController => UserRepository: GetById() => PhotoService => PhotoModifySaveService
             PhotoService => UserRepository: MongoDb, return Photo => UserController
         */
-        PhotoUploadStatus photoUploadStatus = await _userRepository.UploadPhotoAsync(file, User.GetUserIdHashed(), cancellationToken);
+        PhotoUploadStatus photoUploadStatus = await _userRepository.UploadPhotoAsync(file, userId.Value, cancellationToken);
 
         if (photoUploadStatus.IsMaxPhotoReached)
             return BadRequest($"You've reach the limit of {photoUploadStatus.MaxPhotosLimit} photos. Delete some photos to add more.");
@@ -39,7 +47,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpPut("set-main-photo")]
     public async Task<ActionResult> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        UpdateResult? updateResult = await _userRepository.SetMainPhotoAsync(User.GetUserIdHashed(), photoUrlIn, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
+        UpdateResult? updateResult = await _userRepository.SetMainPhotoAsync(userId.Value, photoUrlIn, cancellationToken);
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Set as main photo failed. Try again in a few moments. If the issue persists contact the admin.")
@@ -49,7 +61,11 @@ public class UserController(IUserRepository _userRepository) : BaseApiController
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        UpdateResult? updateResult = await _userRepository.DeletePhotoAsync(User.GetUserIdHashed(), photoUrlIn, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
+        UpdateResult? updateResult = await _userRepository.DeletePhotoAsync(userId.Value, photoUrlIn, cancellationToken);
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the support.")

@@ -25,21 +25,11 @@ public class UserRepository : IUserRepository
     #region CRUD
 
     #region User Management
-    public async Task<AppUser?> GetByIdAsync(ObjectId? userId, CancellationToken cancellationToken) =>
-       userId.HasValue && !userId.Value.Equals(ObjectId.Empty)
-       ? await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken)
-       : null;
+    public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
+        await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<AppUser?> GetByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(userIdHashed)) return null;
-
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
-
-        return await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-    }
+    public async Task<AppUser?> GetByHashedIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
+         await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
       await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
@@ -56,18 +46,14 @@ public class UserRepository : IUserRepository
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<string?> GetGenderByHashedIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
+    public async Task<string?> GetGenderByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
             .Where<AppUser>(appUser => appUser.Id == userId)
             .Select(appUser => appUser.Gender)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userIdHashed, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, ObjectId userId, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
-
         var updatedUser = Builders<AppUser>.Update
         .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
         .Set(appUser => appUser.Introduction, userUpdateDto.Introduction?.Trim())
@@ -82,13 +68,9 @@ public class UserRepository : IUserRepository
     #endregion User Management
 
     #region Photo Management
-    public async Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, string? userIdHashed, CancellationToken cancellationToken)
+    public async Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, ObjectId userId, CancellationToken cancellationToken)
     {
         PhotoUploadStatus photoUploadStatus = new();
-
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return photoUploadStatus;
 
         AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
@@ -143,12 +125,8 @@ public class UserRepository : IUserRepository
         return photoUploadStatus;
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(string? userIdHashed, string blob_url_165_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> SetMainPhotoAsync(ObjectId userId, string blob_url_165_In, CancellationToken cancellationToken)
     {
-        // Convert string userIdHashed to ObjectId userId
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
-
         // Convert blobUri to dbUri
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In, containerName: "photos");
         if (string.IsNullOrEmpty(dbUri)) return null;
@@ -177,12 +155,8 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
-    public async Task<UpdateResult?> DeletePhotoAsync(string? userIdHashed, string? blob_url_165_In, CancellationToken cancellationToken)
+    public async Task<UpdateResult?> DeletePhotoAsync(ObjectId userId, string? blob_url_165_In, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
-
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In, containerName: "photos");
 
         // Find the photo in AppUser
