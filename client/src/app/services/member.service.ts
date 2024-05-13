@@ -53,14 +53,15 @@ export class MemberService {
 
     const params = this.getHttpParams();
 
-    return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params).pipe(
-      map(response => {
-        if (this.memberParams)
-          this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
-        
-        return response;
-      })
-    );
+    return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params)
+      .pipe(
+        map(response => {
+          if (this.memberParams)
+            this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+
+          return response;
+        })
+      );
   }
 
   /**
