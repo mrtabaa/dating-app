@@ -16,7 +16,6 @@ export class MemberService {
   private accountService = inject(AccountService);
 
   private paginationHandler = new PaginationHandler();
-
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
   memberParams: MemberParams | undefined;
@@ -58,6 +57,7 @@ export class MemberService {
       map(response => {
         if (this.memberParams)
           this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+        
         return response;
       })
     );
