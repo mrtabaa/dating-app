@@ -12,6 +12,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { LoadingService } from '../../services/loading.service';
 import { FollowPredicate } from '../../models/helpers/follow-predicate';
 import { FollowModifiedEmit } from '../../models/helpers/follow-modified-emit';
+import { FollowParams } from '../../models/helpers/follow-params';
 
 @Component({
   selector: 'app-follows',
@@ -28,11 +29,10 @@ export class FollowsComponent implements OnInit {
   private followService = inject(FollowService);
   loading = inject(LoadingService);
 
-  defautlPredicate = FollowPredicate;
-  predicate: FollowPredicate = FollowPredicate.followings;
   subscribed: Subscription | undefined;
   members: Member[] | undefined;
 
+  followPredicate = FollowPredicate;
   pagination: Pagination | undefined;
   pageNumber = 1;
   pageSize = 5;
@@ -42,23 +42,27 @@ export class FollowsComponent implements OnInit {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent | undefined;
+  followParams: FollowParams | undefined;
 
   ngOnInit(): void {
+    this.followParams = new FollowParams();
+
     this.getFollows();
   }
 
   getFollows(): void {
     this.members = []; // reset on each tab select
 
-    this.subscribed = this.followService.getFollows(this.predicate).subscribe({
-      next: (response: PaginatedResult<Member[]>) => {
-        if (response.result && response.pagination) {
-          this.members = response.result;
-          this.pagination = response.pagination;
+    if (this.followParams)
+      this.subscribed = this.followService.getFollows(this.followParams).subscribe({
+        next: (response: PaginatedResult<Member[]>) => {
+          if (response.result && response.pagination) {
+            this.members = response.result;
+            this.pagination = response.pagination;
+          }
         }
       }
-    }
-    );
+      );
   }
 
   modifyFollowUnfollowIcon($event: FollowModifiedEmit): void {
@@ -72,20 +76,27 @@ export class FollowsComponent implements OnInit {
    */
   onTabChange(event: MatTabChangeEvent) { // called on tab change
     if (event.tab.textLabel === "Following") {
-      this.predicate = FollowPredicate.followings;
-      this.getFollows();
+      if (this.followParams)
+        this.followParams.predicate = FollowPredicate.followings;
     }
     else {
-      this.predicate = FollowPredicate.followers;
-      this.getFollows()
+      if (this.followParams)
+        this.followParams.predicate = FollowPredicate.followers;
     }
+
+    this.getFollows()
   }
 
   handlePageEvent(e: PageEvent) {
-    this.pageEvent = e;
-    this.pageSize = e.pageSize;
-    this.pageNumber = e.pageIndex + 1;
+    if (this.followParams) {
+      if (e.pageSize !== this.followParams.pageSize)
+        e.pageIndex = 0;
 
-    this.getFollows();
+      this.pageEvent = e;
+      this.followParams.pageSize = e.pageSize;
+      this.followParams.pageNumber = e.pageIndex + 1;
+
+      this.getFollows();
+    }
   }
 }

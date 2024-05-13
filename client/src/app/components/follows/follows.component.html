@@ -1,7 +1,7 @@
 <main>
     <mat-tab-group (selectedTabChange)="onTabChange($event)">
         <mat-tab label="Following">
-            @if(predicate === defautlPredicate.followings)
+            @if(followParams?.predicate === followPredicate.followings)
             {
             <div class="members">
                 @if(members && members.length > 0) {
@@ -16,7 +16,7 @@
             }
         </mat-tab>
         <mat-tab label="Followers">
-            @if(predicate === defautlPredicate.followers)
+            @if(followParams?.predicate === followPredicate.followers)
             {
             <div class="members">
                 @if(members && members.length > 0) {
