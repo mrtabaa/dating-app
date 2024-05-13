@@ -56,25 +56,11 @@ public class UserRepository : IUserRepository
             .Select(appUser => appUser.KnownAs)
             .FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<IdAndStringValue?> GetGenderByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken)
-    {
-        IdAndStringValue idAndGender = new();
-
-        if (string.IsNullOrEmpty(userIdHashed)) return null;
-
-        idAndGender.Id = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (!idAndGender.Id.HasValue || idAndGender.Id.Value.Equals(ObjectId.Empty)) return null;
-
-        idAndGender.Value = await _collection.AsQueryable()
-            .Where<AppUser>(appUser => appUser.Id == idAndGender.Id)
+    public async Task<string?> GetGenderByHashedIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable()
+            .Where<AppUser>(appUser => appUser.Id == userId)
             .Select(appUser => appUser.Gender)
             .FirstOrDefaultAsync(cancellationToken);
-
-        if (string.IsNullOrEmpty(idAndGender.Value)) return null;
-
-        return idAndGender;
-    }
 
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userIdHashed, CancellationToken cancellationToken)
     {

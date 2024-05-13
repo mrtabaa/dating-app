@@ -33,16 +33,13 @@ public class FollowRepository : IFollowRepository
     /// The UpdateFollowingsCount() UpdateFollowersCount() are called to increment 1 in their AppUsers.
     /// MongoDb Session/Transaction is used. 
     /// </summary>
-    /// <param name="userIdHashed"></param>
+    /// <param name="userId"></param>
     /// <param name="followedMemberUserName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>FollowStatus</returns>
-    public async Task<FollowStatus> AddFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
+    public async Task<FollowStatus> AddFollowAsync(ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken)
     {
         FollowStatus followStatus = new();
-
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
         AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
 
@@ -88,16 +85,13 @@ public class FollowRepository : IFollowRepository
     /// The UpdateFollowingsCount() UpdateFollowersCount() are called to decrement 1 from their AppUsers. 
     /// MongoDb Session/Transaction is used. 
     /// </summary>
-    /// <param name="userIdHashed"></param>
+    /// <param name="userId"></param>
     /// <param name="followedMemberUserName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>true: sucess. false: fail</returns>
-    public async Task<FollowStatus> RemoveFollowAsync(string userIdHashed, string followedMemberUserName, CancellationToken cancellationToken)
+    public async Task<FollowStatus> RemoveFollowAsync(ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken)
     {
         FollowStatus followStatus = new();
-
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return followStatus;
 
         AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
 
@@ -121,16 +115,12 @@ public class FollowRepository : IFollowRepository
     /// <summary>
     /// Find only members which the loggedInUser is following. 
     /// </summary>
-    /// <param name="userIdHashed"></param>
+    /// <param name="userId"></param>
     /// <param name="followParams"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>PagedList<AppUser>?. Return null if userIdHashed is invalid</returns>
-    public async Task<PagedList<AppUser>?> GetFollowMembersAsync(string userIdHashed, FollowParams followParams, CancellationToken cancellationToken)
+    /// <returns>PagedList<AppUser>?. Return null if userId is invalid</returns>
+    public async Task<PagedList<AppUser>?> GetFollowMembersAsync(ObjectId userId, FollowParams followParams, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
-
-        if (userId.Value.Equals(ObjectId.Empty) || !userId.HasValue) return null;
-
         followParams.UserId = userId;
 
         return await GetAllFollowsFromDBAsync(followParams, cancellationToken);
@@ -158,8 +148,8 @@ public class FollowRepository : IFollowRepository
     /// <param name="cancellationToken"></param>
     /// <returns>bool isSuccess</returns>
     private async Task<bool> SaveInDbWithSessionAsync(
-        ObjectId? userId,
-        ObjectId? followedId,
+        ObjectId userId,
+        ObjectId followedId,
         FollowAddOrRemove followAddOrRemove,
         CancellationToken cancellationToken,
         Follow? follow = null
@@ -246,7 +236,7 @@ public class FollowRepository : IFollowRepository
     /// <param name="followerId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId? followerId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId followerId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateFollowedByCount;
 
@@ -272,7 +262,7 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId? followedId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId followedId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateFollowerCount;
 

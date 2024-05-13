@@ -75,16 +75,22 @@ public class TokenService : ITokenService
     }
 
     /// <summary>
-    /// Get a hashed ObjecdId of the AppUser and return the user's actual ObjectId from DB.
+    /// Get a hashed ObjecdId of the AppUser and return the user's actual ObjectId from DB or null if conversion failes.
     /// </summary>
     /// <param name="userIdHashed"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Decrypted AppUser ObjedId</returns>
-    public async Task<ObjectId?> GetActualUserId(string? userIdHashed, CancellationToken cancellationToken) =>
-        string.IsNullOrEmpty(userIdHashed)
-        ? null
-        : await _collection.AsQueryable()
+    /// <returns>Decrypted AppUser ObjedId OR null</returns>
+    public async Task<ObjectId?> GetActualUserId(string? userIdHashed, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(userIdHashed)) return null;
+
+        ObjectId? userId = await _collection.AsQueryable()
             .Where(appUser => appUser.IdentifierHash == userIdHashed)
             .Select(appUser => appUser.Id)
             .SingleOrDefaultAsync(cancellationToken);
+
+        return (userId is null || !userId.HasValue || userId.Value.Equals(ObjectId.Empty))
+            ? null // user id is not found
+            : userId;
+    }
 }

@@ -13,12 +13,16 @@ public class MemberController(
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
-        IdAndStringValue? idAndGender = await _userRepository.GetGenderByHashedIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
 
-        if (idAndGender is not null && string.IsNullOrEmpty(memberParams.Gender))
+        string? gender = await _userRepository.GetGenderByHashedIdAsync(userId.Value, cancellationToken);
+
+        if (gender is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
-            memberParams.UserId = idAndGender.Id;
-            memberParams.Gender = idAndGender.Value == "male" ? "female" : "male"; // value is gender here
+            memberParams.UserId = userId;
+            memberParams.Gender = gender == "male" ? "female" : "male"; // value is gender here
         }
 
         PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
@@ -34,17 +38,12 @@ public class MemberController(
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
         List<MemberDto?> memberDtos = [];
 
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return BadRequest("User id is not valid. Login again.");
-
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
             if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, following: true));
             else
-            {
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
-            }
         }
 
         return memberDtos;

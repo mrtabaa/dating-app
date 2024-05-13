@@ -6,7 +6,7 @@ public interface IUserRepository
     public Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken);
     public Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken);
     public Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken);
-    public Task<IdAndStringValue?> GetGenderByHashedIdAsync(string? userIdHashed, CancellationToken cancellationToken);
+    public Task<string?> GetGenderByHashedIdAsync(ObjectId userId, CancellationToken cancellationToken);
 
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, string? userId, CancellationToken cancellationToken);
     public Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, string? userId, CancellationToken cancellationToken);
