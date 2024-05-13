@@ -27,6 +27,19 @@ public class FollowRepository : IFollowRepository
         _logger = logger;
     }
     #endregion
+    /// <summary>
+    /// Find only members which the loggedInUser is following. 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="followParams"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>PagedList<AppUser>?. Return null if userId is invalid</returns>
+    public async Task<PagedList<AppUser>?> GetFollowMembersAsync(ObjectId userId, FollowParams followParams, CancellationToken cancellationToken)
+    {
+        followParams.UserId = userId;
+
+        return await GetAllFollowsFromDBAsync(followParams, cancellationToken);
+    }
 
     /// <summary>
     /// /// Gets a member UserName and follows the member. A Follow doc is added to the db "follows" collection.
@@ -110,20 +123,6 @@ public class FollowRepository : IFollowRepository
             followStatus.IsSuccess = true;
 
         return followStatus;
-    }
-
-    /// <summary>
-    /// Find only members which the loggedInUser is following. 
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="followParams"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>PagedList<AppUser>?. Return null if userId is invalid</returns>
-    public async Task<PagedList<AppUser>?> GetFollowMembersAsync(ObjectId userId, FollowParams followParams, CancellationToken cancellationToken)
-    {
-        followParams.UserId = userId;
-
-        return await GetAllFollowsFromDBAsync(followParams, cancellationToken);
     }
 
     /// <summary>
