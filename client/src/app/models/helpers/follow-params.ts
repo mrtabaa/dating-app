@@ -2,6 +2,6 @@ import { FollowPredicate } from "./follow-predicate";
 
 export class FollowParams {
     pageNumber = 1;
-    pageSize = 5;
+    pageSize = 10;
     predicate = FollowPredicate.followings;
 }

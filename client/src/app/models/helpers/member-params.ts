@@ -1,6 +1,6 @@
 export class MemberParams {
     pageNumber = 1;
-    pageSize = 5;
+    pageSize = 10;
     gender: string;
     minAge = 18;
     maxAge = 99;
