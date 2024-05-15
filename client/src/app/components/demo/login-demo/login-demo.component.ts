@@ -8,14 +8,17 @@ import { AccountService } from '../../../services/account.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { RouterLink } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-login-demo',
   standalone: true,
   imports: [
-    InputCvaComponent,
+    InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
-    MatButtonModule, MatInputModule
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDividerModule
   ],
   templateUrl: './login-demo.component.html',
   styleUrl: './login-demo.component.scss'
@@ -39,7 +42,8 @@ export class LoginDemoComponent implements OnInit, OnDestroy {
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]]
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    rememberMeCtrl: [false, []]
   });
 
   get EmailUsernameCtrl(): FormControl {
@@ -47,6 +51,9 @@ export class LoginDemoComponent implements OnInit, OnDestroy {
   }
   get PasswordCtrl(): FormControl {
     return this.loginFg.get('passwordCtrl') as FormControl;
+  }
+  get RememberMeCtrl(): FormControl {
+    return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
 
   loginEmailUsername(): void {

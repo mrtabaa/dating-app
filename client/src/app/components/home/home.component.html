@@ -9,7 +9,12 @@
     <section class="row1">
         <div class="content">
             <h1>"Find your perfect match!"</h1>
-            <app-login />
+            @if(router.url === '/') {
+                <app-login class="login" />
+            }
+            @else {
+                <app-login-demo class="login" />
+            }
         </div>
     </section>
     <section class="row2">
