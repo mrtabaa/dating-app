@@ -29,15 +29,20 @@ export class MemberService {
   }
 
   getFreshMemberParams(): MemberParams | undefined {
-    const gender = this.accountService.loggedInUserSig()?.gender;
+    // retrieve gender from localStorage since accountService.loggedInUserSig is ran after this service and gender will be undefined.
+    const loggedInUserStr: string | null = localStorage.getItem('loggedInUser');
 
-    if (gender) {
-      this.memberParams = new MemberParams(gender);
-      this.getMembers();
-    }
-    else { // for admin who doesn't have a gender
-      this.memberParams = new MemberParams('male');
-      this.getMembers();
+    if (loggedInUserStr) {
+      const gender: string = JSON.parse(loggedInUserStr).gender;
+
+      if (gender) {
+        this.memberParams = new MemberParams(gender);
+        this.getMembers();
+      }
+      else { // for admin who doesn't have a gender
+        this.memberParams = new MemberParams('male');
+        this.getMembers();
+      }
     }
 
     return this.memberParams;
