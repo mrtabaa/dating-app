@@ -18,10 +18,6 @@ export class FollowService {
   private baseUrl = environment.apiUrl + 'follow/';
   private paginationHandler = new PaginationHandler();
 
-  // setMemberParams(followParamsInput: FollowParams): void {
-  //   this.followParams = followParamsInput;
-  // }
-
   getFollows(followParams: FollowParams): Observable<PaginatedResult<Member[]>> {
     const params = this.getHttpParams(followParams);
 
