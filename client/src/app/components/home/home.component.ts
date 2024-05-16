@@ -21,7 +21,6 @@ import { LoginDemoComponent } from '../demo/login-demo/login-demo.component';
 export class HomeComponent implements OnInit, OnDestroy {
   navbarService = inject(NavbarService);
   router = inject(Router);
-  // loginDemo: boolean;
 
   ngOnInit(): void {
     this.navbarService.showNavbarSig.set(false);
