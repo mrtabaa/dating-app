@@ -1,7 +1,6 @@
+import { BaseParams } from "./BaseParams";
 import { FollowPredicate } from "./follow-predicate";
 
-export class FollowParams {
-    pageNumber = 1;
-    pageSize = 10;
+export class FollowParams extends BaseParams{
     predicate = FollowPredicate.followings;
 }
