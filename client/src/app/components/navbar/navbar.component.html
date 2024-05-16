@@ -1,7 +1,7 @@
 <mat-toolbar color="primary">
     <!--#region LEFT -->
     <section class="left">
-        <a [routerLink]="['/']" class="brand">
+        <a [routerLink]="['/home']" class="brand">
             <mat-icon>eco</mat-icon>
             Hallboard
         </a>
@@ -62,8 +62,7 @@
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
-                    <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority
-                        alt="{{user.knownAs[0]}}">
+                    <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority alt="{{user.knownAs[0]}}">
                     }
                     @else {
                     {{user.knownAs[0] | titlecase}}

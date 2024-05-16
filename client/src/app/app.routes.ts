@@ -18,29 +18,30 @@ import { adminGuard } from './guards/admin.guard';
 import { RecoverComponent } from './components/account/recover/recover.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
+    {
+        path: '',
+        runGuardsAndResolvers: 'always',
+        canActivate: [authLoggedInGuard],
+        children: [
+            { path: '', component: HomeComponent },
+            { path: 'account/login', component: HomeComponent },
+            { path: 'account/register', component: RegisterComponent },
+            { path: 'account/recover', component: RecoverComponent },
+            { path: 'demo', component: HomeComponent }, // DEMO
+        ]
+    },
     {
         path: '',
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard],
         children: [
+            { path: 'home', component: MemberListComponent },
             { path: 'members', component: MemberListComponent },
             { path: 'member/:userName', component: MemberDetailComponent },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
             { path: 'friends', component: FollowsComponent },
             { path: 'messages', component: MessagesComponent },
             { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard] } // both authGuard and adminGuard applied
-        ]
-    },
-    {
-        path: '',
-        runGuardsAndResolvers: 'always',
-        canActivate: [authLoggedInGuard],
-        children: [
-            { path: 'account/login', component: HomeComponent },
-            { path: 'account/register', component: RegisterComponent },
-            { path: 'account/recover', component: RecoverComponent },
-            { path: 'demo', component: HomeComponent}, // DEMO
         ]
     },
     {

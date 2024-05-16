@@ -1,6 +1,6 @@
 <main>
     <nav>
-        <a [routerLink]="['/']" class="brand">
+        <a [routerLink]="['']" class="brand">
             <mat-icon>eco</mat-icon>
             Hallboard
         </a>
@@ -10,10 +10,10 @@
         <div class="content">
             <h1>"Find your perfect match!"</h1>
             @if(router.url === '/') {
-                <app-login class="login" />
+            <app-login class="login" />
             }
             @else {
-                <app-login-demo class="login" />
+            <app-login-demo class="login" />
             }
         </div>
     </section>
