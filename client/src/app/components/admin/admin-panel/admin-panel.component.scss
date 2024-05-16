@@ -1,10 +1,14 @@
-div {
-    width: auto;
-    margin-top: 2%;
-    display: flex;
-    justify-content: center;
+mat-tab-group {
+    div {
+        width: auto;
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
 
-    app-member-management {
-        width: 50rem;
+
+        app-member-management {
+            width: 50rem;
+        }
     }
 }
