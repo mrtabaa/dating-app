@@ -29,7 +29,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
             ? Ok(loggedInDto)
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
-            : BadRequest("Registration has failed. Try again or contact the support.");
+            : BadRequest("Login has failed. Try again or contact the support.");
     }
 
     [HttpGet]
