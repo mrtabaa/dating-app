@@ -6,7 +6,8 @@
             </app-input-cva>
             <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
                 [placeHolder]="'Your password'"
-                [hint]="'8 to 20 characters, a special character, an uppercase character.'">
+                [hint]="'Needs: 8 to 50 characters. A special character, @/&^$ etc. An uppercase character, ABC etc.'"
+                [error]="'Needs: 8 to 50 characters. A special character, @/&^$ etc. An uppercase character, ABC etc.'">
             </app-input-cva>
         </div>
         <div class="buttons">

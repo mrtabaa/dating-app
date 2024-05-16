@@ -16,6 +16,7 @@ export class InputCvaComponent implements ControlValueAccessor {
   @Input({ required: true }) label = '';
   @Input() type = 'text';
   @Input({ required: true }) placeHolder = '';
+  @Input() error = '';
   @Input() hint = '';
   @Input() isFocused = false;
 
