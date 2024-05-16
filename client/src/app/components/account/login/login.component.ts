@@ -9,8 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { RouterLink } from '@angular/router';
-
+import { Router, RouterLink } from '@angular/router';
+import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,7 @@ import { RouterLink } from '@angular/router';
   imports: [
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
-    MatButtonModule, MatInputModule, MatCheckboxModule
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
+  router = inject(Router);
 
   user$!: Observable<LoggedInUser | null>;
   subscrition!: Subscription;
@@ -42,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
     rememberMeCtrl: [false, []]
   });
 

@@ -1,6 +1,5 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
     <section class="container">
-        <h2>Login</h2>
         <div class="inputs">
             <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
                 [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
@@ -19,9 +18,15 @@
                 </button>
             </div>
             <div class="signup">
-                <button [routerLink]="['/account/register']" mat-stroked-button color="primary">Create Account</button>
                 <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
             </div>
+            @if(router.url === '/demo') {
+            <mat-divider />
+            <div class="demo">
+                <button (click)="enterAdminCreds()" mat-stroked-button>Admin creds</button>
+                <button (click)="enterMemberCreds()" mat-stroked-button>Member creds</button>
+            </div>
+            }
         </div>
     </section>
 </form>
