@@ -8,7 +8,7 @@ public class AdminRepository : IAdminRepository
     private readonly UserManager<AppUser> _userManager;
 
     // constructor - dependency injection
-    public AdminRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService)
+    public AdminRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
@@ -18,25 +18,10 @@ public class AdminRepository : IAdminRepository
     #endregion
 
     #region CRUD
-    public async Task<IEnumerable<UserWithRoleDto>> GetUsersWithRolesAsync()
-    {
-        List<UserWithRoleDto> usersWithRoles = [];
-
-        foreach (AppUser appUser in _userManager.Users)
-        {
-            var roles = await _userManager.GetRolesAsync(appUser);
-
-            usersWithRoles.Add(
-                new UserWithRoleDto(
-                    UserName: appUser.UserName!,
-                    Roles: roles
-                )
-            );
-        }
-
-        return usersWithRoles;
-    }
-
+    public async Task<PagedList<AppUser>> GetUsersWithRolesAsync(PaginationParams paginationParams, CancellationToken cancellationToken) =>
+        // set no filter in AsQueryable(). Send a plain query
+        await PagedList<AppUser>.CreatePagedListAsync(_collection.AsQueryable(), paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
+    
     public async Task<IEnumerable<string>?> EditMemberRole(UserWithRoleDto memberWithRoleDto)
     {
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());

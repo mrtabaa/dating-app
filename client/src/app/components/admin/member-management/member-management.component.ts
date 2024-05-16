@@ -11,13 +11,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { BaseParams } from '../../../models/helpers/BaseParams';
+import { Pagination } from '../../../models/helpers/pagination';
+import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 
 @Component({
   selector: 'app-member-management',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    MatTableModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatIconModule
+    MatTableModule, MatFormFieldModule, MatSelectModule, MatButtonModule, MatIconModule, MatPaginatorModule
   ],
   templateUrl: './member-management.component.html',
   styleUrl: './member-management.component.scss'
@@ -34,23 +38,41 @@ export class MemberManagementComponent implements OnInit {
 
   selectedRoles = this.fb.array<string[] | null>([]);
 
+  pagination: Pagination | undefined;
+  pageSizeOptions = [5, 10, 25];
+  hidePageSize = false;
+  showPageSizeOptions = true;
+  showFirstLastButtons = true;
+  disabled = false;
+  pageEvent: PageEvent | undefined;
+  baseParams: BaseParams | undefined;
+
   ngOnInit(): void {
+    this.baseParams = new BaseParams();
+
     this.getMembersWithRoles();
   }
 
   getMembersWithRoles(): void {
-    this.adminService.getMembersWithRoles()
-      .pipe(
-        take(1)
-      ).subscribe({
-        next: (users: UserWithRole[]) => {
-          users.forEach(user => {
-            this.selectedRoles.push(this.fb.control<string[]>(user.roles, [Validators.required]));
-          });
+    if (this.baseParams)
+      this.adminService.getMembersWithRoles(this.baseParams)
+        .pipe(
+          take(1)
+        ).subscribe({
+          next: (response: PaginatedResult<UserWithRole[]>) => {
+            if (response.result && response.pagination) {
+              console.log('hit');
+              response.result.forEach(user => {
+                this.selectedRoles.push(this.fb.control<string[]>(user.roles, [Validators.required]));
+              });
 
-          this.usersWithRole = users;
-        }
-      });
+              this.usersWithRole = response.result;
+              this.pagination = response.pagination;
+
+              console.log(response.result);
+            }
+          }
+        });
   }
 
   updateRoles(i: number, userName: string): void {
@@ -84,5 +106,18 @@ export class MemberManagementComponent implements OnInit {
           ];
       }
     });
+  }
+
+  handlePageEvent(e: PageEvent) {
+    if (this.baseParams) {
+      if (e.pageSize !== this.baseParams.pageSize)
+        e.pageIndex = 0;
+
+      this.pageEvent = e;
+      this.baseParams.pageSize = e.pageSize;
+      this.baseParams.pageNumber = e.pageIndex + 1;
+
+      this.getMembersWithRoles();
+    }
   }
 }

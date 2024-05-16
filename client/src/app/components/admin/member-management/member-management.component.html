@@ -67,4 +67,12 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
     }
+    @if (pagination && baseParams) {
+    <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
+        [pageSize]="baseParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+        [pageIndex]="baseParams.pageNumber - 1" aria-label="Select page" class="paginator">
+        <!-- pageIndex must start from 0 -->
+    </mat-paginator>
+    }
 </section>

@@ -1,12 +1,40 @@
 namespace api.Controllers;
 
 [Authorize(Policy = "RequiredAdminRole")]
-public class AdminController(IAdminRepository _adminRepository) : BaseApiController
+public class AdminController(IAdminRepository _adminRepository, UserManager<AppUser> _userManager) : BaseApiController
 {
     [HttpGet("users-with-roles")]
-    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles()
+    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
     {
-        return Ok(await _adminRepository.GetUsersWithRolesAsync());
+        PagedList<AppUser> pagedAppUsers = await _adminRepository.GetUsersWithRolesAsync(paginationParams, cancellationToken);
+
+        if (pagedAppUsers is null) return BadRequest("Getting members faild");
+
+        if (pagedAppUsers.Count == 0) return NoContent();
+
+        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
+                If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
+        */
+        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
+
+        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
+                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+
+        List<UserWithRoleDto> usersWithRoles = [];
+        
+        foreach (AppUser appUser in pagedAppUsers)
+        {
+            IEnumerable<string> roles = await _userManager.GetRolesAsync(appUser);
+
+            usersWithRoles.Add(
+                new UserWithRoleDto(
+                    UserName: appUser.UserName!,
+                    Roles: roles
+                )
+            );
+        }
+
+        return Ok(usersWithRoles);
     }
 
     [HttpPut("edit-roles")]
