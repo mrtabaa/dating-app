@@ -8,12 +8,11 @@ public class FollowRepository : IFollowRepository
     private readonly IMongoCollection<Follow> _collection;
     private readonly IMongoCollection<AppUser> _collectionUsers;
     private readonly IUserRepository _userRepository;
-    private readonly ITokenService _tokenService;
     private readonly ILogger<FollowRepository> _logger;
 
     // constructor - dependency injections
     public FollowRepository(
-        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository, ITokenService tokenService, ILogger<FollowRepository> logger
+        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository, ILogger<FollowRepository> logger
         )
     {
         _client = client; // used for Session
@@ -21,7 +20,6 @@ public class FollowRepository : IFollowRepository
         _collection = dbName.GetCollection<Follow>(AppVariablesExtensions.collectionFollows);
         _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
-        _tokenService = tokenService;
         _userRepository = userRepository;
 
         _logger = logger;
