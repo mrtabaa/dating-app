@@ -32,11 +32,8 @@ namespace api.DTOs
                 Email = userInput.Email, // required by AspNet Identity
                 UserName = userInput.UserName, // required by AspNet Identity
                 DateOfBirth = userInput.DateOfBirth,
-                KnownAs = userInput.KnownAs.Trim(),
                 LastActive = DateTime.UtcNow,
                 Gender = userInput.Gender.ToLower(),
-                City = userInput.City.Trim(),
-                Country = userInput.Country.Trim(),
                 Photos = [],
                 FollowersCount = 0
             };

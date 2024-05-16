@@ -4,8 +4,5 @@ export interface UserRegister{
     password: string;
     confirmPassword: string;
     dateOfBirth: string | undefined;
-    knownAs: string;
     gender: string;
-    city: string;
-    country: string;
 }

@@ -56,13 +56,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
   registerFg = this.fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    knownAsCtrl: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
     genderCtrl: ['female', [Validators.required]],
-    cityCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
-    countryCtrl: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]]
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -83,17 +80,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get DateOfBirthCtrl(): FormControl {
     return this.registerFg.get('dateOfBirthCtrl') as FormControl;
   }
-  get KnownAsCtrl(): FormControl {
-    return this.registerFg.get('knownAsCtrl') as FormControl;
-  }
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
-  }
-  get CityCtrl(): FormControl {
-    return this.registerFg.get('cityCtrl') as FormControl;
-  }
-  get CountryCtrl(): FormControl {
-    return this.registerFg.get('countryCtrl') as FormControl;
   }
   //#endregion
 
@@ -108,10 +96,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: this.PasswordCtrl.value,
       confirmPassword: this.ConfirmPasswordCtrl.value,
       dateOfBirth: dob,
-      knownAs: this.KnownAsCtrl.value,
+      // knownAs: this.KnownAsCtrl.value,
       gender: this.GenderCtrl.value,
-      city: this.CityCtrl.value,
-      country: this.CountryCtrl.value
+      // city: this.CityCtrl.value,
+      // country: this.CountryCtrl.value
     };
 
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)

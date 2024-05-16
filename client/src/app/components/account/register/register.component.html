@@ -1,6 +1,5 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
     <div class="container">
-        <h2 class="title">Create Account</h2>
         <div class="gender">
             <strong>I am a</strong>
             <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
@@ -15,17 +14,9 @@
         <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
             [hint]="'Will be shown to other members.'">
         </app-input-cva>
-        <app-input-cva [formControl]="KnownAsCtrl" [label]="'Known As'" [placeHolder]="'Your name/nickname'"
-            [hint]="'Enter your name or nickname'">
-        </app-input-cva>
         <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
             [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
         </app-date-picker-cva>
-        <app-input-cva [formControl]="CityCtrl" [label]="'City'" [placeHolder]="'Your city'" [hint]="'Enter your city'">
-        </app-input-cva>
-        <app-input-cva [formControl]="CountryCtrl" [label]="'Country'" [placeHolder]="'Your coutnry'"
-            [hint]="'Enter your country'">
-        </app-input-cva>
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
             [placeHolder]="'Enter a password'" [hint]="'8 to 20 characters, a special character, an uppercase character.'">
         </app-input-cva>
