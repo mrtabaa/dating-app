@@ -4,14 +4,14 @@
         You have unsaved changes. Make sure they are
         all saved.
     </mat-error>
-    <div class="search">
+    <form (ngSubmit)="searchUser()" class="search">
         <mat-form-field appearance="outline">
             <mat-label>Search a user</mat-label>
             <input [formControl]="searchCtrl" type="text" matInput>
             <mat-hint>By Username or Email</mat-hint>
         </mat-form-field>
-        <button type="submit" (click)="searchUser()" [disabled]="searchCtrl.pristine" mat-raised-button>Search</button>
-    </div>
+        <button type="submit" [disabled]="!searchCtrl.value || searchCtrl.value < 1" mat-raised-button>Search</button>
+    </form>
     <table mat-table [dataSource]="usersWithRole" class="mat-elevation-z8">
         <!-- Position Column -->
         <ng-container matColumnDef="no">
