@@ -4,6 +4,12 @@
     align-items: center;
     gap: 1rem;
 
+    .search {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
     .edit-role {
         display: flex;
         flex-direction: column;

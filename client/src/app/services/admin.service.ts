@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { UserWithRole } from '../models/user-with-role.model';
 import { ApiResponseMessage } from '../models/helpers/api-response-message';
-import { BaseParams } from '../models/helpers/BaseParams';
 import { PaginationHandler } from '../extensions/paginationHandler';
 import { PaginatedResult } from '../models/helpers/paginatedResult';
+import { AdminParams } from '../models/helpers/AdminParams';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,8 @@ export class AdminService {
   private apiUrl: string = environment.apiUrl + 'admin/';
   private paginationHandler = new PaginationHandler();
 
-  getMembersWithRoles(baseParams: BaseParams): Observable<PaginatedResult<UserWithRole[]>> {
-    const params = this.getHttpParams(baseParams);
+  getMembersWithRoles(adminParams: AdminParams): Observable<PaginatedResult<UserWithRole[]>> {
+    const params = this.getHttpParams(adminParams);
 
     return this.paginationHandler.getPaginatedResult<UserWithRole[]>(this.apiUrl + 'users-with-roles', params);
   }
@@ -39,11 +39,14 @@ export class AdminService {
     return this.http.delete<ApiResponseMessage>(this.apiUrl + 'delete-member/' + userName);
   }
 
-  private getHttpParams(baseParams: BaseParams): HttpParams {
+  private getHttpParams(adminParams: AdminParams): HttpParams {
     let params = new HttpParams();
 
-    params = params.append('pageNumber', baseParams.pageNumber);
-    params = params.append('pageSize', baseParams.pageSize);
+    params = params.append('pageNumber', adminParams.pageNumber);
+    params = params.append('pageSize', adminParams.pageSize);
+
+    if (adminParams.search)
+      params = params.append('search', adminParams.search);
 
     return params;
   }

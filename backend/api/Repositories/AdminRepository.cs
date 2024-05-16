@@ -18,10 +18,19 @@ public class AdminRepository : IAdminRepository
     #endregion
 
     #region CRUD
-    public async Task<PagedList<AppUser>> GetUsersWithRolesAsync(PaginationParams paginationParams, CancellationToken cancellationToken) =>
+    public async Task<PagedList<AppUser>> GetUsersWithRolesAsync(AdminParams adminParams, CancellationToken cancellationToken)
+    {
+        IMongoQueryable<AppUser> query = _collection.AsQueryable();
+
+        if (!string.IsNullOrEmpty(adminParams.Search))
+            query = query.Where(user => 
+                user.NormalizedUserName != null && user.NormalizedUserName.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase)
+                || user.NormalizedEmail != null && user.NormalizedEmail.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase));
+
         // set no filter in AsQueryable(). Send a plain query
-        await PagedList<AppUser>.CreatePagedListAsync(_collection.AsQueryable(), paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
-    
+        return await PagedList<AppUser>.CreatePagedListAsync(query, adminParams.PageNumber, adminParams.PageSize, cancellationToken);
+    }
+
     public async Task<IEnumerable<string>?> EditMemberRole(UserWithRoleDto memberWithRoleDto)
     {
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());

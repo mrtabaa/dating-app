@@ -4,8 +4,15 @@
         You have unsaved changes. Make sure they are
         all saved.
     </mat-error>
+    <div class="search">
+        <mat-form-field appearance="outline">
+            <mat-label>Search a user</mat-label>
+            <input [formControl]="searchCtrl" type="text" matInput>
+            <mat-hint>By Username or Email</mat-hint>
+        </mat-form-field>
+        <button type="submit" (click)="searchUser()" [disabled]="searchCtrl.pristine" mat-raised-button>Search</button>
+    </div>
     <table mat-table [dataSource]="usersWithRole" class="mat-elevation-z8">
-
         <!-- Position Column -->
         <ng-container matColumnDef="no">
             <th mat-header-cell *matHeaderCellDef> # </th>
@@ -67,11 +74,11 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
     }
-    @if (pagination && baseParams) {
+    @if (pagination && adminParams) {
     <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
-        [pageSize]="baseParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSize]="adminParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
         [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-        [pageIndex]="baseParams.pageNumber - 1" aria-label="Select page" class="paginator">
+        [pageIndex]="adminParams.pageNumber - 1" aria-label="Select page" class="paginator">
         <!-- pageIndex must start from 0 -->
     </mat-paginator>
     }

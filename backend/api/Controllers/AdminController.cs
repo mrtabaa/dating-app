@@ -4,11 +4,11 @@ namespace api.Controllers;
 public class AdminController(IAdminRepository _adminRepository, UserManager<AppUser> _userManager) : BaseApiController
 {
     [HttpGet("users-with-roles")]
-    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles([FromQuery] PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles([FromQuery] AdminParams adminParams, CancellationToken cancellationToken)
     {
-        PagedList<AppUser> pagedAppUsers = await _adminRepository.GetUsersWithRolesAsync(paginationParams, cancellationToken);
+        PagedList<AppUser> pagedAppUsers = await _adminRepository.GetUsersWithRolesAsync(adminParams, cancellationToken);
 
-        if (pagedAppUsers is null) return BadRequest("Getting members faild");
+        if (pagedAppUsers is null) return BadRequest("Getting users faild");
 
         if (pagedAppUsers.Count == 0) return NoContent();
 
