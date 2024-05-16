@@ -25,7 +25,6 @@ import { MatDividerModule } from '@angular/material/divider';
 export class NavbarComponent implements OnInit {
   private accountService = inject(AccountService);
 
-
   loggedInUserSig: Signal<LoggedInUser | null> | undefined;
 
   links = ['members', 'friends', 'messages', 'admin'];

@@ -41,8 +41,11 @@
             <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority
                 alt="{{user.knownAs[0]}}">
             }
-            @else() {
+            @else if (user.knownAs){
             {{user.knownAs[0] | titlecase}}
+            }
+            @else {
+            {{user.userName[0] | titlecase}}
             }
         </button>
         }
@@ -64,8 +67,11 @@
                     @if(user.profilePhotoUrl) {
                     <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority alt="{{user.knownAs[0]}}">
                     }
-                    @else {
+                    @else if (user.knownAs){
                     {{user.knownAs[0] | titlecase}}
+                    }
+                    @else {
+                    {{user.userName[0] | titlecase}}
                     }
                 </div>
                 <div>
