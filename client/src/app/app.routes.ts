@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { RegisterComponent } from './components/account/register/register.component';
 import { NoAccessComponent } from './components/errors/no-access/no-access.component';
 import { NotFoundComponent } from './components/errors/not-found/not-found.component';
 import { ServerErrorComponent } from './components/errors/server-error/server-error.component';
@@ -25,7 +24,7 @@ export const routes: Routes = [
         children: [
             { path: '', component: HomeComponent },
             { path: 'account/login', component: HomeComponent },
-            { path: 'account/register', component: RegisterComponent },
+            { path: 'account/register', component: HomeComponent },
             { path: 'account/recover', component: RecoverComponent },
             { path: 'demo', component: HomeComponent }, // DEMO
         ]

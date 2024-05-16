@@ -1,19 +1,20 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterLink } from '@angular/router';
-import { LoginComponent } from '../account/login/login.component';
-import { NgOptimizedImage } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { NavbarService } from '../../services/helpers/navbar.service';
 import { MatIconModule } from '@angular/material/icon';
-import { LoginDemoComponent } from '../demo/login-demo/login-demo.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { LoginRegisterComponent } from '../account/login-register/login-register.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
-    LoginComponent, LoginDemoComponent,
-    RouterLink, NgOptimizedImage, MatIconModule,
-    MatButtonModule
+    CommonModule,
+    LoginRegisterComponent,
+    NgOptimizedImage, MatIconModule,
+    MatButtonModule, MatTabsModule, RouterLink, RouterLinkActive
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
