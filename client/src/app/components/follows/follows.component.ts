@@ -34,8 +34,6 @@ export class FollowsComponent implements OnInit {
 
   followPredicate = FollowPredicate;
   pagination: Pagination | undefined;
-  pageNumber = 1;
-  pageSize = 5;
   pageSizeOptions = [5, 10, 25];
   hidePageSize = false;
   showPageSizeOptions = true;

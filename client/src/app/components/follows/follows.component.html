@@ -31,11 +31,11 @@
             }
         </mat-tab>
     </mat-tab-group>
-    @if (pagination) {
+    @if (pagination && followParams) {
     <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
-        [pageSize]="pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSize]="followParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
         [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-        [pageIndex]="pageNumber - 1" aria-label="Select page" class="paginator">
+        [pageIndex]="followParams.pageNumber - 1" aria-label="Select page" class="paginator">
         <!-- pageIndex must start from 0 -->
     </mat-paginator>
     }
