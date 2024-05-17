@@ -23,6 +23,7 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
+
             return user;
           }
           return null;
@@ -36,8 +37,6 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
-
-            this.setGetReturnUrl();
 
             return user;
           }
@@ -77,6 +76,8 @@ export class AccountService {
     this.setLoggedInUserRoles(loggedInUser);
 
     this.loggedInUserSig.set(loggedInUser);
+
+    this.setGetReturnUrl();
   }
 
   setGetReturnUrl(): void {
