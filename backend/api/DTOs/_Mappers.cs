@@ -11,11 +11,11 @@ namespace api.DTOs
                 Email = userInput.Email, // required by AspNet Identity
                 UserName = userInput.UserName, // required by AspNet Identity
                 DateOfBirth = userInput.DateOfBirth,
-                KnownAs = userInput.KnownAs.Trim(),
+                KnownAs = userInput.KnownAs,
                 LastActive = DateTime.UtcNow,
                 Gender = userInput.Gender.ToLower(),
-                City = userInput.City.Trim(),
-                Country = userInput.Country.Trim(),
+                Country = userInput.Country,
+                City = userInput.City,
                 Introduction = userInput.Introduction,
                 LookingFor = userInput.LookingFor,
                 Interests = userInput.Interests,
@@ -52,8 +52,8 @@ namespace api.DTOs
                 Introduction: appUser.Introduction,
                 LookingFor: appUser.LookingFor,
                 Interests: appUser.Interests,
-                City: appUser.City,
                 Country: appUser.Country,
+                City: appUser.City,
                 Photos: appUser.Photos,
                 Following: following
             );
@@ -67,7 +67,8 @@ namespace api.DTOs
                 KnownAs = appUser.KnownAs,
                 UserName = appUser.UserName,
                 Gender = appUser.Gender,
-                ProfilePhotoUrl = blobPhotoUrl
+                ProfilePhotoUrl = blobPhotoUrl,
+                IsProfileCompleted = appUser.IsProfileCompleted
             };
         }
 

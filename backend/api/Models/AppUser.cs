@@ -21,4 +21,5 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public List<Photo> Photos { get; set; } = [];
     public int FollowingsCount { get; init; }
     public int FollowersCount { get; init; }
+    public bool IsProfileCompleted { get; init; }
 }

@@ -5,4 +5,5 @@ export interface LoggedInUser {
     gender: string
     profilePhotoUrl: string;
     roles: string[];
+    isProfileCompleted: boolean;
 }

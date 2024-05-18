@@ -28,4 +28,5 @@ public class LoggedInDto
     public string? ProfilePhotoUrl { get; init; }
     public bool IsWrongCreds { get; set; }
     public List<string> Errors { get; init; } = [];
+    public bool IsProfileCompleted { get; init; }
 }
