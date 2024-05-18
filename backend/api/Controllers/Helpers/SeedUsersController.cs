@@ -72,7 +72,8 @@ public class SeedUsersController : BaseApiController
         AppUser admin = new()
         {
             Email = "admin@a.com",
-            UserName = "admin"
+            UserName = "admin",
+            IsProfileCompleted = true
         };
 
         await _userManager.CreateAsync(admin, "Aaaaaaa1");
@@ -81,7 +82,8 @@ public class SeedUsersController : BaseApiController
         AppUser moderator = new()
         {
             Email = "moderator@a.com",
-            UserName = "moderator"
+            UserName = "moderator",
+            IsProfileCompleted = true
         };
 
         await _userManager.CreateAsync(moderator, "Aaaaaaa1");
