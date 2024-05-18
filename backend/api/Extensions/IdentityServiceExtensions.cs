@@ -48,9 +48,9 @@ public static class IdentityServiceExtensions
                     options.User.RequireUniqueEmail = true;
 
                     // Password requirements
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 7;
-                    options.Password.RequireNonAlphanumeric = true;
+                    options.Password.RequireDigit = true;
+                    options.Password.RequiredLength = 8;
+                    options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireLowercase = false;
 
                     // Lockout

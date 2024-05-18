@@ -6,7 +6,7 @@ public record DummyRegisterDto(
         RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage ="Bad Email Format.")
     ] string Email,
     [Length(1, 50)] string UserName,
-    [DataType(DataType.Password), Length(8, 20), RegularExpression(@"^(?=.*[A-Z])(?=.*[^\w\s]).*$")]
+    [DataType(DataType.Password), Length(8, 50), RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage ="Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)")]
     string Password,
     [DataType(DataType.Password), Length(8, 20)] string ConfirmPassword,
     [Length(1, 50)] string KnownAs,
