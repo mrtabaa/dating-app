@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     rememberMeCtrl: [false, []]
   });
 

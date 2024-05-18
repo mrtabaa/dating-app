@@ -9,8 +9,8 @@
             </mat-radio-group>
         </div>
         <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-            [hint]="'Privately used for account management. (e.g. Reset password, Login)'" [error]="'must be valid.'"
-            [isFocused]="true">
+            [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
+            [error]="'Enter a valid email address.'" [isFocused]="true">
         </app-input-cva>
         <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
             [hint]="'Will be shown to other members.'">
@@ -20,8 +20,8 @@
         </app-date-picker-cva>
         <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
             [placeHolder]="'Enter a password'"
-            [hint]="'Needs: 8 to 50 characters. A special character, @/&^$ etc. An uppercase character, ABC etc.'"
-            [error]="'Needs: 8 to 50 characters. A special character, @/&^$ etc. An uppercase character, ABC etc.'">
+            [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
+            [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
         </app-input-cva>
         <div>
             <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"

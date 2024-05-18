@@ -56,8 +56,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   registerFg = this.fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern("^(?=.*[A-Z])(?=.*[^ws]).*$")]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
     genderCtrl: ['female', [Validators.required]],
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
