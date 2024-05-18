@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, take } from 'rxjs';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,9 @@ import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 import { LightboxModule } from 'ng-gallery/lightbox';
 import { IntlModule } from "angular-ecmascript-intl";
 import { AccountService } from '../../../services/account.service';
+import { FollowService } from '../../../services/follow.service';
+import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user-detail',
@@ -26,8 +29,10 @@ import { AccountService } from '../../../services/account.service';
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
   private memberService = inject(MemberService);
+  private followService = inject(FollowService);
   username = inject(AccountService).loggedInUserSig()?.userName;
   private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
 
@@ -51,6 +56,36 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     if (userName) {
       this.member$ = this.memberService.getMemberByUsername(userName);
     }
+  }
+
+  addFollow(member: Member): void {
+    this.followService.addFollow(member.userName)
+      .pipe(
+        take(1))
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          this.snackBar.open(response.message, "Close", {
+            horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
+          });
+
+          member.isFollowing = true;
+        }
+      });
+  }
+
+  removeFollow(member: Member): void {
+    this.followService.removeFollow(member.userName)
+      .pipe(
+        take(1))
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          this.snackBar.open(response.message, "Close", {
+            horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
+          });
+
+          member.isFollowing = false;
+        }
+      });
   }
 
   setGalleryImages(): void {

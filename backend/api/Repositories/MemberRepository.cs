@@ -4,15 +4,17 @@ public class MemberRepository : IMemberRepository
 {
     private readonly IMongoCollection<AppUser>? _collection;
     private readonly IPhotoService _photoService;
+    private readonly IFollowRepository _followRepository;
     #region Db and Token Settings
 
     // constructor - dependency injections
-    public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings, IPhotoService photoService)
+    public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings, IPhotoService photoService, IFollowRepository followRepository)
     {
         // TODO make all dbName/s nullable and handle them with dbName?.GetCollection
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName?.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _photoService = photoService;
+        _followRepository = followRepository;
     }
     #endregion
 
@@ -62,22 +64,30 @@ public class MemberRepository : IMemberRepository
         return appUsers;
     }
 
-    public async Task<MemberDto?> GetByIdAsync(ObjectId? memberId, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetByIdAsync(ObjectId userId, ObjectId? memberId, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _collection.Find<AppUser>(appUser => appUser.Id == memberId).FirstOrDefaultAsync(cancellationToken);
 
         appUser = ConvertAppUserPhotosToBlobPhotos(appUser);
 
-        return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
+        return appUser is null
+            ? null
+            : await _followRepository.CheckIsFollowing(userId, appUser, cancellationToken)
+            ? Mappers.ConvertAppUserToMemberDto(appUser, isFollowing: true)
+            : Mappers.ConvertAppUserToMemberDto(appUser);
     }
 
-    public async Task<MemberDto?> GetByUserNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<MemberDto?> GetByUserNameAsync(ObjectId userId, string userName, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
         appUser = ConvertAppUserPhotosToBlobPhotos(appUser);
 
-        return appUser is null ? null : Mappers.ConvertAppUserToMemberDto(appUser);
+        return appUser is null
+            ? null
+            : await _followRepository.CheckIsFollowing(userId, appUser, cancellationToken)
+            ? Mappers.ConvertAppUserToMemberDto(appUser, isFollowing: true)
+            : Mappers.ConvertAppUserToMemberDto(appUser);
     }
     #endregion CRUD
 

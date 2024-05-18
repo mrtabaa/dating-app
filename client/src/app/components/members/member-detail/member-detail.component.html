@@ -35,8 +35,13 @@
                 color="primary">Edit Profile</button>
             }
             @else {
-            <button mat-raised-button color="primary">LIKE</button>
-            <button mat-raised-button color="accent">MESSAGES</button>
+            @if(member.isFollowing) {
+            <button (click)="removeFollow(member)" mat-raised-button color="primary">Unfollow</button>
+            }
+            @else {
+            <button (click)="addFollow(member)" mat-raised-button color="primary">Follow</button>
+            }
+            <button mat-raised-button color="accent">Messages</button>
             }
         </mat-card-actions>
     </mat-card>

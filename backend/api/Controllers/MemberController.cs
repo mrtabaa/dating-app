@@ -41,7 +41,7 @@ public class MemberController(
         foreach (AppUser pagedAppUser in pagedAppUsers)
         {
             if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
-                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, following: true));
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, isFollowing: true));
             else
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
         }
@@ -52,12 +52,16 @@ public class MemberController(
     [HttpGet("id/{memberId}")]
     public async Task<ActionResult<MemberDto>> GetById(string memberId, CancellationToken cancellationToken)
     {
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
         bool isValid = ObjectId.TryParse(memberId, out ObjectId memberObjectId);
 
         if (!isValid)
             return BadRequest("Invalid memberId. Contact the admin.");
 
-        MemberDto? memberDto = await _memberRepository.GetByIdAsync(memberObjectId, cancellationToken);
+        MemberDto? memberDto = await _memberRepository.GetByIdAsync(userId.Value, memberObjectId, cancellationToken);
 
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
@@ -65,7 +69,11 @@ public class MemberController(
     [HttpGet("username/{userName}")]
     public async Task<ActionResult<MemberDto>> GetByUserName(string userName, CancellationToken cancellationToken)
     {
-        MemberDto? memberDto = await _memberRepository.GetByUserNameAsync(userName, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return BadRequest("User id is invalid. Login again.");
+
+        MemberDto? memberDto = await _memberRepository.GetByUserNameAsync(userId.Value, userName, cancellationToken);
 
         return memberDto is null ? BadRequest("No user found by this username.") : memberDto;
     }
