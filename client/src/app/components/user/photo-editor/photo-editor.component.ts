@@ -33,7 +33,7 @@ export class PhotoEditorComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   private readonly maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
-  private readonly minFileSize = 500 * 500; // 250KB in bytes
+  private readonly minFileSize = 100_000; // 100KB in bytes
 
   loggedInUser: LoggedInUser | null | undefined;
   baseApiUrl: string = environment.apiUrl;
@@ -62,7 +62,7 @@ export class PhotoEditorComponent implements OnInit {
         isHTML5: true,
         allowedFileType: ['image'],
         removeAfterUpload: true,
-        autoUpload: false,
+        autoUpload: true,
         maxFileSize: this.maxFileSize,
       });
 
