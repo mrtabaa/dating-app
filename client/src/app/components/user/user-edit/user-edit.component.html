@@ -50,13 +50,29 @@
             </mat-card>
         </section>
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab label="Edit About {{member.knownAs}}">
+            <mat-tab label="Edit About {{KnownAsCtrl.value}}">
                 <div class="tab-contents">
                     <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
+                            <mat-label>Nickname/Name</mat-label>
+                            <input formControlName="knownAsCtrl" [value]="member.knownAs"
+                                placeholder="Your Nickname or Name" matInput>
+                            <mat-hint>Nickname between 1 to 50 characters</mat-hint>
+                            @if (KnownAsCtrl.hasError('minlength')) {
+                            <mat-error>
+                                Minimum of 1 character is required.
+                            </mat-error>
+                            }
+                            @if (KnownAsCtrl.hasError('maxlength')) {
+                            <mat-error>
+                                Maximum of 50 characters is reached.
+                            </mat-error>
+                            }
+                        </mat-form-field>
+                        <mat-form-field appearaance="outline">
                             <mat-label>Introduction</mat-label>
                             <textarea cdkTextareaAutosize formControlName="introductionCtrl"
-                                [value]="member.introduction" placeholder="Say something about your self" matInput>
+                                [value]="member.introduction" placeholder="Say something about yourself" matInput>
                             {{IntroductionCtrl.value}}
                             </textarea>
                             <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
@@ -112,8 +128,7 @@
                         </mat-form-field>
                         <mat-form-field appearaance="outline">
                             <mat-label>Country</mat-label>
-                            <input cdkTextareaAutosize formControlName="countryCtrl" placeholder="Enter your country."
-                                matInput required>
+                            <input formControlName="countryCtrl" placeholder="Enter your country." matInput required>
                             <mat-hint>Minimum of {{minInputChars}} characters is requried.</mat-hint>
                             @if (IntroductionCtrl.hasError('required')) {
                             <mat-error>This field is required</mat-error>
@@ -134,7 +149,7 @@
             </mat-tab>
             <mat-tab label="Edit Photos">
                 <div class="tab-contents">
-                    <app-photo-editor [member]="member"></app-photo-editor>
+                    <app-photo-editor [member]="member" />
                 </div>
             </mat-tab>
         </mat-tab-group>

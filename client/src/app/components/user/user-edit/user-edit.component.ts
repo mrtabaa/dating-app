@@ -16,6 +16,7 @@ import { UserService } from '../../../services/user.service';
 import { IntlModule } from 'angular-ecmascript-intl';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
+import { AccountService } from '../../../services/account.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -32,6 +33,7 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
 export class UserEditComponent implements OnInit {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
+  private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
 
@@ -47,11 +49,9 @@ export class UserEditComponent implements OnInit {
   }
 
   getMember(): void {
-    const loggedInUserStr = localStorage.getItem('loggedInUser');
+    const loggedInUser: LoggedInUser | null = this.getLoggedInUserLocalStorage();
 
-    if (loggedInUserStr) {
-      const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
-
+    if (loggedInUser)
       this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
         if (member) {
           this.member = member;
@@ -59,10 +59,10 @@ export class UserEditComponent implements OnInit {
           this.initContollersValues(member);
         }
       });
-    }
   }
 
   userEditFg: FormGroup = this.fb.group({
+    knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
@@ -70,6 +70,9 @@ export class UserEditComponent implements OnInit {
     countryCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
   });
 
+  get KnownAsCtrl(): AbstractControl {
+    return this.userEditFg.get('knownAsCtrl') as FormControl;
+  }
   get IntroductionCtrl(): AbstractControl {
     return this.userEditFg.get('introductionCtrl') as FormControl;
   }
@@ -87,6 +90,7 @@ export class UserEditComponent implements OnInit {
   }
 
   initContollersValues(member: Member) {
+    this.KnownAsCtrl.setValue(member.knownAs);
     this.IntroductionCtrl.setValue(member.introduction);
     this.LookingForCtrl.setValue(member.lookingFor);
     this.InterestsCtrl.setValue(member.interests);
@@ -98,11 +102,12 @@ export class UserEditComponent implements OnInit {
     if (member) {
       const updatedUser: UserUpdate = {
         username: member.userName,
+        knownAs: this.KnownAsCtrl.value,
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,
         city: this.CityCtrl.value,
-        country: this.CountryCtrl.value
+        country: this.CountryCtrl.value,
       }
 
       this.userService.updateUser(updatedUser)
@@ -111,12 +116,29 @@ export class UserEditComponent implements OnInit {
           next: (response: ApiResponseMessage) => {
             if (response.message) {
               this.matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
+
+              const loggedInUser: LoggedInUser | null = this.getLoggedInUserLocalStorage();
+
+              if (loggedInUser) {
+                loggedInUser.knownAs = this.KnownAsCtrl.value;
+
+                this.accountService.setCurrentUser(loggedInUser);
+              }
             }
           }
         });
 
       this.userEditFg.markAsPristine();
     }
+  }
+
+  getLoggedInUserLocalStorage(): LoggedInUser | null {
+    const loggedInUserStr = localStorage.getItem('loggedInUser');
+
+    if (loggedInUserStr)
+      return JSON.parse(loggedInUserStr);
+
+    return null;
   }
 
   logForm() {
