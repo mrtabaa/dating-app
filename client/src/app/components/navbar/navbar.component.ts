@@ -2,7 +2,7 @@ import { Component, OnInit, Signal, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { LoggedInUser } from '../../models/logged-in-user.model';
 import { AccountService } from '../../services/account.service';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -24,6 +24,7 @@ import { MatDividerModule } from '@angular/material/divider';
 })
 export class NavbarComponent implements OnInit {
   private accountService = inject(AccountService);
+  private router = inject(Router);
 
   loggedInUserSig: Signal<LoggedInUser | null> | undefined;
 
@@ -31,6 +32,10 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUserSig = this.accountService.loggedInUserSig;
+  }
+
+  goToEditProfile(): void {
+    this.router.navigate(['member/' + this.accountService.loggedInUserSig()?.userName], { skipLocationChange: true });
   }
 
   logout() {
