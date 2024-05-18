@@ -35,7 +35,7 @@ export class FollowService {
   modifyFollowUnfollowIcon(members: Member[], followEmit: FollowModifiedEmit): Member[] {
     for (const member of members) {
       if (member === followEmit.member) {
-        member.following = followEmit.isFollowing;
+        member.isFollowing = followEmit.isFollowing;
       }
     }
 

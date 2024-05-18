@@ -29,7 +29,7 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
         {
             if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
             {
-                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, following: true));
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, isFollowing: true));
             }
             else
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
@@ -37,7 +37,7 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
 
         return memberDtos;
     }
-    
+
     [HttpPost("{targetMemberUserName}")]
     public async Task<ActionResult> Add(string targetMemberUserName, CancellationToken cancellationToken)
     {

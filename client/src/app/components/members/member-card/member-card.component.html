@@ -15,7 +15,7 @@
 
         <ul class="user-icons">
             <li>
-                @if(!memberIn.following){
+                @if(!memberIn.isFollowing){
                 <button (click)="addFollow()" mat-mini-fab>
                     <mat-icon color="primary">person_add</mat-icon>
                 </button>

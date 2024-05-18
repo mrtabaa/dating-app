@@ -14,5 +14,5 @@ public record MemberDto(
     string City,
     string Country,
     List<Photo> Photos,
-    bool Following
+    bool IsFollowing
 );
