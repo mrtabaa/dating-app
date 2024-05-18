@@ -9,8 +9,7 @@
         <div class="gallery">
             @for (photo of member.photos; track $index) {
             <div class="photos">
-                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority
-                    alt="{{member.knownAs}} photo">
+                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Set profile</button>
@@ -62,12 +61,13 @@
         </div>
 
         <div class="process">
-            <div>
+            <div class="queue">
                 Queue progress:
                 <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }">
                 </div>
+                {{uploader.progress}}%
             </div>
-            <div class="buttons">
+            <!-- <div class="buttons">
                 <button mat-raised-button color="primary" type="button" (click)="uploader.uploadAll()"
                     [disabled]="!uploader.getNotUploadedItems().length">
                     <mat-icon>upload</mat-icon> Upload all
@@ -80,7 +80,7 @@
                     [disabled]="!uploader.queue.length">
                     <mat-icon>delete</mat-icon> Remove all
                 </button>
-            </div>
+            </div> -->
         </div>
     </section>
     }
