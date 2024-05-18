@@ -27,6 +27,8 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
+            : loggedInDto.IsWrongCreds
+            ? BadRequest("Wrong username or password.")
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
             : BadRequest("Login has failed. Try again or contact the support.");
