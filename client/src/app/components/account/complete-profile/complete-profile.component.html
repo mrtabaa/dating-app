@@ -1,186 +1,189 @@
-<mat-stepper linear #stepper>
-    <mat-step [stepControl]="starterFg">
-        <div class="container">
-            <form [formGroup]="starterFg">
-                <ng-template matStepLabel>{{starterLable}}</ng-template>
-                <mat-form-field appearaance="outline">
-                    <mat-label>Name or Nickname</mat-label>
-                    <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
-                </mat-form-field>
-                <mat-form-field appearaance="outline">
-                    <mat-label>Country</mat-label>
-                    <input formControlName="countryCtrl" matInput placeholder="United States">
-                </mat-form-field>
-                <mat-form-field appearaance="outline">
-                    <mat-label>City</mat-label>
-                    <input formControlName="cityCtrl" matInput placeholder="New York" required>
-                </mat-form-field>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
-                </div>
-            </form>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="photosCtrl" optional="true">
-        <div class="container photos">
-            <form>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
-                </div>
-                <ng-template matStepLabel>{{photosLabel}}</ng-template>
-                @if(member) {
-                <app-photo-editor [member]="member" />
-                }
-            </form>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="introductionCtrl" optional="true">
-        <div class="container">
-            <form>
-                <ng-template matStepLabel>{{introductionLabel}}</ng-template>
-                <mat-form-field appearaance="outline">
-                    <mat-label>What do you want people know about you?</mat-label>
-                    <textarea cdkTextareaAutosize [formControl]="introductionCtrl" [value]="IntroductionCtrl.value"
-                        placeholder="Say something about yourself" matInput>
+<section>
+    <h3>Please completing your profile to attract more people.</h3>
+    <mat-stepper linear #stepper>
+        <mat-step [stepControl]="starterFg">
+            <div class="container">
+                <form [formGroup]="starterFg">
+                    <ng-template matStepLabel>{{starterLable}}</ng-template>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Name or Nickname</mat-label>
+                        <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Country</mat-label>
+                        <input formControlName="countryCtrl" matInput placeholder="United States">
+                    </mat-form-field>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>City</mat-label>
+                        <input formControlName="cityCtrl" matInput placeholder="New York" required>
+                    </mat-form-field>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step [stepControl]="photosCtrl" optional="true">
+            <div class="container photos">
+                <form>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                    <ng-template matStepLabel>{{photosLabel}}</ng-template>
+                    @if(member) {
+                    <app-photo-editor [member]="member" />
+                    }
+                </form>
+            </div>
+        </mat-step>
+        <mat-step [stepControl]="introductionCtrl" optional="true">
+            <div class="container">
+                <form>
+                    <ng-template matStepLabel>{{introductionLabel}}</ng-template>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>What should people know about you?</mat-label>
+                        <textarea cdkTextareaAutosize [formControl]="introductionCtrl" [value]="IntroductionCtrl.value"
+                            placeholder="Say something about yourself" matInput>
                     {{IntroductionCtrl.value}}
                     </textarea>
-                    <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                    @if (IntroductionCtrl.hasError('maxlength')) {
-                    <mat-error>
-                        Maximum of {{maxTextAreaChars}} characters is reached.
-                    </mat-error>
-                    }
-                </mat-form-field>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
-                </div>
-            </form>
-        </div>
-    </mat-step>
-    <mat-step [stepControl]="interestsCtrl" optional="true">
-        <div class="container">
-            <form>
-                <ng-template matStepLabel>{{interestsLabel}}</ng-template>
-                <mat-form-field appearaance="outline">
-                    <mat-label>Anything you are interested in</mat-label>
-                    <textarea cdkTextareaAutosize [formControl]="interestsCtrl" [value]="InterestsCtrl.value"
-                        placeholder="Any interests?" matInput>
+                        <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        @if (IntroductionCtrl.hasError('maxlength')) {
+                        <mat-error>
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
+                        }
+                    </mat-form-field>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step [stepControl]="interestsCtrl" optional="true">
+            <div class="container">
+                <form>
+                    <ng-template matStepLabel>{{interestsLabel}}</ng-template>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>Anything you are interested in</mat-label>
+                        <textarea cdkTextareaAutosize [formControl]="interestsCtrl" [value]="InterestsCtrl.value"
+                            placeholder="Any interests?" matInput>
                 {{InterestsCtrl.value}}
                 </textarea>
-                    <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                    @if (InterestsCtrl.hasError('maxlength')) {
-                    <mat-error>
-                        Maximum of {{maxTextAreaChars}} characters is reached.
-                    </mat-error>
-                    }
-                </mat-form-field>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
-                </div>
-            </form>
-        </div>
-    </mat-step>  
-    <mat-step [stepControl]="lookingForCtrl" optional="true">
-        <div class="container">
-            <form>
-                <ng-template matStepLabel>{{lookingForLabel}}</ng-template>
-                <mat-form-field appearaance="outline">
-                    <mat-label>What are you looking for?</mat-label>
-                    <textarea cdkTextareaAutosize [formControl]="lookingForCtrl" [value]="LookingForCtrl.value"
-                        placeholder="Anything you are looking for?" matInput>
+                        <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        @if (InterestsCtrl.hasError('maxlength')) {
+                        <mat-error>
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
+                        }
+                    </mat-form-field>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step [stepControl]="lookingForCtrl" optional="true">
+            <div class="container">
+                <form>
+                    <ng-template matStepLabel>{{lookingForLabel}}</ng-template>
+                    <mat-form-field appearaance="outline">
+                        <mat-label>What are you looking for?</mat-label>
+                        <textarea cdkTextareaAutosize [formControl]="lookingForCtrl" [value]="LookingForCtrl.value"
+                            placeholder="Anything you are looking for?" matInput>
                 {{LookingForCtrl.value}}
                 </textarea>
-                    <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                    @if (LookingForCtrl.hasError('maxlength')) {
-                    <mat-error>
-                        Maximum of {{maxTextAreaChars}} characters is reached.
-                    </mat-error>
-                    }
-                </mat-form-field>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button mat-raised-button color="primary" matStepperNext>Next</button>
-                </div>
-            </form>
-        </div>
-    </mat-step>
-    <mat-step>
-        <div class="container">
-            <ng-template matStepLabel>Review & Submit</ng-template>
-            <form class="review-submit">
-                <mat-accordion>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{starterLable}}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                {{starterSummary}}
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        <ul>
-                            <li><strong>Name/NickName:</strong> {{KnownAsCtrl.value}}</li>
-                            <li><strong>Country:</strong> {{CountryCtrl.value | titlecase}}</li>
-                            <li><strong>City:</strong> {{CityCtrl.value | titlecase}}</li>
-                        </ul>
-                    </mat-expansion-panel>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{photosLabel}}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                You can still modify your photos
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        @if(member) {
-                        <app-photo-editor [member]="member" />
+                        <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
+                        @if (LookingForCtrl.hasError('maxlength')) {
+                        <mat-error>
+                            Maximum of {{maxTextAreaChars}} characters is reached.
+                        </mat-error>
                         }
-                    </mat-expansion-panel>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{introductionLabel}}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                What you want people know about you
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        <p>{{IntroductionCtrl.value}}</p>
-                    </mat-expansion-panel>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{interestsLabel}}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                Your interests are
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        <p>{{InterestsCtrl.value}}</p>
-                    </mat-expansion-panel>
-                    <mat-expansion-panel>
-                        <mat-expansion-panel-header>
-                            <mat-panel-title>
-                                {{lookingForLabel}}
-                            </mat-panel-title>
-                            <mat-panel-description>
-                                You are looking for
-                            </mat-panel-description>
-                        </mat-expansion-panel-header>
-                        <p>{{lookingForCtrl.value}}</p>
-                    </mat-expansion-panel>
-                </mat-accordion>
-                <div class="buttons">
-                    <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                    <button (click)="submit()" mat-raised-button color="primary">Submit</button>
-                    <button mat-stroked-button color="warn" (click)="stepper.reset()">Reset</button>
-                </div>
-            </form>
-        </div>
-    </mat-step>
-</mat-stepper>
+                    </mat-form-field>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                </form>
+            </div>
+        </mat-step>
+        <mat-step>
+            <div class="container">
+                <ng-template matStepLabel>Review & Submit</ng-template>
+                <form class="review-submit">
+                    <mat-accordion>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{starterLable}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    {{starterSummary}}
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            <ul>
+                                <li><strong>Name/NickName:</strong> {{KnownAsCtrl.value}}</li>
+                                <li><strong>Country:</strong> {{CountryCtrl.value | titlecase}}</li>
+                                <li><strong>City:</strong> {{CityCtrl.value | titlecase}}</li>
+                            </ul>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{photosLabel}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    You can still modify your photos
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            @if(member) {
+                            <app-photo-editor [member]="member" />
+                            }
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{introductionLabel}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    What you want people know about you
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            <p>{{IntroductionCtrl.value}}</p>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{interestsLabel}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    Your interests are
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            <p>{{InterestsCtrl.value}}</p>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{lookingForLabel}}
+                                </mat-panel-title>
+                                <mat-panel-description>
+                                    You are looking for
+                                </mat-panel-description>
+                            </mat-expansion-panel-header>
+                            <p>{{lookingForCtrl.value}}</p>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button (click)="submit()" mat-raised-button color="primary">Submit</button>
+                        <button mat-stroked-button color="warn" (click)="stepper.reset()">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </mat-step>
+    </mat-stepper>
+</section>
