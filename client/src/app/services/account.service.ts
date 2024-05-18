@@ -37,7 +37,7 @@ export class AccountService {
           if (user) {
             this.setCurrentUser(user);
 
-            this.setGetReturnUrl();
+            this.setGetReturnUrl(); // Never put it setCurrentUser() or all pages refreshes land on members only. 
 
             return user;
           }
