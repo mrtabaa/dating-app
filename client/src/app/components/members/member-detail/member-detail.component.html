@@ -30,8 +30,14 @@
             </div>
         </mat-card-content>
         <mat-card-actions>
+            @if (router.url === '/member/' + username) {
+            <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-stroked-button
+                color="primary">Edit Profile</button>
+            }
+            @else {
             <button mat-raised-button color="primary">LIKE</button>
             <button mat-raised-button color="accent">MESSAGES</button>
+            }
         </mat-card-actions>
     </mat-card>
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
@@ -54,7 +60,8 @@
                 @if (images.length > 0) {
                 <div class="gallery">
                     @for (image of images; track $index) {
-                    <img [lightbox]="$index" gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
+                    <img [lightbox]="$index" gallerize [src]="image.data?.thumb"
+                        alt="{{member.knownAs + '\'s' + ' image'}}">
                     }
                 </div>
                 }

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
 import { Member } from '../../../models/member.model';
@@ -11,12 +11,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 import { LightboxModule } from 'ng-gallery/lightbox';
 import { IntlModule } from "angular-ecmascript-intl";
+import { AccountService } from '../../../services/account.service';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
   imports: [
-    CommonModule, NgOptimizedImage,
+    CommonModule, NgOptimizedImage, RouterModule,
     MatCardModule, MatTabsModule, MatButtonModule,
     GalleryModule, LightboxModule, IntlModule
   ],
@@ -25,8 +26,10 @@ import { IntlModule } from "angular-ecmascript-intl";
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
   private memberService = inject(MemberService);
+  username = inject(AccountService).loggedInUserSig()?.userName;
   private route = inject(ActivatedRoute);
   private gallery = inject(Gallery);
+  router = inject(Router);
 
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
@@ -35,6 +38,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getMember();
     this.setGalleryImages();
+
   }
 
   ngOnDestroy(): void {
