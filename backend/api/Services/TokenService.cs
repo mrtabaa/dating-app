@@ -10,7 +10,7 @@ public class TokenService : ITokenService
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
-        string? tokenValue = config[AppVariablesExtensions.TokenKey];
+        string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 
         // throw exception if tokenValue is null
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
