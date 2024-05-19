@@ -75,7 +75,8 @@ export class CompleteProfileComponent implements OnInit {
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   lookingForCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
-  photosCtrl = this.fb.control(null, [Validators.required]);
+  photosCtrl = this.fb.control(null);
+  // photosCtrl = this.fb.control(null, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
