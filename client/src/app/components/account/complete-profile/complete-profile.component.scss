@@ -1,4 +1,4 @@
-h3 {
+.title {
     text-align: center;
 }
 
@@ -18,7 +18,7 @@ mat-stepper {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 60dvh;
+        min-height: 50dvh;
 
         form {
             background-color: white;
