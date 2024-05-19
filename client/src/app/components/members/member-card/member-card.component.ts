@@ -24,7 +24,7 @@ import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit
 })
 export class MemberCardComponent {
   @Input() memberIn: Member | undefined;
-  @Output() memberUserNameOut = new EventEmitter<FollowModifiedEmit>();
+  @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();
 
   private followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);
@@ -70,7 +70,7 @@ export class MemberCardComponent {
         isFollowing: isFollowing
       };
 
-      this.memberUserNameOut.emit(followModifiedEmit);
+      this.FollowModifiedOut.emit(followModifiedEmit);
     }
   }
 }
