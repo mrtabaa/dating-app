@@ -38,6 +38,10 @@ mat-stepper {
                 align-self: center;
                 gap: 1rem;
             }
+
+            mat-error {
+                text-align: center;
+            }
         }
 
         .review-submit {

@@ -75,7 +75,7 @@ export class CompleteProfileComponent implements OnInit {
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   lookingForCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
-  photosCtrl = this.fb.control(null); // To handle the MatStepper pagination
+  photosCtrl = this.fb.control(null, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
@@ -94,6 +94,9 @@ export class CompleteProfileComponent implements OnInit {
   }
   get LookingForCtrl(): AbstractControl {
     return this.lookingForCtrl as FormControl;
+  }
+  get PhotosCtrl(): AbstractControl {
+    return this.photosCtrl as FormControl;
   }
 
   submit(): void {
@@ -126,5 +129,11 @@ export class CompleteProfileComponent implements OnInit {
           }
         }
       });
+  }
+
+  validateIfUploaded(): void {
+    if (this.accountService.loggedInUserSig()?.profilePhotoUrl) {
+      this.PhotosCtrl.clearValidators();
+    }
   }
 }
