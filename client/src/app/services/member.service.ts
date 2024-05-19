@@ -19,6 +19,7 @@ export class MemberService {
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
   memberParams: MemberParams | undefined;
+  paginatedResultMembers: PaginatedResult<Member[]> | undefined;
 
   constructor() {
     this.getFreshMemberParams();
@@ -61,12 +62,25 @@ export class MemberService {
     return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params)
       .pipe(
         map(response => {
+          this.paginatedResultMembers = response;
+
           if (this.memberParams)
             this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
 
           return response;
         })
       );
+  }
+
+  resetMembersAfterFollowModified(userName: string, isFollowing: boolean): void {
+    if (this.memberParams && this.paginatedResultMembers?.result) {
+      for (const member of this.paginatedResultMembers.result) {
+        if (member.userName === userName)
+          member.isFollowing = isFollowing;
+      }
+
+      this.memberCache.set(Object.values(this.memberParams).join('-'), this.paginatedResultMembers)
+    }
   }
 
   /**
