@@ -4,6 +4,7 @@ public record MemberDto(
     string Schema,
     string? UserName,
     int Age,
+    DateOnly DateOfBirth,
     string KnownAs,
     DateTime Created,
     DateTime LastActive,

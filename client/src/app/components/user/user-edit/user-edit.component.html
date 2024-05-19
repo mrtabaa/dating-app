@@ -69,6 +69,9 @@
                             </mat-error>
                             }
                         </mat-form-field>
+                        <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'"
+                            [minDate]="minDate" [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
+                        </app-date-picker-cva>
                         <mat-form-field appearaance="outline">
                             <mat-label>Introduction</mat-label>
                             <textarea cdkTextareaAutosize formControlName="introductionCtrl"

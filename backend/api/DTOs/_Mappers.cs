@@ -45,6 +45,7 @@ namespace api.DTOs
                 Schema: appUser.Schema,
                 UserName: appUser.UserName,
                 Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
+                DateOfBirth: appUser.DateOfBirth,
                 KnownAs: appUser.KnownAs,
                 Created: appUser.CreatedOn,
                 LastActive: appUser.LastActive,

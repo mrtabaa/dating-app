@@ -17,13 +17,14 @@ import { IntlModule } from 'angular-ecmascript-intl';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { AccountService } from '../../../services/account.service';
+import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
-    PhotoEditorComponent,
+    PhotoEditorComponent, DatePickerCvaComponent,
     MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule,
     IntlModule
   ],
@@ -39,12 +40,19 @@ export class UserEditComponent implements OnInit {
 
   member: Member | undefined;
 
+  minDate = new Date();
+  maxDate = new Date();
   readonly minTextAreaChars: number = 10;
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 30;
 
   ngOnInit(): void {
+    // set datePicker year limitations
+    const currentYear = new Date().getFullYear();
+    this.minDate = new Date(currentYear - 99, 0, 1); // not older than 99 years
+    this.maxDate = new Date(currentYear - 18, 0, 1); // not earlier than 18 years
+
     this.getMember();
   }
 
@@ -63,6 +71,7 @@ export class UserEditComponent implements OnInit {
 
   userEditFg: FormGroup = this.fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+    dateOfBirthCtrl: [null, [Validators.required]],
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
@@ -72,6 +81,9 @@ export class UserEditComponent implements OnInit {
 
   get KnownAsCtrl(): AbstractControl {
     return this.userEditFg.get('knownAsCtrl') as FormControl;
+  }
+  get DateOfBirthCtrl(): FormControl {
+    return this.userEditFg.get('dateOfBirthCtrl') as FormControl;
   }
   get IntroductionCtrl(): AbstractControl {
     return this.userEditFg.get('introductionCtrl') as FormControl;
@@ -91,6 +103,7 @@ export class UserEditComponent implements OnInit {
 
   initContollersValues(member: Member) {
     this.KnownAsCtrl.setValue(member.knownAs);
+    this.DateOfBirthCtrl.setValue(member.dateOfBirth);
     this.IntroductionCtrl.setValue(member.introduction);
     this.LookingForCtrl.setValue(member.lookingFor);
     this.InterestsCtrl.setValue(member.interests);
@@ -103,6 +116,7 @@ export class UserEditComponent implements OnInit {
       const updatedUser: UserUpdate = {
         username: member.userName,
         knownAs: this.KnownAsCtrl.value,
+        dateOfBirth: this.DateOfBirthCtrl.value,
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,

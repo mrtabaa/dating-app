@@ -4,6 +4,7 @@ export interface Member {
     schema: string;
     userName: string;
     age: number;
+    dateOfBirth: Date,
     knownAs: string;
     created: Date;
     lastActive: Date;
