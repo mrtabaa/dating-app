@@ -2,7 +2,7 @@
     <section class="head">
         <h1 class="title">Your Profile</h1>
         <mat-card class="warning">
-            @if (userEditFg.dirty) {
+            @if (!disableItemsOnNoChangeValues()) {
             <mat-card-content>
                 <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
             </mat-card-content>
@@ -42,9 +42,13 @@
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
-                    <button type="submit" (click)="updateUser(member)"
-                        [disabled]="userEditFg.pristine || userEditFg.invalid" mat-raised-button color="primary">
+                    <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
+                        || disableItemsOnNoChangeValues()" mat-raised-button color="primary">
                         Save Changes
+                    </button>
+                    <button (click)="(initContollersValues(member))" [disabled]="disableItemsOnNoChangeValues()"
+                        mat-stroked-button color="warn">
+                        Reset
                     </button>
                 </mat-card-actions>
             </mat-card>

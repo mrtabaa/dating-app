@@ -21,16 +21,23 @@
         padding: 2% 4%;
         display: flex;
         gap: 2rem;
-        
+
         mat-card {
             width: 15rem;
 
-            mat-card-content{
+            mat-card-content {
                 margin-top: 1rem;
             }
 
-            mat-card-actions button {
-                width: 100%;
+            mat-card-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+
+                button {
+
+                    width: 100%;
+                }
             }
         }
 

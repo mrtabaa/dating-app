@@ -1,7 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { UserUpdate } from '../../../models/user-update.model';
 import { Member } from '../../../models/member.model';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
@@ -31,12 +31,13 @@ import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-pick
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
-export class UserEditComponent implements OnInit {
+export class UserEditComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
+  private userEditFgSubscribed: Subscription | undefined;
 
   member: Member | undefined;
 
@@ -54,6 +55,16 @@ export class UserEditComponent implements OnInit {
     this.maxDate = new Date(currentYear - 18, 0, 1); // not earlier than 18 years
 
     this.getMember();
+
+    // this.userEditFg.valueChanges.subscribe(() => {
+    //   if (this.member)
+    //     this.disableButtons(this.member);
+    // });
+  }
+
+  ngOnDestroy(): void {
+    if (this.userEditFgSubscribed)
+      this.userEditFgSubscribed.unsubscribe();
   }
 
   getMember(): void {
@@ -109,6 +120,23 @@ export class UserEditComponent implements OnInit {
     this.InterestsCtrl.setValue(member.interests);
     this.CityCtrl.setValue(member.city);
     this.CountryCtrl.setValue(member.country);
+  }
+
+  disableItemsOnNoChangeValues(): boolean {
+    if (
+      this.member
+      && this.member.knownAs === this.KnownAsCtrl.value
+      && this.member.dateOfBirth === this.DateOfBirthCtrl.value
+      && this.member.introduction === this.IntroductionCtrl.value
+      && this.member.lookingFor === this.LookingForCtrl.value
+      && this.member.interests === this.InterestsCtrl.value
+      && this.member.country === this.CountryCtrl.value
+      && this.member.city === this.CityCtrl.value
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   updateUser(member: Member): void {
