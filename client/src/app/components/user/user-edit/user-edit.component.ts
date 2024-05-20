@@ -122,6 +122,18 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.CountryCtrl.setValue(member.country);
   }
 
+  updateMemberAfterUpdateSucceed(): void {
+    if (this.member) {
+      this.member.knownAs = this.KnownAsCtrl.value;
+      this.member.dateOfBirth = this.DateOfBirthCtrl.value;
+      this.member.introduction = this.IntroductionCtrl.value;
+      this.member.lookingFor = this.LookingForCtrl.value;
+      this.member.interests = this.InterestsCtrl.value;
+      this.member.country = this.CountryCtrl.value;
+      this.member.city = this.CityCtrl.value;
+    }
+  }
+
   disableItemsOnNoChangeValues(): boolean {
     if (
       this.member
@@ -165,6 +177,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
                 loggedInUser.knownAs = this.KnownAsCtrl.value;
 
                 this.accountService.setCurrentUser(loggedInUser);
+
+                this.updateMemberAfterUpdateSucceed();
               }
             }
           }
