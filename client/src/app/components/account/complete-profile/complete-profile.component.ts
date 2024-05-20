@@ -19,6 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../services/account.service';
 import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { CountryListService } from '../../../services/country-list.service';
 
 @Component({
   selector: 'app-complete-profile',
@@ -39,12 +40,14 @@ export class CompleteProfileComponent implements OnInit {
   private memberService = inject(MemberService);
   private userService = inject(UserService);
   private accountService = inject(AccountService);
+  private countryListService = inject(CountryListService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
   private breakpointObserver = inject(BreakpointObserver);
   stepperOrientation: Observable<StepperOrientation>;
 
   member: Member | undefined;
+  filteredCountries$!: Observable<unknown>;
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 30;
@@ -63,6 +66,12 @@ export class CompleteProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.getMember();
+
+    // filter country with user input
+    this.filterCountries();
+
+    // when no country is selected
+    this.hideCountryFlag();
   }
 
   getMember(): void {
@@ -81,8 +90,10 @@ export class CompleteProfileComponent implements OnInit {
 
   starterFg = this.fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    countryCtrl: [null, [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    cityCtrl: [null, [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
+    countryFilterCtrl: ['', Validators.required],
+    selectedCountryCtrl: ['', Validators.required],
+    cityFilterCtrl: ['', Validators.required],
+    selectedCityCtrl: ['', Validators.required],
   })
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
@@ -93,11 +104,17 @@ export class CompleteProfileComponent implements OnInit {
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
   }
-  get CountryCtrl(): AbstractControl {
-    return this.starterFg.get('countryCtrl') as FormControl;
+  get CountryFilterCtrl(): AbstractControl {
+    return this.starterFg.get('countryFilterCtrl') as FormControl;
   }
-  get CityCtrl(): AbstractControl {
-    return this.starterFg.get('cityCtrl') as FormControl;
+  get SelectedCountryCtrl(): AbstractControl {
+    return this.starterFg.get('selectedCountryCtrl') as FormControl;
+  }
+  get CityFilterCtrl(): AbstractControl {
+    return this.starterFg.get('cityFilterCtrl') as FormControl;
+  }
+  get SelectedCityCtrl(): AbstractControl {
+    return this.starterFg.get('selectedCityCtrl') as FormControl;
   }
   get IntroductionCtrl(): AbstractControl {
     return this.introductionCtrl as FormControl;
@@ -149,4 +166,45 @@ export class CompleteProfileComponent implements OnInit {
       this.PhotosCtrl.clearValidators();
     }
   }
+
+  //#region Country/City
+  // ngOnInit
+  filterCountries(): void {
+    this.filteredCountries$ = this.CountryFilterCtrl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this.countryListService.filterCountries(value))
+      );
+  }
+
+  // if no country is selected
+  // ngOnInit
+  hideCountryFlag(): void {
+    this.CountryFilterCtrl.valueChanges.subscribe(value => {
+      if (value.length < 2) {
+        this.SelectedCountryCtrl.setErrors({ 'invalid': true });
+      }
+    })
+  }
+
+  // get from DOM (onSelectionChange)
+  getSelectedCountry(country: ICountry, event: any): void {
+    if (event.isUserInput) {  // check if the option is selected
+      //set phoneNumber
+      this.SelectedCountryCtrl.setValue(country);
+      this.PhoneCountryCodeCtrl.setValue(country.code);
+    }
+  }
+
+  moveFocusToNext(leaveFocus: HTMLInputElement, gainFocus: HTMLInputElement): void {
+    setTimeout(() => {
+      leaveFocus.blur();
+      gainFocus.focus();
+    });
+  }
+
+  clearFlag() {
+    this.SelectedCountryCtrl.setErrors({ required: true });
+  }
+  //#endregion Country/City
 }
