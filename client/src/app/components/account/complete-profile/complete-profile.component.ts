@@ -8,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
 import { MemberService } from '../../../services/member.service';
-import { take } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
@@ -17,6 +17,8 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
 import { UserService } from '../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../services/account.service';
+import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-complete-profile',
@@ -27,7 +29,10 @@ import { AccountService } from '../../../services/account.service';
     MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule, MatExpansionModule
   ],
   templateUrl: './complete-profile.component.html',
-  styleUrl: './complete-profile.component.scss'
+  styleUrl: './complete-profile.component.scss',
+  providers: [{
+    provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
+  }]
 })
 export class CompleteProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -36,6 +41,8 @@ export class CompleteProfileComponent implements OnInit {
   private accountService = inject(AccountService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
+  private breakpointObserver = inject(BreakpointObserver);
+  stepperOrientation: Observable<StepperOrientation>;
 
   member: Member | undefined;
   readonly maxTextAreaChars: number = 1000;
@@ -48,6 +55,11 @@ export class CompleteProfileComponent implements OnInit {
   readonly interestsLabel = 'Interests';
   readonly lookingForLabel = 'Looking for';
   panelOpenState = false;
+
+  constructor() {
+    this.stepperOrientation = this.breakpointObserver.observe('(min-width: 990px)')
+      .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
+  }
 
   ngOnInit(): void {
     this.getMember();

@@ -1,6 +1,6 @@
 <section>
     <h1 class="title">Please completing your profile to attract more people.</h1>
-    <mat-stepper linear #stepper>
+    <mat-stepper [linear]="true" #stepper [orientation]="(stepperOrientation | async)!">
         <mat-step [stepControl]="starterFg">
             <div class="container">
                 <form [formGroup]="starterFg">
@@ -118,6 +118,7 @@
             <div class="container">
                 <ng-template matStepLabel>Review & Submit</ng-template>
                 <form class="review-submit">
+                    <h2 class="title">Review each section and Submit</h2>
                     <mat-accordion>
                         <mat-expansion-panel [expanded]="true">
                             <mat-expansion-panel-header>
