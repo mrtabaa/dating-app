@@ -3,7 +3,7 @@ export interface LoggedInUser {
     knownAs: string;
     token: string;
     gender: string
-    profilePhotoUrl: string;
+    profilePhotoUrl: string | undefined;
     roles: string[];
     isProfileCompleted: boolean;
 }

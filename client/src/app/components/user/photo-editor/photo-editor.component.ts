@@ -14,6 +14,7 @@ import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Photo } from '../../../models/photo.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
+import { PhotoDeleteResponse } from '../../../models/helpers/photo-delete-response';
 
 @Component({
   selector: 'app-photo-editor',
@@ -100,19 +101,6 @@ export class PhotoEditorComponent implements OnInit {
   //#endregion Photo Upload using `ng2-file-upload`
 
   /**
-   * Set navbar profile photo ONLY when FIRST photo is uploaded.
-   * @param url_165 
-   */
-  setNavbarProfilePhoto(url_165: string): void {
-    if (this.loggedInUser) {
-
-      this.loggedInUser.profilePhotoUrl = url_165;
-
-      this.accountService.loggedInUserSig.set(this.loggedInUser)
-    }
-  }
-
-  /**
    * Set main photo for card and album
    * @param url_165In 
    */
@@ -129,11 +117,11 @@ export class PhotoEditorComponent implements OnInit {
                 photo.isMain = false;
 
               // set new selected main
-              if (photo.url_165 === url_165In) {
+              if (photo.url_165 === url_165In && this.loggedInUser) {
                 photo.isMain = true;
 
                 // update navbar photo
-                this.loggedInUser!.profilePhotoUrl = url_165In;
+                this.loggedInUser.profilePhotoUrl = url_165In;
                 this.accountService.setCurrentUser(this.loggedInUser!);
               }
             })
@@ -144,17 +132,59 @@ export class PhotoEditorComponent implements OnInit {
       });
   }
 
-  deletePhoto(url_128In: string, index: number): void {
-    this.userService.deletePhoto(url_128In)
+  deletePhoto(url_165In: string, index: number): void {
+    this.userService.deletePhoto(url_165In)
       .pipe(take(1))
       .subscribe({
-        next: (response: ApiResponseMessage) => {
-          if (response && this.member) {
+        next: (pDR: PhotoDeleteResponse) => {
+          if (this.member) {
             this.member.photos.splice(index, 1);
 
-            this.snackBar.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+            // Update navbar if there's no photo left.
+            if (this.member.photos.length === 0 && this.loggedInUser) {
+              this.loggedInUser.profilePhotoUrl = undefined;
+              this.accountService.setCurrentUser(this.loggedInUser);
+            }
+
+            // Update navbar if main photo was deleted
+            if (pDR.newMainUrl)
+              this.setNextMainWhenMainDeleted(pDR);
+
+            this.snackBar.open(pDR.successMessage, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
           }
         }
       })
+  }
+
+  /**
+   * Set navbar profile photo ONLY when FIRST photo is uploaded.
+   * @param url_165 
+   */
+  private setNavbarProfilePhoto(url_165: string): void {
+    if (this.loggedInUser) {
+
+      this.loggedInUser.profilePhotoUrl = url_165;
+
+      this.accountService.loggedInUserSig.set(this.loggedInUser)
+    }
+  }
+
+  /**
+   * If the main photo was deleted, set the next photo (if any) as the main photo.
+   * @param pDR // has value when deleted photo was main. Update navbar photo
+   */
+  private setNextMainWhenMainDeleted(pDR: PhotoDeleteResponse): void {
+    if (this.member) {
+      this.setNavbarProfilePhoto(pDR.newMainUrl);
+
+      // exclude the blob SasToken
+      const imageUrlFirstPart = pDR.newMainUrl.split('.web');
+
+      for (const photo of this.member.photos) {
+        // If the deleted photo was main => Update the next photo as main.
+        if (photo.url_165.includes(imageUrlFirstPart[0]))
+          photo.isMain = true;
+      }
+    }
   }
 }

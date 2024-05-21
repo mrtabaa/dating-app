@@ -10,5 +10,5 @@ public interface IUserRepository
     public Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, ObjectId userId, CancellationToken cancellationToken);
     public Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, ObjectId userId, CancellationToken cancellationToken);
     public Task<UpdateResult?> SetMainPhotoAsync(ObjectId userId, string photoUrlIn, CancellationToken cancellationToken);
-    public Task<UpdateResult?> DeletePhotoAsync(ObjectId userId, string? urlIn, CancellationToken cancellationToken);
+    public Task<PhotoDeleteResponse> DeletePhotoAsync(ObjectId userId, string? urlIn, CancellationToken cancellationToken);
 }
