@@ -7,18 +7,6 @@
             }
         </div>
         <div class="gallery">
-            <!-- @for (photo of member.photos; track $index) {
-            <div class="photos">
-                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
-                <div class="buttons">
-                    <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
-                        [disabled]="photo.isMain">Set profile</button>
-                    <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn"
-                        [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
-                </div>
-            </div>
-            } -->
-
             <div class="upload-photo-area">
                 <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
                     [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
@@ -37,16 +25,17 @@
                 </mat-card>
             </div>
             @for (photo of member.photos; track $index) {
-                <div class="photos">
-                    <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
-                    <div class="buttons">
-                        <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
-                            [disabled]="photo.isMain">Set profile</button>
-                        <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn"
-                            [disabled]="photo.isMain"><mat-icon>delete</mat-icon></button>
-                    </div>
+            <div class="photos">
+                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
+                <div class="buttons">
+                    <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
+                        [disabled]="photo.isMain">Set profile</button>
+                    <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn">
+                        <mat-icon>delete</mat-icon>
+                    </button>
                 </div>
-                }
+            </div>
+            }
         </div>
     </section>
     }
