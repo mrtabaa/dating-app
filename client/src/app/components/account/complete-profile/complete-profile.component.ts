@@ -143,10 +143,4 @@ export class CompleteProfileComponent implements OnInit {
         }
       });
   }
-
-  validateIfUploaded(): void {
-    if (this.accountService.loggedInUserSig()?.profilePhotoUrl) {
-      this.PhotosCtrl.clearValidators();
-    }
-  }
 }
