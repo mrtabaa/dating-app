@@ -1,16 +1,16 @@
 <main>
     @if(loggedInUser && member) {
     <section class="top">
-        <div>
-            @if (member.photos.length === 0) {
+        <div class="header">
+            @if (member.photos.length === 0 && !isUploading) {
             <mat-hint>Your album is empty. You may upload some photos.</mat-hint>
             }
-        </div>
-        <div class="gallery">
             @if(isUploading) {
             <button (click)="uploader?.cancelAll()" mat-raised-button color="accent">Stop Uploading</button>
             }
-            @else {
+        </div>
+        <div class="gallery">
+            @if(!isUploading) {
             <div class="upload-photo-area">
                 <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
                     [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,

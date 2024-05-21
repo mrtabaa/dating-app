@@ -8,6 +8,11 @@ main {
         flex-direction: column;
         gap: 1rem;
 
+        .header {
+            display: flex;
+            justify-content: center;
+        }
+
         .gallery {
             display: flex;
             align-items: center;
