@@ -10,8 +10,13 @@ main {
 
         .gallery {
             display: flex;
+            align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+
+            .upload-photo-area {
+                flex: 1;
+            }
 
             .photos {
                 width: 165px;
