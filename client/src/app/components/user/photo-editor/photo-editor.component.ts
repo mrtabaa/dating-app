@@ -41,6 +41,7 @@ export class PhotoEditorComponent implements OnInit {
 
   uploader: FileUploader | undefined;
   hasBaseDropZoneOver = false;
+  isUploading = false;
 
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
@@ -76,6 +77,14 @@ export class PhotoEditorComponent implements OnInit {
         }
       }
 
+      this.uploader.onProgressAll = () => {
+        this.isUploading = true;
+      }
+
+      this.uploader.onCancelItem = () => {
+        this.isUploading = false;
+      }
+
       this.uploader.onWhenAddingFileFailed = (file) => {
         if (file.size > this.maxFileSize)
           this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
@@ -90,6 +99,8 @@ export class PhotoEditorComponent implements OnInit {
           if (this.member?.photos.length === 1)
             this.setNavbarProfilePhoto(photo.url_165)
         }
+
+        this.isUploading = false;
       }
 
       this.uploader.onErrorItem = (item, error) => {

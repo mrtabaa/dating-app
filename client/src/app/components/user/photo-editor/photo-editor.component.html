@@ -7,6 +7,10 @@
             }
         </div>
         <div class="gallery">
+            @if(isUploading) {
+            <button (click)="uploader?.cancelAll()" mat-raised-button color="accent">Stop Uploading</button>
+            }
+            @else {
             <div class="upload-photo-area">
                 <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
                     [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
@@ -24,6 +28,7 @@
                     </mat-card-actions>
                 </mat-card>
             </div>
+            }
             @for (photo of member.photos; track $index) {
             <div class="photos">
                 <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
