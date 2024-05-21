@@ -24,19 +24,15 @@
                 </form>
             </div>
         </mat-step>
-        <mat-step [stepControl]="photosCtrl">
+        <mat-step [stepControl]="photosCtrl" optional>
             <div class="container photos">
                 <form>
                     <div class="buttons">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button (click)="validateIfUploaded()" mat-raised-button color="primary"
-                            matStepperNext>Next</button>
+                        <button mat-raised-button color="primary" matStepperNext>Next</button>
                     </div>
                     <ng-template matStepLabel>{{photosLabel}}</ng-template>
                     @if(member) {
-                    @if(PhotosCtrl.invalid) {
-                    <mat-error>Having one photo is required.</mat-error>
-                    }
                     <app-photo-editor [member]="member" />
                     }
                 </form>

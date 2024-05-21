@@ -59,17 +59,19 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     }
 
     [HttpDelete("delete-one-photo")]
-    public async Task<ActionResult> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
+    public async Task<ActionResult<PhotoDeleteResponse>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
-        UpdateResult? updateResult = await _userRepository.DeletePhotoAsync(userId.Value, photoUrlIn, cancellationToken);
+        PhotoDeleteResponse photoDeleteResponse = await _userRepository.DeletePhotoAsync(userId.Value, photoUrlIn, cancellationToken);
 
-        return updateResult is null || updateResult.ModifiedCount == 0
-            ? BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the support.")
-            : Ok(new Response(Message: "Photo deleted successfully."));
+        if (photoDeleteResponse.IsDeletionFailed)
+            return BadRequest("Photo deletion failed. Try again in a few moments. If the issue persists contact the support.");
+
+        photoDeleteResponse.SuccessMessage = "Photo got deleted successfully.";
+        return photoDeleteResponse;
     }
     #endregion Photo Management
 }

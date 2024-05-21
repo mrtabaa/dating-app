@@ -5,6 +5,7 @@ import { UserUpdate } from '../models/user-update.model';
 import { environment } from '../../environments/environment';
 import { Member } from '../models/member.model';
 import { ApiResponseMessage } from '../models/helpers/api-response-message';
+import { PhotoDeleteResponse } from '../models/helpers/photo-delete-response';
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +40,9 @@ export class UserService {
     return this.http.put<ApiResponseMessage>(this.baseUrl + '/set-main-photo', null, { params: queryParams });
   }
 
-  deletePhoto(url_128In: string): Observable<ApiResponseMessage> {
+  deletePhoto(url_128In: string): Observable<PhotoDeleteResponse> {
     const queryParams = new HttpParams().set('photoUrlIn', url_128In);
 
-    return this.http.delete<ApiResponseMessage>(this.baseUrl + '/delete-one-photo', { params: queryParams });
+    return this.http.delete<PhotoDeleteResponse>(this.baseUrl + '/delete-one-photo', { params: queryParams });
   }
 }
