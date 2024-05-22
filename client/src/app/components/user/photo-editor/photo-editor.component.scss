@@ -18,11 +18,11 @@ main {
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-
+            
             .upload-photo-area {
                 flex: 1;
             }
-
+            
             .photos {
                 width: 165px;
 
@@ -75,6 +75,9 @@ main {
     }
 
     .queue {
+        .queue-length {
+            color: #673ab7;
+        }
         .photos-queue {
             display: flex;
             flex-direction: column;
