@@ -233,7 +233,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError("Upload failed. Error writing to MongoDB." + ex.Message);
+            _logger.LogError("Delete failed. Error writing to MongoDB." + ex.Message);
 
             await session.AbortTransactionAsync(cancellationToken);
 
@@ -274,11 +274,15 @@ public class UserRepository : IUserRepository
             throw new InvalidOperationException(message);
         }
 
-        // convert next photoUrl 
-        string? blobPhotoUrl = _photoService.ConvertPhotoToBlobLinkWithSas(
-            updatedAppUser.Photos.Where<Photo>(photo => photo.IsMain).FirstOrDefault())?.Url_165;
+        return _photoService.ConvertPhotoToBlobLinkWithSas(
+                updatedAppUser.Photos.ElementAtOrDefault(1))?.Url_165;
+        // updatedAppUser.Photos.Count > 1
+        // ? _photoService.ConvertPhotoToBlobLinkWithSas(
+        //     updatedAppUser.Photos.ElementAtOrDefault(1))?.Url_165
+        // : _photoService.ConvertPhotoToBlobLinkWithSas(
+        //     updatedAppUser.Photos.FirstOrDefault())?.Url_165;
 
-        return string.IsNullOrEmpty(blobPhotoUrl) ? null : blobPhotoUrl;
+        // return string.IsNullOrEmpty(blobPhotoUrl) ? null : blobPhotoUrl;
     }
     #endregion Photo Management
 
