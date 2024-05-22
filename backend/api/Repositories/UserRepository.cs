@@ -5,19 +5,19 @@ public class UserRepository : IUserRepository
     private readonly IMongoCollection<AppUser> _collection;
     private readonly ILogger<UserRepository> _logger;
     private readonly IPhotoService _photoService;
-    private readonly ITokenService _tokenService;
+    private readonly IMongoClient _client;
 
     // constructor - dependency injections
     public UserRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        ILogger<UserRepository> logger, IPhotoService photoService, ITokenService tokenService
+        ILogger<UserRepository> logger, IPhotoService photoService
         )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        _client = client;
 
         _photoService = photoService;
-        _tokenService = tokenService;
         _logger = logger;
     }
     #endregion
@@ -87,7 +87,7 @@ public class UserRepository : IUserRepository
             return photoUploadStatus;
         }
 
-        // save file in Storage using PhotoService / userEmail makes the folder name
+        // save file in Storage using PhotoService / userId makes the folder name
         string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
 
         if (photoUrls is null)
@@ -106,19 +106,40 @@ public class UserRepository : IUserRepository
         // save to DB
         appUser.Photos.Add(photo);
 
-        var updatedUser = Builders<AppUser>.Update
-            .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-            .Set(doc => doc.Photos, appUser.Photos);
+        #region MongoDb Session
+        //// Session is NOT supported in MongoDb Standalone servers!
+        // Create a session object that is used when leveraging transactions
+        using var session = await _client.StartSessionAsync(null, cancellationToken);
 
-        UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+        // Begin transaction
+        session.StartTransaction();
 
-        // If db is not updated and cancellation is requested, delete the photo from Azure Blob Storage and stop proceeding.
-        // Consider using "Full Optimistic Locking / appUser Version comparison" if data integrity is required. 
-        if (result.ModifiedCount == 0 && cancellationToken.IsCancellationRequested)
+        try
         {
+            var updatedUser = Builders<AppUser>.Update
+                        .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                        .Set(doc => doc.Photos, appUser.Photos);
+
+            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+
+            // If db is not updated and cancellation is requested, delete the photo from Azure Blob Storage and stop proceeding.
+            // Consider using "Full Optimistic Locking / appUser Version comparison" if data integrity is required. 
+            if (result.ModifiedCount == 0 && cancellationToken.IsCancellationRequested)
+                throw new InvalidOperationException("Adding photoUrl to db has failed. Session is aborted.");
+
+            await session.CommitTransactionAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Upload failed. Error writing to MongoDB." + ex.Message);
+
+            await session.AbortTransactionAsync(cancellationToken);
+
+            // Delete the uploaded blobs
             await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
             return photoUploadStatus;
         }
+        #endregion MongoDb Session
 
         photo = _photoService.ConvertPhotoToBlobLinkWithSas(photo);
 
@@ -176,6 +197,16 @@ public class UserRepository : IUserRepository
             return photoDeleteResponse;
         }
 
+        // #region MongoDb Session
+        // //// Session is NOT supported in MongoDb Standalone servers!
+        // // Create a session object that is used when leveraging transactions
+        // using var session = await _client.StartSessionAsync(null, cancellationToken);
+
+        // // Begin transaction
+        // session.StartTransaction();
+
+        // try
+        // {
         // Create Filter of the matching Id
         FilterDefinition<AppUser> filterDef = Builders<AppUser>.Filter
             .Eq(appUser => appUser.Id, userId);
@@ -192,24 +223,25 @@ public class UserRepository : IUserRepository
         {
             string? newMainBlob = await SetNextPhotoAsMain(filterDef, userId, cancellationToken);
 
-            if (!string.IsNullOrEmpty(newMainBlob))
-            {
-                photoDeleteResponse.NewMainUrl = newMainBlob;
-                return photoDeleteResponse;
-            }
-
             photoDeleteResponse.NewMainUrl = newMainBlob;
             return photoDeleteResponse;
         }
 
         // Delete blob
         bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
-        if (!isDeleteSuccess)
-        {
-            _logger.LogError("Delete from disk failed. See the logs.");
-            photoDeleteResponse.IsDeletionFailed = true;
-            return photoDeleteResponse;
-        }
+        //     if (!isDeleteSuccess)
+        //         throw new InvalidOperationException("Delete from blob failed.");
+        // }
+        // catch (Exception ex)
+        // {
+        //     _logger.LogError("Upload failed. Error writing to MongoDB." + ex.Message);
+
+        //     await session.AbortTransactionAsync(cancellationToken);
+
+        //     photoDeleteResponse.IsDeletionFailed = true;
+        //     return photoDeleteResponse;
+        // }
+        // #endregion MongoDb Session
 
         return photoDeleteResponse;
     }
