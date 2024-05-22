@@ -72,26 +72,26 @@ public class UserRepository : IUserRepository
     #region Photo Management
     public async Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, ObjectId userId, CancellationToken cancellationToken)
     {
-        PhotoUploadStatus photoUploadStatus = new();
+        PhotoUploadStatus photoUploadResponse = new();
 
         AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
         {
             _logger.LogError("appUser is Null / not found");
-            return photoUploadStatus;
+            return photoUploadResponse;
         }
 
-        if (appUser.Photos.Count >= photoUploadStatus.MaxPhotosLimit)
+        if (appUser.Photos.Count >= photoUploadResponse.MaxPhotosLimit)
         {
-            photoUploadStatus.IsMaxPhotoReached = true;
-            return photoUploadStatus;
+            photoUploadResponse.IsMaxPhotoReached = true;
+            return photoUploadResponse;
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
         string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
 
         if (photoUrls is null)
-            return photoUploadStatus;
+            return photoUploadResponse;
 
         Photo? photo;
         if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
@@ -109,7 +109,7 @@ public class UserRepository : IUserRepository
         #region MongoDb Session
         //// Session is NOT supported in MongoDb Standalone servers!
         // Create a session object that is used when leveraging transactions
-        using var session = await _client.StartSessionAsync(null, cancellationToken);
+        using IClientSessionHandle session = await _client.StartSessionAsync(null, cancellationToken);
 
         // Begin transaction
         session.StartTransaction();
@@ -137,15 +137,15 @@ public class UserRepository : IUserRepository
 
             // Delete the uploaded blobs
             await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
-            return photoUploadStatus;
+            return photoUploadResponse;
         }
         #endregion MongoDb Session
 
         photo = _photoService.ConvertPhotoToBlobLinkWithSas(photo);
 
         // return the saved photo if save on Azure and DB
-        photoUploadStatus.Photo = photo;
-        return photoUploadStatus;
+        photoUploadResponse.Photo = photo;
+        return photoUploadResponse;
     }
 
     public async Task<UpdateResult?> SetMainPhotoAsync(ObjectId userId, string blob_url_165_In, CancellationToken cancellationToken)
@@ -197,53 +197,50 @@ public class UserRepository : IUserRepository
             return photoDeleteResponse;
         }
 
-        // #region MongoDb Session
-        // //// Session is NOT supported in MongoDb Standalone servers!
-        // // Create a session object that is used when leveraging transactions
-        // using var session = await _client.StartSessionAsync(null, cancellationToken);
+        #region MongoDb Session
+        //// Session is NOT supported in MongoDb Standalone servers!
+        // Create a session object that is used when leveraging transactions
+        using IClientSessionHandle session = await _client.StartSessionAsync(null, cancellationToken);
 
-        // // Begin transaction
-        // session.StartTransaction();
+        // Begin transaction
+        session.StartTransaction();
 
-        // try
-        // {
-        // Create Filter of the matching Id
-        FilterDefinition<AppUser> filterDef = Builders<AppUser>.Filter
-            .Eq(appUser => appUser.Id, userId);
-
-        // Make updateDef to Delete the photo
-        UpdateDefinition<AppUser>? updateDef = Builders<AppUser>.Update
-            .PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == dbUri);
-
-        // Execute updating the AppUser
-        await _collection.UpdateOneAsync(filterDef, updateDef, null, cancellationToken);
-
-        // SET the next photo to main (if any)
-        if (photo.IsMain)
+        try
         {
-            string? newMainBlob = await SetNextPhotoAsMain(filterDef, userId, cancellationToken);
+            // Create Filter of the matching Id
+            FilterDefinition<AppUser> filterDef = Builders<AppUser>.Filter
+                .Eq(appUser => appUser.Id, userId);
 
-            photoDeleteResponse.NewMainUrl = newMainBlob;
+            // Make updateDef to Delete the photo
+            UpdateDefinition<AppUser>? updateDef = Builders<AppUser>.Update
+                .PullFilter(appUser => appUser.Photos, photo => photo.Url_165 == dbUri);
+
+            // Execute updating the AppUser
+            await _collection.UpdateOneAsync(session, filterDef, updateDef, null, cancellationToken);
+
+            // SET the next photo to main (if any)
+            if (photo.IsMain)
+                photoDeleteResponse.NewMainUrl = await SetNextPhotoAsMain(session, filterDef, userId, cancellationToken);
+
+            // Delete blob
+            bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
+            if (!isDeleteSuccess)
+                throw new InvalidOperationException("Deleting blob failed.");
+
+            await session.CommitTransactionAsync(cancellationToken);
+
             return photoDeleteResponse;
         }
+        catch (Exception ex)
+        {
+            _logger.LogError("Upload failed. Error writing to MongoDB." + ex.Message);
 
-        // Delete blob
-        bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
-        //     if (!isDeleteSuccess)
-        //         throw new InvalidOperationException("Delete from blob failed.");
-        // }
-        // catch (Exception ex)
-        // {
-        //     _logger.LogError("Upload failed. Error writing to MongoDB." + ex.Message);
+            await session.AbortTransactionAsync(cancellationToken);
 
-        //     await session.AbortTransactionAsync(cancellationToken);
-
-        //     photoDeleteResponse.IsDeletionFailed = true;
-        //     return photoDeleteResponse;
-        // }
-        // #endregion MongoDb Session
-
-        return photoDeleteResponse;
+            photoDeleteResponse.IsDeletionFailed = true;
+            return photoDeleteResponse;
+        }
+        #endregion MongoDb Session
     }
 
     /// <summary>
@@ -253,7 +250,7 @@ public class UserRepository : IUserRepository
     /// <param name="filterDef"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<string?> SetNextPhotoAsMain(FilterDefinition<AppUser> filterDef, ObjectId userId, CancellationToken cancellationToken)
+    private async Task<string?> SetNextPhotoAsMain(IClientSessionHandle session, FilterDefinition<AppUser> filterDef, ObjectId userId, CancellationToken cancellationToken)
     {
         // Add this filter to filterDef which already includes userId. Check if there's a photo with IsMain == false
         filterDef = Builders<AppUser>.Filter
@@ -263,7 +260,7 @@ public class UserRepository : IUserRepository
         UpdateDefinition<AppUser> updateDef = Builders<AppUser>.Update
             .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true); // Find the next 'false' and make it 'true'
 
-        UpdateResult updateResult = await _collection.UpdateOneAsync(filterDef, updateDef, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateOneAsync(session, filterDef, updateDef, null, cancellationToken);
 
         if (updateResult.ModifiedCount == 0) return null;
 
