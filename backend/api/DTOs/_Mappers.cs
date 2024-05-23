@@ -15,6 +15,7 @@ namespace api.DTOs
                 LastActive = DateTime.UtcNow,
                 Gender = userInput.Gender.ToLower(),
                 Country = userInput.Country,
+                State = userInput.State,
                 City = userInput.City,
                 Introduction = userInput.Introduction,
                 LookingFor = userInput.LookingFor,
@@ -54,6 +55,7 @@ namespace api.DTOs
                 LookingFor: appUser.LookingFor,
                 Interests: appUser.Interests,
                 Country: appUser.Country,
+                State: appUser.State,
                 City: appUser.City,
                 Photos: appUser.Photos,
                 IsFollowing: isFollowing

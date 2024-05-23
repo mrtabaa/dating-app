@@ -55,11 +55,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.maxDate = new Date(currentYear - 18, 0, 1); // not earlier than 18 years
 
     this.getMember();
-
-    // this.userEditFg.valueChanges.subscribe(() => {
-    //   if (this.member)
-    //     this.disableButtons(this.member);
-    // });
   }
 
   ngOnDestroy(): void {
@@ -86,8 +81,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
-    cityCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    countryCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
+    countryCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
+    stateCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
+    cityCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
   });
 
   get KnownAsCtrl(): AbstractControl {
@@ -105,11 +101,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
   get InterestsCtrl(): AbstractControl {
     return this.userEditFg.get('interestsCtrl') as FormControl;
   }
-  get CityCtrl(): AbstractControl {
-    return this.userEditFg.get('cityCtrl') as FormControl;
-  }
   get CountryCtrl(): AbstractControl {
     return this.userEditFg.get('countryCtrl') as FormControl;
+  }
+  get StateCtrl(): AbstractControl {
+    return this.userEditFg.get('stateCtrl') as FormControl;
+  }
+  get CityCtrl(): AbstractControl {
+    return this.userEditFg.get('cityCtrl') as FormControl;
   }
 
   initContollersValues(member: Member) {
@@ -118,8 +117,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.IntroductionCtrl.setValue(member.introduction);
     this.LookingForCtrl.setValue(member.lookingFor);
     this.InterestsCtrl.setValue(member.interests);
-    this.CityCtrl.setValue(member.city);
     this.CountryCtrl.setValue(member.country);
+    this.StateCtrl.setValue(member.state);
+    this.CityCtrl.setValue(member.city);
   }
 
   updateMemberAfterUpdateSucceed(): void {
@@ -130,6 +130,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.member.lookingFor = this.LookingForCtrl.value;
       this.member.interests = this.InterestsCtrl.value;
       this.member.country = this.CountryCtrl.value;
+      this.member.state = this.StateCtrl.value;
       this.member.city = this.CityCtrl.value;
     }
   }
@@ -143,6 +144,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       && this.member.lookingFor === this.LookingForCtrl.value
       && this.member.interests === this.InterestsCtrl.value
       && this.member.country === this.CountryCtrl.value
+      && this.member.state === this.StateCtrl.value
       && this.member.city === this.CityCtrl.value
     ) {
       return true;
@@ -160,8 +162,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,
-        city: this.CityCtrl.value,
         country: this.CountryCtrl.value,
+        state: this.StateCtrl.value,
+        city: this.CityCtrl.value
       }
 
       this.userService.updateUser(updatedUser)

@@ -12,8 +12,9 @@ public record DummyRegisterDto(
     [Length(1, 50)] string KnownAs,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
-    [Length(3, 30)] string City,
     [Length(3, 30)] string Country,
+    [Length(3, 30)] string State,
+    [Length(3, 30)] string City,
     [MaxLength(1000)] string? Introduction,
     [MaxLength(1000)] string? LookingFor,
     [MaxLength(1000)] string? Interests

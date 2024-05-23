@@ -7,5 +7,6 @@ public record UserUpdateDto(
     [MaxLength(1000)] string? LookingFor,
     [MaxLength(1000)] string? Interests,
     [MinLength(3), MaxLength(30)] string Country,
+    [MinLength(3), MaxLength(30)] string State,
     [MinLength(3), MaxLength(30)] string City
 );

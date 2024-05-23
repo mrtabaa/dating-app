@@ -4,7 +4,7 @@ import { Country } from '../models/country.model';
 @Injectable({
   providedIn: 'root'
 })
-export class CountryListService {
+export class CountryService {
 
   constructor() { }
 

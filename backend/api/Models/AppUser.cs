@@ -16,8 +16,9 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public string? Introduction { get; init; }
     public string? LookingFor { get; init; }
     public string? Interests { get; init; }
-    public string City { get; init; } = string.Empty;
     public string Country { get; init; } = string.Empty;
+    public string State { get; init; } = string.Empty;
+    public string City { get; init; } = string.Empty;
     public List<Photo> Photos { get; set; } = [];
     public int FollowingsCount { get; init; }
     public int FollowersCount { get; init; }

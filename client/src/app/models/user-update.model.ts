@@ -6,5 +6,6 @@ export interface UserUpdate {
     lookingFor: string;
     interests: string;
     country: string;
+    state: string;
     city: string;
 }

@@ -12,8 +12,9 @@ public record MemberDto(
     string? Introduction,
     string? LookingFor,
     string? Interests,
-    string City,
     string Country,
+    string State,
+    string City,
     List<Photo> Photos,
     bool IsFollowing
 );

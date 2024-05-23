@@ -9,9 +9,29 @@
                         <mat-label>Name or Nickname</mat-label>
                         <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
                     </mat-form-field>
-                    <mat-form-field appearaance="outline">
+                    <!-- Country -->
+                    <mat-form-field [appClearControlFieldByClickDir]="CountryCtrl" appearance="outline"
+                        flexLayout="row">
                         <mat-label>Country</mat-label>
-                        <input formControlName="countryCtrl" matInput placeholder="United States">
+                        @if(SelectedCountryCtrl.valid) {
+                        <img [src]="'/assets/images/flags/4x3/' + SelectedCountryCtrl.value.acr +'.svg'" height="25"
+                            alt="Acr">
+                        }
+                        &nbsp;
+                        <input formControlName="countryCtrl" #countryInput [selectedCountryCtrlIn]="SelectedCountryCtrl"
+                            [countryCtrlIn]="CountryCtrl" type="text" placeholder="Search the country"
+                            aria-label="Country Code" matInput [matAutocomplete]="auto" required>
+                        <mat-autocomplete #auto="matAutocomplete"
+                            (optionSelected)="moveFocusToNext(countryInput, governmentIdInput)">
+                            <mat-option class="country-option" *ngFor="let country of filteredCountries$ | async"
+                                [value]="country.shortName" (onSelectionChange)="getSelectedCountry(country, $event)"
+                                fxLayout="row" fxLayoutAlign="start center">
+                                <img [src]="'/assets/images/flags/4x3/' + country.acr +'.svg'" class="flag" alt="Acr">
+                                &nbsp;&nbsp;
+                                <span fxFlex>{{country.name}}</span>
+                            </mat-option>
+                        </mat-autocomplete>
+                        <mat-error>This field is required.</mat-error>
                     </mat-form-field>
                     <mat-form-field appearaance="outline">
                         <mat-label>City</mat-label>

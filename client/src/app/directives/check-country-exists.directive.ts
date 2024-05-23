@@ -8,13 +8,13 @@ import { AbstractControl } from '@angular/forms';
 // check if the user input country exists
 export class CheckCountryExistsDirective {
   // Pass in multiple inputs: two controllers
-  @Input('checkCountryExistsIn') selectedCountryCtrl!: AbstractControl;
-  @Input('secondInputIn') countryFilterCtrl!: AbstractControl;
+  @Input() selectedCountryCtrlIn: AbstractControl | undefined;
+  @Input() countryCtrlIn: AbstractControl | undefined;
 
   @HostListener('focusout')
   onBlur() {
-    if (this.selectedCountryCtrl.invalid)
-      this.countryFilterCtrl.setValue("");
+    if (this.selectedCountryCtrlIn && this.countryCtrlIn)
+      if (this.selectedCountryCtrlIn.invalid)
+        this.countryCtrlIn.setValue("");
   }
-
 }
