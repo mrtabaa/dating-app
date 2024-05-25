@@ -1,14 +1,8 @@
 <div>
     <mat-form-field appearance="outline">
         <mat-label>{{label}}</mat-label>
-        <!-- TODO fix appAutofocusDir -->
-        @if (isFocused) {
-        <input appAutofocusDir type={{type}} [formControl]="Control" placeholder="{{placeHolder}}" matInput>
-        }
-        @else {
-        <input type={{type}} [formControl]="Control" placeholder="{{placeHolder}}" matInput>
-        }
-
+        <input [appAutofocusDir]="isFocused" [type]="type" [formControl]="Control"
+            placeholder="{{placeHolder}}" matInput>
         @if(Control.pristine) {
         <mat-hint>{{hint}}</mat-hint>
         }
