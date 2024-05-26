@@ -13,19 +13,19 @@
         }
         <mat-card-content>
             <div>
-                <strong>Location</strong>
+                <p>Location</p>
                 <p>{{member.city}}, {{member.country}}</p>
             </div>
             <div>
-                <strong>Age</strong>
+                <p class="title">Age</p>
                 <p>{{member.age}}</p>
             </div>
             <div>
-                <strong>Last Active</strong>
+                <p class="title">Last Active</p>
                 <p>{{member.lastActive | intlRelativeTime}}</p>
             </div>
             <div>
-                <strong>member Since</strong>
+                <p class="title">Member Since</p>
                 <p>{{member.created | date}}</p>
             </div>
         </mat-card-content>
@@ -48,16 +48,28 @@
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
         <mat-tab label="About {{member.knownAs}}">
             <div class="tab-contents">
-                <h4>Introduction</h4>
+                @if (member.introduction.length > 0) {
+                <h6>Introduction</h6>
                 <p>{{member.introduction}}</p>
-                <h4>Looking For</h4>
+                }
+                @if (member.lookingFor.length > 0) {
+                <h6>Looking For</h6>
                 <p>{{member.lookingFor}}</p>
+                }
+                @if(member.introduction.length === 0 && member.lookingFor.length === 0) {
+                <p>There is no information provided.</p>
+                }
             </div>
         </mat-tab>
         <mat-tab label="Interests">
             <div class="tab-contents">
-                <h4>Interests</h4>
+                @if(member.interests.length > 0) {
+                <h6>Interests</h6>
                 <p>{{member.interests}}</p>
+                }
+                @else {
+                <p>There is no information provided.</p>
+                }
             </div>
         </mat-tab>
         <mat-tab label="Photos">
