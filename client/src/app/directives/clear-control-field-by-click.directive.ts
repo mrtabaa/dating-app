@@ -8,11 +8,11 @@ import { AbstractControl } from '@angular/forms';
 export class ClearControlFieldByClickDirective {
 
   // send control from DOM through this line, e.g, [dirClearControlFieldByClick]="CountryFilterCtrl"
-  @Input('appClearControlFieldByClickDir') control!: AbstractControl;
+  @Input('appClearControlFieldByClickDir') control: AbstractControl | undefined;
 
   @HostListener('click', ['$event.target'])
-  public onClickOrEnter(): void { 
-    if (this.control.value) {
+  public onClickOrEnter(): void {
+    if (this.control?.value) {
       this.control.setValue("");
     }
   }
