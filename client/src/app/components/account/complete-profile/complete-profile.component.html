@@ -8,8 +8,12 @@
                     <mat-form-field appearaance="outline">
                         <mat-label>Name or Nickname</mat-label>
                         <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
-                        <!-- TODO add other validations -->
+                        @if(KnownAsCtrl.hasError('required')) {
                         <mat-error>This field is required.</mat-error>
+                        }
+                        @if(KnownAsCtrl.hasError('maxlength')) {
+                        <mat-error>Up to {{maxInputChars}} is allowed.</mat-error>
+                        }
                     </mat-form-field>
                     <!-- Location -->
                     @if(!isCountrySelected) {

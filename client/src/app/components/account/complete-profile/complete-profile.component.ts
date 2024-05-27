@@ -55,7 +55,7 @@ export class CompleteProfileComponent implements OnInit {
 
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
-  readonly maxInputChars: number = 30;
+  readonly maxInputChars: number = 50;
   readonly starterLable = 'Starter';
   readonly starterSummary = 'Your basic information';
   readonly photosLabel = 'Photos';
@@ -96,7 +96,7 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   starterFg = this.fb.group({
-    knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+    knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]],
     searchedLocationCtrl: [null, Validators.required],
     countryCtrl: [null],
     stateCtrl: [null],
