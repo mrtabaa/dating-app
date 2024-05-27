@@ -19,6 +19,7 @@ export class GooglePlaceService {
       fields: ["place_id", "name", "address_components"],
       strictBounds: false,
       // types: ["university", "school"],
+      types: ['(cities)']
     };
 
     // invoke googleMapService
