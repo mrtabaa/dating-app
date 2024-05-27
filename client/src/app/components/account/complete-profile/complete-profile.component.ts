@@ -46,7 +46,6 @@ export class CompleteProfileComponent implements OnInit {
   private userService = inject(UserService);
   private accountService = inject(AccountService);
   private googlePlaceService = inject(GooglePlaceService);
-  // private countryService = inject(CountryService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
   private breakpointObserver = inject(BreakpointObserver);
@@ -97,10 +96,7 @@ export class CompleteProfileComponent implements OnInit {
 
   starterFg = this.fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]],
-    searchedLocationCtrl: [null, Validators.required],
-    countryCtrl: [null],
-    stateCtrl: [null],
-    cityCtrl: [null]
+    searchedLocationCtrl: [null, Validators.required]
   })
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
@@ -113,15 +109,6 @@ export class CompleteProfileComponent implements OnInit {
   }
   get SearchedLocationCtrl(): AbstractControl {
     return this.starterFg.get('searchedLocationCtrl') as FormControl;
-  }
-  get CountryCtrl(): AbstractControl {
-    return this.starterFg.get('countryCtrl') as FormControl;
-  }
-  get StateCtrl(): AbstractControl {
-    return this.starterFg.get('stateCtrl') as FormControl;
-  }
-  get CityCtrl(): AbstractControl {
-    return this.starterFg.get('cityCtrl') as FormControl;
   }
   get IntroductionCtrl(): AbstractControl {
     return this.introductionCtrl as FormControl;
@@ -137,36 +124,42 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   submit(): void {
-    const updatedUser: UserUpdate = {
+    if (this.countrySig() && this.stateSig() && this.citySig()) {
+      const updatedUser: UserUpdate = this.createUpdatedUser();
+
+      this.userService.updateUser(updatedUser)
+        .pipe(take(1))
+        .subscribe({
+          next: (response: ApiResponseMessage) => {
+            if (response.message) {
+              const loggedInUserStr: string | null = localStorage.getItem('loggedInUser');
+              if (loggedInUserStr) {
+                const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
+
+                loggedInUser.isProfileCompleted = true;
+
+                this.router.navigate(['members']);
+
+                this.accountService.setCurrentUser(loggedInUser);
+              }
+
+              this.matSnack.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
+            }
+          }
+        });
+    }
+  }
+
+  private createUpdatedUser(): UserUpdate {
+    return {
       knownAs: this.KnownAsCtrl.value,
+      country: this.countrySig() as string,
+      state: this.stateSig() as string,
+      city: this.citySig() as string,
       introduction: this.IntroductionCtrl.value,
       lookingFor: this.LookingForCtrl.value,
-      interests: this.InterestsCtrl.value,
-      country: this.CountryCtrl.value,
-      state: this.StateCtrl.value,
-      city: this.CityCtrl.value
+      interests: this.InterestsCtrl.value
     }
-
-    this.userService.updateUser(updatedUser)
-      .pipe(take(1))
-      .subscribe({
-        next: (response: ApiResponseMessage) => {
-          if (response.message) {
-            const loggedInUserStr: string | null = localStorage.getItem('loggedInUser');
-            if (loggedInUserStr) {
-              const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
-
-              loggedInUser.isProfileCompleted = true;
-
-              this.router.navigate(['members']);
-
-              this.accountService.setCurrentUser(loggedInUser);
-            }
-
-            this.matSnack.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
-          }
-        }
-      });
   }
 
   searchLocation(location: HTMLInputElement): void {
