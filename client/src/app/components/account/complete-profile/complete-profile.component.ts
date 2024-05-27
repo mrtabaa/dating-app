@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Signal, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -8,10 +8,10 @@ import { Router, RouterLink } from '@angular/router';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
 import { MemberService } from '../../../services/member.service';
-import { Observable, map, startWith, take } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Member } from '../../../models/member.model';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { UserUpdate } from '../../../models/user-update.model';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { UserService } from '../../../services/user.service';
@@ -19,20 +19,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../services/account.service';
 import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Country } from '../../../models/country.model';
-import { CountryService } from '../../../services/country.service';
-import { ClearControlFieldByClickDirective } from '../../../directives/clear-control-field-by-click.directive';
-import { CheckCountryExistsDirective } from '../../../directives/check-country-exists.directive';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { GooglePlaceService } from '../../../services/google-place.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
   imports: [
-    FormsModule, ReactiveFormsModule, CommonModule,
+    FormsModule, ReactiveFormsModule, CommonModule, NgOptimizedImage,
     PhotoEditorComponent,
-    MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule, MatExpansionModule, MatAutocompleteModule,
-    ClearControlFieldByClickDirective, CheckCountryExistsDirective
+    MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule,
+    MatExpansionModule, MatAutocompleteModule, MatIconModule, MatCardModule, MatDividerModule
   ],
   templateUrl: './complete-profile.component.html',
   styleUrl: './complete-profile.component.scss',
@@ -45,13 +45,14 @@ export class CompleteProfileComponent implements OnInit {
   private memberService = inject(MemberService);
   private userService = inject(UserService);
   private accountService = inject(AccountService);
-  private countryService = inject(CountryService);
+  private googlePlaceService = inject(GooglePlaceService);
+  // private countryService = inject(CountryService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
   private breakpointObserver = inject(BreakpointObserver);
+
   stepperOrientation: Observable<StepperOrientation>;
 
-  member: Member | undefined;
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 30;
@@ -61,8 +62,15 @@ export class CompleteProfileComponent implements OnInit {
   readonly introductionLabel = 'Introduction';
   readonly interestsLabel = 'Interests';
   readonly lookingForLabel = 'Looking for';
+
+  member: Member | undefined;
   panelOpenState = false;
-  filteredCountries$!: Observable<Country[]>;
+  isCountrySelected = false;
+
+  countrySig: Signal<string | undefined> = this.googlePlaceService.countrySig;
+  countryAcrSig: Signal<string | undefined> = this.googlePlaceService.countryAcrSig;
+  stateSig: Signal<string | undefined> = this.googlePlaceService.stateSig;
+  citySig: Signal<string | undefined> = this.googlePlaceService.citySig;
 
   constructor() {
     this.stepperOrientation = this.breakpointObserver.observe('(min-width: 990px)')
@@ -73,10 +81,10 @@ export class CompleteProfileComponent implements OnInit {
     this.getMember();
 
     // filter country with user input
-    this.filterCountries();
+    // this.filterCountries();
 
     // when no country is selected
-    this.hideCountryFlag();
+    // this.hideCountryFlag();
   }
 
   getMember(): void {
@@ -95,10 +103,10 @@ export class CompleteProfileComponent implements OnInit {
 
   starterFg = this.fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    selectedCountryCtrl: ['', Validators.required],
-    countryCtrl: [null, [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    stateCtrl: ['', [Validators.required, Validators.maxLength(20)]],
-    cityCtrl: [null, [Validators.required, Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
+    searchedLocationCtrl: [null, Validators.required],
+    countryCtrl: [null],
+    stateCtrl: [null],
+    cityCtrl: [null]
   })
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
@@ -109,8 +117,8 @@ export class CompleteProfileComponent implements OnInit {
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
   }
-  get SelectedCountryCtrl(): AbstractControl {
-    return this.starterFg.get('selectedCountryCtrl') as FormControl;
+  get SearchedLocationCtrl(): AbstractControl {
+    return this.starterFg.get('searchedLocationCtrl') as FormControl;
   }
   get CountryCtrl(): AbstractControl {
     return this.starterFg.get('countryCtrl') as FormControl;
@@ -161,43 +169,62 @@ export class CompleteProfileComponent implements OnInit {
               this.accountService.setCurrentUser(loggedInUser);
             }
 
-            this.matSnack.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
+            this.matSnack.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
           }
         }
       });
   }
 
-  // ngOnInit
-  filterCountries(): void {
-    this.filteredCountries$ = this.CountryCtrl.valueChanges
-      .pipe(
-        startWith(''),
-        map((value: string) => this.countryService.filterCountries(value))
-      );
+  searchLocation(location: HTMLInputElement): void {
+    this.isCountrySelected = false;
+    this.googlePlaceService.countrySig.set(undefined);
+
+    this.googlePlaceService.searchLocation(location);
   }
+
+  confirmLocation(): void {
+    this.isCountrySelected = true;
+    this.countrySig = this.googlePlaceService.countrySig;
+    this.countryAcrSig = this.googlePlaceService.countryAcrSig;
+    this.stateSig = this.googlePlaceService.stateSig;
+    this.citySig = this.googlePlaceService.citySig;
+  }
+
+  selectAnotherCountry(): void {
+    this.isCountrySelected = false;
+  }
+
+  // ngOnInit
+  // filterCountries(): void {
+  //   this.filteredCountries$ = this.CountryCtrl.valueChanges
+  //     .pipe(
+  //       startWith(''),
+  //       map((value: string) => this.countryService.filterCountries(value))
+  //     );
+  // }
 
   // if no country is selected
   // ngOnInit
-  hideCountryFlag(): void {
-    this.CountryCtrl.valueChanges.subscribe((value: string) => {
-      if (value.length < 2) {
-        this.SelectedCountryCtrl.setErrors({ 'invalid': true });
-      }
-    })
-  }
+  // hideCountryFlag(): void {
+  //   this.CountryCtrl.valueChanges.subscribe((value: string) => {
+  //     if (value.length < 2) {
+  //       this.SelectedCountryCtrl.setErrors({ 'invalid': true });
+  //     }
+  //   })
+  // }
 
   // get from DOM (onSelectionChange)
-  getSelectedCountry(country: Country, event: any): void {
-    if (event.isUserInput) {  // check if the option is selected
-      //set phoneNumber
-      this.SelectedCountryCtrl.setValue(country);
-    }
-  }
+  // getSelectedCountry(evernt): void {
+  //   if (event.isUserInput) {  // check if the option is selected
+  //     //set phoneNumber
+  //     this.SelectedCountryCtrl.setValue(country);
+  //   }
+  // }
 
-  moveFocusToNext(leaveFocus: HTMLInputElement, gainFocus: HTMLInputElement): void {
-    setTimeout(() => {
-      leaveFocus.blur();
-      gainFocus.focus();
-    });
-  }
+  // moveFocusToNext(leaveFocus: HTMLInputElement, gainFocus: HTMLInputElement): void {
+  //   setTimeout(() => {
+  //     leaveFocus.blur();
+  //     gainFocus.focus();
+  //   });
+  // }
 }
