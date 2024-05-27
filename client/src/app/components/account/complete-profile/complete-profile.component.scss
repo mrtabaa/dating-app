@@ -39,8 +39,8 @@ mat-stepper {
                 gap: 1rem;
             }
 
-            mat-error {
-                text-align: center;
+            .location-error {
+                list-style: disc;
             }
         }
 

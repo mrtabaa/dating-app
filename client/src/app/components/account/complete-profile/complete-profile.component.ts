@@ -79,12 +79,6 @@ export class CompleteProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.getMember();
-
-    // filter country with user input
-    // this.filterCountries();
-
-    // when no country is selected
-    // this.hideCountryFlag();
   }
 
   getMember(): void {
@@ -192,39 +186,7 @@ export class CompleteProfileComponent implements OnInit {
 
   selectAnotherCountry(): void {
     this.isCountrySelected = false;
+    this.googlePlaceService.countrySig.set(undefined);
+    this.countrySig = this.googlePlaceService.countrySig;
   }
-
-  // ngOnInit
-  // filterCountries(): void {
-  //   this.filteredCountries$ = this.CountryCtrl.valueChanges
-  //     .pipe(
-  //       startWith(''),
-  //       map((value: string) => this.countryService.filterCountries(value))
-  //     );
-  // }
-
-  // if no country is selected
-  // ngOnInit
-  // hideCountryFlag(): void {
-  //   this.CountryCtrl.valueChanges.subscribe((value: string) => {
-  //     if (value.length < 2) {
-  //       this.SelectedCountryCtrl.setErrors({ 'invalid': true });
-  //     }
-  //   })
-  // }
-
-  // get from DOM (onSelectionChange)
-  // getSelectedCountry(evernt): void {
-  //   if (event.isUserInput) {  // check if the option is selected
-  //     //set phoneNumber
-  //     this.SelectedCountryCtrl.setValue(country);
-  //   }
-  // }
-
-  // moveFocusToNext(leaveFocus: HTMLInputElement, gainFocus: HTMLInputElement): void {
-  //   setTimeout(() => {
-  //     leaveFocus.blur();
-  //     gainFocus.focus();
-  //   });
-  // }
 }
