@@ -1,8 +1,7 @@
-$buttonHoverColor: rgb(228, 227, 227);
-
 mat-toolbar {
     display: flex;
     justify-content: space-between;
+    background-color: #ffd9e1;
 
     .left {
         display: flex;
@@ -11,7 +10,7 @@ mat-toolbar {
         .brand {
             display: flex;
             align-items: center;
-            color: white;
+            color: palevioletred;
             text-decoration: none;
 
             font-family: "Fredoka", sans-serif;
@@ -31,6 +30,7 @@ mat-toolbar {
         .menu-button {
             position: relative;
             font-size: 1.5rem;
+            border-radius: 50%;
 
             .top-avatar {
                 display: flex;

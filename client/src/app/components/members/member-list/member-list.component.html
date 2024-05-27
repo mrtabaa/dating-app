@@ -1,6 +1,7 @@
 <main>
     <form [formGroup]="filterFg" class="sidebar">
         <div class="order-by">
+            <p>Order members</p>
             <mat-form-field>
                 <mat-label>Order by</mat-label>
                 <mat-select formControlName="orderByCtrl" (selectionChange)="updateMemberParams()">
@@ -13,6 +14,7 @@
         </div>
         <mat-divider></mat-divider>
         <div class="filter">
+            <p>Filter members</p>
             <mat-form-field>
                 <mat-label>Gender</mat-label>
                 <mat-select formControlName="genderCtrl" (selectionChange)="updateMemberParams()">
@@ -47,8 +49,9 @@
             </div>
         </div>
     </form>
+    <mat-divider vertical></mat-divider>
     <section class="members-container">
-        <h1>Find Your Beloved One!</h1>
+        <h3>Find Your Beloved One!</h3>
         <div class="members">
             @if (members?.length === 0) {
             <p>No user exists with this filter. Please change the filter values or Reset the filter.</p>

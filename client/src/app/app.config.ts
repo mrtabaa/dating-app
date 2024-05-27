@@ -7,10 +7,11 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { loadingInterceptor } from './interceptors/loading.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes), provideAnimations(),
-    provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor, loadingInterceptor]))
+    provideHttpClient(withInterceptors([errorInterceptor, jwtInterceptor, loadingInterceptor])), provideAnimationsAsync(), provideAnimationsAsync(), provideAnimationsAsync(), provideAnimationsAsync()
   ]
 };
