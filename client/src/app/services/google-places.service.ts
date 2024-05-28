@@ -8,6 +8,7 @@ export class GooglePlacesService {
   countryAcrSig = signal<string | undefined>(undefined);
   stateSig = signal<string | undefined>(undefined);
   citySig = signal<string | undefined>(undefined);
+  isCountrySelectedSig = signal<boolean>(false);
 
   /*
   ** called by CompleteProfile
@@ -35,6 +36,14 @@ export class GooglePlacesService {
       //   this.zone.run(() => { });
       // }
     });
+  }
+
+  /**
+   * Resets signals which are used for conditions in the components. 
+   */
+  resetCountry(): void {
+    this.countrySig.set(undefined);
+    this.isCountrySelectedSig.set(false);
   }
 
   /* called in searchUniversity() >> google.maps.event.addListenerOnce()

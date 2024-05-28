@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal, inject } from '@angular/core';
+import { Component, OnInit, Signal, ViewChild, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
@@ -19,20 +19,20 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../services/account.service';
 import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { GooglePlacesService } from '../../../services/google-places.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { GooglePlacesComponent } from '../../google-places/google-places.component';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
   imports: [
     FormsModule, ReactiveFormsModule, CommonModule, NgOptimizedImage,
-    PhotoEditorComponent,
+    PhotoEditorComponent, GooglePlacesComponent,
     MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule,
-    MatExpansionModule, MatAutocompleteModule, MatIconModule, MatCardModule, MatDividerModule
+    MatExpansionModule, MatIconModule, MatCardModule, MatDividerModule
   ],
   templateUrl: './complete-profile.component.html',
   styleUrl: './complete-profile.component.scss',
@@ -41,6 +41,8 @@ import { MatDividerModule } from '@angular/material/divider';
   }]
 })
 export class CompleteProfileComponent implements OnInit {
+  @ViewChild(GooglePlacesComponent) private googlePlacesComponent: GooglePlacesComponent | undefined;
+
   private fb = inject(FormBuilder);
   private memberService = inject(MemberService);
   private userService = inject(UserService);
@@ -64,12 +66,12 @@ export class CompleteProfileComponent implements OnInit {
 
   member: Member | undefined;
   panelOpenState = false;
-  isCountrySelected = false;
 
   countrySig: Signal<string | undefined> = this.googlePlacesService.countrySig;
   countryAcrSig: Signal<string | undefined> = this.googlePlacesService.countryAcrSig;
   stateSig: Signal<string | undefined> = this.googlePlacesService.stateSig;
   citySig: Signal<string | undefined> = this.googlePlacesService.citySig;
+  isCountrySelectedSig: Signal<boolean> = this.googlePlacesService.isCountrySelectedSig;
 
   constructor() {
     this.stepperOrientation = this.breakpointObserver.observe('(min-width: 990px)')
@@ -95,8 +97,7 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   starterFg = this.fb.group({
-    knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]],
-    searchedLocationCtrl: [null, Validators.required]
+    knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]]
   })
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
@@ -106,9 +107,6 @@ export class CompleteProfileComponent implements OnInit {
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
-  }
-  get SearchedLocationCtrl(): AbstractControl {
-    return this.starterFg.get('searchedLocationCtrl') as FormControl;
   }
   get IntroductionCtrl(): AbstractControl {
     return this.introductionCtrl as FormControl;
@@ -162,24 +160,11 @@ export class CompleteProfileComponent implements OnInit {
     }
   }
 
-  searchLocation(location: HTMLInputElement): void {
-    this.isCountrySelected = false;
-    this.googlePlacesService.countrySig.set(undefined);
+  resetCountry(): void {
+    this.googlePlacesService.resetCountry();
+    this.googlePlacesComponent?.searchedLocationCtrl.reset();
 
-    this.googlePlacesService.searchLocation(location);
-  }
-
-  confirmLocation(): void {
-    this.isCountrySelected = true;
     this.countrySig = this.googlePlacesService.countrySig;
-    this.countryAcrSig = this.googlePlacesService.countryAcrSig;
-    this.stateSig = this.googlePlacesService.stateSig;
-    this.citySig = this.googlePlacesService.citySig;
-  }
-
-  selectAnotherCountry(): void {
-    this.isCountrySelected = false;
-    this.googlePlacesService.countrySig.set(undefined);
-    this.countrySig = this.googlePlacesService.countrySig;
+    this.isCountrySelectedSig = this.googlePlacesService.isCountrySelectedSig;
   }
 }

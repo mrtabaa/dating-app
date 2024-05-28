@@ -16,56 +16,8 @@
                         }
                     </mat-form-field>
                     <!-- Location -->
-                    @if(!isCountrySelected) {
-                    <mat-form-field appearance="outline">
-                        <mat-label>Search your location</mat-label>
-                        <input formControlName="searchedLocationCtrl" #location (input)="searchLocation(location)"
-                            type="text" placeholder="By city or zip" aria-label="Location" matInput>
-                        <ng-container matSuffix>
-                            @if(!countrySig()) {
-                            <mat-icon matSuffix color="primary">radio_button_unchecked</mat-icon>
-                            }
-                            @else {
-                            <mat-icon matSuffix color="primary">check_circle</mat-icon>
-                            }
-                        </ng-container>
-                        <mat-hint>Select your City or Zip from the list.</mat-hint>
-                        <mat-error>This field is required.</mat-error>
-                    </mat-form-field>
-                    <button type="button" (click)="confirmLocation()" [disabled]="SearchedLocationCtrl.invalid"
-                        mat-stroked-button color="accent">
-                        Confirm the country
-                    </button>
-                    }
-                    @else if(!countrySig()) {
-                    <mat-error>
-                        <ul class="location-error">
-                            <li>Search by a City or Zipcode.</li>
-                            <li>A location must be selected from the list.</li>
-                        </ul>
-                    </mat-error>
-                    <button (click)="selectAnotherCountry()" mat-mini-fab color="warn">
-                        <mat-icon>undo</mat-icon>
-                    </button>
-                    }
-                    @else {
-                    <mat-card>
-                        <mat-card-content>
-                            {{countrySig()}}
-                            <img ngSrc="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg" alt="flag"
-                                width="25" height="15">
-                        </mat-card-content>
-                        <mat-divider></mat-divider>
-                        <mat-card-content>{{stateSig()}}</mat-card-content>
-                        <mat-divider></mat-divider>
-                        <mat-card-content>{{citySig()}}</mat-card-content>
-                        <mat-divider></mat-divider>
-                        <button type="button" (click)="selectAnotherCountry()" mat-button color="primary">
-                            Wrong location?
-                        </button>
-                    </mat-card>
-                    }
-                    @if(countrySig() && isCountrySelected) {
+                    <app-google-places />
+                    @if(countrySig() && isCountrySelectedSig()) {
                     <div class="buttons">
                         <button type="submit" mat-raised-button color="primary" matStepperNext>Next</button>
                     </div>
@@ -235,8 +187,7 @@
                     <div class="buttons">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
                         <button (click)="submit()" mat-raised-button color="primary">Submit</button>
-                        <button mat-stroked-button color="warn"
-                            (click)="stepper.reset(); selectAnotherCountry()">Reset</button>
+                        <button mat-stroked-button color="warn" (click)="stepper.reset(); resetCountry()">Reset</button>
                     </div>
                 </form>
             </div>
