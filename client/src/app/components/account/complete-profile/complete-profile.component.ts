@@ -153,7 +153,7 @@ export class CompleteProfileComponent implements OnInit {
   private createUpdatedUser(): UserUpdate {
     return {
       knownAs: this.KnownAsCtrl.value,
-      country: this.countrySig() as string,
+      country: this.countrySig() as string, // Type assertion since countrySig() is never null here
       state: this.stateSig() as string,
       city: this.citySig() as string,
       introduction: this.IntroductionCtrl.value,
