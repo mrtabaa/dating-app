@@ -3,11 +3,12 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class GooglePlaceService {
+export class GooglePlacesService {
   countrySig = signal<string | undefined>(undefined);
   countryAcrSig = signal<string | undefined>(undefined);
   stateSig = signal<string | undefined>(undefined);
   citySig = signal<string | undefined>(undefined);
+  isCountrySelectedSig = signal<boolean>(false);
 
   /*
   ** called by CompleteProfile
@@ -35,6 +36,14 @@ export class GooglePlaceService {
       //   this.zone.run(() => { });
       // }
     });
+  }
+
+  /**
+   * Resets signals which are used for conditions in the components. 
+   */
+  resetCountry(): void {
+    this.countrySig.set(undefined);
+    this.isCountrySelectedSig.set(false);
   }
 
   /* called in searchUniversity() >> google.maps.event.addListenerOnce()
