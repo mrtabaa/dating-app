@@ -20,7 +20,7 @@ import { AccountService } from '../../../services/account.service';
 import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { GooglePlaceService } from '../../../services/google-place.service';
+import { GooglePlacesService } from '../../../services/google-places.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -45,7 +45,7 @@ export class CompleteProfileComponent implements OnInit {
   private memberService = inject(MemberService);
   private userService = inject(UserService);
   private accountService = inject(AccountService);
-  private googlePlaceService = inject(GooglePlaceService);
+  private googlePlacesService = inject(GooglePlacesService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
   private breakpointObserver = inject(BreakpointObserver);
@@ -66,10 +66,10 @@ export class CompleteProfileComponent implements OnInit {
   panelOpenState = false;
   isCountrySelected = false;
 
-  countrySig: Signal<string | undefined> = this.googlePlaceService.countrySig;
-  countryAcrSig: Signal<string | undefined> = this.googlePlaceService.countryAcrSig;
-  stateSig: Signal<string | undefined> = this.googlePlaceService.stateSig;
-  citySig: Signal<string | undefined> = this.googlePlaceService.citySig;
+  countrySig: Signal<string | undefined> = this.googlePlacesService.countrySig;
+  countryAcrSig: Signal<string | undefined> = this.googlePlacesService.countryAcrSig;
+  stateSig: Signal<string | undefined> = this.googlePlacesService.stateSig;
+  citySig: Signal<string | undefined> = this.googlePlacesService.citySig;
 
   constructor() {
     this.stepperOrientation = this.breakpointObserver.observe('(min-width: 990px)')
@@ -164,22 +164,22 @@ export class CompleteProfileComponent implements OnInit {
 
   searchLocation(location: HTMLInputElement): void {
     this.isCountrySelected = false;
-    this.googlePlaceService.countrySig.set(undefined);
+    this.googlePlacesService.countrySig.set(undefined);
 
-    this.googlePlaceService.searchLocation(location);
+    this.googlePlacesService.searchLocation(location);
   }
 
   confirmLocation(): void {
     this.isCountrySelected = true;
-    this.countrySig = this.googlePlaceService.countrySig;
-    this.countryAcrSig = this.googlePlaceService.countryAcrSig;
-    this.stateSig = this.googlePlaceService.stateSig;
-    this.citySig = this.googlePlaceService.citySig;
+    this.countrySig = this.googlePlacesService.countrySig;
+    this.countryAcrSig = this.googlePlacesService.countryAcrSig;
+    this.stateSig = this.googlePlacesService.stateSig;
+    this.citySig = this.googlePlacesService.citySig;
   }
 
   selectAnotherCountry(): void {
     this.isCountrySelected = false;
-    this.googlePlaceService.countrySig.set(undefined);
-    this.countrySig = this.googlePlaceService.countrySig;
+    this.googlePlacesService.countrySig.set(undefined);
+    this.countrySig = this.googlePlacesService.countrySig;
   }
 }

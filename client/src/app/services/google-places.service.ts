@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class GooglePlaceService {
+export class GooglePlacesService {
   countrySig = signal<string | undefined>(undefined);
   countryAcrSig = signal<string | undefined>(undefined);
   stateSig = signal<string | undefined>(undefined);
