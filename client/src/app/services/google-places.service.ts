@@ -54,11 +54,19 @@ export class GooglePlacesService {
     if (place) {
       const address_components = place.address_components as google.maps.GeocoderAddressComponent[];
 
-      if (address_components && address_components[0] && address_components[2] && address_components[3]) {
-        this.countrySig.set(address_components[3].long_name);
-        this.countryAcrSig.set(address_components[3].short_name);
-        this.stateSig.set(address_components[2].long_name);
-        this.citySig.set(address_components[0].long_name);
+      if (address_components) {
+        if (address_components[3]) {
+          this.countrySig.set(address_components[3].long_name);
+          this.countryAcrSig.set(address_components[3].short_name);
+          this.stateSig.set(address_components[2].long_name);
+          this.citySig.set(address_components[0].long_name);
+        }
+        else { // Ahvaz-khuzestan doesn't have [3]
+          this.countrySig.set(address_components[2].long_name);
+          this.countryAcrSig.set(address_components[2].short_name);
+          this.stateSig.set(address_components[1].long_name);
+          this.citySig.set(address_components[0].long_name);
+        }
       }
     }
   }
