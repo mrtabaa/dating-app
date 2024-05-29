@@ -54,6 +54,7 @@ namespace api.DTOs
                 Introduction: appUser.Introduction,
                 LookingFor: appUser.LookingFor,
                 Interests: appUser.Interests,
+                CountryAcr: appUser.CountryAcr,
                 Country: appUser.Country,
                 State: appUser.State,
                 City: appUser.City,

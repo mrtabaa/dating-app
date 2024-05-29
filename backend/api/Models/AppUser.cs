@@ -16,6 +16,7 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public string? Introduction { get; init; }
     public string? LookingFor { get; init; }
     public string? Interests { get; init; }
+    public string CountryAcr { get; init; } = string.Empty;
     public string Country { get; init; } = string.Empty;
     public string State { get; init; } = string.Empty;
     public string City { get; init; } = string.Empty;
