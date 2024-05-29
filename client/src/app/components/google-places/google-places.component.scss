@@ -11,3 +11,30 @@
 .location-error {
     list-style: disc;
 }
+
+mat-card {
+    mat-card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+
+            font-weight: bold;
+        }
+
+        ul {
+            list-style: none;
+
+            li {
+                .title {
+                    color: gray;
+                }
+            }
+        }
+    }
+}

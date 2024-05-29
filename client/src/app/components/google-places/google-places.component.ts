@@ -29,6 +29,8 @@ export class GooglePlacesComponent {
   citySig: Signal<string | undefined> = this.googlePlacesService.citySig;
   isCountrySelectedSig: Signal<boolean> = this.googlePlacesService.isCountrySelectedSig;
 
+  isImageLoaded = false;
+
   searchedLocationCtrl = this.fb.control(null, Validators.required);
 
   searchLocation(location: HTMLInputElement): void {
@@ -47,10 +49,11 @@ export class GooglePlacesComponent {
   }
 
   resetCountry(): void {
+    this.isImageLoaded = false;
     this.searchedLocationCtrl.reset();
 
     this.googlePlacesService.resetCountry();
-    
+
     this.countrySig = this.googlePlacesService.countrySig;
     this.isCountrySelectedSig = this.googlePlacesService.isCountrySelectedSig;
   }
