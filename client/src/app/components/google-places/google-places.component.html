@@ -1,60 +1,62 @@
-@if(!isCountrySelectedSig()) {
-<div class="search-field">
-    <mat-form-field appearance="outline">
-        <mat-label>Search your location by City</mat-label>
-        <input [formControl]="searchedLocationCtrl" #location (input)="searchLocation(location)" type="text"
-            placeholder="City name" aria-label="Location" matInput>
-        <ng-container matSuffix>
-            @if(!countrySig()) {
-            <mat-icon matSuffix color="primary">radio_button_unchecked</mat-icon>
-            }
-            @else {
-            <mat-icon matSuffix color="primary">check_circle</mat-icon>
-            }
-        </ng-container>
-        <mat-hint>Select your City from the list.</mat-hint>
-        <mat-error>This field is required.</mat-error>
-    </mat-form-field>
-    <button type="button" (click)="confirmLocation()" [disabled]="searchedLocationCtrl.invalid" mat-stroked-button
-        color="accent">
-        Confirm your location
-    </button>
-</div>
-}
-@else if(!countrySig()) {
-<mat-error>
-    <ul class="location-error">
-        <li>Search by a City name only.</li>
-        <li>A location must be selected from the list.</li>
-    </ul>
-</mat-error>
-<button (click)="resetCountry()" mat-mini-fab color="warn">
-    <mat-icon>undo</mat-icon>
-</button>
-}
-@else {
-<mat-card>
-    <mat-card-content>
-        <div class="header">
-            <p>Your selected location:</p>
-            <img ngSrc="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg" alt="flag" width="25"
-                height="15" (load)="isImageLoaded = true" [style.display]="isImageLoaded ? 'inline' : 'none'">
-        </div>
-        <mat-divider />
-        <ul>
-            <li>
-                <span class="title">Country:</span> {{countrySig()}}
-            </li>
-            <li>
-                <span class="title">State:</span> {{stateSig()}}
-            </li>
-            <li>
-                <span class="title">City:</span> {{citySig()}}
-            </li>
-        </ul>
-        <button (click)="resetCountry()" class="edit" mat-button>
-            <mat-icon>arrow_left</mat-icon> Edit
+<section class="container">
+    @if(!isCountrySelectedSig()) {
+    <div class="search-field">
+        <mat-form-field appearance="outline">
+            <mat-label>Search your location by City</mat-label>
+            <input [formControl]="searchedLocationCtrl" #location (input)="searchLocation(location)" type="text"
+                placeholder="City name" aria-label="Location" matInput>
+            <ng-container matSuffix>
+                @if(!countrySig()) {
+                <mat-icon matSuffix color="primary">radio_button_unchecked</mat-icon>
+                }
+                @else {
+                <mat-icon matSuffix color="primary">check_circle</mat-icon>
+                }
+            </ng-container>
+            <mat-hint>Select your City from the list.</mat-hint>
+            <mat-error>This field is required.</mat-error>
+        </mat-form-field>
+        <button type="button" (click)="confirmLocation()" [disabled]="searchedLocationCtrl.invalid" mat-stroked-button
+            color="accent">
+            Confirm your location
         </button>
-    </mat-card-content>
-</mat-card>
-}
+    </div>
+    }
+    @else if(!countrySig()) {
+    <mat-error>
+        <ul class="location-error">
+            <li>Search by a City name only.</li>
+            <li>A location must be selected from the list.</li>
+        </ul>
+    </mat-error>
+    <button (click)="resetCountry()" mat-mini-fab color="warn">
+        <mat-icon>undo</mat-icon>
+    </button>
+    }
+    @else {
+    <mat-card>
+        <mat-card-content>
+            <div class="header">
+                <p>Your selected location:</p>
+                <img ngSrc="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg" alt="flag" width="25"
+                    height="15" (load)="isImageLoaded = true" [style.display]="isImageLoaded ? 'inline' : 'none'">
+            </div>
+            <mat-divider />
+            <ul>
+                <li>
+                    <span class="title">Country:</span> {{countrySig()}}
+                </li>
+                <li>
+                    <span class="title">State:</span> {{stateSig()}}
+                </li>
+                <li>
+                    <span class="title">City:</span> {{citySig()}}
+                </li>
+            </ul>
+            <button (click)="resetCountry()" class="edit" mat-button>
+                <mat-icon>arrow_left</mat-icon> Edit
+            </button>
+        </mat-card-content>
+    </mat-card>
+    }
+</section>
