@@ -4,7 +4,7 @@
         <input [appAutofocusDir]="isFocused" [type]="type === 'password' && isPasswordHidden ? 'password' : 'text'" [formControl]="Control"
             placeholder="{{placeHolder}}" matInput>
         @if (type === 'password') {
-        <button (click)="showHidePassword()" mat-icon-button matSuffix>
+        <button type="button" (click)="showHidePassword()" mat-icon-button matSuffix>
             <mat-icon>
                 {{isPasswordHidden ? 'visibility_off' : 'visibility'}}
             </mat-icon>
