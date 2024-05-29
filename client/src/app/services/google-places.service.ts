@@ -42,7 +42,10 @@ export class GooglePlacesService {
    * Resets signals which are used for conditions in the components. 
    */
   resetCountry(): void {
+    this.countryAcrSig.set(undefined);
     this.countrySig.set(undefined);
+    this.stateSig.set(undefined);
+    this.citySig.set(undefined);
     this.isCountrySelectedSig.set(false);
   }
 

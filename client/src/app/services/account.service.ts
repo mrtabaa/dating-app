@@ -1,16 +1,19 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { map, Observable, take } from 'rxjs';
 import { UserLogin } from '../models/account/user-login.model';
 import { UserRegister } from '../models/account/user-register.model';
 import { environment } from '../../environments/environment';
 import { LoggedInUser } from '../models/logged-in-user.model';
+import { GooglePlacesService } from './google-places.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
+  private googlePlacesService = inject(GooglePlacesService);
+
   private baseUrl = environment.apiUrl + "account/";
 
   loggedInUserSig = signal<LoggedInUser | null>(null);
@@ -64,6 +67,7 @@ export class AccountService {
     localStorage.clear();
     this.loggedInUserSig.set(null);
     this.router.navigate(['account/login'])
+    this.googlePlacesService.resetCountry();
   }
 
   /**
