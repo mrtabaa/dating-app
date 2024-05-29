@@ -5,6 +5,7 @@ export interface UserUpdate {
     introduction: string;
     lookingFor: string;
     interests: string;
+    countryAcr: string;
     country: string;
     state: string;
     city: string;
