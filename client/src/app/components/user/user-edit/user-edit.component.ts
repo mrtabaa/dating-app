@@ -18,13 +18,16 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { AccountService } from '../../../services/account.service';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
+import { GooglePlacesComponent } from '../../google-places/google-places.component';
+import { GooglePlacesService } from '../../../services/google-places.service';
+import { CommonService } from '../../../services/common.service';
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
-    PhotoEditorComponent, DatePickerCvaComponent,
+    PhotoEditorComponent, DatePickerCvaComponent, GooglePlacesComponent,
     MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule,
     IntlModule
   ],
@@ -35,8 +38,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private memberService = inject(MemberService);
   private accountService = inject(AccountService);
+  private googlePlacesService = inject(GooglePlacesService);
+  private commonService = inject(CommonService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
+
   private userEditFgSubscribed: Subscription | undefined;
 
   member: Member | undefined;
@@ -81,9 +87,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
-    countryCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    stateCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]],
-    cityCtrl: ['', [Validators.minLength(this.minInputChars), Validators.maxLength(this.maxInputChars)]]
   });
 
   get KnownAsCtrl(): AbstractControl {
@@ -101,15 +104,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
   get InterestsCtrl(): AbstractControl {
     return this.userEditFg.get('interestsCtrl') as FormControl;
   }
-  get CountryCtrl(): AbstractControl {
-    return this.userEditFg.get('countryCtrl') as FormControl;
-  }
-  get StateCtrl(): AbstractControl {
-    return this.userEditFg.get('stateCtrl') as FormControl;
-  }
-  get CityCtrl(): AbstractControl {
-    return this.userEditFg.get('cityCtrl') as FormControl;
-  }
 
   initContollersValues(member: Member) {
     this.KnownAsCtrl.setValue(member.knownAs);
@@ -117,9 +111,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.IntroductionCtrl.setValue(member.introduction);
     this.LookingForCtrl.setValue(member.lookingFor);
     this.InterestsCtrl.setValue(member.interests);
-    this.CountryCtrl.setValue(member.country);
-    this.StateCtrl.setValue(member.state);
-    this.CityCtrl.setValue(member.city);
+    this.googlePlacesService.isCountrySelectedSig.set(true);
+    this.googlePlacesService.countryAcrSig.set(member.countryAcr);
+    this.googlePlacesService.countrySig.set(member.country);
+    this.googlePlacesService.stateSig.set(member.state);
+    this.googlePlacesService.citySig.set(member.city);
   }
 
   updateMemberAfterUpdateSucceed(): void {
@@ -129,9 +125,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.member.introduction = this.IntroductionCtrl.value;
       this.member.lookingFor = this.LookingForCtrl.value;
       this.member.interests = this.InterestsCtrl.value;
-      this.member.country = this.CountryCtrl.value;
-      this.member.state = this.StateCtrl.value;
-      this.member.city = this.CityCtrl.value;
+      this.member.countryAcr = this.googlePlacesService.countryAcrSig() as string;
+      this.member.country = this.googlePlacesService.countrySig() as string;
+      this.member.state = this.googlePlacesService.stateSig() as string;
+      this.member.city = this.googlePlacesService.citySig() as string;
     }
   }
 
@@ -143,12 +140,18 @@ export class UserEditComponent implements OnInit, OnDestroy {
       && this.member.introduction === this.IntroductionCtrl.value
       && this.member.lookingFor === this.LookingForCtrl.value
       && this.member.interests === this.InterestsCtrl.value
-      && this.member.country === this.CountryCtrl.value
-      && this.member.state === this.StateCtrl.value
-      && this.member.city === this.CityCtrl.value
+      && this.member.countryAcr === this.googlePlacesService.countryAcrSig()
+      && this.member.country === this.googlePlacesService.countrySig()
+      && this.member.state === this.googlePlacesService.stateSig()
+      && this.member.city === this.googlePlacesService.citySig()
     ) {
+
+      this.commonService.isPreventingLeavingPage = false
+
       return true;
     }
+
+    this.commonService.isPreventingLeavingPage = true;
 
     return false;
   }
@@ -162,9 +165,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,
-        country: this.CountryCtrl.value,
-        state: this.StateCtrl.value,
-        city: this.CityCtrl.value
+        countryAcr: this.googlePlacesService.countryAcrSig() as string,
+        country: this.googlePlacesService.countrySig() as string,
+        state: this.googlePlacesService.stateSig() as string,
+        city: this.googlePlacesService.citySig() as string,
       }
 
       this.userService.updateUser(updatedUser)
