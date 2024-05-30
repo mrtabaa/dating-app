@@ -65,10 +65,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.loginFg.get('turnsTileCtrl') as FormControl;
   }
 
-  check(): void {
-    console.log(this.TurnsTileCtrl);
-  }
-
   loginEmailUsername(): void {
     const userLoginInput: UserLogin = {
       emailUsername: this.EmailUsernameCtrl.value,
