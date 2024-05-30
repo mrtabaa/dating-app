@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, take } from 'rxjs';
 import { UserLogin } from '../../../models/account/user-login.model';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { AccountService } from '../../../services/account.service';
@@ -11,6 +11,7 @@ import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component'
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
+import { UserRegister } from '../../../models/account/user-register.model';
 
 @Component({
   selector: 'app-login',
@@ -66,7 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.subscrition = this.accountService.login(userLoginInput)
       .subscribe({
         next: res => {
-          this.snackBar.open("You logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+          this.snackBar.open('You logged in as: ' + res?.userName, 'Close', { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
         }
         // complete: () => console.log('Login successful.')
       });
@@ -79,8 +80,37 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.PasswordCtrl.setValue('Aaaaaaa1')
   }
 
-  enterMemberCreds(): void {
-    this.EmailUsernameCtrl.setValue('a');
-    this.PasswordCtrl.setValue('Aaaaaaa1')
+  generateMemberCreds(): void {
+    const randomAccount = 'ab' + this.generateRandomText(3);
+
+    const userRegInput: UserRegister = {
+      email: randomAccount + '@a.com',
+      username: randomAccount,
+      password: 'Aaaaaaa1',
+      confirmPassword: 'Aaaaaaa1',
+      dateOfBirth: '2000-01-01',
+      gender: 'male'
+    }
+
+    this.accountService.register(userRegInput)
+      .pipe(
+        take(1)
+      ).subscribe({
+        next: response => {
+          if (response) {
+            this.EmailUsernameCtrl.setValue(randomAccount);
+            this.PasswordCtrl.setValue('Aaaaaaa1')
+          }
+        }
+      });
+  }
+
+  private generateRandomText(length: number): string {
+    const characters = '0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
   }
 }

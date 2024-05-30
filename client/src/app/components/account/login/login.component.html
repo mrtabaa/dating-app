@@ -13,8 +13,8 @@
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn" mat-raised-button
-                    color="primary">
+                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn"
+                    mat-raised-button color="primary">
                     Sign in
                 </button>
             </div>
@@ -22,10 +22,22 @@
                 <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
             </div>
             @if(router.url === '/demo') {
-            <mat-divider />
             <div class="demo">
-                <button (click)="enterAdminCreds()" mat-stroked-button color="warn">Admin creds</button>
-                <button (click)="enterMemberCreds()" mat-stroked-button color="warn">Member creds</button>
+                <mat-divider />
+                <div class="demo-buttons">
+                    <button (click)="enterAdminCreds()" mat-stroked-button color="warn">
+                        Admin creds
+                    </button>
+                    <button (click)="generateMemberCreds()" mat-stroked-button color="warn">
+                        Generate demo member
+                    </button>
+                </div>
+                @if(PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
+                <p class="demo-text">
+                    NOTE: Keep the generated username to login again. <br />
+                    <span>Password:</span> {{PasswordCtrl.value}}
+                </p>
+                }
             </div>
             }
         </div>
