@@ -10,6 +10,7 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
+        <ngx-turnstile [siteKey]="turnsTileSiteKey" theme="light"></ngx-turnstile>
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>

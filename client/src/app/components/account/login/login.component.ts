@@ -12,12 +12,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
+import { NgxTurnstileModule } from "ngx-turnstile"; // CloudFlare
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    InputCvaComponent, RouterLink,
+    InputCvaComponent, RouterLink, NgxTurnstileModule,
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
@@ -32,6 +34,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   user$!: Observable<LoggedInUser | null>;
   subscrition!: Subscription;
+  turnsTileSiteKey = environment.turnstileSiteKey;
 
   ngOnInit(): void {
     this.loginFg;
