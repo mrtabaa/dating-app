@@ -12,14 +12,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
-import { NgxTurnstileModule } from "ngx-turnstile"; // CloudFlare
+import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
-    InputCvaComponent, RouterLink, NgxTurnstileModule,
+    InputCvaComponent, RouterLink, NgxTurnstileModule, NgxTurnstileFormsModule,
     FormsModule, ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
@@ -48,7 +48,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
-    rememberMeCtrl: [false, []]
+    rememberMeCtrl: [false, []], 
+    turnsTileCtrl: [null, [Validators.required]]
   });
 
   get EmailUsernameCtrl(): FormControl {
@@ -59,6 +60,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
   get RememberMeCtrl(): FormControl {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
+  }
+  get TurnsTileCtrl(): FormControl {
+    return this.loginFg.get('turnsTileCtrl') as FormControl;
+  }
+
+  check(): void {
+    console.log(this.TurnsTileCtrl);
   }
 
   loginEmailUsername(): void {
