@@ -16,11 +16,13 @@ public record RegisterDto(
 public record LoginDto(
     [MaxLength(50)] string EmailUsername,
     [DataType(DataType.Password), Length(8, 50), RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage ="Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)")]
-     string Password
+     string Password,
+     string TurnstileToken
 );
 
 public class LoggedInDto
 {
+    public bool IsTurnstileTokenInvalid { get; set; }
     public string? Token { get; init; }
     public string? KnownAs { get; init; }
     public string? UserName { get; init; }

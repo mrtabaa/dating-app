@@ -68,7 +68,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginEmailUsername(): void {
     const userLoginInput: UserLogin = {
       emailUsername: this.EmailUsernameCtrl.value,
-      password: this.PasswordCtrl.value
+      password: this.PasswordCtrl.value,
+      turnsTileToken: this.TurnsTileCtrl.value
     };
 
     this.subscrition = this.accountService.login(userLoginInput)

@@ -6,16 +6,22 @@ public class AccountRepository : IAccountRepository
 {
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
+    private readonly ITurnstileValidatorService _turnstileValidatorService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IPhotoService _photoService;
 
     // constructor - dependency injection
-    public AccountRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, ITokenService tokenService, IPhotoService photoService)
+    public AccountRepository(
+        IMongoClient client, IMyMongoDbSettings dbSettings,
+        ITurnstileValidatorService turnstileValidatorService,
+        UserManager<AppUser> userManager, ITokenService tokenService,
+        IPhotoService photoService
+    )
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-
+        _turnstileValidatorService = turnstileValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;
         _photoService = photoService;
@@ -60,6 +66,17 @@ public class AccountRepository : IAccountRepository
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
+
+        #region Turnstile validation
+        bool isValid = await _turnstileValidatorService.ValidateTokenAsync(userInput.TurnstileToken, cancellationToken);
+
+        if (!isValid)
+        {
+            loggedInDto.IsTurnstileTokenInvalid = true;
+
+            return loggedInDto;
+        }
+        #endregion
 
         AppUser? appUser;
 

@@ -7,6 +7,10 @@ public static class IdentityServiceExtensions
 {
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
+        #region Turnstile Token Validation
+            services.AddHttpClient<ITurnstileValidatorService, TurnstileValidatorService>();
+        #endregion
+
         #region Token
         string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 

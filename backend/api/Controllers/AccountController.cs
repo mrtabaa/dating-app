@@ -27,11 +27,13 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
+            : loggedInDto.IsTurnstileTokenInvalid
+            ? BadRequest("Turnstile token is invalid.")
             : loggedInDto.IsWrongCreds
-            ? BadRequest("Wrong username or password.")
+            ? Unauthorized("Wrong username or password.")
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
-            : BadRequest("Login has failed. Try again or contact the support.");
+            : Unauthorized("Login has failed. Try again or contact the support.");
     }
 
     [HttpGet]
