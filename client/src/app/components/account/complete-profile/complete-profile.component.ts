@@ -170,8 +170,11 @@ export class CompleteProfileComponent implements OnInit {
     this.isCountrySelectedSig = this.googlePlacesService.isCountrySelectedSig;
   }
 
+  /**
+   * Receives isUploading event from PhotoEditor to disable the Next button while a photo isUploading
+   * @param $isUploading
+   */
   setIsUploadingPhoto($isUploading: boolean): void {
-    console.log($isUploading);
     this.isUploading = $isUploading;
   }
 }
