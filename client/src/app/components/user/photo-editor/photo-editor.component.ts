@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,6 +29,9 @@ import { PhotoDeleteResponse } from '../../../models/helpers/photo-delete-respon
 })
 export class PhotoEditorComponent implements OnInit {
   @Input() member: Member | undefined;
+  @Output() isUploadingOut = new EventEmitter<boolean>(false);
+  isUploading = false;
+
   private accountService = inject(AccountService);
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
@@ -41,7 +44,6 @@ export class PhotoEditorComponent implements OnInit {
 
   uploader: FileUploader | undefined;
   hasBaseDropZoneOver = false;
-  isUploading = false;
 
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
@@ -79,10 +81,12 @@ export class PhotoEditorComponent implements OnInit {
 
       this.uploader.onProgressAll = () => {
         this.isUploading = true;
+        this.isUploadingOut.emit(this.isUploading);
       }
 
       this.uploader.onCancelItem = () => {
         this.isUploading = false;
+        this.isUploadingOut.emit(this.isUploading);
       }
 
       this.uploader.onWhenAddingFileFailed = (file) => {
@@ -101,6 +105,7 @@ export class PhotoEditorComponent implements OnInit {
         }
 
         this.isUploading = false;
+        this.isUploadingOut.emit(this.isUploading);
       }
 
       this.uploader.onErrorItem = (item, error) => {

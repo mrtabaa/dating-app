@@ -1,7 +1,7 @@
 <section>
     <h6 class="title">Please complete your profile to attract more people.</h6>
     <mat-stepper [linear]="true" #stepper [orientation]="(stepperOrientation | async)!">
-        <mat-step [stepControl]="starterFg">
+        <!-- <mat-step [stepControl]="starterFg">
             <div class="container">
                 <form [formGroup]="starterFg">
                     <ng-template matStepLabel>{{starterLable}}</ng-template>
@@ -14,9 +14,9 @@
                         @if(KnownAsCtrl.hasError('maxlength')) {
                         <mat-error>Up to {{maxInputChars}} is allowed.</mat-error>
                         }
-                    </mat-form-field>
+                    </mat-form-field> -->
                     <!-- Location -->
-                    <app-google-places />
+                    <!-- <app-google-places />
                     @if(countrySig() && isCountrySelectedSig()) {
                     <div class="buttons">
                         <button type="submit" mat-raised-button color="primary" matStepperNext>Next</button>
@@ -24,17 +24,18 @@
                     }
                 </form>
             </div>
-        </mat-step>
+        </mat-step> -->
         <mat-step [stepControl]="photosCtrl" optional>
             <div class="container photos">
                 <form>
                     <div class="buttons">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                        <button [disabled]="isUploading" mat-raised-button color="primary" matStepperNext>Next</button>
                     </div>
                     <ng-template matStepLabel>{{photosLabel}}</ng-template>
                     @if(member) {
-                    <app-photo-editor [member]="member" />
+                    <!-- <app-photo-editor [member]="member" /> -->
+                    <app-photo-editor [member]="member" (isUploadingOut)="setIsUploadingPhoto($event)" />
                     }
                 </form>
             </div>

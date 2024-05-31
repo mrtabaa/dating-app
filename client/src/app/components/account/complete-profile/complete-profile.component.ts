@@ -66,6 +66,7 @@ export class CompleteProfileComponent implements OnInit {
 
   member: Member | undefined;
   panelOpenState = false;
+  isUploading = false;
 
   countrySig: Signal<string | undefined> = this.googlePlacesService.countrySig;
   countryAcrSig: Signal<string | undefined> = this.googlePlacesService.countryAcrSig;
@@ -167,5 +168,10 @@ export class CompleteProfileComponent implements OnInit {
 
     this.countrySig = this.googlePlacesService.countrySig;
     this.isCountrySelectedSig = this.googlePlacesService.isCountrySelectedSig;
+  }
+
+  setIsUploadingPhoto($isUploading: boolean): void {
+    console.log($isUploading);
+    this.isUploading = $isUploading;
   }
 }
