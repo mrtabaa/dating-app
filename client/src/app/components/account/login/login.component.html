@@ -26,10 +26,12 @@
             <div class="demo">
                 <mat-divider />
                 <div class="demo-buttons">
-                    <button (click)="enterAdminCreds()" mat-stroked-button color="warn">
+                    <button (click)="enterAdminCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
+                        color="warn">
                         Admin creds
                     </button>
-                    <button (click)="generateMemberCreds()" mat-stroked-button color="warn">
+                    <button (click)="generateMemberCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
+                        color="warn">
                         Generate demo member
                     </button>
                 </div>
