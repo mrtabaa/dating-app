@@ -19,8 +19,9 @@ import { environment } from '../../../../environments/environment';
   selector: 'app-login',
   standalone: true,
   imports: [
-    InputCvaComponent, RouterLink, NgxTurnstileModule, NgxTurnstileFormsModule,
+    InputCvaComponent, RouterLink, 
     FormsModule, ReactiveFormsModule,
+    NgxTurnstileModule, NgxTurnstileFormsModule,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
   templateUrl: './login.component.html',
@@ -97,7 +98,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: 'Aaaaaaa1',
       confirmPassword: 'Aaaaaaa1',
       dateOfBirth: '2000-01-01',
-      gender: 'male'
+      gender: 'male',
+      turnsTileToken: this.TurnsTileCtrl.value
     }
 
     this.accountService.register(userRegInput)

@@ -12,12 +12,15 @@ import { MatRadioModule } from '@angular/material/radio';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
+    NgxTurnstileModule, NgxTurnstileFormsModule,
     InputCvaComponent, DatePickerCvaComponent,
     MatButtonModule, MatInputModule, MatRadioModule
   ],
@@ -33,6 +36,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   minDate = new Date();
   maxDate = new Date();
   emailExistsErrorMessage: string | undefined;
+  turnsTileSiteKey = environment.turnstileSiteKey;
 
   subscriptionRegisterUser!: Subscription;
 
@@ -60,6 +64,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
     genderCtrl: ['female', [Validators.required]],
+    turnsTileCtrl: [null, [Validators.required]]
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -83,6 +88,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
+  get TurnsTileCtrl(): FormControl {
+    return this.registerFg.get('turnsTileCtrl') as FormControl;
+  }
   //#endregion
 
 
@@ -96,10 +104,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: this.PasswordCtrl.value,
       confirmPassword: this.ConfirmPasswordCtrl.value,
       dateOfBirth: dob,
-      // knownAs: this.KnownAsCtrl.value,
       gender: this.GenderCtrl.value,
-      // city: this.CityCtrl.value,
-      // country: this.CountryCtrl.value
+      turnsTileToken: this.TurnsTileCtrl.value
     };
 
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)

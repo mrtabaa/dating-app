@@ -33,6 +33,17 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
+        #region Turnstile validation
+        bool isValid = await _turnstileValidatorService.ValidateTokenAsync(registerDto.TurnstileToken, cancellationToken);
+
+        if (!isValid)
+        {
+            loggedInDto.IsTurnstileTokenInvalid = true;
+
+            return loggedInDto;
+        }
+        #endregion
+
         #region Create user, token and add role
 
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);

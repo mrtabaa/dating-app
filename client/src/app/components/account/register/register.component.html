@@ -39,10 +39,9 @@
         </div>
         }
 
+        <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
         <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
             class="submitBtn">Register</button>
-        <!-- <button type="button" mat-raised-button (click)="checkStatus()">check</button> -->
-        <!-- <p>{{registerFg.value | json}}</p> -->
         <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
 </form>

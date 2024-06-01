@@ -14,6 +14,8 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
+            : loggedInDto.IsTurnstileTokenInvalid
+            ? BadRequest("Turnstile token is invalid.")
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
             : BadRequest("Registration has failed. Try again or contact the support.");

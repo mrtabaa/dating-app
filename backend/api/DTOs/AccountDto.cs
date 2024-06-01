@@ -10,7 +10,8 @@ public record RegisterDto(
     string Password,
     [DataType(DataType.Password), Length(8, 50)] string ConfirmPassword,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
-    string Gender
+    string Gender,
+    string TurnstileToken
 );
 
 public record LoginDto(
