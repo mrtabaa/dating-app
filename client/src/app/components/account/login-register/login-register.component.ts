@@ -16,4 +16,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login-register.component.html',
   styleUrl: './login-register.component.scss'
 })
-export class LoginRegisterComponent { }
+export class LoginRegisterComponent {
+  isLoginShown = true;
+  isRegisterShown = false;
+
+  toggleIsLoginShown(): void {
+    this.isLoginShown = !this.isLoginShown;
+    this.isRegisterShown = !this.isRegisterShown;
+  }
+}

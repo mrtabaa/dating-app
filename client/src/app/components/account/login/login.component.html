@@ -10,7 +10,11 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
-        <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+        <div>
+            @if(router.url !== '/demo' && isLoginShownIn) {
+            <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+            }
+        </div>
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
@@ -22,9 +26,13 @@
             <div class="recovery">
                 <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
             </div>
+            <mat-divider />
             @if(router.url === '/demo') {
             <div class="demo">
-                <mat-divider />
+                @if(isLoginShownIn) {
+                <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
+                    theme="light"></ngx-turnstile>
+                }
                 <div class="demo-buttons">
                     <button (click)="enterAdminCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
                         color="warn">

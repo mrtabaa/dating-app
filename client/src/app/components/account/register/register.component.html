@@ -38,8 +38,9 @@
             <mat-error>{{emailExistsErrorMessage}}</mat-error>
         </div>
         }
-
+        @if(isRegisterShownIn) {
         <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+        }
         <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
             class="submitBtn">Register</button>
         <!-- <p>{{registerFg.errors | json}}</p> -->

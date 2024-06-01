@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -33,10 +33,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
+  @Input() isRegisterShownIn = false;
+
   minDate = new Date();
   maxDate = new Date();
   emailExistsErrorMessage: string | undefined;
   turnsTileSiteKey = environment.turnstileSiteKey;
+  isTurnstileActive = false;
+
 
   subscriptionRegisterUser!: Subscription;
 

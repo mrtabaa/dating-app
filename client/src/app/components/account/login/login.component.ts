@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -19,7 +19,7 @@ import { environment } from '../../../../environments/environment';
   selector: 'app-login',
   standalone: true,
   imports: [
-    InputCvaComponent, RouterLink, 
+    InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
     NgxTurnstileModule, NgxTurnstileFormsModule,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
@@ -33,9 +33,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   router = inject(Router);
 
+  @Input() isLoginShownIn = false;
+
   user$!: Observable<LoggedInUser | null>;
   subscrition!: Subscription;
   turnsTileSiteKey = environment.turnstileSiteKey;
+  isTurnstileActive = false;
 
   ngOnInit(): void {
     this.loginFg;
@@ -49,7 +52,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
-    rememberMeCtrl: [false, []], 
+    rememberMeCtrl: [false, []],
     turnsTileCtrl: [null, [Validators.required]]
   });
 
