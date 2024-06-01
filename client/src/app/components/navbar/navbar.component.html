@@ -81,8 +81,8 @@
             </div>
             }
             <!-- navigation -->
-            <mat-divider></mat-divider>
             @if(loggedInUserSig && loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
+            <mat-divider></mat-divider>
             <mat-list>
                 <mat-list-item (click)="goToEditProfile()"
                     routerLinkActive="router-link-active">
