@@ -81,12 +81,12 @@ public class AccountRepository : IAccountRepository
         #region Turnstile validation
         bool isValid = await _turnstileValidatorService.ValidateTokenAsync(userInput.TurnstileToken, cancellationToken);
 
-        if (!isValid)
-        {
-            loggedInDto.IsTurnstileTokenInvalid = true;
+        // if (!isValid)
+        // {
+        //     loggedInDto.IsTurnstileTokenInvalid = true;
 
-            return loggedInDto;
-        }
+        //     return loggedInDto;
+        // }
         #endregion
 
         AppUser? appUser;
