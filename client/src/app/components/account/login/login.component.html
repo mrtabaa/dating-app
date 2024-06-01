@@ -26,8 +26,8 @@
             <div class="recovery">
                 <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
             </div>
-            <mat-divider />
             @if(router.url === '/demo') {
+            <mat-divider />
             <div class="demo">
                 @if(isLoginShownIn) {
                 <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
