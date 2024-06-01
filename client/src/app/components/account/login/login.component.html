@@ -1,6 +1,12 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
     <section class="container">
         <div class="inputs">
+            @if(PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
+            <p class="demo-text">
+                NOTE: Keep the generated username to login again. <br />
+                <span>Password:</span> {{PasswordCtrl.value}}
+            </p>
+            }
             <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
                 [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
             </app-input-cva>
@@ -43,12 +49,6 @@
                         Generate demo member
                     </button>
                 </div>
-                @if(PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
-                <p class="demo-text">
-                    NOTE: Keep the generated username to login again. <br />
-                    <span>Password:</span> {{PasswordCtrl.value}}
-                </p>
-                }
             </div>
             }
         </div>
