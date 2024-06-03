@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace api.Services;
 
-public class TurnstileValidatorService(HttpClient _httpClient, IConfiguration _config) : ITurnstileValidatorService
+public class TurnstileService(HttpClient _httpClient, IConfiguration _config) : ITurnstileValidatorService
 {
     public async Task<bool> ValidateTokenAsync(string turnstileToken, CancellationToken cancellationToken)
     {
