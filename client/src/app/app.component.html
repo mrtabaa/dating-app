@@ -4,8 +4,8 @@
   </ngx-spinner>
 
   <section class="container">
-    <!-- showNavbarSig() becomes true/false in the component which wants to remove the navbar. e.g. HomeComoponent -->
-    @if(showNavbarSig()){
+    <!-- showHideComp() returns true/false in the component which wants to remove the navbar. e.g. HomeComoponent -->
+    @if(showHideComp()){
     <header>
       <nav>
         <app-navbar />
@@ -19,7 +19,7 @@
       </div>
     </main>
     <footer>
-      <app-footer />
+      <app-footer [isFooterShownIn]="showHideComp()" />
     </footer>
   </section>
 </div>
