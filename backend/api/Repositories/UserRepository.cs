@@ -28,9 +28,6 @@ public class UserRepository : IUserRepository
     public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
         await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<AppUser?> GetByHashedIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
-         await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
-
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
       await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
