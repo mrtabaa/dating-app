@@ -1,8 +1,7 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { NavbarService } from '../../services/helpers/navbar.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LoginRegisterComponent } from '../account/login-register/login-register.component';
@@ -19,14 +18,6 @@ import { LoginRegisterComponent } from '../account/login-register/login-register
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, OnDestroy {
-  navbarService = inject(NavbarService);
+export class HomeComponent {
   router = inject(Router);
-
-  ngOnInit(): void {
-    this.navbarService.showNavbarSig.set(false);
-  }
-  ngOnDestroy(): void {
-    this.navbarService.showNavbarSig.set(true);
-  }
 }
