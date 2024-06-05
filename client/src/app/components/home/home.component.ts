@@ -31,7 +31,7 @@ export class HomeComponent {
   isLoginRegister = false;
 
   constructor() {
-    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 30rem)')
+    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 820px)') // include iPad
       .pipe(map(({ matches }) => {
         matches = matches ? false : true
 
