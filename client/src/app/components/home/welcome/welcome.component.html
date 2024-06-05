@@ -1,8 +1,8 @@
 <img class="main-bg-image" ngSrc="/assets/images/components/home/mobile/1.jpg" fill priority alt="Loading image...">
 <main>
     <mat-stepper headerPosition="bottom">
-        <mat-step [completed]="false">
-            <section class="page-1">
+        <mat-step [completed]="false" class="mat-step">
+            <section class="page-1 pages">
                 <h4 class="title">Find Your Perfect Match!</h4>
                 <button (click)="toggleIsLogginRegister()" mat-raised-button color="primary">
                     Get Started
@@ -10,8 +10,8 @@
             </section>
         </mat-step>
         <mat-step [completed]="false">
-            <section class="page-2">
-                <div class="top">
+            <section class="page-2 pages">
+                <div class="content">
                     <h3 class="title">Friendship</h3>
                     <p>
                         Hallboard is the perfect place for you to meet like-minded people as a friend in your area.
@@ -23,10 +23,17 @@
             </section>
         </mat-step>
         <mat-step [completed]="false">
-            <section class="page-3">
-                <button mat-icon-button matStepperPrevious color="primary">
-                    <mat-icon>arrow_circle_right</mat-icon>
+            <section class="page-3 pages">
+                <button (click)="toggleIsLogginRegister()" mat-raised-button color="primary">
+                    Get Started
                 </button>
+                <div class="content">
+                    <h3 class="title">Co-Worker</h3>
+                    <p>
+                        Hallboard has a variety of groups and events that you can join, which is a great way to meet new
+                        people in person.
+                    </p>
+                </div>
             </section>
         </mat-step>
 
