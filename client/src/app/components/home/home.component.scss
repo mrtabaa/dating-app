@@ -2,6 +2,11 @@ main {
     display: flex;
     flex-direction: column;
     gap: 3rem;
+    height: 100%;
+
+    app-welcome {
+        flex-grow: 1;
+    }
 
     nav {
         z-index: 1;
