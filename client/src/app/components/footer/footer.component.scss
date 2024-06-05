@@ -1,4 +1,9 @@
 mat-toolbar {
-    height: 3rem;
-    background-color: #ffd9e1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    p {
+        margin: 0;
+    }
 }
