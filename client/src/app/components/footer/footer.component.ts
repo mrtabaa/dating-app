@@ -15,6 +15,8 @@ import { ResponsiveService } from '../../services/responsive.service';
 })
 export class FooterComponent {
   responsiveService = inject(ResponsiveService);
+  
+  currentYear: number = new Date().getFullYear();
 
   @Input() isLoggedInIn: boolean = false;
 }
