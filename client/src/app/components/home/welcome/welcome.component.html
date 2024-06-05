@@ -1,0 +1,35 @@
+<img class="main-bg-image" ngSrc="/assets/images/components/home/mobile/1.jpg" fill priority alt="Loading image...">
+<main>
+    <mat-stepper headerPosition="bottom">
+        <mat-step [completed]="false">
+            <section class="left">
+                <h4 class="title">Find Your Perfect Match!</h4>
+                <button (click)="toggleIsLogginRegister()" mat-raised-button color="primary">
+                    Get Started
+                </button>
+            </section>
+        </mat-step>
+        <mat-step [completed]="false">
+            <section class="center">
+                <div class="top">
+                    <h3 class="title">Friendship</h3>
+                    <p>
+                        Hallboard is the perfect place for you to meet like-minded people as a friend in your area.
+                    </p>
+                </div>
+                <button (click)="toggleIsLogginRegister()" mat-raised-button color="primary">
+                    Get Started
+                </button>
+            </section>
+        </mat-step>
+        <mat-step [completed]="false">
+            <button mat-icon-button matStepperPrevious color="primary">
+                <mat-icon>arrow_circle_right</mat-icon>
+            </button>
+        </mat-step>
+
+        <ng-template matStepperIcon="number">
+            <mat-icon>circle</mat-icon>
+        </ng-template>
+    </mat-stepper>
+</main>

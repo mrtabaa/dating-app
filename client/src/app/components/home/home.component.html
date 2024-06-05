@@ -5,7 +5,18 @@
             Hallboard
         </a>
     </nav>
-    <img class="main-bg-image" ngSrc="/assets/images/components/home/bg.webp" fill priority alt="Loading image...">
+    <!-- Mobile only  -->
+    @if(isMobileView$ | async) {
+    @if(isLoginRegister) {
+    <app-login-register />
+    }
+    @else {
+    <app-welcome (isLogingRegisterOut)="isLoginRegister = true" />
+    }
+    }
+    <!-- desktop only -->
+    @else {
+    <img class="main-bg-image" ngSrc="/assets/images/components/home/bg.webp" fill priority alt="Loading...">
     <section class="row1">
         <h3>Find Your Perfect Match!</h3>
         <app-login-register />
@@ -58,4 +69,5 @@
             </div>
         </div>
     </section> -->
+    }
 </main>
