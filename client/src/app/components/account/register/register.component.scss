@@ -1,9 +1,17 @@
+
+
+$fieldFormWidth: 25rem;
+
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    padding-top: 2rem;
+    padding: 2rem 1.5rem 0;
+
+    >* {
+        width: $fieldFormWidth;
+    }
 
     .title {
         width: auto;
@@ -20,10 +28,6 @@
         width: auto;
         right: 3rem;
         margin-bottom: 1rem;
-    }
-
-    >* {
-        width: 80%;
     }
 }
 

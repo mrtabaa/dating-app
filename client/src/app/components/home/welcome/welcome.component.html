@@ -2,7 +2,7 @@
 <main>
     <mat-stepper headerPosition="bottom">
         <mat-step [completed]="false">
-            <section class="left">
+            <section class="page-1">
                 <h4 class="title">Find Your Perfect Match!</h4>
                 <button (click)="toggleIsLogginRegister()" mat-raised-button color="primary">
                     Get Started
@@ -10,7 +10,7 @@
             </section>
         </mat-step>
         <mat-step [completed]="false">
-            <section class="center">
+            <section class="page-2">
                 <div class="top">
                     <h3 class="title">Friendship</h3>
                     <p>
@@ -23,9 +23,11 @@
             </section>
         </mat-step>
         <mat-step [completed]="false">
-            <button mat-icon-button matStepperPrevious color="primary">
-                <mat-icon>arrow_circle_right</mat-icon>
-            </button>
+            <section class="page-3">
+                <button mat-icon-button matStepperPrevious color="primary">
+                    <mat-icon>arrow_circle_right</mat-icon>
+                </button>
+            </section>
         </mat-step>
 
         <ng-template matStepperIcon="number">
