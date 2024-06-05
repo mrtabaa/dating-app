@@ -1,2 +1,10 @@
-<mat-toolbar color="primary">
+<mat-toolbar [ngStyle]="{
+    'background-color': isLoggedInIn || !responsiveService.isMobileSig() ? '#ffd9e1' : 'transparent',
+    'margin-top': !responsiveService.isMobileSig() ? '1rem' : '0'
+    }">
+    <p [ngStyle]="{
+        'color': isLoggedInIn || !responsiveService.isMobileSig() ? 'black' : 'white',
+        'font-size': responsiveService.isMobileSig() ? '10px' : '1rem'}">
+        All photos are of models and used for illustrative purposes only
+    </p>
 </mat-toolbar>
