@@ -1,6 +1,5 @@
-import { Component, OnInit, Signal, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { LoggedInUser } from '../../models/logged-in-user.model';
 import { AccountService } from '../../services/account.service';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,6 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
+import { ResponsiveService } from '../../services/responsive.service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,20 +22,24 @@ import { MatDividerModule } from '@angular/material/divider';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit {
-  private accountService = inject(AccountService);
+export class NavbarComponent {
   private router = inject(Router);
-
-  loggedInUserSig: Signal<LoggedInUser | null> | undefined;
+  private accountService = inject(AccountService);
+  loggedInUserSig = inject(AccountService).loggedInUserSig;
+  isMobileSig = inject(ResponsiveService).isMobileSig;
+  isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
 
   links = ['members', 'friends', 'messages', 'admin'];
 
-  ngOnInit(): void {
-    this.loggedInUserSig = this.accountService.loggedInUserSig;
-  }
-
   goToEditProfile(): void {
     this.router.navigate(['member/' + this.accountService.loggedInUserSig()?.userName], { skipLocationChange: true });
+  }
+
+  /**
+   * Set isWelcomeCompSig to true to show WelcomeComponent if brand is clicked. 
+   */
+  setIsWelcomeCompSig(): void {
+    this.isWelcomeCompSig.set(true);
   }
 
   logout() {

@@ -25,17 +25,17 @@ import { ResponsiveService } from '../../services/responsive.service';
 })
 export class HomeComponent {
   private breakpointObserver = inject(BreakpointObserver);
-  private responsiveService = inject(ResponsiveService);
+  private isMobileSig = inject(ResponsiveService).isMobileSig;
+  isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
 
   isMobileView$: Observable<boolean>;
-  isGetStartedClicked = false;
 
   constructor() {
     this.isMobileView$ = this.breakpointObserver.observe('(min-width: 51rem)') // include iPad
       .pipe(map(({ matches }) => {
         matches = matches ? false : true
 
-        this.responsiveService.isMobileSig.set(matches);
+        this.isMobileSig.set(matches);
 
         return matches;
       }));

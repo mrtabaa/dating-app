@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ResponsiveService } from '../../services/responsive.service';
+import { AccountService } from '../../services/account.service';
 
 @Component({
   selector: 'app-footer',
@@ -14,9 +15,9 @@ import { ResponsiveService } from '../../services/responsive.service';
   styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
-  responsiveService = inject(ResponsiveService);
-  
-  currentYear: number = new Date().getFullYear();
+  loggedInUserSig = inject(AccountService).loggedInUserSig;
+  isMobileSig = inject(ResponsiveService).isMobileSig;
+  isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
 
-  @Input() isLoggedInIn: boolean = false;
+  currentYear: number = new Date().getFullYear();
 }

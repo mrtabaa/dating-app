@@ -1,13 +1,18 @@
-<mat-toolbar color="primary">
+<mat-toolbar [ngStyle]="{
+    'background-color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() ? 'transparent' : '#ffd9e1',
+    'margin-top': isMobileSig() ? '0' : '1rem'
+    }">
     <!--#region LEFT -->
     <section class="left">
-        <a [routerLink]="['/home']" class="brand">
+        <a [routerLink]="['/home']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
+            'color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() ? 'white' : 'palevioletred',
+        }">
             <mat-icon>eco</mat-icon>
             Hallboard
         </a>
 
         <!-- #region NavLinks -->
-        @if(loggedInUserSig && loggedInUserSig()) {
+        @if(loggedInUserSig()) {
         <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
             @for (link of links; track $index) {
             @if(loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
@@ -35,7 +40,7 @@
     <section class="right">
         <!-- if logged-in: show appMenu
             else: show signup/login -->
-        @if(loggedInUserSig && loggedInUserSig(); as user) {
+        @if(loggedInUserSig(); as user) {
         <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
             @if(user.profilePhotoUrl) {
             <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority
@@ -49,19 +54,10 @@
             }
         </button>
         }
-        @else {
-        <!-- signup/login -->
-        <button mat-raised-button color="accent" routerLink="account/register">
-            Sign Up
-        </button>
-        <button mat-raised-button color="accent" routerLink="account/login" routerLinkActive="router-link-active">
-            Login
-        </button>
-        }
         <!-- menu if logged-in -->
         <mat-menu #appMenu [class]="'mat-menu'">
             <!-- profile -->
-            @if(loggedInUserSig && loggedInUserSig(); as user) {
+            @if(loggedInUserSig(); as user) {
             <div class="user-info">
                 <div class="profile-image">
                     @if(user.profilePhotoUrl) {
@@ -81,11 +77,10 @@
             </div>
             }
             <!-- navigation -->
-            @if(loggedInUserSig && loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
+            @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
             <mat-divider></mat-divider>
             <mat-list>
-                <mat-list-item (click)="goToEditProfile()"
-                    routerLinkActive="router-link-active">
+                <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active">
                     <div mat-button class="menu-items">
                         <mat-icon>account_circle</mat-icon>
                         Your Profile

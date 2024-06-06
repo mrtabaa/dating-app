@@ -5,4 +5,5 @@ import { Injectable, signal } from '@angular/core';
 })
 export class ResponsiveService {
   isMobileSig = signal<boolean>(false);
+  isWelcomeCompSig = signal<boolean>(true);
 }
