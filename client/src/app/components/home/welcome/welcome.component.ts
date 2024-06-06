@@ -16,9 +16,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './welcome.component.scss'
 })
 export class WelcomeComponent {
-  @Output() isLogingRegisterOut = new EventEmitter(false);
+  @Output() isGetStartedClickedOut = new EventEmitter(false);
 
-  toggleIsLogginRegister(): void {
-    this.isLogingRegisterOut.emit(true);
+  toggleIsGetStartedClicked(): void {
+    this.isGetStartedClickedOut.emit(true);
   }
 }

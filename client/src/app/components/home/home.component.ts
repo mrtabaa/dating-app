@@ -28,7 +28,7 @@ export class HomeComponent {
   private responsiveService = inject(ResponsiveService);
 
   isMobileView$: Observable<boolean>;
-  isLoginRegister = false;
+  isGetStartedClicked = false;
 
   constructor() {
     this.isMobileView$ = this.breakpointObserver.observe('(min-width: 820px)') // include iPad
