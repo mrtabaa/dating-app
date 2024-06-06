@@ -8,27 +8,6 @@ main {
         flex-grow: 1;
     }
 
-    nav {
-        z-index: 1;
-
-        .brand {
-            width: fit-content;
-            display: flex;
-            align-items: center;
-            color: white;
-            text-decoration: none;
-            margin: 1rem 0 0 1rem;
-
-            font-family: "Fredoka", sans-serif;
-            font-size: 28px;
-            font-optical-sizing: auto;
-            font-weight: bold;
-            font-style: normal;
-            font-variation-settings:
-                "wdth" 100;
-        }
-    }
-
     .main-bg-image {
         z-index: -1;
         /* Example height for the container */
@@ -132,13 +111,5 @@ main {
         //         }
         //     }
         // }
-    }
-}
-
-@media only screen and (min-width: 50rem) {
-    .container {
-        border: 1px solid rgb(218, 218, 218);
-        padding-top: 1rem;
-        border-radius: 2rem;
     }
 }
