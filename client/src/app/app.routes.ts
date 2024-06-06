@@ -16,7 +16,7 @@ import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.
 import { adminGuard } from './guards/admin.guard';
 import { RecoverComponent } from './components/account/recover/recover.component';
 import { CompleteProfileComponent } from './components/account/complete-profile/complete-profile.component';
-import { profileCompleteGuard } from './guards/profile-complete.guard';
+import { completeProfileGuard } from './guards/complete-profile.guard';
 import { profileIsCompletedGuard } from './guards/profile-is-completed.guard';
 
 export const routes: Routes = [
@@ -35,7 +35,7 @@ export const routes: Routes = [
     {
         path: '',
         runGuardsAndResolvers: 'always',
-        canActivate: [authGuard, profileCompleteGuard],
+        canActivate: [authGuard, completeProfileGuard],
         children: [
             { path: 'home', component: MemberListComponent },
             { path: 'members', component: MemberListComponent },
@@ -49,7 +49,7 @@ export const routes: Routes = [
     {
         path: '',
         children: [
-            { path: 'account/complete-profile', component: CompleteProfileComponent, canActivate: [profileIsCompletedGuard] },
+            { path: 'account/complete-profile', component: CompleteProfileComponent, canActivate: [authGuard, profileIsCompletedGuard] },
             { path: 'errors', component: TestErrorComponent },
             { path: 'server-error', component: ServerErrorComponent },
             { path: 'no-access', component: NoAccessComponent }
