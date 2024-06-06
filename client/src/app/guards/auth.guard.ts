@@ -14,7 +14,8 @@ export const authGuard: CanActivateFn = (route, state) => {
   localStorage.setItem('returnUrl', state.url);
   router.navigate([''], { queryParams: { 'returnUrl': state.url } })
 
-  snackbar.open('Please login first.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 })
+  if (router.url === '/' || router.url === '/account/login' || router.url === '/account/register')
+    snackbar.open('Please login first.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 })
 
   return false;
 };
