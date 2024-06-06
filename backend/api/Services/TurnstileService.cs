@@ -2,10 +2,12 @@ using Newtonsoft.Json;
 
 namespace api.Services;
 
-public class TurnstileService(HttpClient _httpClient, IConfiguration _config) : ITurnstileValidatorService
+public class TurnstileService(HttpClient _httpClient, IConfiguration _config) : ITurnstileService
 {
-    public async Task<bool> ValidateTokenAsync(string turnstileToken, CancellationToken cancellationToken)
+    public async Task<bool> ValidateTokenAsync(string? turnstileToken, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(turnstileToken)) return false;
+
         string? secretKey = _config.GetValue<string>("TurnstileSecretKey");
 
         if (string.IsNullOrEmpty(secretKey)) return false;
@@ -25,8 +27,7 @@ public class TurnstileService(HttpClient _httpClient, IConfiguration _config) : 
 
             dynamic? jsonResponse = JsonConvert.DeserializeObject(responseString);
 
-            if (jsonResponse != null)
-                return jsonResponse.success;
+            if (jsonResponse != null) return jsonResponse.success;
         }
 
         return false;
