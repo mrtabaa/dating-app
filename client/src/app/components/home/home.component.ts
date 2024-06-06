@@ -31,7 +31,7 @@ export class HomeComponent {
   isGetStartedClicked = false;
 
   constructor() {
-    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 820px)') // include iPad
+    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 51rem)') // include iPad
       .pipe(map(({ matches }) => {
         matches = matches ? false : true
 
