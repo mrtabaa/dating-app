@@ -6,7 +6,7 @@ public class AccountRepository : IAccountRepository
 {
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
-    private readonly ITurnstileValidatorService _turnstileValidatorService;
+    private readonly ITurnstileService _turnstileValidatorService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IPhotoService _photoService;
@@ -14,7 +14,7 @@ public class AccountRepository : IAccountRepository
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        ITurnstileValidatorService turnstileValidatorService,
+        ITurnstileService turnstileValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
         IPhotoService photoService
     )
