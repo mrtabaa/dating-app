@@ -1,17 +1,17 @@
 <main>
     <nav>
-        <a [routerLink]="['']" class="brand">
+        <a [routerLink]="['']" class="brand" (click)="isGetStartedClicked = false">
             <mat-icon>eco</mat-icon>
             Hallboard
         </a>
     </nav>
     <!-- Mobile only  -->
     @if(isMobileView$ | async) {
-    @if(isLoginRegister) {
+    @if(isGetStartedClicked) {
     <app-login-register />
     }
     @else {
-    <app-welcome (isLogingRegisterOut)="isLoginRegister = true" />
+    <app-welcome (isGetStartedClickedOut)="isGetStartedClicked = true" />
     }
     }
     <!-- desktop only -->
