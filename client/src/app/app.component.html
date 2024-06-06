@@ -4,22 +4,20 @@
   </ngx-spinner>
 
   <section class="container">
-    <!-- showHideComp() returns true/false in the component which wants to remove the navbar. e.g. HomeComoponent -->
-    @if(showHideComp()){
     <header>
       <nav>
         <app-navbar />
       </nav>
     </header>
-    }
 
     <main>
       <div class="wrapper">
         <router-outlet />
       </div>
     </main>
+    
     <footer>
-      <app-footer [isLoggedInIn]="showHideComp()" />
+      <app-footer />
     </footer>
   </section>
 </div>

@@ -1,9 +1,10 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatStepperModule } from '@angular/material/stepper';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-welcome',
@@ -16,9 +17,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './welcome.component.scss'
 })
 export class WelcomeComponent {
-  @Output() isGetStartedClickedOut = new EventEmitter(false);
+  isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
 
-  toggleIsGetStartedClicked(): void {
-    this.isGetStartedClickedOut.emit(true);
+  toggleIsGetStartedClicked(isWelcome: boolean): void {
+    this.isWelcomeCompSig.set(isWelcome);
   }
 }

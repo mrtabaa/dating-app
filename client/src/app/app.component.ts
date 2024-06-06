@@ -29,11 +29,4 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.accountService.reloadLoggedInUser();
   }
-
-  showHideComp(): boolean {
-    if (!(this.router.url === '/' || this.router.url === '/account/login' || this.router.url === '/account/register'))
-      return true
-    else
-      return false;
-  }
 }

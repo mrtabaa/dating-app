@@ -1,10 +1,10 @@
 <mat-toolbar [ngStyle]="{
-    'background-color': isLoggedInIn || !responsiveService.isMobileSig() ? '#ffd9e1' : 'transparent',
-    'margin-top': !responsiveService.isMobileSig() ? '1rem' : '0'
+    'background-color': loggedInUserSig() || !isMobileSig() || !isWelcomeCompSig() ? '#ffd9e1' : 'transparent',
+    'margin-top': !isMobileSig() ? '1rem' : '0'
     }">
     <p [ngStyle]="{
-        'color': isLoggedInIn || !responsiveService.isMobileSig() ? 'black' : 'white',
-        'font-size': responsiveService.isMobileSig() ? '10px' : '1rem'}">
+        'color': loggedInUserSig() || !isMobileSig() || !isWelcomeCompSig() ? 'black' : 'white',
+        'font-size': isMobileSig() ? '10px' : '1rem'}">
         Made with ❤️ by Hallboard. ©{{currentYear}}
     </p>
 </mat-toolbar>
