@@ -16,7 +16,7 @@ export class AccountService {
 
   private baseUrl = environment.apiUrl + "account/";
 
-  loggedInUserSig = signal<LoggedInUser | null>(null);
+  loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -65,7 +65,7 @@ export class AccountService {
 
   logout(): void {
     localStorage.clear();
-    this.loggedInUserSig.set(null);
+    this.loggedInUserSig.set(undefined);
     this.router.navigate(['account/login'])
     this.googlePlacesService.resetCountry();
   }
