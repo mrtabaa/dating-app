@@ -39,7 +39,7 @@ main {
     }
 }
 
-@media only screen and (min-width: 30rem) {
+@media only screen and (min-width: 51rem) {
     main {
         .row1 {
             display: flex;
@@ -48,7 +48,6 @@ main {
             position: absolute;
             right: 10%;
             top: 10rem;
-            z-index: 2;
 
             h3 {
                 font-weight: bold;
