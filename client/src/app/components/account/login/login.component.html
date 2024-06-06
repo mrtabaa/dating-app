@@ -1,54 +1,50 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
-    <section class="container">
-        <div class="inputs">
-            @if(router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
-            <p class="demo-text">
-                NOTE: Keep the generated username to login again. <br />
-                <span>Password:</span> {{PasswordCtrl.value}}
-            </p>
-            }
-            <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
-                [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
-            </app-input-cva>
-            <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
-                [placeHolder]="'Your password'"
-                [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
-                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
-            </app-input-cva>
-        </div>
-        @if(router.url !== '/demo' && isLoginShownIn) {
-        <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+    <div class="inputs">
+        @if(router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
+        <p class="demo-text">
+            NOTE: Keep the generated username to login again. <br />
+            <span>Password:</span> {{PasswordCtrl.value}}
+        </p>
         }
-        <div class="buttons">
-            <div class="signin">
-                <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()" class="submitBtn"
-                    mat-raised-button color="primary">
-                    Sign in
+        <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
+            [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
+        </app-input-cva>
+        <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
+            [placeHolder]="'Your password'"
+            [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
+            [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
+        </app-input-cva>
+    </div>
+    @if(router.url !== '/demo' && isLoginShownIn) {
+    <ngx-turnstile class="turnstile" [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
+        theme="light"></ngx-turnstile>
+    }
+    <div class="buttons">
+        <div class="signin">
+            <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
+            <button type="submit" (click)="loginEmailUsername()" class="submitBtn" mat-raised-button color="primary">
+                Sign in
+            </button>
+        </div>
+        <div class="recovery">
+            <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
+        </div>
+        @if(router.url === '/demo') {
+        <mat-divider />
+        <div class="demo">
+            @if(isLoginShownIn) {
+            <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+            }
+            <div class="demo-buttons">
+                <button (click)="enterAdminCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button color="warn">
+                    Admin creds
+                </button>
+                <button (click)="generateMemberCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
+                    color="warn">
+                    Generate demo member
                 </button>
             </div>
-            <div class="recovery">
-                <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
-            </div>
-            @if(router.url === '/demo') {
-            <mat-divider />
-            <div class="demo">
-                @if(isLoginShownIn) {
-                <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
-                    theme="light"></ngx-turnstile>
-                }
-                <div class="demo-buttons">
-                    <button (click)="enterAdminCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
-                        color="warn">
-                        Admin creds
-                    </button>
-                    <button (click)="generateMemberCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
-                        color="warn">
-                        Generate demo member
-                    </button>
-                </div>
-            </div>
-            }
         </div>
-    </section>
+        }
+    </div>
 </form>
