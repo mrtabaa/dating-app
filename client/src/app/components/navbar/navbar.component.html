@@ -1,5 +1,5 @@
 <mat-toolbar [ngStyle]="{
-    'background-color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() ? 'transparent' : '#ffd9e1',
+    'background-color': !loggedInUserSig() && isWelcomeCompSig() || !isMobileSig() ? 'transparent' : '#ffd9e1',
     'margin-top': isMobileSig() ? '0' : '1rem'
     }">
     <!--#region LEFT -->
