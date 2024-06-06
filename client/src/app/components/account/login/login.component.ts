@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -32,6 +32,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
   router = inject(Router);
+  renderer = inject(Renderer2);
 
   @Input() isLoginShownIn = false;
 
@@ -41,12 +42,30 @@ export class LoginComponent implements OnInit, OnDestroy {
   isTurnstileActive = false;
 
   ngOnInit(): void {
-    this.loginFg;
+    this.turnsTileChange();
   }
 
   ngOnDestroy(): void {
     if (this.subscrition)
       this.subscrition.unsubscribe();
+  }
+
+  turnsTileChange(): void {
+    this.renderer.listen('window', 'message', (event) => {
+      if (event.data.event !== 'init') {
+        return;
+      }
+
+      const turnstileIframe = this.renderer.selectRootElement(`#cf-chl-widget-${event.data.widgetId}`);
+      if (!turnstileIframe) {
+        return;
+      }
+
+      this.renderer.setStyle(turnstileIframe, 'width', '100%');
+      this.renderer.setStyle(turnstileIframe, 'height', '65px');
+      this.renderer.setStyle(turnstileIframe, 'display', 'flex'); // Changed to 'block' to ensure visibility
+      event.stopImmediatePropagation();
+    });
   }
 
   loginFg = this.fb.group({
