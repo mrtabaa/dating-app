@@ -2,90 +2,83 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-        width: 100%;
-        max-width: 34rem;
-        padding: 2rem 1rem 0;
-    }
+    gap: 1.5rem;
+    // max-width: 34rem;
+    background-color: yellow;
 }
 
-@media only screen and (min-width: 30rem) {
-    $fieldFormWidth: 25rem;
+// @media only screen and (min-width: 30rem) {
+//     $fieldFormWidth: 25rem;
 
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+//     form {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-            width: $fieldFormWidth;
-            max-width: 34rem;
-            padding: 2rem 1.5rem 0;
+//         .container {
+//             display: flex;
+//             flex-direction: column;
+//             align-items: center;
+//             gap: 1.5rem;
+//             width: $fieldFormWidth;
+//             max-width: 34rem;
+//             padding: 2rem 1.5rem 0;
 
-            >* {
-                width: $fieldFormWidth;
-            }
+//             >* {
+//                 width: $fieldFormWidth;
+//             }
 
-            h2 {
-                width: auto;
-            }
+//             h2 {
+//                 width: auto;
+//             }
 
-            .inputs {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
+//             .inputs {
+//                 display: flex;
+//                 flex-direction: column;
+//                 gap: 1rem;
 
-                .demo-text {
-                    color: rgb(235, 144, 144);
-                    background-color: rgb(228, 228, 228);
-                    border-radius: 1rem;
-                    padding: 0.5rem;
+//                 .demo-text {
+//                     color: rgb(235, 144, 144);
+//                     background-color: rgb(228, 228, 228);
+//                     border-radius: 1rem;
+//                     padding: 0.5rem;
 
-                    span {
-                        color: gray;
-                    }
-                }
-            }
+//                     span {
+//                         color: gray;
+//                     }
+//                 }
+//             }
 
-            .buttons {
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 1rem;
-                gap: 1rem;
+//             .buttons {
+//                 display: flex;
+//                 flex-direction: column;
+//                 margin-bottom: 1rem;
+//                 gap: 1rem;
 
-                .signin {
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 1rem;
-                    width: 100%;
-                }
+//                 .signin {
+//                     display: flex;
+//                     justify-content: space-between;
+//                     gap: 1rem;
+//                     width: 100%;
+//                 }
 
-                .signup {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                }
+//                 .signup {
+//                     width: 100%;
+//                     display: flex;
+//                     justify-content: space-between;
+//                 }
 
-                .demo {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 1rem;
+//                 .demo {
+//                     display: flex;
+//                     flex-direction: column;
+//                     gap: 1rem;
 
-                    .demo-buttons {
-                        display: flex;
-                        gap: 1rem;
-                    }
-                }
-            }
-        }
-    }
-}
+//                     .demo-buttons {
+//                         display: flex;
+//                         gap: 1rem;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
