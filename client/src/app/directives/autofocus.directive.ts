@@ -1,15 +1,16 @@
-import { Directive, ElementRef, Input, OnInit, inject } from '@angular/core';
+import { Directive, ElementRef, Input, inject, AfterViewInit } from '@angular/core';
 
 @Directive({
   selector: '[appAutofocusDir]',
   standalone: true
 })
-export class AutofocusDirective implements OnInit {
+export class AutofocusDirective implements AfterViewInit {
   @Input('appAutofocusDir') isFocused: boolean | undefined;
   private elRef = inject(ElementRef);
 
-  ngOnInit(): void {
-    if (this.isFocused)
-      setTimeout(() => this.elRef.nativeElement.focus());
+  ngAfterViewInit(): void {
+    if (this.isFocused) {
+      this.elRef.nativeElement.focus();
+    }
   }
 }
