@@ -5,8 +5,6 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LoginRegisterComponent } from '../account/login-register/login-register.component';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { Observable, map } from 'rxjs';
 import { WelcomeComponent } from './welcome/welcome.component';
 import { FooterComponent } from '../footer/footer.component';
 import { ResponsiveService } from '../../services/responsive.service';
@@ -24,20 +22,6 @@ import { ResponsiveService } from '../../services/responsive.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  private breakpointObserver = inject(BreakpointObserver);
-  private isMobileSig = inject(ResponsiveService).isMobileSig;
+  isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
-
-  isMobileView$: Observable<boolean>;
-
-  constructor() {
-    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 51rem)') // include iPad
-      .pipe(map(({ matches }) => {
-        matches = matches ? false : true
-
-        this.isMobileSig.set(matches);
-
-        return matches;
-      }));
-  }
 }

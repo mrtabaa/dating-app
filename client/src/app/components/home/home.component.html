@@ -1,6 +1,6 @@
 <main>
     <!-- Mobile only  -->
-    @if(isMobileView$ | async) {
+    @if(isMobileSig()) {
     @if(!isWelcomeCompSig()) {
     <app-login-register />
     }
