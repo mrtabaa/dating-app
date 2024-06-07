@@ -1,6 +1,85 @@
 .drawar-container {
+    position: fixed; // Changed from absolute to fixed to position relative to the viewport
+    top: 0; // Align to the top of the viewport
+    left: 0; // Align to the left of the viewport
+    height: 100%; // Full height of the viewport
+    width: 100%; // Full width of the viewport
+    z-index: 3; // Ensure it's above all other content
+
     mat-drawer {
-        width: 60%;
+        width: 60%; // You can adjust this as needed
+        height: 100%; // Full height of the drawer
+        z-index: 4; // Ensure the drawer is above the backdrop
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 2rem;
+
+            * {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                padding: 0;
+            }
+
+            .profile-image {
+                position: relative;
+                font-size: 3rem;
+                background-color: rgb(246, 209, 164);
+
+                width: 4rem;
+                height: 4rem;
+                border-radius: 50%;
+                box-shadow: 3px 3px 3px rgb(144, 144, 144);
+
+                img {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    border-radius: 50%;
+                }
+            }
+
+            .username {
+                color: gray;
+            }
+        }
+
+        .logout {
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        mat-list {
+            padding: 0;
+            margin: 0;
+
+            mat-list-item {
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-items {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                line-height: 47px;
+                padding-left: 1rem;
+                margin: 0;
+
+                &:hover {
+                    background-color: rgb(255, 176, 255);
+                    cursor: pointer;
+                }
+            }
+        }
     }
 
     mat-drawer-content {
@@ -22,6 +101,22 @@
             mat-toolbar-row {
                 display: flex;
                 justify-content: space-between;
+
+                .menu-button {
+                    position: relative;
+                    font-size: 1.5rem;
+                    border-radius: 50%;
+
+                    .top-avatar {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        border-radius: 50%;
+                    }
+                }
             }
         }
     }

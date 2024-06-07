@@ -1,7 +1,57 @@
-<mat-drawer-container class="drawar-container" hasBackdrop="true"
-    [ngStyle]="{'background-color': true ? 'transparent' : '#ffd9e1'}">
+<mat-drawer-container class="drawar-container" hasBackdrop="true" [ngStyle]="{
+        'background-color': isWelcomeCompSig() || loggedInUserSig() ? 'transparent' : '#ffd9e1',
+        'height': drawer.opened ? '100%' : 'fit-content'
+    }">
     <mat-drawer #drawer mode="over">
-        I'm a drawer. Items go here
+        <!-- profile -->
+        @if(loggedInUserSig(); as user) {
+        <div class="user-info">
+            <div class="profile-image">
+                @if(user.profilePhotoUrl) {
+                <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority alt="{{user.knownAs[0]}}">
+                }
+                @else if (user.knownAs){
+                {{user.knownAs[0] | titlecase}}
+                }
+                @else {
+                {{user.userName[0] | titlecase}}
+                }
+            </div>
+            <div>
+                <p>{{user.knownAs | titlecase}}</p>
+                <p class="username">{{user.userName}}</p>
+            </div>
+        </div>
+        }
+        <!-- navigation -->
+        @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
+        <mat-divider></mat-divider>
+        <mat-list>
+            <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
+                <div mat-button class="menu-items">
+                    <mat-icon>account_circle</mat-icon>
+                    Your Profile
+                </div>
+            </mat-list-item>
+            <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
+                <div class="menu-items">
+                    <mat-icon>edit</mat-icon>
+                    Edit Profile
+                </div>
+            </mat-list-item>
+            <!-- <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
+                    <div class="menu-items">
+                        <mat-icon>assignment_returned</mat-icon>
+                        Manage Products
+                    </div>
+                </mat-list-item> -->
+        </mat-list>
+        }
+
+        <mat-divider></mat-divider>
+        <div class="logout">
+            <button mat-raised-button (click)="logout()">Logout</button>
+        </div>
     </mat-drawer>
     <mat-drawer-content>
         <mat-toolbar [ngStyle]="{'background-color': isWelcomeCompSig() ? 'transparent' : '#ffd9e1'}">
@@ -12,8 +62,19 @@
                     <mat-icon>eco</mat-icon>
                     Hallboard
                 </a>
-                @if(loggedInUserSig()) {
-                <button mat-icon-button (click)="drawer.toggle()"><mat-icon color="primary">menu</mat-icon></button>
+                @if(loggedInUserSig(); as user) {
+                <button class="menu-button" (click)="drawer.toggle()" mat-mini-fab>
+                    @if(user.profilePhotoUrl) {
+                    <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority
+                        alt="{{user.knownAs[0]}}">
+                    }
+                    @else if (user.knownAs){
+                    {{user.knownAs[0] | titlecase}}
+                    }
+                    @else {
+                    {{user.userName[0] | titlecase}}
+                    }
+                </button>
                 }
             </mat-toolbar-row>
         </mat-toolbar>
