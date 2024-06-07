@@ -7,12 +7,14 @@ import { UserRegister } from '../models/account/user-register.model';
 import { environment } from '../../environments/environment';
 import { LoggedInUser } from '../models/logged-in-user.model';
 import { GooglePlacesService } from './google-places.service';
+import { ResponsiveService } from './responsive.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private googlePlacesService = inject(GooglePlacesService);
+  private responsiveService = inject(ResponsiveService);
 
   private baseUrl = environment.apiUrl + "account/";
 
@@ -81,6 +83,9 @@ export class AccountService {
     this.setLoggedInUserRoles(loggedInUser);
 
     this.loggedInUserSig.set(loggedInUser);
+
+    // Set it to false to show Hallboard in color to the loggedInUser. Default was true
+    this.responsiveService.isWelcomeCompSig.set(false);
   }
 
   setGetReturnUrl(): void {
@@ -89,10 +94,10 @@ export class AccountService {
     console.log(this.loggedInUserSig()?.roles);
 
     this.loggedInUserSig()?.roles.includes('admin')
-    ? this.router.navigate(['admin'])
-    : returnUrl
-    ? this.router.navigate([returnUrl])
-    : this.router.navigate(['members']);
+      ? this.router.navigate(['admin'])
+      : returnUrl
+        ? this.router.navigate([returnUrl])
+        : this.router.navigate(['members']);
 
     localStorage.removeItem('returnUrl');
   }
