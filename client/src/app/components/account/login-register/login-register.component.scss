@@ -4,3 +4,9 @@ mat-tab-group {
     max-width: 30rem;
     margin: 0 auto;
 }
+
+@media only screen and (min-width: 51rem) {
+    mat-tab-group {
+        width: 35rem;
+    }
+}
