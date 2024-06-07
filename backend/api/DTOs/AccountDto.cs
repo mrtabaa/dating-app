@@ -24,6 +24,7 @@ public record LoginDto(
 public class LoggedInDto
 {
     public bool IsTurnstileTokenInvalid { get; set; }
+    public string? TurnstileToken { get; set; }
     public string? Token { get; init; }
     public string? KnownAs { get; init; }
     public string? UserName { get; init; }

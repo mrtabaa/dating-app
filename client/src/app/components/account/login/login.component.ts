@@ -128,10 +128,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(
         take(1)
       ).subscribe({
-        next: response => {
+        next: (response: LoggedInUser | null) => {
           if (response) {
             this.EmailUsernameCtrl.setValue(randomAccount);
-            this.PasswordCtrl.setValue('Aaaaaaa1')
+            this.PasswordCtrl.setValue('Aaaaaaa1');
+            this.TurnsTileCtrl.setValue(response.turnstileToken);
           }
         }
       });
