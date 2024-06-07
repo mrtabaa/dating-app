@@ -10,12 +10,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 import { ResponsiveService } from '../../services/responsive.service';
+import { NavMobileComponent } from './nav-mobile/nav-mobile.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Observable, map } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
     CommonModule, RouterLink, RouterLinkActive, NgOptimizedImage,
+    NavMobileComponent,
     MatIconModule, MatToolbarModule, MatTabsModule, MatMenuModule,
     MatButtonModule, MatListModule, MatDividerModule
   ],
@@ -25,9 +29,23 @@ import { ResponsiveService } from '../../services/responsive.service';
 export class NavbarComponent {
   private router = inject(Router);
   private accountService = inject(AccountService);
+  private breakpointObserver = inject(BreakpointObserver);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+
+  isMobileView$: Observable<boolean>;
+
+  constructor() {
+    this.isMobileView$ = this.breakpointObserver.observe('(min-width: 51rem)') // include iPad
+      .pipe(map(({ matches }) => {
+        matches = matches ? false : true
+
+        this.isMobileSig.set(matches);
+
+        return matches;
+      }));
+  }
 
   links = ['members', 'friends', 'messages', 'admin'];
 
