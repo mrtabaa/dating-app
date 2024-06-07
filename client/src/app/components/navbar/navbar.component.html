@@ -5,7 +5,7 @@
     <!--#region LEFT -->
     <section class="left">
         <a [routerLink]="['/home']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
-            'color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() ? 'white' : 'palevioletred',
+            'color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() || !isMobileSig() ? 'white' : 'palevioletred',
         }">
             <mat-icon>eco</mat-icon>
             Hallboard
