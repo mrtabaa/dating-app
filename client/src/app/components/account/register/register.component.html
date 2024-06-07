@@ -1,43 +1,48 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
     <div class="container">
-        <div class="gender">
-            <strong>I am a</strong>
-            <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
-                <mat-radio-button value="female">Female</mat-radio-button>
-                <mat-radio-button value="male">Male</mat-radio-button>
-                <mat-radio-button value="other">Other</mat-radio-button>
-            </mat-radio-group>
-        </div>
-        <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-            [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
-            [error]="'Enter a valid email address.'" [isFocused]="true">
-        </app-input-cva>
-        <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
-            [hint]="'Will be shown to other members.'">
-        </app-input-cva>
-        <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
-            [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
-        </app-date-picker-cva>
-        <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
-            [placeHolder]="'Enter a password'"
-            [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
-            [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
-        </app-input-cva>
-        <div>
-            <app-input-cva [formControl]="ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
-                [placeHolder]="'Confirm your password'" [hint]="'Confirm above password'">
+        <div class="inputs">
+            <div class="gender">
+                <strong>I am a</strong>
+                <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
+                    <mat-radio-button value="female">Female</mat-radio-button>
+                    <mat-radio-button value="male">Male</mat-radio-button>
+                    <mat-radio-button value="other">Other</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
+                [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
+                [error]="'Enter a valid email address.'" [isFocused]="true">
             </app-input-cva>
-            @if(PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
-            <mat-error>Password entries don't match.</mat-error>
+            <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
+                [hint]="'Will be shown to other members.'">
+            </app-input-cva>
+            <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
+                [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
+            </app-date-picker-cva>
+            <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
+                [placeHolder]="'Enter a password'"
+                [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
+                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'" 
+                [ngStyle]="{
+                    'margin-bottom': PasswordCtrl.invalid ? '1rem' : '0'
+                }">
+            </app-input-cva>
+            <div>
+                <app-input-cva [formControl]=" ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
+                    [placeHolder]="'Confirm your password'" [hint]="'Confirm above password'">
+                </app-input-cva>
+                @if(PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
+                <mat-error>Password entries don't match.</mat-error>
+                }
+            </div>
+
+            <!-- show api errors -->
+            @if(emailExistsErrorMessage) {
+            <div>
+                <mat-error>{{emailExistsErrorMessage}}</mat-error>
+            </div>
             }
         </div>
-
-        <!-- show api errors -->
-        @if(emailExistsErrorMessage) {
-        <div>
-            <mat-error>{{emailExistsErrorMessage}}</mat-error>
-        </div>
-        }
         @if(isRegisterShownIn) {
         <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
         }
