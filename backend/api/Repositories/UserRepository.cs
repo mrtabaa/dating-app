@@ -58,6 +58,7 @@ public class UserRepository : IUserRepository
         .Set(appUser => appUser.LookingFor, userUpdateDto.LookingFor?.Trim())
         .Set(appUser => appUser.Interests, userUpdateDto.Interests?.Trim())
         .Set(appUser => appUser.Country, userUpdateDto.Country.Trim())
+        .Set(appUser => appUser.State, userUpdateDto.State.Trim())
         .Set(appUser => appUser.City, userUpdateDto.City.Trim())
         .Set(appUser => appUser.IsProfileCompleted, true);
 
