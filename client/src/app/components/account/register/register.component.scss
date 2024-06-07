@@ -1,13 +1,11 @@
-
-
-$fieldFormWidth: 25rem;
+$fieldFormWidth: 100%;
 
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5rem;
-    padding: 2rem 1.5rem 0;
+    gap: 3rem;
+    padding: 2rem 0 1rem;
 
     >* {
         width: $fieldFormWidth;
@@ -29,7 +27,4 @@ $fieldFormWidth: 25rem;
         right: 3rem;
         margin-bottom: 1rem;
     }
-}
-
-@media only screen and (min-width: 40rem) {
 }
