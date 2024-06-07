@@ -8,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { PhotoEditorComponent } from '../../user/photo-editor/photo-editor.component';
 import { MemberService } from '../../../services/member.service';
-import { Observable, map, take } from 'rxjs';
+import { take } from 'rxjs';
 import { LoggedInUser } from '../../../models/logged-in-user.model';
 import { Member } from '../../../models/member.model';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
@@ -17,13 +17,13 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
 import { UserService } from '../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AccountService } from '../../../services/account.service';
-import { STEPPER_GLOBAL_OPTIONS, StepperOrientation } from '@angular/cdk/stepper';
-import { BreakpointObserver } from '@angular/cdk/layout';
+import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { GooglePlacesService } from '../../../services/google-places.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { GooglePlacesComponent } from '../../google-places/google-places.component';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-complete-profile',
@@ -50,9 +50,7 @@ export class CompleteProfileComponent implements OnInit {
   private googlePlacesService = inject(GooglePlacesService);
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
-  private breakpointObserver = inject(BreakpointObserver);
-
-  stepperOrientation: Observable<StepperOrientation>;
+  isMobileSig = inject(ResponsiveService).isMobileSig;
 
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
@@ -73,11 +71,6 @@ export class CompleteProfileComponent implements OnInit {
   stateSig: Signal<string | undefined> = this.googlePlacesService.stateSig;
   citySig: Signal<string | undefined> = this.googlePlacesService.citySig;
   isCountrySelectedSig: Signal<boolean> = this.googlePlacesService.isCountrySelectedSig;
-
-  constructor() {
-    this.stepperOrientation = this.breakpointObserver.observe('(min-width: 990px)')
-      .pipe(map(({ matches }) => matches ? 'horizontal' : 'vertical'));
-  }
 
   ngOnInit(): void {
     this.getMember();

@@ -2,7 +2,7 @@
     @if(!isCountrySelectedSig()) {
     <div class="search-field">
         <mat-form-field appearance="outline">
-            <mat-label>Search your location by City</mat-label>
+            <mat-label>Search your City</mat-label>
             <input [formControl]="searchedLocationCtrl" #location (input)="searchLocation(location)" type="text"
                 placeholder="City name" aria-label="Location" matInput>
             <ng-container matSuffix>
