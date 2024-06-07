@@ -1,11 +1,20 @@
-<mat-drawer-container class="drawar-container" hasBackdrop="true">
-    <mat-drawer #drawer mode="over">I'm a drawer</mat-drawer>
+<mat-drawer-container class="drawar-container" hasBackdrop="true"
+    [ngStyle]="{'background-color': true ? 'transparent' : '#ffd9e1'}">
+    <mat-drawer #drawer mode="over">
+        I'm a drawer. Items go here
+    </mat-drawer>
     <mat-drawer-content>
-        <mat-toolbar color="primary">
+        <mat-toolbar [ngStyle]="{'background-color': isWelcomeCompSig() ? 'transparent' : '#ffd9e1'}">
             <mat-toolbar-row>
-                <span>Hallboard</span>
-                <span class="example-spacer"></span>
-                <button mat-raised-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
+                <a [routerLink]="['/home']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
+                    'color': isWelcomeCompSig() ? 'white' : 'palevioletred'
+                }">
+                    <mat-icon>eco</mat-icon>
+                    Hallboard
+                </a>
+                @if(loggedInUserSig()) {
+                <button mat-icon-button (click)="drawer.toggle()"><mat-icon color="primary">menu</mat-icon></button>
+                }
             </mat-toolbar-row>
         </mat-toolbar>
     </mat-drawer-content>

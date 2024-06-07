@@ -1,6 +1,28 @@
 .drawar-container {
     mat-drawer {
-        background-color: #ffd9e1;
         width: 60%;
+    }
+
+    mat-drawer-content {
+        mat-toolbar {
+            .brand {
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+
+                font-family: "Fredoka", sans-serif;
+                font-size: 28px;
+                font-optical-sizing: auto;
+                font-weight: bold;
+                font-style: normal;
+                font-variation-settings:
+                    "wdth" 100;
+            }
+
+            mat-toolbar-row {
+                display: flex;
+                justify-content: space-between;
+            }
+        }
     }
 }
