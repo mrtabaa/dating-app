@@ -63,7 +63,7 @@ namespace api.DTOs
             );
         }
 
-        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl)
+        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl, string? turnstileToken = null)
         {
             return new LoggedInDto
             {
@@ -72,7 +72,8 @@ namespace api.DTOs
                 UserName = appUser.UserName,
                 Gender = appUser.Gender,
                 ProfilePhotoUrl = blobPhotoUrl,
-                IsProfileCompleted = appUser.IsProfileCompleted
+                IsProfileCompleted = appUser.IsProfileCompleted,
+                TurnstileToken = turnstileToken
             };
         }
 

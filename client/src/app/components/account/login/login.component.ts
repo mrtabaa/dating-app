@@ -42,8 +42,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   isTurnstileActive = false;
 
   ngOnInit(): void {
-    // this.turnsTileChange();
-    console.log();
+    this.turnsTileChange();
   }
 
   ngOnDestroy(): void {
@@ -51,23 +50,23 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.subscrition.unsubscribe();
   }
 
-  // turnsTileChange(): void {
-  //   this.renderer.listen('window', 'message', (event) => {
-  //     if (event.data.event !== 'init') {
-  //       return;
-  //     }
+  turnsTileChange(): void {
+    this.renderer.listen('window', 'message', (event) => {
+      if (event.data.event !== 'init') {
+        return;
+      }
 
-  //     const turnstileIframe = this.renderer.selectRootElement(`#cf-chl-widget-${event.data.widgetId}`);
-  //     if (!turnstileIframe) {
-  //       return;
-  //     }
+      const turnstileIframe = this.renderer.selectRootElement(`#cf-chl-widget-${event.data.widgetId}`);
+      if (!turnstileIframe) {
+        return;
+      }
 
-  //     this.renderer.setStyle(turnstileIframe, 'width', '100%');
-  //     this.renderer.setStyle(turnstileIframe, 'height', '65px');
-  //     this.renderer.setStyle(turnstileIframe, 'display', 'flex'); // Changed to 'block' to ensure visibility
-  //     event.stopImmediatePropagation();
-  //   });
-  // }
+      this.renderer.setStyle(turnstileIframe, 'width', '100%');
+      this.renderer.setStyle(turnstileIframe, 'height', '65px');
+      this.renderer.setStyle(turnstileIframe, 'display', 'flex'); // Changed to 'block' to ensure visibility
+      event.stopImmediatePropagation();
+    });
+  }
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
@@ -129,10 +128,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(
         take(1)
       ).subscribe({
-        next: response => {
+        next: (response: LoggedInUser | null) => {
           if (response) {
             this.EmailUsernameCtrl.setValue(randomAccount);
-            this.PasswordCtrl.setValue('Aaaaaaa1')
+            this.PasswordCtrl.setValue('Aaaaaaa1');
+            this.TurnsTileCtrl.setValue(response.turnstileToken);
           }
         }
       });
