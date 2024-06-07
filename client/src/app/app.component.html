@@ -6,7 +6,12 @@
   <section class="container">
     <header>
       <nav>
+        @if(isMobileView$ | async) {
+        <app-nav-mobile />
+        }
+        @else {
         <app-navbar />
+        }
       </nav>
     </header>
 
@@ -15,7 +20,7 @@
         <router-outlet />
       </div>
     </main>
-    
+
     <footer>
       <app-footer />
     </footer>

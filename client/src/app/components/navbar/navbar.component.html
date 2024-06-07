@@ -1,15 +1,10 @@
-@if(isMobileView$ | async) {
-<app-nav-mobile />
-}
-@else {
 <mat-toolbar [ngStyle]="{
-    'background-color': !loggedInUserSig() && isWelcomeCompSig() || !isMobileSig() ? 'transparent' : '#ffd9e1',
-    'margin-top': isMobileSig() ? '0' : '1rem'
+    'background-color': loggedInUserSig() ? '#ffd9e1' : 'transparent'
     }">
     <!--#region LEFT -->
     <section class="left">
-        <a [routerLink]="['/home']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
-            'color': !loggedInUserSig() && isMobileSig() && isWelcomeCompSig() || !isMobileSig() ? 'white' : 'palevioletred',
+        <a [routerLink]="['/home']" class="brand" [ngStyle]="{
+            'color': !loggedInUserSig() ? 'white' : 'palevioletred',
         }">
             <mat-icon>eco</mat-icon>
             Hallboard
@@ -113,4 +108,3 @@
     </section>
     <!-- #endregion -->
 </mat-toolbar>
-}
