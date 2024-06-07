@@ -1,24 +1,31 @@
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { Component, inject } from '@angular/core';
+import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
+import { Component, ViewChild, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ResponsiveService } from '../../../services/responsive.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AccountService } from '../../../services/account.service';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-nav-mobile',
   standalone: true,
   imports: [
-    RouterModule, CommonModule,
-    MatSidenavModule, MatToolbarModule, MatIconModule, MatButtonModule
+    RouterModule, CommonModule, NgOptimizedImage,
+    MatSidenavModule, MatToolbarModule, MatIconModule, MatButtonModule,
+    MatListModule, MatDividerModule
   ],
   templateUrl: './nav-mobile.component.html',
   styleUrl: './nav-mobile.component.scss'
 })
 export class NavMobileComponent {
+  @ViewChild('drawer') drawer: MatDrawer | undefined;
+
+  private router = inject(Router);
+  private accountService = inject(AccountService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
 
@@ -26,6 +33,18 @@ export class NavMobileComponent {
      * Set isWelcomeCompSig to true to show WelcomeComponent if brand is clicked. 
      */
   setIsWelcomeCompSig(): void {
-    this.isWelcomeCompSig.set(true);
+    if (!this.loggedInUserSig())
+      this.isWelcomeCompSig.set(true); // change nav-mobile bg-color: transparent & color: white
+  }
+
+  goToEditProfile(): void {
+    this.router.navigate(['member/' + this.accountService.loggedInUserSig()?.userName], { skipLocationChange: true });
+  }
+
+  logout() {
+    this.accountService.logout();
+
+    if (this.drawer)
+      this.drawer.close();
   }
 }
