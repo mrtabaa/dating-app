@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, inject, Renderer2 } from '@angular/core';
+import { Component, Input, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -12,8 +12,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
-import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
-import { environment } from '../../../../environments/environment';
+import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
 
 @Component({
   selector: 'app-login',
@@ -21,13 +20,13 @@ import { environment } from '../../../../environments/environment';
   imports: [
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
-    NgxTurnstileModule, NgxTurnstileFormsModule,
+    TurnstileComponent,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnDestroy {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -38,34 +37,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   user$!: Observable<LoggedInUser | null>;
   subscrition!: Subscription;
-  turnsTileSiteKey = environment.turnstileSiteKey;
   isTurnstileActive = false;
-
-  ngOnInit(): void {
-    this.turnsTileChange();
-  }
 
   ngOnDestroy(): void {
     if (this.subscrition)
       this.subscrition.unsubscribe();
-  }
-
-  turnsTileChange(): void {
-    this.renderer.listen('window', 'message', (event) => {
-      if (event.data.event !== 'init') {
-        return;
-      }
-
-      const turnstileIframe = this.renderer.selectRootElement(`#cf-chl-widget-${event.data.widgetId}`);
-      if (!turnstileIframe) {
-        return;
-      }
-
-      this.renderer.setStyle(turnstileIframe, 'width', '100%');
-      this.renderer.setStyle(turnstileIframe, 'height', '65px');
-      this.renderer.setStyle(turnstileIframe, 'display', 'flex'); // Changed to 'block' to ensure visibility
-      event.stopImmediatePropagation();
-    });
   }
 
   loginFg = this.fb.group({

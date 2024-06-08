@@ -22,8 +22,7 @@
             <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
                 [placeHolder]="'Enter a password'"
                 [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
-                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'" 
-                [ngStyle]="{
+                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'" [ngStyle]="{
                     'margin-bottom': PasswordCtrl.invalid ? '1rem' : '0'
                 }">
             </app-input-cva>
@@ -44,7 +43,7 @@
             }
         </div>
         @if(isRegisterShownIn) {
-        <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl" theme="light"></ngx-turnstile>
+        <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" />
         }
         <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
             class="submitBtn">Register</button>

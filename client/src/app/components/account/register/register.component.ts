@@ -13,7 +13,7 @@ import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component'
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
-import { environment } from '../../../../environments/environment';
+import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +21,7 @@ import { environment } from '../../../../environments/environment';
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
     NgxTurnstileModule, NgxTurnstileFormsModule,
-    InputCvaComponent, DatePickerCvaComponent,
+    InputCvaComponent, DatePickerCvaComponent, TurnstileComponent,
     MatButtonModule, MatInputModule, MatRadioModule
   ],
   templateUrl: './register.component.html',
@@ -38,9 +38,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   minDate = new Date();
   maxDate = new Date();
   emailExistsErrorMessage: string | undefined;
-  turnsTileSiteKey = environment.turnstileSiteKey;
-  isTurnstileActive = false;
-
 
   subscriptionRegisterUser!: Subscription;
 
