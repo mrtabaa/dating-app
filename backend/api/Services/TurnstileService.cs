@@ -8,7 +8,7 @@ public class TurnstileService(HttpClient _httpClient, IConfiguration _config) : 
     {
         if (string.IsNullOrEmpty(turnstileToken)) return false;
 
-        string? secretKey = _config.GetValue<string>("TurnstileSecretKey");
+        string? secretKey = _config.GetValue<string>(AppVariablesExtensions.TurnstileSecretKey);
 
         if (string.IsNullOrEmpty(secretKey)) return false;
 
