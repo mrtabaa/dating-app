@@ -17,14 +17,13 @@
             </app-input-cva>
         </div>
         @if(router.url !== '/demo' && isLoginShownIn) {
-        <ngx-turnstile class="turnstile" [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
-            theme="light"></ngx-turnstile>
+        <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" />
         }
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()" class="submitBtn" mat-raised-button
-                    color="primary">
+                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn"
+                    mat-raised-button color="primary">
                     Sign in
                 </button>
             </div>
@@ -35,8 +34,7 @@
             <mat-divider />
             <div class="demo">
                 @if(isLoginShownIn) {
-                <ngx-turnstile [siteKey]="turnsTileSiteKey" formControlName="turnsTileCtrl"
-                    theme="light"></ngx-turnstile>
+                <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" />
                 }
                 <div class="demo-buttons">
                     <button (click)="enterAdminCreds()" [disabled]="TurnsTileCtrl.invalid" mat-stroked-button
