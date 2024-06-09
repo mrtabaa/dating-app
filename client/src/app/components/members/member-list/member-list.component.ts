@@ -16,7 +16,7 @@ import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit
 import { FollowService } from '../../../services/follow.service';
 
 @Component({
-  selector: 'app-user-list',
+  selector: 'app-member-list',
   standalone: true,
   imports: [
     MemberCardComponent, FormsModule, ReactiveFormsModule,
