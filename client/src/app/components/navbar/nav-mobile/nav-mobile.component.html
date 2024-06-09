@@ -27,13 +27,15 @@
         @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
         <mat-divider></mat-divider>
         <mat-list>
-            <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
+            <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active"
+                [routerLinkActiveOptions]="{exact: true}">
                 <div mat-button class="menu-items">
                     <mat-icon>account_circle</mat-icon>
                     Your Profile
                 </div>
             </mat-list-item>
-            <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
+            <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active"
+                [routerLinkActiveOptions]="{exact: true}">
                 <div class="menu-items">
                     <mat-icon>edit</mat-icon>
                     Edit Profile
@@ -60,7 +62,9 @@
                     'color': isWelcomeCompSig() ? 'white' : 'palevioletred'
                 }">
                     <mat-icon>eco</mat-icon>
+                    @if(!loggedInUserSig()?.isProfileCompleted) {
                     Hallboard
+                    }
                 </a>
                 @if(loggedInUserSig(); as user) {
                 <button class="menu-button" (click)="drawer.toggle()" mat-mini-fab>
