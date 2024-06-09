@@ -91,13 +91,11 @@ export class AccountService {
   setGetReturnUrl(): void {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
 
-    console.log(this.loggedInUserSig()?.roles);
-
     this.loggedInUserSig()?.roles.includes('admin')
       ? this.router.navigate(['admin'])
       : returnUrl
         ? this.router.navigate([returnUrl])
-        : this.router.navigate(['members']);
+        : this.router.navigate(['/main']);
 
     localStorage.removeItem('returnUrl');
   }

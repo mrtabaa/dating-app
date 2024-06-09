@@ -17,7 +17,7 @@ export const authLoggedInGuard: CanActivateFn = () => {
     if (!loggedInUser.isProfileCompleted)
       router.navigate(['account/complete-profile']);
     else
-      router.navigate(['/members']);
+      router.navigate(['/main']);
 
     return false;
   }

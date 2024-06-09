@@ -1,0 +1,31 @@
+@if(isMobileSig()) {
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon>delete</mat-icon>
+        </ng-template>
+        <app-member-list-mobile />
+    </mat-tab>
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon>eco</mat-icon>
+        </ng-template>
+        <app-follows />
+    </mat-tab>
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon>person</mat-icon>
+        </ng-template>
+        <app-messages />
+    </mat-tab>
+    <mat-tab>
+        <ng-template mat-tab-label>
+            <mat-icon>edit</mat-icon>
+        </ng-template>
+        <app-admin-panel />
+    </mat-tab>
+</mat-tab-group>
+}
+@else {
+<app-member-list />
+}
