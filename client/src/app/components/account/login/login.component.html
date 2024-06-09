@@ -1,9 +1,13 @@
 <form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
     <div class="container">
         <div class="inputs">
-            @if(router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com") {
+            @if(
+                router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com" 
+                && PasswordCtrl.valid && EmailUsernameCtrl.valid) {
             <p class="demo-text">
                 NOTE: Keep the generated username & password to login again. <br />
+                <span>Username/Email:</span> {{EmailUsernameCtrl.value}}
+                <br />
                 <span>Password:</span> {{PasswordCtrl.value}}
             </p>
             }
