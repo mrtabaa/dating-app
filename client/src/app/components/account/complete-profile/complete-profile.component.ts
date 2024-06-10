@@ -130,7 +130,7 @@ export class CompleteProfileComponent implements OnInit {
 
                 loggedInUser.isProfileCompleted = true;
 
-                this.router.navigate(['members']);
+                this.router.navigate(['/main']);
 
                 this.accountService.setCurrentUser(loggedInUser);
               }

@@ -112,7 +112,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
       .subscribe({
         next: res => {
-          this.router.navigate(['/members']);
+          this.router.navigate(['/main']);
           this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
         },
         error: err => this.emailExistsErrorMessage = err.error,

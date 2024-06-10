@@ -1,35 +1,30 @@
 import { Component, OnDestroy, inject } from '@angular/core';
-import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
-import { Pagination } from '../../../models/helpers/pagination';
-import { PaginatedResult } from "../../../models/helpers/paginatedResult";
-import { Member } from '../../../models/member.model';
-import { MemberCardComponent } from '../member-card/member-card.component';
-import { MemberService } from '../../../services/member.service';
-import { MemberParams } from '../../../models/helpers/member-params';
-import { MatSelectModule } from '@angular/material/select';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
-import { FollowService } from '../../../services/follow.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { Subscription } from 'rxjs';
+import { MemberParams } from '../../../../models/helpers/member-params';
+import { PaginatedResult } from '../../../../models/helpers/paginatedResult';
+import { Pagination } from '../../../../models/helpers/pagination';
+import { Member } from '../../../../models/member.model';
+import { MemberService } from '../../../../services/member.service';
 
 @Component({
-  selector: 'app-member-list',
+  selector: 'app-member-list-mobile',
   standalone: true,
   imports: [
-    MemberCardComponent, FormsModule, ReactiveFormsModule,
+    FormsModule, ReactiveFormsModule,
     MatPaginatorModule, MatSelectModule, MatButtonModule,
     MatIconModule, MatDividerModule
   ],
-  templateUrl: './member-list.component.html',
-  styleUrls: ['./member-list.component.scss']
+  templateUrl: './member-list-mobile.component.html',
+  styleUrl: './member-list-mobile.component.scss'
 })
-export class MemberListComponent implements OnDestroy {
-  //#region Variables
+export class MemberListMobileComponent implements OnDestroy {
   private memberService = inject(MemberService);
-  private followService = inject(FollowService);
   private fb = inject(FormBuilder);
 
   subscribed: Subscription | undefined;
@@ -46,7 +41,7 @@ export class MemberListComponent implements OnDestroy {
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
 
   // Material Pagination attrs
-  pageSizeOptions = [5, 10, 25];
+  pageSizeOptions = [5, 10, 15];
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
@@ -132,11 +127,6 @@ export class MemberListComponent implements OnDestroy {
 
       this.memberService.setMemberParams(this.memberParams);
     }
-  }
-
-  modifyFollowUnfollowIcon($event: FollowModifiedEmit): void {
-    if (this.members)
-      this.members = this.followService.modifyFollowUnfollowIcon(this.members, $event);
   }
 
   private initAgesRange(): void {

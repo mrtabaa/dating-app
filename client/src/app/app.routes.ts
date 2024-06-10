@@ -6,7 +6,6 @@ import { TestErrorComponent } from './components/errors/test-error/test-error.co
 import { HomeComponent } from './components/home/home.component';
 import { MessagesComponent } from './components/messages/messages.component';
 import { MemberDetailComponent } from './components/members/member-detail/member-detail.component';
-import { MemberListComponent } from './components/members/member-list/member-list.component';
 import { UserEditComponent } from './components/user/user-edit/user-edit.component';
 import { authGuard } from './guards/auth.guard';
 import { authLoggedInGuard } from './guards/auth-logged-in.guard';
@@ -18,6 +17,8 @@ import { RecoverComponent } from './components/account/recover/recover.component
 import { CompleteProfileComponent } from './components/account/complete-profile/complete-profile.component';
 import { completeProfileGuard } from './guards/complete-profile.guard';
 import { profileIsCompletedGuard } from './guards/profile-is-completed.guard';
+import { MainComponent } from './components/main/main.component';
+import { mobileGuard } from './guards/mobile.guard';
 
 export const routes: Routes = [
     {
@@ -37,13 +38,13 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard, completeProfileGuard],
         children: [
-            { path: 'home', component: MemberListComponent },
-            { path: 'members', component: MemberListComponent },
-            { path: 'member/:userName', component: MemberDetailComponent },
+            { path: 'home', component: MainComponent },
+            { path: 'main', component: MainComponent },
+            { path: 'member/:userName', component: MemberDetailComponent, canActivate: [mobileGuard] },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
-            { path: 'friends', component: FollowsComponent },
-            { path: 'messages', component: MessagesComponent },
-            { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard] } // both authGuard and adminGuard applied
+            { path: 'friends', component: FollowsComponent, canActivate: [mobileGuard] },
+            { path: 'messages', component: MessagesComponent, canActivate: [mobileGuard] },
+            { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard, mobileGuard] } // both authGuard and adminGuard applied
         ]
     },
     {
