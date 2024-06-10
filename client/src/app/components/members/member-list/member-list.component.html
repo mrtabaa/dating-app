@@ -1,7 +1,7 @@
 <main>
     <form [formGroup]="filterFg" class="sidebar">
         <div class="order-by">
-            <p>Order members</p>
+            <p class="title">Order members</p>
             <mat-form-field>
                 <mat-label>Order by</mat-label>
                 <mat-select formControlName="orderByCtrl" (selectionChange)="updateMemberParams()">
@@ -14,31 +14,29 @@
         </div>
         <mat-divider></mat-divider>
         <div class="filter">
-            <p>Filter members</p>
-            <mat-form-field>
-                <mat-label>Gender</mat-label>
-                <mat-select formControlName="genderCtrl" (selectionChange)="updateMemberParams()">
-                    <mat-option [value]="'female'">Female</mat-option>
-                    <mat-option [value]="'male'">Male</mat-option>
-                    <mat-option [value]="'other'">Other</mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>From age</mat-label>
-                <mat-select formControlName="minAgeCtrl" (selectionChange)="updateMemberParams()">
-                    @for (age of ages; track $index) {
-                    <mat-option [value]="age" [disabled]="age > MaxAgeCtrl.value">{{age}}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-                <mat-label>To age</mat-label>
-                <mat-select formControlName="maxAgeCtrl" (selectionChange)="updateMemberParams()">
-                    @for (age of ages; track $index) {
-                    <mat-option [value]="age" [disabled]="age < MinAgeCtrl.value">{{age}}</mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
+            <p class="title">Filter members</p>
+            <section class="filters">
+                <!-- Gender -->
+                <mat-form-field>
+                    <mat-label>By gender</mat-label>
+                    <mat-select formControlName="genderCtrl" (selectionChange)="updateMemberParams()">
+                        <mat-option [value]="'female'">Female</mat-option>
+                        <mat-option [value]="'male'">Male</mat-option>
+                        <mat-option [value]="'other'">Other</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <!-- Age -->
+                <div class="age">
+                    <p>By age range</p>
+                    <div class="slider">
+                        <mat-slider min="{{minAge}}" max="{{maxAge}}" discrete>
+                            <input formControlName="minAgeCtrl" matSliderStartThumb>
+                            <input formControlName="maxAgeCtrl" matSliderEndThumb>
+                        </mat-slider>
+                    </div>
+                </div>
+            </section>
+            <!-- Buttons -->
             <div class="buttons">
                 <button mat-stroked-button (click)="initResetFilter()" color="warn">
                     Reset
