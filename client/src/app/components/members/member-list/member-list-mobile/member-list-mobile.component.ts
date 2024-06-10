@@ -11,21 +11,29 @@ import { PaginatedResult } from '../../../../models/helpers/paginatedResult';
 import { Pagination } from '../../../../models/helpers/pagination';
 import { Member } from '../../../../models/member.model';
 import { MemberService } from '../../../../services/member.service';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { MatTabsModule } from '@angular/material/tabs';
+import { OrderBottomSheetComponent } from './order-bottom-sheet/order-bottom-sheet.component';
+import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-sheet.component';
 
 @Component({
   selector: 'app-member-list-mobile',
   standalone: true,
   imports: [
     FormsModule, ReactiveFormsModule,
+    OrderBottomSheetComponent, FilterBottomSheetComponent,
     MatPaginatorModule, MatSelectModule, MatButtonModule,
-    MatIconModule, MatDividerModule
+    MatIconModule, MatDividerModule, MatSliderModule,
+    MatBottomSheetModule, MatTabsModule
   ],
   templateUrl: './member-list-mobile.component.html',
   styleUrl: './member-list-mobile.component.scss'
 })
 export class MemberListMobileComponent implements OnDestroy {
-  private memberService = inject(MemberService);
-  private fb = inject(FormBuilder);
+  private _memberService = inject(MemberService);
+  private _fb = inject(FormBuilder);
+  private _matBottomSheet = inject(MatBottomSheet);
 
   subscribed: Subscription | undefined;
 
@@ -33,7 +41,6 @@ export class MemberListMobileComponent implements OnDestroy {
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
 
-  ages: number[] = [];
   minAge: number = 18;
   maxAge: number = 99;
 
@@ -41,7 +48,7 @@ export class MemberListMobileComponent implements OnDestroy {
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
 
   // Material Pagination attrs
-  pageSizeOptions = [5, 10, 15];
+  pageSizeOptions = [9, 15, 21];
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
@@ -51,9 +58,7 @@ export class MemberListMobileComponent implements OnDestroy {
 
   //#region auto-run methods
   constructor() {
-    this.initAgesRange();
-
-    this.memberParams = this.memberService.getFreshMemberParams();
+    this.memberParams = this._memberService.getFreshMemberParams();
 
     this.initResetFilter();
   }
@@ -64,16 +69,14 @@ export class MemberListMobileComponent implements OnDestroy {
   //#endregion auto-run methods
 
   //#region Reactive Form 
-  filterFg = this.fb.group({
-    orderByCtrl: [],
+  orderByCtrl = this._fb.control('', [])
+
+  filterFg = this._fb.group({
     genderCtrl: [],
     minAgeCtrl: [],
     maxAgeCtrl: []
   });
 
-  get OrderByCtrl(): AbstractControl {
-    return this.filterFg.get('orderByCtrl') as FormControl;
-  }
   get GenderCtrl(): AbstractControl {
     return this.filterFg.get('genderCtrl') as FormControl;
   }
@@ -85,10 +88,19 @@ export class MemberListMobileComponent implements OnDestroy {
   }
   //#endregion Reactive form
 
-  initResetFilter(): void {
-    this.memberParams = this.memberService.getFreshMemberParams();
+  openOrderBottomSheet(): void {
+    this._matBottomSheet.open(OrderBottomSheetComponent);
+  }
 
-    this.OrderByCtrl.setValue(this.memberParams?.orderBy);
+  openFilterBottomSheet(): void {
+    this._matBottomSheet.open(FilterBottomSheetComponent);
+  }
+
+  initResetFilter(): void {
+    this.memberParams = this._memberService.getFreshMemberParams();
+
+    if (this.memberParams?.orderBy)
+      this.orderByCtrl.setValue(this.memberParams.orderBy);
     this.GenderCtrl.setValue(this.memberParams?.gender);
     this.MinAgeCtrl.setValue(this.memberParams?.minAge);
     this.MaxAgeCtrl.setValue(this.memberParams?.maxAge);
@@ -97,7 +109,9 @@ export class MemberListMobileComponent implements OnDestroy {
   }
 
   getMembers(): void {
-    this.subscribed = this.memberService.getMembers().subscribe({
+    this.updateMemberParams();
+
+    this.subscribed = this._memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
           this.members = response.result;
@@ -113,25 +127,19 @@ export class MemberListMobileComponent implements OnDestroy {
       this.memberParams.pageSize = e.pageSize;
       this.memberParams.pageNumber = e.pageIndex + 1;
 
-      this.memberService.setMemberParams(this.memberParams);
+      this._memberService.setMemberParams(this.memberParams);
       this.getMembers();
     }
   }
 
   updateMemberParams(): void {
-    if (this.memberParams) {
-      this.memberParams.orderBy = this.OrderByCtrl.value;
+    if (this.memberParams && this.orderByCtrl.value) {
+      this.memberParams.orderBy = this.orderByCtrl.value;
       this.memberParams.gender = this.GenderCtrl.value;
       this.memberParams.minAge = this.MinAgeCtrl.value;
       this.memberParams.maxAge = this.MaxAgeCtrl.value;
 
-      this.memberService.setMemberParams(this.memberParams);
-    }
-  }
-
-  private initAgesRange(): void {
-    for (let i = this.minAge; i < this.maxAge + 1; i++) {
-      this.ages.push(i);
+      this._memberService.setMemberParams(this.memberParams);
     }
   }
 }

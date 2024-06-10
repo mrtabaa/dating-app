@@ -1,2 +1,49 @@
-<p style="padding: 1rem;">Please visit the page from a desktop computer. <span style="color: red"> Mobile version is under development.</span> Hang on
-    for a few days!</p>
+<main>
+
+</main>
+<mat-tab-group headerPosition="below">
+    <mat-tab label="Filter by" #filter>
+        <ng-template mat-tab-label>
+            <mat-icon [color]="filter.isActive ? 'primary' : ''">wc</mat-icon>
+        </ng-template>
+        <form [formGroup]="filterFg" class="sidebar">
+            <div class="filter">
+                <p class="title">Filter members</p>
+                <section class="filters">
+                    <!-- Gender -->
+                    <mat-form-field>
+                        <mat-label>By gender</mat-label>
+                        <mat-select formControlName="genderCtrl" (selectionChange)="updateMemberParams()">
+                            <mat-option [value]="'female'">Female</mat-option>
+                            <mat-option [value]="'male'">Male</mat-option>
+                            <mat-option [value]="'other'">Other</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <!-- Age -->
+                    <div class="age">
+                        <p>By age range</p>
+                        <div class="slider">
+                            <mat-slider min="{{minAge}}" max="{{maxAge}}" discrete>
+                                <input formControlName="minAgeCtrl" matSliderStartThumb>
+                                <input formControlName="maxAgeCtrl" matSliderEndThumb>
+                            </mat-slider>
+                        </div>
+                    </div>
+                </section>
+                <!-- Buttons -->
+                <div class="buttons">
+                    <button mat-stroked-button (click)="initResetFilter()" color="warn">
+                        Reset
+                    </button>
+                    <button mat-stroked-button (click)="getMembers()" color="primary">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </mat-tab>
+</mat-tab-group>
+<div class="buttons">
+    <button mat-raised-button (click)="openOrderBottomSheet()">Order by</button>
+    <button mat-raised-button (click)="openFilterBottomSheet()">Filter by</button>
+</div>
