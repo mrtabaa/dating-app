@@ -92,7 +92,7 @@ export class AccountService {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
 
     this.loggedInUserSig()?.roles.includes('admin')
-      ? this.router.navigate(['admin'])
+      ? this.router.navigate(['/admin'])
       : returnUrl
         ? this.router.navigate([returnUrl])
         : this.router.navigate(['/main']);
