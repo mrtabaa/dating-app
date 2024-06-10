@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
 import { FollowService } from '../../../services/follow.service';
+import { MatSliderModule } from '@angular/material/slider';
 
 @Component({
   selector: 'app-member-list',
@@ -21,7 +22,7 @@ import { FollowService } from '../../../services/follow.service';
   imports: [
     MemberCardComponent, FormsModule, ReactiveFormsModule,
     MatPaginatorModule, MatSelectModule, MatButtonModule,
-    MatIconModule, MatDividerModule
+    MatIconModule, MatDividerModule, MatSliderModule
   ],
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.scss']
@@ -38,7 +39,6 @@ export class MemberListComponent implements OnDestroy {
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
 
-  ages: number[] = [];
   minAge: number = 18;
   maxAge: number = 99;
 
@@ -56,8 +56,6 @@ export class MemberListComponent implements OnDestroy {
 
   //#region auto-run methods
   constructor() {
-    this.initAgesRange();
-
     this.memberParams = this.memberService.getFreshMemberParams();
 
     this.initResetFilter();
@@ -102,6 +100,8 @@ export class MemberListComponent implements OnDestroy {
   }
 
   getMembers(): void {
+    this.updateMemberParams();
+
     this.subscribed = this.memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
@@ -137,11 +137,5 @@ export class MemberListComponent implements OnDestroy {
   modifyFollowUnfollowIcon($event: FollowModifiedEmit): void {
     if (this.members)
       this.members = this.followService.modifyFollowUnfollowIcon(this.members, $event);
-  }
-
-  private initAgesRange(): void {
-    for (let i = this.minAge; i < this.maxAge + 1; i++) {
-      this.ages.push(i);
-    }
   }
 }
