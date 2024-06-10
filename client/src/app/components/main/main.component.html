@@ -1,29 +1,39 @@
 @if(isMobileSig()) {
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-    <mat-tab>
+<mat-tab-group mat-stretch-tabs="true" disablePagination="true">
+    @if(loggedInUserSig()?.roles?.includes("admin")) {
+    <mat-tab #admin>
         <ng-template mat-tab-label>
-            <mat-icon>delete</mat-icon>
-        </ng-template>
-        <app-member-list-mobile />
-    </mat-tab>
-    <mat-tab>
-        <ng-template mat-tab-label>
-            <mat-icon>eco</mat-icon>
-        </ng-template>
-        <app-follows />
-    </mat-tab>
-    <mat-tab>
-        <ng-template mat-tab-label>
-            <mat-icon>person</mat-icon>
-        </ng-template>
-        <app-messages />
-    </mat-tab>
-    <mat-tab>
-        <ng-template mat-tab-label>
-            <mat-icon>edit</mat-icon>
+            <mat-icon [color]="admin.isActive ? 'primary' : ''">admin_panel_settings</mat-icon>
         </ng-template>
         <app-admin-panel />
     </mat-tab>
+    }
+    <mat-tab #members>
+        <ng-template mat-tab-label>
+            <mat-icon [color]="members.isActive ? 'primary' : ''">diversity_3</mat-icon>
+        </ng-template>
+        <app-member-list-mobile />
+    </mat-tab>
+    @if(!loggedInUserSig()?.roles?.includes("admin")) {
+    <mat-tab #follows>
+        <ng-template mat-tab-label>
+            <mat-icon [color]="follows.isActive ? 'primary' : ''">group_add</mat-icon>
+        </ng-template>
+        <app-follows />
+    </mat-tab>
+    <mat-tab #message>
+        <ng-template mat-tab-label>
+            <mat-icon [color]="message.isActive ? 'primary' : ''">chat</mat-icon>
+        </ng-template>
+        <app-messages />
+    </mat-tab>
+    <mat-tab #comment>
+        <ng-template mat-tab-label>
+            <mat-icon [color]="comment.isActive ? 'primary' : ''">share_reviews</mat-icon>
+        </ng-template>
+        Comments section
+    </mat-tab>
+    }
 </mat-tab-group>
 }
 @else {

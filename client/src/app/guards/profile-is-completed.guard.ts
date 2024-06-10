@@ -12,7 +12,7 @@ export const profileIsCompletedGuard: CanActivateFn = () => {
     const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
 
     if (loggedInUser.isProfileCompleted) {
-      router.navigate(['members']);
+      router.navigate(['/main']);
 
       snackBar.open("You've already completed your profile and can modify it in the 'Edit Profile' page.", 'close', { duration: 10000, horizontalPosition: 'center', verticalPosition: 'bottom' });
 

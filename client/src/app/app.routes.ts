@@ -18,6 +18,7 @@ import { CompleteProfileComponent } from './components/account/complete-profile/
 import { completeProfileGuard } from './guards/complete-profile.guard';
 import { profileIsCompletedGuard } from './guards/profile-is-completed.guard';
 import { MainComponent } from './components/main/main.component';
+import { mobileGuard } from './guards/mobile.guard';
 
 export const routes: Routes = [
     {
@@ -39,11 +40,11 @@ export const routes: Routes = [
         children: [
             { path: 'home', component: MainComponent },
             { path: 'main', component: MainComponent },
-            { path: 'member/:userName', component: MemberDetailComponent },
+            { path: 'member/:userName', component: MemberDetailComponent, canActivate: [mobileGuard] },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
-            { path: 'friends', component: FollowsComponent },
-            { path: 'messages', component: MessagesComponent },
-            { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard] } // both authGuard and adminGuard applied
+            { path: 'friends', component: FollowsComponent, canActivate: [mobileGuard] },
+            { path: 'messages', component: MessagesComponent, canActivate: [mobileGuard] },
+            { path: 'admin', component: AdminPanelComponent, canActivate: [adminGuard, mobileGuard] } // both authGuard and adminGuard applied
         ]
     },
     {
