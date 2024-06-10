@@ -26,7 +26,7 @@ export class NavbarComponent {
   private accountService = inject(AccountService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
 
-  links = ['members', 'friends', 'messages', 'admin'];
+  links = ['main', 'friends', 'messages', 'admin'];
 
   goToEditProfile(): void {
     this.router.navigate(['member/' + this.accountService.loggedInUserSig()?.userName], { skipLocationChange: true });

@@ -17,14 +17,24 @@
             @if(loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
                 [active]="rla.isActive">
+                @if(link === "main") {
+                Members
+                }
+                @else {
                 {{link | titlecase}}
+                }
             </a>
             }
             @else if(link !== "admin")
             {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
                 [active]="rla.isActive">
+                @if(link === "main") {
+                Members
+                }
+                @else {
                 {{link | titlecase}}
+                }
             </a>
             }
             }
