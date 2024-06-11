@@ -35,7 +35,8 @@ export class MemberListMobileComponent implements OnDestroy {
   private _fb = inject(FormBuilder);
   private _matBottomSheet = inject(MatBottomSheet);
 
-  subscribed: Subscription | undefined;
+  subsGetMembers: Subscription | undefined;
+  subsOrderBottomSheet: Subscription | undefined;
 
   pagination: Pagination | undefined;
   members: Member[] | undefined;
@@ -60,14 +61,14 @@ export class MemberListMobileComponent implements OnDestroy {
   constructor() {
     this.memberParams = this._memberService.getFreshMemberParams();
 
-    this._memberService.dismissOrderFilterBottomSheet
-      .subscribe(() => this._matBottomSheet.dismiss());
+    this.dismissBottomSheet();
 
     this.initResetFilter();
   }
 
   ngOnDestroy(): void {
-    this.subscribed?.unsubscribe();
+    this.subsGetMembers?.unsubscribe();
+    this.subsOrderBottomSheet?.unsubscribe();
   }
   //#endregion auto-run methods
 
@@ -89,6 +90,7 @@ export class MemberListMobileComponent implements OnDestroy {
   }
   //#endregion Reactive form
 
+  //#region BottomSheets
   openOrderBottomSheet(): void {
     this._matBottomSheet.open(OrderBottomSheetComponent);
   }
@@ -98,8 +100,10 @@ export class MemberListMobileComponent implements OnDestroy {
   }
 
   dismissBottomSheet(): void {
-    this._matBottomSheet.dismiss();
+    this._memberService.dismissOrderFilterBottomSheet.pipe(
+    ).subscribe(() => this._matBottomSheet.dismiss());
   }
+  //#endregion BottomSheets
 
   initResetFilter(): void {
     this.memberParams = this._memberService.getFreshMemberParams();
@@ -114,7 +118,7 @@ export class MemberListMobileComponent implements OnDestroy {
   getMembers(): void {
     this.updateMemberParams();
 
-    this.subscribed = this._memberService.getMembers().subscribe({
+    this.subsGetMembers = this._memberService.getMembers().subscribe({
       next: (response: PaginatedResult<Member[]>) => {
         if (response.result && response.pagination) {
           this.members = response.result;
