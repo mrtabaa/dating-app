@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { AfterContentInit, Component, OnDestroy, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -30,7 +30,7 @@ import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-
   templateUrl: './member-list-mobile.component.html',
   styleUrl: './member-list-mobile.component.scss'
 })
-export class MemberListMobileComponent implements OnDestroy {
+export class MemberListMobileComponent implements OnDestroy, AfterContentInit {
   private _memberService = inject(MemberService);
   private _fb = inject(FormBuilder);
   private _matBottomSheet = inject(MatBottomSheet);
@@ -44,8 +44,8 @@ export class MemberListMobileComponent implements OnDestroy {
   minAge: number = 18;
   maxAge: number = 99;
 
-  orderOptions: string[] = ['lastActive', 'created', 'age'];
-  orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
+  private orderSheet = new OrderBottomSheetComponent();
+  selectedOrder = this.orderSheet.orderByCtrl.value;
 
   // Material Pagination attrs
   pageSizeOptions = [9, 15, 21];
@@ -63,13 +63,18 @@ export class MemberListMobileComponent implements OnDestroy {
     this.initResetFilter();
   }
 
+  ngAfterContentInit(): void {
+    if (this.orderSheet.isSuccess)
+      this._matBottomSheet.dismiss();
+  }
+
   ngOnDestroy(): void {
     this.subscribed?.unsubscribe();
   }
   //#endregion auto-run methods
 
   //#region Reactive Form 
-  orderByCtrl = this._fb.control('', [])
+  // orderByCtrl = this._fb.control('', [])
 
   filterFg = this._fb.group({
     genderCtrl: [],
@@ -99,8 +104,6 @@ export class MemberListMobileComponent implements OnDestroy {
   initResetFilter(): void {
     this.memberParams = this._memberService.getFreshMemberParams();
 
-    if (this.memberParams?.orderBy)
-      this.orderByCtrl.setValue(this.memberParams.orderBy);
     this.GenderCtrl.setValue(this.memberParams?.gender);
     this.MinAgeCtrl.setValue(this.memberParams?.minAge);
     this.MaxAgeCtrl.setValue(this.memberParams?.maxAge);
@@ -133,8 +136,8 @@ export class MemberListMobileComponent implements OnDestroy {
   }
 
   updateMemberParams(): void {
-    if (this.memberParams && this.orderByCtrl.value) {
-      this.memberParams.orderBy = this.orderByCtrl.value;
+    if (this.memberParams && this.selectedOrder) {
+      this.memberParams.orderBy = this.selectedOrder;
       this.memberParams.gender = this.GenderCtrl.value;
       this.memberParams.minAge = this.MinAgeCtrl.value;
       this.memberParams.maxAge = this.MaxAgeCtrl.value;

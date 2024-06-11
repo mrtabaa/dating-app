@@ -5,7 +5,6 @@ import { PaginatedResult } from "../models/helpers/paginatedResult";
 import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
 import { MemberParams } from '../models/helpers/member-params';
-import { AccountService } from './account.service';
 import { PaginationHandler } from '../extensions/paginationHandler';
 
 @Injectable({
@@ -13,7 +12,6 @@ import { PaginationHandler } from '../extensions/paginationHandler';
 })
 export class MemberService {
   private http = inject(HttpClient);
-  private accountService = inject(AccountService);
 
   private paginationHandler = new PaginationHandler();
   baseUrl: string = environment.apiUrl + 'member/';
@@ -25,8 +23,9 @@ export class MemberService {
     this.getFreshMemberParams();
   }
 
-  setMemberParams(memberParamsInput: MemberParams): void {
-    this.memberParams = memberParamsInput;
+  setMemberParams(memberParamsInput: MemberParams | undefined): void {
+    if (memberParamsInput)
+      this.memberParams = memberParamsInput;
   }
 
   getFreshMemberParams(): MemberParams | undefined {

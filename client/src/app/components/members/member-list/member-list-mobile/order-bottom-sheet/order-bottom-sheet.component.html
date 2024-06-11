@@ -1,12 +1,12 @@
-<p class="title">Order members</p>
 <form>
+    <p class="title">Order members</p>
     <mat-form-field>
         <mat-label>Order by</mat-label>
-        <!-- <mat-select [formControl]="orderByCtrl" (selectionChange)="updateMemberParams()">
-        @for (orderOption of orderOptions; track $index) {
-        <mat-option [value]="orderOption" (click)="getMembers()"
-            [disabled]="orderOption === memberParams?.orderBy">{{orderOptionsView[$index]}}</mat-option>
-        }
-    </mat-select> -->
+        <mat-select [formControl]="orderByCtrl" (selectionChange)="getOrderValue()">
+            @for (orderOption of orderOptions; track $index) {
+            <mat-option [value]="orderOption" (click)="getMembers()"
+                [disabled]="orderOption === orderByCtrl.value">{{orderOptionsView[$index]}}</mat-option>
+            }
+        </mat-select>
     </mat-form-field>
 </form>
