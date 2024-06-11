@@ -1,4 +1,4 @@
-import { AfterContentInit, Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -30,7 +30,7 @@ import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-
   templateUrl: './member-list-mobile.component.html',
   styleUrl: './member-list-mobile.component.scss'
 })
-export class MemberListMobileComponent implements OnDestroy, AfterContentInit {
+export class MemberListMobileComponent implements OnDestroy {
   private _memberService = inject(MemberService);
   private _fb = inject(FormBuilder);
   private _matBottomSheet = inject(MatBottomSheet);
@@ -60,12 +60,10 @@ export class MemberListMobileComponent implements OnDestroy, AfterContentInit {
   constructor() {
     this.memberParams = this._memberService.getFreshMemberParams();
 
-    this.initResetFilter();
-  }
+    this._memberService.dismissOrderFilterBottomSheet
+      .subscribe(() => this._matBottomSheet.dismiss());
 
-  ngAfterContentInit(): void {
-    if (this.orderSheet.isSuccess)
-      this._matBottomSheet.dismiss();
+    this.initResetFilter();
   }
 
   ngOnDestroy(): void {
@@ -74,8 +72,6 @@ export class MemberListMobileComponent implements OnDestroy, AfterContentInit {
   //#endregion auto-run methods
 
   //#region Reactive Form 
-  // orderByCtrl = this._fb.control('', [])
-
   filterFg = this._fb.group({
     genderCtrl: [],
     minAgeCtrl: [],
@@ -99,6 +95,10 @@ export class MemberListMobileComponent implements OnDestroy, AfterContentInit {
 
   openFilterBottomSheet(): void {
     this._matBottomSheet.open(FilterBottomSheetComponent);
+  }
+
+  dismissBottomSheet(): void {
+    this._matBottomSheet.dismiss();
   }
 
   initResetFilter(): void {

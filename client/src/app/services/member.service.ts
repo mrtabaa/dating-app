@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { EventEmitter, Injectable, inject, signal } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { PaginatedResult } from "../models/helpers/paginatedResult";
 import { Member } from '../models/member.model';
@@ -12,6 +12,11 @@ import { PaginationHandler } from '../extensions/paginationHandler';
 })
 export class MemberService {
   private http = inject(HttpClient);
+
+  //#region Mobile
+  dismissOrderFilterBottomSheet = new EventEmitter<void>();
+  selectedOrderSig = signal<string | null>('lastActive');
+  //#endregion
 
   private paginationHandler = new PaginationHandler();
   baseUrl: string = environment.apiUrl + 'member/';
