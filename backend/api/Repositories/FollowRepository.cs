@@ -9,10 +9,12 @@ public class FollowRepository : IFollowRepository
     private readonly IMongoCollection<AppUser> _collectionUsers;
     private readonly IUserRepository _userRepository;
     private readonly ILogger<FollowRepository> _logger;
+    private readonly IPhotoService _photoService;
 
     // constructor - dependency injections
     public FollowRepository(
-        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository, ILogger<FollowRepository> logger
+        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository,
+        IPhotoService photoService, ILogger<FollowRepository> logger
         )
     {
         _client = client; // used for Session
@@ -21,6 +23,7 @@ public class FollowRepository : IFollowRepository
         _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _userRepository = userRepository;
+        _photoService = photoService;
 
         _logger = logger;
     }
@@ -200,7 +203,7 @@ public class FollowRepository : IFollowRepository
     /// <param name="loggedInUserId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>appUsers</returns>
-    private async Task<PagedList<AppUser>> GetAllFollowsFromDBAsync(FollowParams followParams, CancellationToken cancellationToken)
+    private async Task<PagedList<AppUser>?> GetAllFollowsFromDBAsync(FollowParams followParams, CancellationToken cancellationToken)
     {
         if (followParams.Predicate == FollowPredicate.Followings)
         {
@@ -211,7 +214,11 @@ public class FollowRepository : IFollowRepository
                             appUser => appUser.Id,
                             (follow, appUser) => appUser); // project the AppUser
 
-            return await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+            PagedList<AppUser>? appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+
+            appUsers = GetAppUsersWithBlobPhotos(appUsers);
+
+            return appUsers is null ? null : appUsers;
         }
         else // (followParams.Predicate == FollowPredicate.Followers)
         {
@@ -222,7 +229,11 @@ public class FollowRepository : IFollowRepository
                     appUser => appUser.Id,
                     (follow, appUser) => appUser);
 
-            return await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+            PagedList<AppUser>? appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+
+            appUsers = GetAppUsersWithBlobPhotos(appUsers);
+
+            return appUsers is null ? null : appUsers;
         }
     }
 
@@ -276,5 +287,36 @@ public class FollowRepository : IFollowRepository
 
         await _collectionUsers.UpdateOneAsync<AppUser>(session, appUser =>
                 appUser.Id == followedId, updateFollowerCount, null, cancellationToken);
+    }
+
+    /// Convert all members' appUser.Photos to BlobLinkFormat
+    private PagedList<AppUser>? GetAppUsersWithBlobPhotos(PagedList<AppUser> appUsers)
+    {
+        for (int i = 0; i < appUsers.Count; i++)
+        {
+            AppUser? appUser = null;
+
+            if (appUsers[i].Photos.Count > 0) // skip if appUser has no photos
+            {
+                appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
+
+                if (appUser is null) return null;
+
+                appUsers[i] = appUser;
+            }
+        }
+
+        return appUsers;
+    }
+
+    private AppUser? ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
+    {
+        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos)?.ToList();
+        if (blobConvertedPhotos is null)
+            return null;
+
+        appUser.Photos = blobConvertedPhotos;
+
+        return appUser;
     }
 }
