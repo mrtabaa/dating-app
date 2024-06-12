@@ -38,7 +38,7 @@ export class OrderBottomSheetComponent implements OnInit {
     this._memberService.getMembers().pipe(
       tap(res => {
         if (res)
-          this._memberService.dismissOrderFilterBottomSheet.emit();
+          this._memberService.eventEmitOrderFilterBottomSheet.emit();
       })
     ).subscribe();
   }

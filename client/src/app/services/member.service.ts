@@ -14,7 +14,7 @@ export class MemberService {
   private http = inject(HttpClient);
 
   //#region Mobile
-  dismissOrderFilterBottomSheet = new EventEmitter<void>();
+  eventEmitOrderFilterBottomSheet = new EventEmitter<void>();
   selectedOrderSig = signal<string | null>('lastActive');
   //#endregion
 
@@ -114,6 +114,9 @@ export class MemberService {
 
   //#region Helpers
   private getHttpParams(): HttpParams {
+    if (!this.memberParams)
+      this.getFreshMemberParams();
+
     let params = new HttpParams();
 
     if (this.memberParams) {
