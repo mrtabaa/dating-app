@@ -61,6 +61,7 @@ export class CompleteProfileComponent implements OnInit {
   readonly introductionLabel = 'Introduction';
   readonly interestsLabel = 'Interests';
   readonly lookingForLabel = 'Looking for';
+  readonly emptyWarning = 'No info is entered. Consider updating to attract more matches.';
 
   member: Member | undefined;
   panelOpenState = false;

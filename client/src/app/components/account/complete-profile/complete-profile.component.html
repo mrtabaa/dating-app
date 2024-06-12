@@ -131,8 +131,8 @@
                     </mat-form-field>
                     <div class="buttons saveAngNext">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button (click)="saveAngNext()" mat-raised-button color="primary"
-                            matStepperNext>Save & Next</button>
+                        <button (click)="saveAngNext()" mat-raised-button color="primary" matStepperNext>Save &
+                            Next</button>
                     </div>
                 </form>
             </div>
@@ -209,7 +209,12 @@
                                 </mat-panel-description>
                                 }
                             </mat-expansion-panel-header>
+                            @if(IntroductionCtrl.value) {
                             <p>{{IntroductionCtrl.value}}</p>
+                            }
+                            @else {
+                            <mat-error>{{emptyWarning}}</mat-error>
+                            }
                         </mat-expansion-panel>
                         <mat-expansion-panel>
                             <mat-expansion-panel-header>
@@ -222,7 +227,12 @@
                                 </mat-panel-description>
                                 }
                             </mat-expansion-panel-header>
+                            @if(interestsCtrl.value) {
                             <p>{{InterestsCtrl.value}}</p>
+                            }
+                            @else {
+                            <mat-error>{{emptyWarning}}</mat-error>
+                            }
                         </mat-expansion-panel>
                         <mat-expansion-panel>
                             <mat-expansion-panel-header>
@@ -235,7 +245,12 @@
                                 </mat-panel-description>
                                 }
                             </mat-expansion-panel-header>
+                            @if(lookingForCtrl.value) {
                             <p>{{lookingForCtrl.value}}</p>
+                            }
+                            @else {
+                            <mat-error>{{emptyWarning}}</mat-error>
+                            }
                         </mat-expansion-panel>
                     </mat-accordion>
                     <div class="buttons">
