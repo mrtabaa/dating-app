@@ -46,7 +46,7 @@ export class MemberListComponent implements OnDestroy {
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
 
   // Material Pagination attrs
-  pageSizeOptions = [5, 10, 25];
+  pageSizeOptions = [5, 9, 25];
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
