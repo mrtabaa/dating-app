@@ -11,12 +11,13 @@ import { MemberService } from '../../../../services/member.service';
 import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { OrderBottomSheetComponent } from './order-bottom-sheet/order-bottom-sheet.component';
 import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-sheet.component';
+import { MemberCardMobileComponent } from '../../member-card/member-card-mobile/member-card-mobile.component';
 
 @Component({
   selector: 'app-member-list-mobile',
   standalone: true,
   imports: [
-    OrderBottomSheetComponent, FilterBottomSheetComponent,
+    MemberCardMobileComponent, OrderBottomSheetComponent, FilterBottomSheetComponent,
     MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
   ],
   templateUrl: './member-list-mobile.component.html',
@@ -96,7 +97,7 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
   }
 
   initResetFilter(): void {
-    this._memberService.getFreshMemberParams();
+    this._memberService.resetMemberParamsAndSignals();
 
     this.getMembers();
   }

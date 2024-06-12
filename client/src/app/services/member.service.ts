@@ -6,16 +6,24 @@ import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
 import { MemberParams } from '../models/helpers/member-params';
 import { PaginationHandler } from '../extensions/paginationHandler';
+import { AccountService } from './account.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
   private http = inject(HttpClient);
+  private gender = inject(AccountService).loggedInUserSig()?.gender;
+
+  minAge = 18;
+  maxAge = 99;
 
   //#region Mobile
   eventEmitOrderFilterBottomSheet = new EventEmitter<void>();
   selectedOrderSig = signal<string | null>('lastActive');
+  selectedMinAgeSig = signal<number | null>(this.minAge);
+  selectedMaxAgeSig = signal<number | null>(this.maxAge);
+  selectedGenderSig = signal<string | undefined>(this.gender);
   //#endregion
 
   private paginationHandler = new PaginationHandler();
@@ -129,6 +137,14 @@ export class MemberService {
     }
 
     return params;
+  }
+
+  resetMemberParamsAndSignals(): void {
+    this.getFreshMemberParams();
+
+    this.selectedGenderSig.set(undefined);
+    this.selectedMinAgeSig.set(this.minAge);
+    this.selectedMaxAgeSig.set(this.maxAge);
   }
   //#endregion
 }
