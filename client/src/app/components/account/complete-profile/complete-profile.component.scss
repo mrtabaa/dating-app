@@ -29,6 +29,13 @@ mat-stepper {
                 align-self: center;
                 gap: 1rem;
             }
+            .saveAngNext {
+                gap: 0.5rem;
+                
+                button {
+                    padding: 0.5rem;
+                }
+            }
         }
 
         .review-submit {

@@ -76,20 +76,6 @@ export class CompleteProfileComponent implements OnInit {
     this.getMember();
   }
 
-  getMember(): void {
-    const loggedInUserStr = localStorage.getItem('loggedInUser');
-
-    if (loggedInUserStr) {
-      const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
-
-      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
-        if (member) {
-          this.member = member;
-        }
-      });
-    }
-  }
-
   starterFg = this.fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]]
   })
@@ -97,7 +83,6 @@ export class CompleteProfileComponent implements OnInit {
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   lookingForCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   photosCtrl = this.fb.control(null);
-  // photosCtrl = this.fb.control(null, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
@@ -115,9 +100,45 @@ export class CompleteProfileComponent implements OnInit {
     return this.photosCtrl as FormControl;
   }
 
+  getMember(): void {
+    const loggedInUserStr = localStorage.getItem('loggedInUser');
+
+    if (loggedInUserStr) {
+      const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
+
+      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(
+        take(1))
+        .subscribe(member => {
+          if (member) {
+            this.member = member;
+
+            this.initControllers(member);
+          }
+        });
+    }
+  }
+
+  initControllers(member: Member): void {
+    this.KnownAsCtrl.setValue(member.knownAs);
+    this.IntroductionCtrl.setValue(member.introduction);
+    this.InterestsCtrl.setValue(member.interests);
+    this.LookingForCtrl.setValue(member.lookingFor);
+
+    console.log(this.KnownAsCtrl.value);
+  }
+
+  saveAngNext(): void {
+    const updatedUser: UserUpdate = this.createUpdatedUser();
+    updatedUser.isProfileCompoleted = false;
+
+    this.userService.updateUser(updatedUser)
+      .pipe(take(1)).subscribe();
+  }
+
   submit(): void {
     if (this.countrySig() && this.stateSig() && this.citySig()) {
       const updatedUser: UserUpdate = this.createUpdatedUser();
+      updatedUser.isProfileCompoleted = true;
 
       this.userService.updateUser(updatedUser)
         .pipe(take(1))
@@ -151,7 +172,8 @@ export class CompleteProfileComponent implements OnInit {
       city: this.citySig() as string,
       introduction: this.IntroductionCtrl.value,
       lookingFor: this.LookingForCtrl.value,
-      interests: this.InterestsCtrl.value
+      interests: this.InterestsCtrl.value,
+      isProfileCompoleted: false
     }
   }
 

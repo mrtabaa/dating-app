@@ -39,8 +39,10 @@
             <div class="header">
                 <p>Your selected location:</p>
                 <!-- Must use src since ngSrc doesn't pickup isImageLoaded properly. -->
+                @if ("/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg") {
                 <img src="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg" alt="flag" width="25"
                     height="15" (load)="isImageLoaded = true" [style.display]="isImageLoaded ? 'inline' : 'none'">
+                }
             </div>
             <mat-divider />
             <ul>

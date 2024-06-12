@@ -9,4 +9,5 @@ export interface UserUpdate {
     country: string;
     state: string;
     city: string;
+    isProfileCompoleted: boolean;
 }

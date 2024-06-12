@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace api.DTOs;
 
 public record UserUpdateDto(
@@ -8,5 +10,6 @@ public record UserUpdateDto(
     [MaxLength(1000)] string? Interests,
     [MinLength(3), MaxLength(30)] string Country,
     [MinLength(3), MaxLength(30)] string State,
-    [MinLength(3), MaxLength(30)] string City
+    [MinLength(3), MaxLength(30)] string City,
+    [Optional] bool IsProfileCompleted
 );

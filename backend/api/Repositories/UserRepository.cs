@@ -60,7 +60,7 @@ public class UserRepository : IUserRepository
         .Set(appUser => appUser.Country, userUpdateDto.Country.Trim())
         .Set(appUser => appUser.State, userUpdateDto.State.Trim())
         .Set(appUser => appUser.City, userUpdateDto.City.Trim())
-        .Set(appUser => appUser.IsProfileCompleted, true);
+        .Set(appUser => appUser.IsProfileCompleted, userUpdateDto.IsProfileCompleted);
 
         return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
     }

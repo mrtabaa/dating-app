@@ -2,6 +2,7 @@
     <h6 class="title">Please complete your profile to attract more people.</h6>
     <mat-stepper [linear]="true" #stepper [orientation]="isMobileSig() ? 'vertical' : 'horizontal'">
         <mat-step [stepControl]="starterFg">
+            <!-- Name and Location -->
             <div class="container">
                 <form [formGroup]="starterFg">
                     <ng-template matStepLabel>{{starterLable}}</ng-template>
@@ -25,6 +26,7 @@
                 </form>
             </div>
         </mat-step>
+        <!-- Photos -->
         <mat-step [stepControl]="photosCtrl" optional>
             <div class="container photos">
                 <form>
@@ -36,7 +38,6 @@
                     }
                     <ng-template matStepLabel>{{photosLabel}}</ng-template>
                     @if(member) {
-                    <!-- <app-photo-editor [member]="member" /> -->
                     <app-photo-editor [member]="member" (isUploadingOut)="setIsUploadingPhoto($event)" />
                     }
                     @if(isMobileSig()) { <!-- Mobile -->
@@ -48,6 +49,7 @@
                 </form>
             </div>
         </mat-step>
+        <!-- Introduction -->
         <mat-step [stepControl]="introductionCtrl" optional="true">
             <div class="container">
                 <form>
@@ -70,13 +72,15 @@
                         </mat-error>
                         }
                     </mat-form-field>
-                    <div class="buttons">
+                    <div class="buttons saveAngNext">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                        <button (click)="saveAngNext()" mat-raised-button color="primary" matStepperNext>Save &
+                            Next</button>
                     </div>
                 </form>
             </div>
         </mat-step>
+        <!-- Interest -->
         <mat-step [stepControl]="interestsCtrl" optional="true">
             <div class="container">
                 <form>
@@ -99,13 +103,15 @@
                         </mat-error>
                         }
                     </mat-form-field>
-                    <div class="buttons">
+                    <div class="buttons saveAngNext">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                        <button (click)="saveAngNext()" mat-raised-button color="primary" matStepperNext>Save &
+                            Next</button>
                     </div>
                 </form>
             </div>
         </mat-step>
+        <!-- Looking For -->
         <mat-step [stepControl]="lookingForCtrl" optional="true">
             <div class="container">
                 <form>
@@ -123,13 +129,15 @@
                         </mat-error>
                         }
                     </mat-form-field>
-                    <div class="buttons">
+                    <div class="buttons saveAngNext">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext>Next</button>
+                        <button (click)="saveAngNext()" mat-raised-button color="primary"
+                            matStepperNext>Save & Next</button>
                     </div>
                 </form>
             </div>
         </mat-step>
+        <!-- Review and Submit -->
         <mat-step>
             <div class="container">
                 <ng-template matStepLabel>Review & Submit</ng-template>
@@ -151,7 +159,7 @@
                             <ul>
                                 <li>{{KnownAsCtrl.value}}</li>
                                 <li>{{countrySig()}}
-                                    @if(countryAcrSig()) {
+                                    @if("/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg") {
                                     <img ngSrc="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg"
                                         alt="flag" width="25" height="15">
                                     }
@@ -165,7 +173,7 @@
                                 <li><strong>Name/NickName:</strong> {{KnownAsCtrl.value}}</li>
                                 <li><strong>Country:</strong>
                                     {{countrySig()}}
-                                    @if(countryAcrSig()) {
+                                    @if("/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg") {
                                     <img ngSrc="/assets/images/flags/4x3/{{countryAcrSig()?.toLowerCase()}}.svg"
                                         alt="flag" width="25" height="15">
                                     }
@@ -232,7 +240,7 @@
                     </mat-accordion>
                     <div class="buttons">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button (click)="submit()" mat-raised-button color="primary">Submit</button>
+                        <button (click)="submit()" type="submit" mat-raised-button color="primary">Submit</button>
                         <button mat-stroked-button color="warn" (click)="stepper.reset(); resetCountry()">Reset</button>
                     </div>
                 </form>
