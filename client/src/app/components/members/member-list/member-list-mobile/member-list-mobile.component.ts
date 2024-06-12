@@ -41,7 +41,7 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
   pageSizeOptions = [9, 15, 21];
   hidePageSize = false;
   showPageSizeOptions = true;
-  showFirstLastButtons = true;
+  showFirstLastButtons = false;
   disabled = false;
   pageEvent: PageEvent | undefined;
   //#endregion
@@ -88,9 +88,6 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
         if (response.result && response.pagination) {
           this.members = response.result;
           this.pagination = response.pagination;
-
-          console.log(this.members);
-          console.log(this._memberService.memberParams);
         }
       }
     });

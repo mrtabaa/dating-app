@@ -1,0 +1,28 @@
+@if (memberIn) {
+<div [routerLink]="['/member/' + memberIn.userName]" class="img-wrapper">
+    @if (memberIn.photos.length === 0) {
+    <img ngSrc="/assets/images/defaults/user.png" fill priority alt="{{memberIn.knownAs}} photo">
+    }
+    @else {
+    @for (photo of memberIn.photos; track $index) {
+    @if (photo.isMain) {
+    <img ngSrc="{{photo.url_165}}" fill priority alt="{{memberIn.knownAs}}">
+    }
+    }
+    }
+    <section class="details">
+        @switch (memberIn.gender) {
+        @case ('male') {
+        <mat-icon color="primary">boy</mat-icon>
+        }
+        @case ('female') {
+        <mat-icon color="primary">girl</mat-icon>
+        }
+        @default {
+        <mat-icon color="primary">group_add</mat-icon>
+        }
+        }
+        <p>{{memberIn.knownAs | shortenString:7 | titlecase}}, {{memberIn.age}}</p>
+    </section>
+</div>
+}

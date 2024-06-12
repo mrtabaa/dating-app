@@ -50,10 +50,16 @@ export class MemberService {
 
       if (gender) {
         this.memberParams = new MemberParams(gender);
+
+        this.setMobileDefaultPageSize();
+
         this.getMembers();
       }
       else { // for admin who doesn't have a gender
         this.memberParams = new MemberParams('male');
+
+        this.setMobileDefaultPageSize();
+
         this.getMembers();
       }
     }
@@ -137,6 +143,11 @@ export class MemberService {
     }
 
     return params;
+  }
+
+  setMobileDefaultPageSize(): void {
+    if (this.memberParams?.pageSize === 10) // change desktop default pageSize to mobile
+      this.memberParams.pageSize = 9;
   }
 
   resetMemberParamsAndSignals(): void {
