@@ -18,11 +18,12 @@
                 <input formControlName="minAgeCtrl" matSliderStartThumb>
                 <input formControlName="maxAgeCtrl" matSliderEndThumb>
             </mat-slider>
+            <p class="hint">Slide between {{minAge}} and {{maxAge}}</p>
         </div>
     </section>
     <!-- Buttons -->
     <div class="buttons">
-        <button mat-stroked-button (click)="updateMemberParams()" color="primary">
+        <button (click)="updateMemberParams()" [disabled]="disableButton()" mat-stroked-button color="primary">
             Apply Filters
         </button>
     </div>

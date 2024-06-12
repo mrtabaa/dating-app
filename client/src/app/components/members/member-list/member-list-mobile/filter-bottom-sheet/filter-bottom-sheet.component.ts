@@ -5,6 +5,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MemberService } from '../../../../../services/member.service';
+import { AccountService } from '../../../../../services/account.service';
 
 @Component({
   selector: 'app-filter-bottom-sheet',
@@ -20,13 +21,14 @@ export class FilterBottomSheetComponent {
   private _fb = inject(FormBuilder);
   private _memberService = inject(MemberService);
   private _memberParams = inject(MemberService).memberParams;
+  private _loggedInUserSig = inject(AccountService).loggedInUserSig;
 
   minAge: number = 18;
   maxAge: number = 99;
 
   //#region Reactive Form 
   filterFg = this._fb.group({
-    genderCtrl: [],
+    genderCtrl: [this._loggedInUserSig()?.gender === 'male' ? 'female' : 'male'],
     minAgeCtrl: [this.minAge],
     maxAgeCtrl: [this.maxAge]
   });
@@ -44,13 +46,19 @@ export class FilterBottomSheetComponent {
 
   updateMemberParams(): void {
     if (this._memberParams) {
-      this._memberParams.gender = this.GenderCtrl.value;
       this._memberParams.minAge = this.MinAgeCtrl.value;
       this._memberParams.maxAge = this.MaxAgeCtrl.value;
+      this._memberParams.gender = this.GenderCtrl.value;
 
       this._memberService.setMemberParams(this._memberParams);
 
       this._memberService.eventEmitOrderFilterBottomSheet.emit();
     }
+  }
+
+  disableButton(): boolean {
+    return this.MinAgeCtrl.value === this.minAge &&
+      this.MaxAgeCtrl.value === this.maxAge &&
+      this.GenderCtrl.value === this._loggedInUserSig()?.gender
   }
 }

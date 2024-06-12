@@ -28,6 +28,11 @@ form {
             mat-slider {
                 width: 90%;
             }
+
+            .hint {
+                color: gray;
+                font-size: 1rem;
+            }
         }
     }
 }
