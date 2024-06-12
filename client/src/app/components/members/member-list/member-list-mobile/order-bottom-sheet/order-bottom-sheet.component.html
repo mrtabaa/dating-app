@@ -1,0 +1,12 @@
+<form>
+    <p class="title">Order members</p>
+    <mat-form-field>
+        <mat-label>Order by</mat-label>
+        <mat-select [formControl]="orderByCtrl" (selectionChange)="getMembers()">
+            @for (orderOption of orderOptions; track $index) {
+            <mat-option [value]="orderOption"
+                [disabled]="orderOption === orderByCtrl.value">{{orderOptionsView[$index]}}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</form>

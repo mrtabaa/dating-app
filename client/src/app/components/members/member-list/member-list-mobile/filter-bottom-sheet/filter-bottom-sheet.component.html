@@ -1,0 +1,30 @@
+<form [formGroup]="filterFg">
+    <p class="title">Filter members</p>
+    <section class="filters">
+        <!-- Gender -->
+        <mat-form-field>
+            <mat-label>By gender</mat-label>
+            <mat-select formControlName="genderCtrl">
+                <mat-option [value]="'female'">Female</mat-option>
+                <mat-option [value]="'male'">Male</mat-option>
+                <mat-option [value]="'other'">Other</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-divider />
+        <!-- Age -->
+        <div class="age">
+            <p>By age range</p>
+            <mat-slider min="{{minAge}}" max="{{maxAge}}" discrete>
+                <input formControlName="minAgeCtrl" matSliderStartThumb>
+                <input formControlName="maxAgeCtrl" matSliderEndThumb>
+            </mat-slider>
+            <p class="hint">Slide between {{minAge}} and {{maxAge}}</p>
+        </div>
+    </section>
+    <!-- Buttons -->
+    <div class="buttons">
+        <button (click)="updateMemberParams()" [disabled]="disableButton()" mat-stroked-button color="primary">
+            Apply Filters
+        </button>
+    </div>
+</form>

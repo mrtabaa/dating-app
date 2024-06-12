@@ -1,19 +1,30 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { EventEmitter, Injectable, inject, signal } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 import { PaginatedResult } from "../models/helpers/paginatedResult";
 import { Member } from '../models/member.model';
 import { environment } from '../../environments/environment';
 import { MemberParams } from '../models/helpers/member-params';
-import { AccountService } from './account.service';
 import { PaginationHandler } from '../extensions/paginationHandler';
+import { AccountService } from './account.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
   private http = inject(HttpClient);
-  private accountService = inject(AccountService);
+  private gender = inject(AccountService).loggedInUserSig()?.gender;
+
+  minAge = 18;
+  maxAge = 99;
+
+  //#region Mobile
+  eventEmitOrderFilterBottomSheet = new EventEmitter<void>();
+  selectedOrderSig = signal<string | null>('lastActive');
+  selectedMinAgeSig = signal<number | null>(this.minAge);
+  selectedMaxAgeSig = signal<number | null>(this.maxAge);
+  selectedGenderSig = signal<string | undefined>(this.gender);
+  //#endregion
 
   private paginationHandler = new PaginationHandler();
   baseUrl: string = environment.apiUrl + 'member/';
@@ -25,8 +36,9 @@ export class MemberService {
     this.getFreshMemberParams();
   }
 
-  setMemberParams(memberParamsInput: MemberParams): void {
-    this.memberParams = memberParamsInput;
+  setMemberParams(memberParamsInput: MemberParams | undefined): void {
+    if (memberParamsInput)
+      this.memberParams = memberParamsInput;
   }
 
   getFreshMemberParams(): MemberParams | undefined {
@@ -38,10 +50,16 @@ export class MemberService {
 
       if (gender) {
         this.memberParams = new MemberParams(gender);
+
+        this.setMobileDefaultPageSize();
+
         this.getMembers();
       }
       else { // for admin who doesn't have a gender
         this.memberParams = new MemberParams('male');
+
+        this.setMobileDefaultPageSize();
+
         this.getMembers();
       }
     }
@@ -110,6 +128,9 @@ export class MemberService {
 
   //#region Helpers
   private getHttpParams(): HttpParams {
+    if (!this.memberParams)
+      this.getFreshMemberParams();
+
     let params = new HttpParams();
 
     if (this.memberParams) {
@@ -122,6 +143,19 @@ export class MemberService {
     }
 
     return params;
+  }
+
+  setMobileDefaultPageSize(): void {
+    if (this.memberParams?.pageSize === 10) // change desktop default pageSize to mobile
+      this.memberParams.pageSize = 9;
+  }
+
+  resetMemberParamsAndSignals(): void {
+    this.getFreshMemberParams();
+
+    this.selectedGenderSig.set(undefined);
+    this.selectedMinAgeSig.set(this.minAge);
+    this.selectedMaxAgeSig.set(this.maxAge);
   }
   //#endregion
 }

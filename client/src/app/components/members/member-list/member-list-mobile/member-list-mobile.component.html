@@ -1,2 +1,22 @@
-<p style="padding: 1rem;">Please visit the page from a desktop computer. <span style="color: red"> Mobile version is under development.</span> Hang on
-    for a few days!</p>
+<main>
+    <section class="member-container">
+        <div class="members">
+            @for (member of members; track $index) {
+            <app-member-card-mobile [memberIn]="member" />
+            }
+        </div>
+        @if (pagination && memberParams) {
+        <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
+            [pageSize]="memberParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+            [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+            [pageIndex]="memberParams.pageNumber - 1" aria-label="Select page" class="paginator">
+            <!-- pageIndex must start from 0 -->
+        </mat-paginator>
+        }
+    </section>
+    <section class="buttons">
+        <button mat-raised-button (click)="openOrderBottomSheet()">Order by</button>
+        <button mat-raised-button (click)="openFilterBottomSheet()">Filter by</button>
+        <button mat-stroked-button (click)="initResetFilter()" color="warn">Reset</button>
+    </section>
+</main>
