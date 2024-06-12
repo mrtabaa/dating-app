@@ -40,7 +40,7 @@ export const routes: Routes = [
         children: [
             { path: 'home', component: MainComponent },
             { path: 'main', component: MainComponent },
-            { path: 'member/:userName', component: MemberDetailComponent, canActivate: [mobileGuard] },
+            { path: 'member/:userName', component: MemberDetailComponent },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
             { path: 'friends', component: FollowsComponent, canActivate: [mobileGuard] },
             { path: 'messages', component: MessagesComponent, canActivate: [mobileGuard] },
