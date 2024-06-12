@@ -1,3 +1,4 @@
+<!-- #region Mobile -->
 @if(isMobileSig()) {
 <mat-tab-group mat-stretch-tabs="true" disablePagination="true">
     @if(loggedInUserSig()?.roles?.includes("admin")) {
@@ -36,6 +37,9 @@
     }
 </mat-tab-group>
 }
+<!-- #endregion -->
+<!-- #region Desktop -->
 @else {
 <app-member-list />
 }
+<!-- #endregion -->
