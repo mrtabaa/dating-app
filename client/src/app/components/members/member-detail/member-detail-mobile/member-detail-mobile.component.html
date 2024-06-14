@@ -1,0 +1,108 @@
+@if (member$ | async; as member) {
+<mat-card>
+    <mat-card-header>
+        <mat-card-title-group>
+            @if (member.photos.length === 0) {
+            <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}" height="{{imageWH}}"
+                alt="Loading...">
+            }
+            @else {
+            @for (photo of member.photos; track $index) {
+            @if (photo.isMain) {
+            <img mat-card-image ngSrc="{{photo.url_165}}" width="{{imageWH}}" height="{{imageWH}}" priority
+                alt="Loading...">
+            }
+            }
+            }
+            <mat-card-title>
+                <div>
+                    @if (router.url === '/member/' + username) {
+                    <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-stroked-button
+                        color="primary"><mat-icon color="primary">edit</mat-icon></button>
+                    }
+                    @else {
+                    @if(member.isFollowing){
+                    <button (click)="removeFollow(member)" mat-mini-fab>
+                        <mat-icon color="primary">person_remove</mat-icon>
+                    </button>
+                    }
+                    @else {
+                    <button (click)="addFollow(member)" mat-mini-fab>
+                        <mat-icon color="primary">person_add</mat-icon>
+                    </button>
+                    }
+                    }
+                </div>
+                {{member.knownAs | titlecase | shortenString: 13}}, {{member.age}}
+            </mat-card-title>
+            <mat-card-subtitle>Active: {{member.lastActive | intlRelativeTime}}</mat-card-subtitle>
+            <mat-card-subtitle>Since: {{member.created | date}}</mat-card-subtitle>
+        </mat-card-title-group>
+    </mat-card-header>
+    <div class="second-header">
+        <mat-card-subtitle class="location">{{member.city}}, {{member.state}}, {{member.country}}</mat-card-subtitle>
+        <button routerLink="/main" mat-icon-button><mat-icon color="primary">reply</mat-icon></button>
+    </div>
+    <mat-divider />
+    <mat-card-content>
+        <mat-tab-group mat-stretch-tabs="true" disablePagination="true">
+            <mat-tab #photos>
+                <div class="tab-container">
+                    <ng-template mat-tab-label>
+                        <mat-icon [color]="photos.isActive ? 'primary' : ''">photo_library</mat-icon>
+                    </ng-template>
+                    @if (images.length > 0) {
+                    <div class="gallery">
+                        @for (image of images; track $index) {
+                        <div class="photo" [lightbox]="$index">
+                            <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
+                            <mat-icon color="primary">zoom_in</mat-icon>
+                        </div>
+                        }
+                    </div>
+                    }
+                    @else {
+                    <p>This member has not shared any photos!</p>
+                    }
+                </div>
+            </mat-tab>
+            <mat-tab #about>
+                <div class="tab-container">
+                    <ng-template mat-tab-label>
+                        <mat-icon [color]="about.isActive ? 'primary' : ''">library_books</mat-icon>
+                    </ng-template>
+                    <div class="about">
+                        @if (member.introduction.length > 0) {
+                        <h6 class="title">Introduction:</h6>
+                        <p>{{member.introduction}}</p>
+                        }
+                        @if (member.lookingFor.length > 0) {
+                        <h6 class="title">Looking For:</h6>
+                        <p>{{member.lookingFor}}</p>
+                        }
+                        @if(member.interests.length > 0) {
+                        <h6 class="title">Interests:</h6>
+                        <p>{{member.interests}}</p>
+                        }
+                        @if(member.introduction.length === 0 && member.lookingFor.length === 0 &&
+                        member.interests.length
+                        === 0) {
+                        <p>There is no information provided.</p>
+                        }
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab #messages>
+                <div class="tab-container">
+                    <ng-template mat-tab-label>
+                        <mat-icon [color]="messages.isActive ? 'primary' : ''">mail</mat-icon>
+                    </ng-template>
+                    <div class="messages">
+                        Live messaging system will be here soon...
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-card-content>
+</mat-card>
+}
