@@ -27,14 +27,14 @@
         @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
         <mat-divider></mat-divider>
         <mat-list>
-            <mat-list-item [routerLink]="['member/' + loggedInUserSig()?.userName]" routerLinkActive="router-link-active"
+            <mat-list-item (click)="closeDrawar()" [routerLink]="['member/' + loggedInUserSig()?.userName]" routerLinkActive="router-link-active"
                 [routerLinkActiveOptions]="{exact: true}">
                 <div mat-button class="menu-items">
                     <mat-icon>account_circle</mat-icon>
                     Your Profile
                 </div>
             </mat-list-item>
-            <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active"
+            <mat-list-item (click)="closeDrawar()" [routerLink]="['/user/edit']" routerLinkActive="router-link-active"
                 [routerLinkActiveOptions]="{exact: true}">
                 <div class="menu-items">
                     <mat-icon>edit</mat-icon>

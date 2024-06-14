@@ -37,6 +37,10 @@ export class NavMobileComponent {
       this.isWelcomeCompSig.set(true); // change nav-mobile bg-color: transparent & color: white
   }
 
+  closeDrawar(): void {
+    this.drawer?.close();
+  }
+
   logout() {
     this.accountService.logout();
 
