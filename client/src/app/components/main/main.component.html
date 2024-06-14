@@ -3,24 +3,30 @@
 <mat-tab-group mat-stretch-tabs="true" disablePagination="true">
     @if(loggedInUserSig()?.roles?.includes("admin")) {
     <mat-tab #admin>
-        <ng-template mat-tab-label>
-            <mat-icon [color]="admin.isActive ? 'primary' : ''">admin_panel_settings</mat-icon>
-        </ng-template>
-        <app-admin-panel />
+        <div class="tab-container">
+            <ng-template mat-tab-label>
+                <mat-icon [color]="admin.isActive ? 'primary' : ''">admin_panel_settings</mat-icon>
+            </ng-template>
+            <app-admin-panel />
+        </div>
     </mat-tab>
     }
     <mat-tab #members>
-        <ng-template mat-tab-label>
-            <mat-icon [color]="members.isActive ? 'primary' : ''">diversity_3</mat-icon>
-        </ng-template>
-        <app-member-list-mobile />
+        <div class="tab-container">
+            <ng-template mat-tab-label>
+                <mat-icon [color]="members.isActive ? 'primary' : ''">diversity_3</mat-icon>
+            </ng-template>
+            <app-member-list-mobile />
+        </div>
     </mat-tab>
     @if(!loggedInUserSig()?.roles?.includes("admin")) {
     <mat-tab #follows>
-        <ng-template mat-tab-label>
-            <mat-icon [color]="follows.isActive ? 'primary' : ''">group_add</mat-icon>
-        </ng-template>
-        <app-follows />
+        <div class="tab-container">
+            <ng-template mat-tab-label>
+                <mat-icon [color]="follows.isActive ? 'primary' : ''">group_add</mat-icon>
+            </ng-template>
+            <app-follows />
+        </div>
     </mat-tab>
     <mat-tab #message>
         <ng-template mat-tab-label>
@@ -29,10 +35,12 @@
         <app-messages />
     </mat-tab>
     <mat-tab #comment>
-        <ng-template mat-tab-label>
-            <mat-icon [color]="comment.isActive ? 'primary' : ''">share_reviews</mat-icon>
-        </ng-template>
-        <app-comment />
+        <div class="tab-container">
+            <ng-template mat-tab-label>
+                <mat-icon [color]="comment.isActive ? 'primary' : ''">share_reviews</mat-icon>
+            </ng-template>
+            <app-comment />
+        </div>
     </mat-tab>
     }
 </mat-tab-group>

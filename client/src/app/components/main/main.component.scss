@@ -1,6 +1,11 @@
+mat-tab-group {
+  .tab-container {
+    padding: 1rem 0;
+  }
+}
+
 ::ng-deep .mat-mdc-tab-body-content {
   overflow: hidden;
-  padding: 1rem 0;
 }
 
 ::ng-deep .mat-mdc-tab.mdc-tab {
