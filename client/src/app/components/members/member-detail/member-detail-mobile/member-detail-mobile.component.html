@@ -6,7 +6,7 @@
                 <div class="photo">
                     @if (member.photos.length === 0) {
                     <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}"
-                        height="{{imageWH}}" alt="Loading...">
+                        height="{{imageWH}}" priority alt="Loading...">
                     }
                     @else {
                     @for (photo of member.photos; track $index) {
@@ -76,22 +76,23 @@
                     <mat-icon [color]="about.isActive ? 'primary' : ''">library_books</mat-icon>
                 </ng-template>
                 <div class="about">
-                    @if (member.introduction.length > 0) {
+                    @if(
+                    !(member.introduction || member.lookingFor || member.interests)) {
+                    <p>There is no information provided.</p>
+                    }
+                    @else {
+                    @if (member.introduction) {
                     <h6 class="title">Introduction:</h6>
                     <p>{{member.introduction}}</p>
                     }
-                    @if (member.lookingFor.length > 0) {
+                    @if (member.lookingFor) {
                     <h6 class="title">Looking For:</h6>
                     <p>{{member.lookingFor}}</p>
                     }
-                    @if(member.interests.length > 0) {
+                    @if(member.interests) {
                     <h6 class="title">Interests:</h6>
                     <p>{{member.interests}}</p>
                     }
-                    @if(member.introduction.length === 0 && member.lookingFor.length === 0 &&
-                    member.interests.length
-                    === 0) {
-                    <p>There is no information provided.</p>
                     }
                 </div>
             </div>
