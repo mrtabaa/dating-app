@@ -1,3 +1,7 @@
+@if(isMobileSig()) {
+<app-member-detail-mobile />
+}
+@else {
 @if (member$ | async; as member) {
 <main>
     <mat-card>
@@ -97,4 +101,5 @@
         </mat-tab>
     </mat-tab-group>
 </main>
+}
 }
