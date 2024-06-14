@@ -24,8 +24,9 @@
             </div>
             <div class="actions">
                 @if (router.url === '/member/' + username) {
-                <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-stroked-button
-                    color="primary"><mat-icon color="primary">edit</mat-icon></button>
+                <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-icon-button>
+                    <mat-icon color="primary">edit</mat-icon>
+                </button>
                 }
                 @else {
                 @if(member.isFollowing){
