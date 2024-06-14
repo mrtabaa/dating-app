@@ -17,7 +17,6 @@ import { MemberCardComponent } from '../../members/member-card/member-card.compo
 import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MemberService } from '../../../services/member.service';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -37,8 +36,7 @@ export class FollowsMobileComponent implements OnInit, OnDestroy {
   @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();
 
   private _followService = inject(FollowService);
-  private _memberService = inject(MemberService);
-  loading = inject(LoadingService);
+  isLoadingSig = inject(LoadingService).isLoadingsig;
   snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
 

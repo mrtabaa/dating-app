@@ -22,6 +22,7 @@ import { GooglePlacesComponent } from '../../google-places/google-places.compone
 import { GooglePlacesService } from '../../../services/google-places.service';
 import { CommonService } from '../../../services/common.service';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -44,6 +45,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
+  isLoadingSig = inject(LoadingService).isLoadingsig;
 
   private userEditFgSubscribed: Subscription | undefined;
 

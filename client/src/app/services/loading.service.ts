@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 @Injectable({
@@ -6,7 +6,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class LoadingService {
   private spinnerService = inject(NgxSpinnerService);
-  isLoading: boolean | undefined;
+  isLoadingsig = signal<boolean>(false);
 
   loading() {
     this.spinnerService.show(undefined, {
@@ -15,12 +15,12 @@ export class LoadingService {
       color: '#fff'
     })
 
-    this.isLoading = true;
+    this.isLoadingsig.set(true);
   }
 
   idle() {
     this.spinnerService.hide();
 
-    this.isLoading = false;
+    this.isLoadingsig.set(false);
   }
 }

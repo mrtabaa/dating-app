@@ -13,7 +13,7 @@
                 <app-member-card [memberIn]="member" (FollowModifiedOut)="modifyFollowUnfollowIcon($event)" />
                 }
                 }
-                @else if(!loading.isLoading) {
+                @else if(!isLoadingSig()) {
                 <p>You've not followed anyone so far.</p>
                 }
             </div>
@@ -28,7 +28,7 @@
                 <app-member-card [memberIn]="member" (FollowModifiedOut)="modifyFollowUnfollowIcon($event)" />
                 }
                 }
-                @else if(!loading.isLoading) {
+                @else if(!isLoadingSig()) {
                 <p>Your follwers list is empty. Communication brings better days!</p>
                 }
             </div>

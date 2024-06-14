@@ -29,7 +29,7 @@ import { FollowsMobileComponent } from './follows-mobile/follows-mobile.componen
 })
 export class FollowsComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);
-  loading = inject(LoadingService);
+  isLoadingSig = inject(LoadingService).isLoadingsig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
 
   subscribed: Subscription | undefined;

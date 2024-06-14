@@ -1,11 +1,11 @@
 <div class="container">
+    @if (!disableItemsOnNoChangeValues() && !isLoadingSig()) {
     <mat-card class="warning">
-        @if (!disableItemsOnNoChangeValues()) {
         <mat-card-content>
             <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
         </mat-card-content>
-        }
     </mat-card>
+    }
     @if(member) {
     <div class="content">
         @if(!isMobileSig()) {
