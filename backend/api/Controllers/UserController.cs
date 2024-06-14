@@ -14,10 +14,10 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
 
         UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, userId.Value, cancellationToken);
 
-        return updateResult is null || updateResult.MatchedCount == 1 && updateResult.ModifiedCount == 0
-            ? BadRequest("This info is already saved.")
-            : updateResult.MatchedCount == 0
+        return updateResult is null || updateResult.MatchedCount == 0
             ? BadRequest("Update failed. Try again later or if the issue persists contact the support.")
+            : !userUpdateDto.IsProfileCompleted || updateResult.MatchedCount == 1 && updateResult.ModifiedCount == 0
+            ? BadRequest("This info is already saved.")
             : Ok(new Response(Message: "Your information has been updated successfully."));
     }
     #endregion User Management
