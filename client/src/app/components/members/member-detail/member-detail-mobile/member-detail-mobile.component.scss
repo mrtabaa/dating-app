@@ -1,34 +1,43 @@
-mat-card {
-    min-height: 100%;
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 
     img {
         border-radius: 1rem;
     }
 
-    mat-card-title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    mat-card-subtitle {
-        font-size: 0.9rem;
-    }
-
-    .second-header {
-        display: flex;
-        justify-content: space-between;
-
-        .location {
-            padding: 0 1rem;
+    header {
+        .gray-text {
+            font-weight: normal;
+            color: gray;
         }
-    }
 
-    mat-card-actions {
-        display: flex;
-        justify-content: space-evenly;
+        p {
+            margin: 0;
+        }
+
+        .title {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            font-weight: bold;
+
+            .photo-info {
+                display: flex;
+                gap: 0.5rem;
+
+                .info {
+                    display: flex;
+                    flex-direction: column;
+                }
+            }
+
+            .actions {
+                display: flex;
+                gap: 1rem;
+            }
+        }
     }
 
     mat-tab-group {
@@ -62,8 +71,6 @@ mat-card {
                 }
             }
         }
-
-
 
         .about {
             .title {

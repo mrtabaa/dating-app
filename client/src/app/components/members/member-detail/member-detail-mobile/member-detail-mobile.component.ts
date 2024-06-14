@@ -41,7 +41,7 @@ export class MemberDetailMobileComponent implements OnInit, OnDestroy {
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
   images: GalleryItem[] = [];
-  readonly imageWH = 70;
+  readonly imageWH = 50;
 
   ngOnInit(): void {
     this.getMember();
