@@ -1,12 +1,12 @@
-@if(loggedInUser && member) {
+@if(loggedInUser && memberIn) {
 @if(isMobileSig()) {
-<app-photo-editor-mobile [memberIn]="member" />
+<app-photo-editor-mobile [memberIn]="memberIn" />
 }
 @else {
 <main>
     <section class="top">
         <div class="header">
-            @if (member.photos.length === 0 && !isUploading) {
+            @if (memberIn.photos.length === 0 && !isUploading) {
             <mat-hint>Your album is empty. You may upload some photos.</mat-hint>
             }
             @if(isUploading) {
@@ -33,9 +33,9 @@
                 </mat-card>
             </div>
             }
-            @for (photo of member.photos; track $index) {
+            @for (photo of memberIn.photos; track $index) {
             <div class="photos">
-                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
+                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{memberIn.knownAs}} photo">
                 <div class="buttons">
                     <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Set profile</button>
