@@ -1,43 +1,39 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { FileUploadModule, FileUploader } from 'ng2-file-upload';
 import { take } from 'rxjs';
-import { Member } from '../../../models/member.model';
-import { environment } from '../../../../environments/environment';
-import { AccountService } from '../../../services/account.service';
-import { UserService } from '../../../services/user.service';
-import { MatCardModule } from '@angular/material/card';
+import { environment } from '../../../../../environments/environment';
+import { ApiResponseMessage } from '../../../../models/helpers/api-response-message';
+import { PhotoDeleteResponse } from '../../../../models/helpers/photo-delete-response';
+import { LoggedInUser } from '../../../../models/logged-in-user.model';
+import { Member } from '../../../../models/member.model';
+import { Photo } from '../../../../models/photo.model';
+import { AccountService } from '../../../../services/account.service';
+import { UserService } from '../../../../services/user.service';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
-import { LoggedInUser } from '../../../models/logged-in-user.model';
-import { Photo } from '../../../models/photo.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
-import { PhotoDeleteResponse } from '../../../models/helpers/photo-delete-response';
-import { ResponsiveService } from '../../../services/responsive.service';
-import { PhotoEditorMobileComponent } from './photo-editor-mobile/photo-editor-mobile.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-photo-editor',
+  selector: 'app-photo-editor-mobile',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage,
-    PhotoEditorMobileComponent,
-    MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
+    MatIconModule, MatButtonModule, MatFormFieldModule, MatCardModule,
     FileUploadModule
   ],
-  templateUrl: './photo-editor.component.html',
-  styleUrls: ['./photo-editor.component.scss']
+  templateUrl: './photo-editor-mobile.component.html',
+  styleUrl: './photo-editor-mobile.component.scss'
 })
-export class PhotoEditorComponent implements OnInit {
-  @Input() member: Member | undefined;
+export class PhotoEditorMobileComponent implements OnInit {
+  @Input() memberIn: Member | undefined;
   @Output() isUploadingOut = new EventEmitter<boolean>(false);
   isUploading = false;
 
   private accountService = inject(AccountService);
   private userService = inject(UserService);
-  isMobileSig = inject(ResponsiveService).isMobileSig;
   private snackBar = inject(MatSnackBar);
 
   private readonly maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
@@ -101,10 +97,10 @@ export class PhotoEditorComponent implements OnInit {
       this.uploader.onSuccessItem = (item, response) => {
         if (response) {
           const photo: Photo = JSON.parse(response);
-          this.member?.photos.push(photo);
+          this.memberIn?.photos.push(photo);
 
           // set navbar profile photo when first photo is uploaded
-          if (this.member?.photos.length === 1)
+          if (this.memberIn?.photos.length === 1)
             this.setNavbarProfilePhoto(photo.url_165)
         }
 
@@ -129,9 +125,9 @@ export class PhotoEditorComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (response: ApiResponseMessage) => {
-          if (response && this.member) {
+          if (response && this.memberIn) {
 
-            this.member.photos.forEach(photo => {
+            this.memberIn.photos.forEach(photo => {
               // unset previous main
               if (photo.isMain === true)
                 photo.isMain = false;
@@ -157,11 +153,11 @@ export class PhotoEditorComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (pDR: PhotoDeleteResponse) => {
-          if (this.member) {
-            this.member.photos.splice(index, 1);
+          if (this.memberIn) {
+            this.memberIn.photos.splice(index, 1);
 
             // Update navbar if there's no photo left.
-            if (this.member.photos.length === 0 && this.loggedInUser) {
+            if (this.memberIn.photos.length === 0 && this.loggedInUser) {
               this.loggedInUser.profilePhotoUrl = undefined;
               this.accountService.setCurrentUser(this.loggedInUser);
             }
@@ -194,13 +190,13 @@ export class PhotoEditorComponent implements OnInit {
    * @param pDR // has value when deleted photo was main. Update navbar photo
    */
   private setNextMainWhenMainDeleted(pDR: PhotoDeleteResponse): void {
-    if (this.member) {
+    if (this.memberIn) {
       this.setNavbarProfilePhoto(pDR.newMainUrl);
 
       // exclude the blob SasToken
       const imageUrlFirstPart = pDR.newMainUrl.split('.web');
 
-      for (const photo of this.member.photos) {
+      for (const photo of this.memberIn.photos) {
         // If the deleted photo was main => Update the next photo as main.
         if (photo.url_165.includes(imageUrlFirstPart[0]))
           photo.isMain = true;

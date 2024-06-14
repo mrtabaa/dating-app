@@ -1,12 +1,8 @@
-@if(loggedInUser && member) {
-@if(isMobileSig()) {
-<app-photo-editor-mobile [memberIn]="member" />
-}
-@else {
 <main>
+    @if(loggedInUser && memberIn) {
     <section class="top">
         <div class="header">
-            @if (member.photos.length === 0 && !isUploading) {
+            @if (memberIn.photos.length === 0 && !isUploading) {
             <mat-hint>Your album is empty. You may upload some photos.</mat-hint>
             }
             @if(isUploading) {
@@ -15,29 +11,16 @@
         </div>
         <div class="gallery">
             @if(!isUploading) {
-            <div class="upload-photo-area">
-                <mat-card ng2FileDrop (fileOver)="fileOverBase($event)" (click)="fileInput.click()"
-                    [uploader]="uploader" [ngClass]="{'nv-file-not-over': !hasBaseDropZoneOver,
-                            'nv-file-over': hasBaseDropZoneOver}">
-                    <mat-card-header>
-                        <mat-card-title>Add Photos</mat-card-title>
-                        <mat-card-subtitle>Click or Drop photos here</mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <mat-icon>cloud_upload</mat-icon>
-                    </mat-card-content>
-                    <mat-card-actions>
-                        <button type="button" mat-raised-button>Choose Photos</button>
-                        <input #fileInput ng2FileSelect [uploader]="uploader" multiple type="file" id="file">
-                    </mat-card-actions>
-                </mat-card>
+            <div ng2FileDrop (click)="fileInput.click()" (keydown)="fileInput.click()" [uploader]="uploader" tabindex="0" class="upload-photo-area">
+                <button type="button" mat-raised-button>Choose Photos <mat-icon>cloud_upload</mat-icon></button>
+                <input #fileInput ng2FileSelect [uploader]="uploader" multiple type="file" id="file">
             </div>
             }
-            @for (photo of member.photos; track $index) {
+            @for (photo of memberIn.photos; track $index) {
             <div class="photos">
-                <img ngSrc="{{photo.url_165}}" width="165" height="165" priority alt="{{member.knownAs}} photo">
+                <img ngSrc="{{photo.url_165}}" width="40" height="40" priority alt="{{memberIn.knownAs}} photo">
                 <div class="buttons">
-                    <button (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
+                    <button class="set-main" (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
                         [disabled]="photo.isMain">Set profile</button>
                     <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn">
                         <mat-icon>delete</mat-icon>
@@ -47,6 +30,8 @@
             }
         </div>
     </section>
+    }
+
     @if (uploader && uploader.queue && uploader.queue.length) {
     <section class="queue">
         <p class="queue-length">Uploading queue: {{ uploader.queue.length }}</p>
@@ -57,7 +42,7 @@
                 <strong>Size</strong>
             </div>
             @for (item of uploader.queue; track $index) {
-            <div>
+            <div class="photo-details">
                 <p>{{ item?.file?.name }}</p>
                 @if (uploader.options.isHTML5) {
                 <p nowrap> {{ item?.file?.size/1024/1024 | number:'.2' }} MB</p>
@@ -91,5 +76,3 @@
     </section>
     }
 </main>
-}
-}
