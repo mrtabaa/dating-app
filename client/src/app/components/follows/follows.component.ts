@@ -13,13 +13,15 @@ import { LoadingService } from '../../services/loading.service';
 import { FollowPredicate } from '../../models/helpers/follow-predicate';
 import { FollowModifiedEmit } from '../../models/helpers/follow-modified-emit';
 import { FollowParams } from '../../models/helpers/follow-params';
+import { ResponsiveService } from '../../services/responsive.service';
+import { FollowsMobileComponent } from './follows-mobile/follows-mobile.component';
 
 @Component({
   selector: 'app-follows',
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    MemberCardComponent,
+    MemberCardComponent, FollowsMobileComponent,
     MatTabsModule, MatPaginatorModule
   ],
   templateUrl: './follows.component.html',
@@ -28,19 +30,21 @@ import { FollowParams } from '../../models/helpers/follow-params';
 export class FollowsComponent implements OnInit {
   private followService = inject(FollowService);
   loading = inject(LoadingService);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
 
   subscribed: Subscription | undefined;
   members: Member[] | undefined;
 
   followPredicate = FollowPredicate;
+  followParams: FollowParams | undefined;
+  
   pagination: Pagination | undefined;
-  pageSizeOptions = [5, 10, 25];
+  pageSizeOptions = [5, 9, 25];
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent | undefined;
-  followParams: FollowParams | undefined;
 
   ngOnInit(): void {
     this.followParams = new FollowParams();

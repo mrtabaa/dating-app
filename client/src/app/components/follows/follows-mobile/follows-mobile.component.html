@@ -1,0 +1,108 @@
+<main>
+    <mat-tab-group (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="Following">
+            @if(followParams?.predicate === followPredicate.followings)
+            {
+            <div class="members">
+                @if(members && members.length > 0) {
+                @for (member of members; track $index;) {
+                <section class="title">
+                    <div class="photo-info">
+                        <div class="photo">
+                            @if (member.photos.length === 0) {
+                            <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}"
+                                height="{{imageWH}}" alt="Loading...">
+                            }
+                            @else {
+                            @for (photo of member.photos; track $index) {
+                            @if (photo.isMain) {
+                            <img mat-card-image ngSrc="{{photo.url_165}}" width="{{imageWH}}" height="{{imageWH}}"
+                                priority alt="Loading...">
+                            }
+                            }
+                            }
+                        </div>
+                        <div class="info">
+                            <p>{{member.knownAs | titlecase | shortenString: 15}}, {{member.age}}</p>
+                            <p class="gray-text">{{member.userName | shortenString: 15}}</p>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        @if(member.isFollowing){
+                        <button (click)="removeFollow(member)" mat-mini-fab>
+                            <mat-icon color="primary">person_remove</mat-icon>
+                        </button>
+                        }
+                        @else {
+                        <button (click)="addFollow(member)" mat-mini-fab>
+                            <mat-icon color="primary">person_add</mat-icon>
+                        </button>
+                        }
+                    </div>
+                </section>
+                }
+                }
+                @else if(!loading.isLoading) {
+                <p>You've not followed anyone so far.</p>
+                }
+            </div>
+            }
+        </mat-tab>
+        <mat-tab label="Followers">
+            @if(followParams?.predicate === followPredicate.followers)
+            {
+            <div class="members">
+                @if(members && members.length > 0) {
+                @for (member of members; track $index;) {
+                <section class="title">
+                    <div class="photo-info">
+                        <div class="photo">
+                            @if (member.photos.length === 0) {
+                            <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}"
+                                height="{{imageWH}}" alt="Loading...">
+                            }
+                            @else {
+                            @for (photo of member.photos; track $index) {
+                            @if (photo.isMain) {
+                            <img mat-card-image ngSrc="{{photo.url_165}}" width="{{imageWH}}" height="{{imageWH}}"
+                                priority alt="Loading...">
+                            }
+                            }
+                            }
+                        </div>
+                        <div class="info">
+                            <p>{{member.knownAs | titlecase | shortenString: 15}}, {{member.age}}</p>
+                            <p class="gray-text">{{member.userName | shortenString: 15}}</p>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        @if(member.isFollowing){
+                        <button (click)="removeFollow(member)" mat-mini-fab>
+                            <mat-icon color="primary">person_remove</mat-icon>
+                        </button>
+                        }
+                        @else {
+                        <button (click)="addFollow(member)" mat-mini-fab>
+                            <mat-icon color="primary">person_add</mat-icon>
+                        </button>
+                        }
+                    </div>
+                </section>
+                }
+                }
+                @else if(!loading.isLoading) {
+                <p>Your follwers list is empty. Communication brings better days!</p>
+                }
+            </div>
+            }
+        </mat-tab>
+    </mat-tab-group>
+    @if (pagination && followParams) {
+    <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
+        [pageSize]="followParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+        [pageIndex]="followParams.pageNumber - 1" aria-label="Select page" class="paginator">
+        <!-- pageIndex must start from 0 -->
+    </mat-paginator>
+    }
+</main>

@@ -1,0 +1,39 @@
+.members {
+    padding: 1rem 1rem;
+
+    .gray-text {
+        font-weight: normal;
+        color: gray;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    img {
+        border-radius: 1rem;
+    }
+
+    .title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1rem;
+        font-weight: bold;
+
+        .photo-info {
+            display: flex;
+            gap: 0.5rem;
+
+            .info {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+}
