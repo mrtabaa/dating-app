@@ -131,7 +131,7 @@ export class CompleteProfileComponent implements OnInit {
 
   saveAngNext(): void {
     const updatedUser: UserUpdate = this.createUpdatedUser();
-    updatedUser.isProfileCompoleted = false;
+    updatedUser.isProfileCompleted = false;
 
     this.userService.updateUser(updatedUser)
       .pipe(take(1)).subscribe();
@@ -140,7 +140,7 @@ export class CompleteProfileComponent implements OnInit {
   submit(): void {
     if (this.countrySig() && this.stateSig() && this.citySig()) {
       const updatedUser: UserUpdate = this.createUpdatedUser();
-      updatedUser.isProfileCompoleted = true;
+      updatedUser.isProfileCompleted = true;
 
       this.userService.updateUser(updatedUser)
         .pipe(take(1))
@@ -175,7 +175,7 @@ export class CompleteProfileComponent implements OnInit {
       introduction: this.IntroductionCtrl.value,
       lookingFor: this.LookingForCtrl.value,
       interests: this.InterestsCtrl.value,
-      isProfileCompoleted: false
+      isProfileCompleted: false
     }
   }
 

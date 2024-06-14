@@ -171,7 +171,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
         country: this.googlePlacesService.countrySig() as string,
         state: this.googlePlacesService.stateSig() as string,
         city: this.googlePlacesService.citySig() as string,
-        isProfileCompoleted: true
+        isProfileCompleted: true
       }
 
       this.userService.updateUser(updatedUser)
