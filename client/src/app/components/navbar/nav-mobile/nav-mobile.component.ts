@@ -37,10 +37,6 @@ export class NavMobileComponent {
       this.isWelcomeCompSig.set(true); // change nav-mobile bg-color: transparent & color: white
   }
 
-  goToEditProfile(): void {
-    this.router.navigate(['member/' + this.accountService.loggedInUserSig()?.userName], { skipLocationChange: true });
-  }
-
   logout() {
     this.accountService.logout();
 
