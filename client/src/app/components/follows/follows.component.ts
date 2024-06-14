@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
 import { Subscription } from 'rxjs';
@@ -27,7 +27,7 @@ import { FollowsMobileComponent } from './follows-mobile/follows-mobile.componen
   templateUrl: './follows.component.html',
   styleUrl: './follows.component.scss'
 })
-export class FollowsComponent implements OnInit {
+export class FollowsComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);
   loading = inject(LoadingService);
   isMobileSig = inject(ResponsiveService).isMobileSig;
@@ -37,7 +37,7 @@ export class FollowsComponent implements OnInit {
 
   followPredicate = FollowPredicate;
   followParams: FollowParams | undefined;
-  
+
   pagination: Pagination | undefined;
   pageSizeOptions = [5, 9, 25];
   hidePageSize = false;
@@ -50,6 +50,11 @@ export class FollowsComponent implements OnInit {
     this.followParams = new FollowParams();
 
     this.getFollows();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscribed)
+      this.subscribed.unsubscribe();
   }
 
   getFollows(): void {

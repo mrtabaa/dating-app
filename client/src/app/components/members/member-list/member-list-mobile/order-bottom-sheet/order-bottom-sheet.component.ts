@@ -1,10 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MemberService } from '../../../../../services/member.service';
 import { MemberParams } from '../../../../../models/helpers/member-params';
-import { tap } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 
 @Component({
   selector: 'app-order-bottom-sheet',
@@ -16,12 +16,13 @@ import { tap } from 'rxjs';
   templateUrl: './order-bottom-sheet.component.html',
   styleUrl: './order-bottom-sheet.component.scss'
 })
-export class OrderBottomSheetComponent implements OnInit {
+export class OrderBottomSheetComponent implements OnInit, OnDestroy {
   private _memberService = inject(MemberService);
   selectedOrderSig = inject(MemberService).selectedOrderSig;
   private _fb = inject(FormBuilder);
 
   memberParams: MemberParams | undefined;
+  subscribed: Subscription | undefined;
 
   orderOptions: string[] = ['lastActive', 'created', 'age'];
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
@@ -30,12 +31,17 @@ export class OrderBottomSheetComponent implements OnInit {
     this.orderByCtrl.setValue(this._memberService.selectedOrderSig());
   }
 
+  ngOnDestroy(): void {
+    if (this.subscribed)
+      this.subscribed.unsubscribe();
+  }
+
   orderByCtrl = this._fb.control('lastActive', [])
 
   getMembers(): void {
     this.setMemberParams()
 
-    this._memberService.getMembers().pipe(
+    this.subscribed = this._memberService.getMembers().pipe(
       tap(res => {
         if (res)
           this._memberService.eventEmitOrderFilterBottomSheet.emit();

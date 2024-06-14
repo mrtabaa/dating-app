@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, inject } from '@angular/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { Subscription, take } from 'rxjs';
@@ -33,7 +33,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './follows-mobile.component.html',
   styleUrl: './follows-mobile.component.scss'
 })
-export class FollowsMobileComponent implements OnInit {
+export class FollowsMobileComponent implements OnInit, OnDestroy {
   @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();
 
   private _followService = inject(FollowService);
@@ -61,6 +61,11 @@ export class FollowsMobileComponent implements OnInit {
     this.followParams = new FollowParams();
 
     this.getFollows();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscribed)
+      this.subscribed.unsubscribe();
   }
 
   getFollows(): void {

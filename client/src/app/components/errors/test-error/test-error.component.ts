@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
+import { take } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -15,35 +16,35 @@ export class TestErrorComponent {
   validationErrors: string[] =[];
 
   get404Error(): void {
-    this.http.get(this.baseUrl + 'buggy/not-found').subscribe({
+    this.http.get(this.baseUrl + 'buggy/not-found').pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => console.log(err)
     });
   }
 
   get400Error(): void {
-    this.http.get(this.baseUrl + 'buggy/bad-request').subscribe({
+    this.http.get(this.baseUrl + 'buggy/bad-request').pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => console.log(err)
     });
   }
 
   get500Error(): void {
-    this.http.get(this.baseUrl + 'buggy/server-error').subscribe({
+    this.http.get(this.baseUrl + 'buggy/server-error').pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => console.log(err)
     });
   }
 
   get401Error(): void {
-    this.http.get(this.baseUrl + 'buggy/auth').subscribe({
+    this.http.get(this.baseUrl + 'buggy/auth').pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => console.log(err)
     });
   }
 
   get400RegisterValidationErrors(): void {
-    this.http.post(this.baseUrl + 'account/register', {}).subscribe({
+    this.http.post(this.baseUrl + 'account/register', {}).pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => {
         this.validationErrors = err;
@@ -52,7 +53,7 @@ export class TestErrorComponent {
   }
 
   get400LoginValidationErrors(): void {
-    this.http.post(this.baseUrl + 'account/login', {}).subscribe({
+    this.http.post(this.baseUrl + 'account/login', {}).pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => {
         this.validationErrors = err;
