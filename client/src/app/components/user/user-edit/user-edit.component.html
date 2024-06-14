@@ -1,16 +1,14 @@
 <div class="container">
-    <section class="head">
-        <h5 class="title">Your Profile</h5>
-        <mat-card class="warning">
-            @if (!disableItemsOnNoChangeValues()) {
-            <mat-card-content>
-                <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
-            </mat-card-content>
-            }
-        </mat-card>
-    </section>
+    <mat-card class="warning">
+        @if (!disableItemsOnNoChangeValues()) {
+        <mat-card-content>
+            <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
+        </mat-card-content>
+        }
+    </mat-card>
     @if(member) {
     <div class="content">
+        @if(!isMobileSig()) {
         <section class="user-card">
             <mat-card>
                 @for (photo of member.photos; track $index) {
@@ -53,6 +51,7 @@
                 </mat-card-actions>
             </mat-card>
         </section>
+        }
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
             <mat-tab label="Edit About {{KnownAsCtrl.value}}">
                 <div class="tab-contents">
@@ -118,6 +117,19 @@
                         <mat-card>
                         </mat-card>
                         <app-google-places />
+
+                        @if(isMobileSig()) {
+                        <div class="mobile-buttons">
+                            <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
+                                                || disableItemsOnNoChangeValues()" mat-raised-button color="primary">
+                                Save Changes
+                            </button>
+                            <button (click)="(initContollersValues(member))" [disabled]="disableItemsOnNoChangeValues()"
+                                mat-stroked-button color="warn">
+                                Reset
+                            </button>
+                        </div>
+                        }
                     </form>
                 </div>
             </mat-tab>

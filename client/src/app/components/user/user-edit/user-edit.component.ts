@@ -21,6 +21,7 @@ import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-pick
 import { GooglePlacesComponent } from '../../google-places/google-places.component';
 import { GooglePlacesService } from '../../../services/google-places.service';
 import { CommonService } from '../../../services/common.service';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -42,6 +43,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private commonService = inject(CommonService);
   private fb = inject(FormBuilder);
   private matSnak = inject(MatSnackBar);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
 
   private userEditFgSubscribed: Subscription | undefined;
 

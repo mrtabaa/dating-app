@@ -1,20 +1,10 @@
 .container {
     display: flex;
     flex-direction: column;
+    position: relative;
 
-    .head {
-        display: flex;
-        gap: 30%;
-        align-items: center;
-        height: 3rem;
-
-        .title {
-            margin: 0;
-        }
-
-        .warning {
-            background-color: rgb(255, 219, 255);
-        }
+    .warning {
+        background-color: rgb(255, 219, 255);
     }
 
     .content {
@@ -46,7 +36,13 @@
             flex-grow: 3;
 
             .tab-contents {
-                padding: 1rem;
+                padding: 1rem 0;
+
+                .mobile-buttons {
+                    display: flex;
+                    justify-content: center;
+                    gap: 1rem;
+                }
             }
 
             .about-contents {
@@ -58,6 +54,16 @@
                     width: 100%;
                 }
             }
+        }
+    }
+}
+
+@media only screen and (min-width: 40rem) {
+    .container {
+        .warning {
+            position: absolute;
+            top: 0;
+            left: 50%;
         }
     }
 }
