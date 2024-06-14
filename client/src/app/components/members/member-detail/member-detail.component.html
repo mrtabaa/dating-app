@@ -46,6 +46,24 @@
         </mat-card-actions>
     </mat-card>
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+        <mat-tab label="Photos">
+            <div class="tab-contents">
+                @if (images.length > 0) {
+                <div class="gallery">
+                    @for (image of images; track $index) {
+                    <div class="photo" [lightbox]="$index">
+                        <img gallerize [src]="image.data?.thumb"
+                            alt="{{member.knownAs + '\'s' + ' image'}}">
+                        <mat-icon color="primary">zoom_in</mat-icon>
+                    </div>
+                    }
+                </div>
+                }
+                @else {
+                <p>This member has not shared any photos!</p>
+                }
+            </div>
+        </mat-tab>
         <mat-tab label="About {{member.knownAs}}">
             <div class="tab-contents">
                 @if (member.introduction.length > 0) {
@@ -69,21 +87,6 @@
                 }
                 @else {
                 <p>There is no information provided.</p>
-                }
-            </div>
-        </mat-tab>
-        <mat-tab label="Photos">
-            <div class="tab-contents">
-                @if (images.length > 0) {
-                <div class="gallery">
-                    @for (image of images; track $index) {
-                    <img [lightbox]="$index" gallerize [src]="image.data?.thumb"
-                        alt="{{member.knownAs + '\'s' + ' image'}}">
-                    }
-                </div>
-                }
-                @else {
-                <p>This member has not shared any photos!</p>
                 }
             </div>
         </mat-tab>

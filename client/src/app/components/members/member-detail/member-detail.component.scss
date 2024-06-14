@@ -34,6 +34,18 @@ main {
             flex-wrap: wrap;
             gap: 1rem;
 
+            .photo {
+                position: relative;
+
+                mat-icon {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    width: 2rem;
+                    height: 2rem;
+                    font-size: 2rem;
+                }
+            }
         }
     }
 }

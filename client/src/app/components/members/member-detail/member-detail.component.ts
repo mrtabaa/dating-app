@@ -15,13 +15,14 @@ import { AccountService } from '../../../services/account.service';
 import { FollowService } from '../../../services/follow.service';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, RouterModule,
-    MatCardModule, MatTabsModule, MatButtonModule,
+    MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
     GalleryModule, LightboxModule, IntlModule
   ],
   templateUrl: './member-detail.component.html',
