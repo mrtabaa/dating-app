@@ -28,23 +28,24 @@
         </mat-step>
         <!-- Photos -->
         <mat-step [stepControl]="photosCtrl" optional>
+            <ng-template matStepLabel>{{photosLabel}}</ng-template>
             <div class="container photos">
                 <form>
-                    @if(!isMobileSig()) { <!-- Desktop -->
-                    <div class="buttons">
-                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
-                        <button [disabled]="isUploading" mat-raised-button color="primary" matStepperNext>Next</button>
-                    </div>
-                    }
-                    <ng-template matStepLabel>{{photosLabel}}</ng-template>
                     @if(member) {
-                    <app-photo-editor [member]="member" (isUploadingOut)="setIsUploadingPhoto($event)" />
-                    }
                     @if(isMobileSig()) { <!-- Mobile -->
+                    <app-photo-editor-mobile [memberIn]="member" (isUploadingOut)="setIsUploadingPhoto($event)" />
                     <div class="buttons">
                         <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
                         <button [disabled]="isUploading" mat-raised-button color="primary" matStepperNext>Next</button>
                     </div>
+                    }
+                    @else { <!-- Desktop -->
+                    <div class="buttons">
+                        <button mat-stroked-button color="primary" matStepperPrevious>Back</button>
+                        <button [disabled]="isUploading" mat-raised-button color="primary" matStepperNext>Next</button>
+                    </div>
+                    <app-photo-editor [memberIn]="member" (isUploadingOut)="setIsUploadingPhoto($event)" />
+                    }
                     }
                 </form>
             </div>
@@ -195,7 +196,7 @@
                                 }
                             </mat-expansion-panel-header>
                             @if(member) {
-                            <app-photo-editor [member]="member" />
+                            <app-photo-editor [memberIn]="member" />
                             }
                         </mat-expansion-panel>
                         <mat-expansion-panel>

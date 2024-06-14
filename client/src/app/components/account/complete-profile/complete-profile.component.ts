@@ -24,13 +24,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { GooglePlacesComponent } from '../../google-places/google-places.component';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { PhotoEditorMobileComponent } from '../../user/photo-editor/photo-editor-mobile/photo-editor-mobile.component';
 
 @Component({
   selector: 'app-complete-profile',
   standalone: true,
   imports: [
     FormsModule, ReactiveFormsModule, CommonModule, NgOptimizedImage,
-    PhotoEditorComponent, GooglePlacesComponent,
+    PhotoEditorComponent, PhotoEditorMobileComponent, GooglePlacesComponent,
     MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule,
     MatExpansionModule, MatIconModule, MatCardModule, MatDividerModule
   ],
