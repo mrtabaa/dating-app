@@ -14,6 +14,7 @@ import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-pick
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
 import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-register',
@@ -32,6 +33,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
 
   @Input() isRegisterShownIn = false;
 

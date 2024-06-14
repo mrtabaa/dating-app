@@ -11,7 +11,7 @@
             </div>
             <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
                 [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
-                [error]="'Enter a valid email address.'" [isFocused]="true">
+                [error]="'Enter a valid email address.'" [isFocused]="!isMobileSig()">
             </app-input-cva>
             <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
                 [hint]="'Will be shown to other members.'">

@@ -12,7 +12,7 @@
             </p>
             }
             <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
-                [placeHolder]="'Email or Username'" [isFocused]="true" [hint]="'Your registered email or username'">
+                [placeHolder]="'Email or Username'" [isFocused]="!isMobileSig()" [hint]="'Your registered email or username'">
             </app-input-cva>
             <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
                 [placeHolder]="'Your password'"

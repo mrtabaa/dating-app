@@ -13,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
 import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-login',
@@ -30,6 +31,7 @@ export class LoginComponent implements OnDestroy {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
   router = inject(Router);
   renderer = inject(Renderer2);
 
