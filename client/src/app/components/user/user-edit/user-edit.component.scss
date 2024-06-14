@@ -4,6 +4,10 @@
     position: relative;
 
     .warning {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 3;
         background-color: rgb(255, 219, 255);
     }
 
