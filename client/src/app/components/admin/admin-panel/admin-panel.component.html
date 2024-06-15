@@ -1,3 +1,7 @@
+@if(isMobileSig()) {
+<p>Admin functions are available in Desktop view only! Use a computer.</p>
+}
+@else {
 <mat-tab-group mat-stretch-tabs="true" class="user-info">
     <mat-tab *appHasRoleDir="['admin']" label="User Management">
         <div>
@@ -10,3 +14,4 @@
         </div>
     </mat-tab>
 </mat-tab-group>
+}
