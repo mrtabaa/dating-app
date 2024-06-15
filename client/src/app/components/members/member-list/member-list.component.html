@@ -1,9 +1,9 @@
 <main>
     <form [formGroup]="filterFg" class="sidebar">
         <div class="order-by">
-            <p class="title">Order members</p>
+            <p class="title">Sort members</p>
             <mat-form-field>
-                <mat-label>Order by</mat-label>
+                <mat-label>Sort by</mat-label>
                 <mat-select formControlName="orderByCtrl" (selectionChange)="updateMemberParams()">
                     @for (orderOption of orderOptions; track $index) {
                     <mat-option [value]="orderOption" (click)="getMembers()"
