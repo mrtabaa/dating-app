@@ -23,6 +23,7 @@
     "@angular/router": "^18.0.0",
     "angular-ecmascript-intl": "^3.0.0",
     "ng-gallery": "^11.0.0",
+    "ng-recaptcha": "^13.2.1",
     "ng2-file-upload": "^5.0.0",
     "ngx-spinner": "^16.0.2",
     "ngx-turnstile": "^0.2.2",

@@ -6,7 +6,7 @@ public class AccountRepository : IAccountRepository
 {
     #region Db and Token Settings
     private readonly IMongoCollection<AppUser>? _collection;
-    private readonly ITurnstileService _turnstileValidatorService;
+    private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IPhotoService _photoService;
@@ -14,14 +14,14 @@ public class AccountRepository : IAccountRepository
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        ITurnstileService turnstileValidatorService,
+        Interfaces.IRecaptchaService turnstileValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
         IPhotoService photoService
     )
     {
         var database = client.GetDatabase(dbSettings.DatabaseName);
         _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-        _turnstileValidatorService = turnstileValidatorService;
+        _recaptchaService = turnstileValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;
         _photoService = photoService;
@@ -34,7 +34,7 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         #region Turnstile validation
-        bool isValid = await _turnstileValidatorService.ValidateTokenAsync(registerDto.TurnstileToken, cancellationToken);
+        bool isValid = await _recaptchaService.ValidateTokenAsync(registerDto.RecaptchaToken, cancellationToken);
 
         if (!isValid)
         {
@@ -79,7 +79,7 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         #region Turnstile validation
-        bool isValid = await _turnstileValidatorService.ValidateTokenAsync(userInput.TurnstileToken, cancellationToken);
+        bool isValid = await _recaptchaService.ValidateTokenAsync(userInput.RecaptchaToken, cancellationToken);
 
         if (!isValid)
         {
@@ -112,7 +112,7 @@ public class AccountRepository : IAccountRepository
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
         if (!string.IsNullOrEmpty(token))
-            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.TurnstileToken); // Return loggedInDto
+            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.RecaptchaToken); // Return loggedInDto
 
         return loggedInDto;
     }

@@ -30,7 +30,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : loggedInDto.IsTurnstileTokenInvalid
-            ? BadRequest("Turnstile token is invalid.")
+            ? BadRequest("Recaptcha token is invalid. Slide the 'Not a robot?' again.")
             : loggedInDto.IsWrongCreds
             ? Unauthorized("Wrong username or password.")
             : (loggedInDto.Errors.Count != 0)

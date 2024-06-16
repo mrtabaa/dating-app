@@ -11,14 +11,14 @@ public record RegisterDto(
     [DataType(DataType.Password), Length(8, 50)] string ConfirmPassword,
     [Range(typeof(DateOnly), "1900-01-01", "2050-01-01")] DateOnly DateOfBirth,
     string Gender,
-    string TurnstileToken
+    string RecaptchaToken
 );
 
 public record LoginDto(
     [MaxLength(50)] string EmailUsername,
     [DataType(DataType.Password), Length(8, 50), RegularExpression(@"^(?=.*[A-Z])(?=.*\d).+$", ErrorMessage ="Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)")]
      string Password,
-     string? TurnstileToken
+     string RecaptchaToken
 );
 
 public class LoggedInDto

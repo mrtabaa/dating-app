@@ -1,6 +1,6 @@
 namespace api.Interfaces;
 
-public interface ITurnstileService
+public interface IRecaptchaService
 {
     public Task<bool> ValidateTokenAsync(string? turnstileToken, CancellationToken cancellationToken);
 }

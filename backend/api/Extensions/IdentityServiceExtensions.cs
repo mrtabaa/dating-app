@@ -8,7 +8,7 @@ public static class IdentityServiceExtensions
     public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
     {
         #region Turnstile Token Validation
-        services.AddHttpClient<ITurnstileService, TurnstileService>();
+        services.AddHttpClient<Interfaces.IRecaptchaService, Services.RecaptchaService>();
         #endregion
 
         #region Token

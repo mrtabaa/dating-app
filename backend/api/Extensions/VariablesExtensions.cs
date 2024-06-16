@@ -3,7 +3,7 @@ namespace api.Extensions;
 public static class AppVariablesExtensions
 {
     public const string TokenKey = "TokenKey";
-    public const string TurnstileSecretKey = "TurnstileSecretKey";
+    public const string recaptchaSecretKey = "RecaptchaSecretKey";
 
     public const string collectionUsers = "users";
     public const string collectionFollows = "follows";

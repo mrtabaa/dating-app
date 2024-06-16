@@ -12,8 +12,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router, RouterLink } from '@angular/router';
 import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
-import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-login',
@@ -21,8 +22,8 @@ import { ResponsiveService } from '../../../services/responsive.service';
   imports: [
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
-    TurnstileComponent,
-    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
+    RecaptchaV3Module,
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -34,23 +35,26 @@ export class LoginComponent implements OnDestroy {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   router = inject(Router);
   renderer = inject(Renderer2);
+  private _recaptchaService = inject(ReCaptchaV3Service);
+  private _recaptchaToken: string | undefined;
 
   @Input() isLoginShownIn = false;
 
-  user$!: Observable<LoggedInUser | null>;
-  subscrition!: Subscription;
+  user$: Observable<LoggedInUser | null> | undefined;
+  subscribedLogin: Subscription | undefined;
+  subcribedRecaptcha: Subscription | undefined;
   isTurnstileActive = false;
 
   ngOnDestroy(): void {
-    if (this.subscrition)
-      this.subscrition.unsubscribe();
+    this.subscribedLogin?.unsubscribe();
+    this.subcribedRecaptcha?.unsubscribe();
   }
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     rememberMeCtrl: [false, []],
-    turnsTileCtrl: [null, [Validators.required]]
+    isRecaptchaValidCtrl: [false, [Validators.required]]
   });
 
   get EmailUsernameCtrl(): FormControl {
@@ -62,26 +66,35 @@ export class LoginComponent implements OnDestroy {
   get RememberMeCtrl(): FormControl {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
-  get TurnsTileCtrl(): FormControl {
-    return this.loginFg.get('turnsTileCtrl') as FormControl;
+  get RecaptchaTokenCtrl(): FormControl {
+    return this.loginFg.get('isRecaptchaValidCtrl') as FormControl;
+  }
+
+  validateRecaptcha(): void {
+    this.subcribedRecaptcha = this._recaptchaService.execute('login').subscribe(
+      (token: string) => this._recaptchaToken = token);
   }
 
   loginEmailUsername(): void {
-    const userLoginInput: UserLogin = {
-      emailUsername: this.EmailUsernameCtrl.value,
-      password: this.PasswordCtrl.value,
-      turnsTileToken: this.TurnsTileCtrl.value
-    };
+    console.log(this._recaptchaToken);
 
-    this.subscrition = this.accountService.login(userLoginInput)
-      .subscribe({
-        next: res => {
-          this.snackBar.open('You logged in as: ' + res?.userName, 'Close', { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
-        }
-        // complete: () => console.log('Login successful.')
-      });
+    if (this._recaptchaToken) {
+      const userLoginInput: UserLogin = {
+        emailUsername: this.EmailUsernameCtrl.value,
+        password: this.PasswordCtrl.value,
+        recaptchaToken: this._recaptchaToken
+      };
 
-    this.loginFg.markAllAsTouched();
+      this.subscribedLogin = this.accountService.login(userLoginInput)
+        .subscribe({
+          next: res => {
+            this.snackBar.open('You logged in as: ' + res?.userName, 'Close', { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+          }
+          // complete: () => console.log('Login successful.')
+        });
+
+      this.loginFg.markAllAsTouched();
+    }
   }
 
   enterAdminCreds(): void {
@@ -99,7 +112,7 @@ export class LoginComponent implements OnDestroy {
       confirmPassword: 'Aaaaaaa1',
       dateOfBirth: '2000-01-01',
       gender: 'male',
-      turnsTileToken: this.TurnsTileCtrl.value
+      turnsTileToken: this.RecaptchaTokenCtrl.value
     }
 
     this.accountService.register(userRegInput)
@@ -110,7 +123,7 @@ export class LoginComponent implements OnDestroy {
           if (response) {
             this.EmailUsernameCtrl.setValue(randomAccount);
             this.PasswordCtrl.setValue('Aaaaaaa1');
-            this.TurnsTileCtrl.setValue(response.turnstileToken);
+            this.RecaptchaTokenCtrl.setValue(response.turnstileToken);
           }
         }
       });

@@ -30,3 +30,4 @@ global using System.Net;
 global using System.Text.Json;
 global using api.Models.Errors;
 global using Azure.Storage.Blobs;
+global using System.Runtime.InteropServices;
