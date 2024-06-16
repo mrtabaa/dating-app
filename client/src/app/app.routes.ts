@@ -38,7 +38,6 @@ export const routes: Routes = [
         runGuardsAndResolvers: 'always',
         canActivate: [authGuard, completeProfileGuard],
         children: [
-            { path: 'home', component: MainComponent },
             { path: 'main', component: MainComponent },
             { path: 'member/:userName', component: MemberDetailComponent },
             { path: 'user/edit', component: UserEditComponent, canDeactivate: [preventUnsavedChangesGuard] },
