@@ -1,18 +1,15 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build, deploy and clean ASP.Net Core / api app to Azure Web App - da-api-mr
+name: Build, deploy and clean ASP.Net Core / api app to AWS ElasticBeanstalk - da-api-prod
 
 on:
   push:
     branches:
-      - feature/azure-storage
+      - feature/aws-prod
     paths:
       - 'backend/**'
       
   pull_request:
       branches:
-      - feature/azure-storage
+      - feature/aws-prod
       paths:
       - 'backend/**'
 
@@ -52,15 +49,18 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-      
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+
+      - name: Deploy to AWS Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
-          app-name: 'da-api-mr'
-          slot-name: 'Production'
-          package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2706DEB79BA64D12BFFB60412AC994FA }}
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: 'da'
+          environment_name: 'Da-production'
+          version_label: ${{ github.sha }}
+          region: 'us-east-1'
+          deployment_package: ${{env.DOTNET_ROOT}}/myapp
+      
 
   cleanup:
     runs-on: ubuntu-latest
