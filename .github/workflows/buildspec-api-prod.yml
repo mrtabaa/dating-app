@@ -31,18 +31,20 @@ jobs:
       - name: dotnet publish
         run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp
 
-      - name: Upload artifact for deployment job
+      - name: Zip the application
+        run: zip -r myapp.zip ./myapp
+
+      - name: Upload zipped artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ./myapp
+          path: ./myapp.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     environment:
       name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     
     steps:
       - name: Download artifact from build job
@@ -60,7 +62,7 @@ jobs:
           environment_name: 'production'
           version_label: ${{ github.sha }}
           region: 'us-east-1'
-          deployment_package: myapp
+          deployment_package: myapp.zip
       
 
   cleanup:
