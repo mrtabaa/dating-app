@@ -29,16 +29,16 @@ jobs:
           include-prerelease: true
 
       - name: dotnet publish
-        run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp
+        run: dotnet publish ./backend/dating-app.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Zip the application
-        run: zip -r myapp.zip ./myapp
+        run: cd ${{env.DOTNET_ROOT}}; zip -r ../myapp.zip .; cd ..
 
       - name: Upload zipped artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: myapp.zip
+          path: ${{env.DOTNET_ROOT}}/myapp.zip
 
   deploy:
     runs-on: ubuntu-latest
