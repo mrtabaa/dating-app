@@ -1,32 +1,78 @@
 version: 0.2
 
-phases:
-install:
-runtime-versions:
-dotnet: 8.x
-pre_build:
-commands:
-- echo Restoring dependencies
+name: Build, deploy and clean ASP.Net Core / api app to AWS ElasticBeanstalk - da-api-prod
 
-- dotnet restore ./backend/dating-app.sln
+on:
+  push:
+    branches:
+      - feature/aws-prod
+    paths:
+      - 'backend/**'
+      
+  pull_request:
+      branches:
+      - feature/aws-prod
+      paths:
+      - 'backend/**'
 
-build:
-commands:
-- echo Build started on `date`
+  workflow_dispatch: # This line adds the manual trigger option
 
-- dotnet publish ./backend/dating-app.sln -c Release -o ./myapp
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-post_build:
-commands:
-- echo Build completed on `date`
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.x'
+          include-prerelease: true
 
-artifacts:
-files:
-- '**/*'
+      - name: dotnet publish
+        run: dotnet publish ./backend/dating-app.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
-base-directory: './myapp'
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
-cache:
-paths:
-- '/root/.nuget/packages/**/*'
+  artifacts:
+  files:
+    - '**/*'
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+
+      - name: Deploy to AWS Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: 'da-api'
+          environment_name: 'production'
+          version_label: ${{ github.sha }}
+          region: 'us-east-1'
+          deployment_package: ${{env.DOTNET_ROOT}}/myapp
+      
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Clean up artifacts and publish directory
+        uses: actions/checkout@v4
+        with:
+          clean: true
