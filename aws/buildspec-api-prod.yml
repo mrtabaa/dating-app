@@ -1,3 +1,5 @@
+version: 0.2
+
 name: Build, deploy and clean ASP.Net Core / api app to AWS ElasticBeanstalk - da-api-prod
 
 on:
