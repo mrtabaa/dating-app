@@ -51,7 +51,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
-          path: myapp
 
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
