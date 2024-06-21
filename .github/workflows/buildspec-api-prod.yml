@@ -49,9 +49,6 @@ jobs:
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
-        artifacts:
-          files:
-            - '**/*'
         with:
           name: .net-app
 
