@@ -1,4 +1,4 @@
-name: Build, deploy and clean ASP.Net Core / api app to AWS ElasticBeanstalk - da-api-prod
+name: AWS => Build, deploy, ASP.Net Core / api app to AWS ElasticBeanstalk - da-api-prod
 
 on:
   push:
@@ -29,13 +29,13 @@ jobs:
           include-prerelease: true
 
       - name: dotnet publish
-        run: dotnet publish ./backend/dating-app.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./myapp
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,6 +49,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: .net-app
+          path: myapp
 
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
@@ -59,7 +60,7 @@ jobs:
           environment_name: 'production'
           version_label: ${{ github.sha }}
           region: 'us-east-1'
-          deployment_package: ${{env.DOTNET_ROOT}}/myapp
+          deployment_package: myapp
       
 
   cleanup:
