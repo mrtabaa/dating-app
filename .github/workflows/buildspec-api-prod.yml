@@ -62,6 +62,7 @@ jobs:
           version_label: ${{ github.sha }}
           region: 'us-east-1'
           deployment_package: myapp.zip
+          wait_for_environment_recovery: 60
       
 
   cleanup:
