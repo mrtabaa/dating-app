@@ -59,8 +59,8 @@ jobs:
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          # aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: 'da-api'
           environment_name: 'production'
           version_label: ${{ github.sha }}
