@@ -33,11 +33,11 @@ jobs:
 
       - name: Verify .runtimeconfig.json
         run: |
-          if [ ! -f "./myapp/*.runtimeconfig.json" ]; then
+          if ls ./myapp/*.runtimeconfig.json 1> /dev/null 2>&1; then
+            echo ".runtimeconfig.json found."
+          else
             echo ".runtimeconfig.json not found!"
             exit 1
-          else
-            echo ".runtimeconfig.json found."
           fi
 
       - name: Zip the application
