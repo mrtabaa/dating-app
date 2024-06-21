@@ -8,9 +8,9 @@ on:
       - 'backend/**'
       
   pull_request:
-      branches:
+    branches:
       - feature/aws-prod
-      paths:
+    paths:
       - 'backend/**'
 
   workflow_dispatch: # This line adds the manual trigger option
@@ -29,10 +29,22 @@ jobs:
           include-prerelease: true
 
       - name: dotnet publish
-        run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp
+        run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp --self-contained false
+
+      - name: Verify .runtimeconfig.json
+        run: |
+          if [ ! -f "./myapp/*.runtimeconfig.json" ]; then
+            echo ".runtimeconfig.json not found!"
+            exit 1
+          else
+            echo ".runtimeconfig.json found."
+          fi
 
       - name: Zip the application
         run: zip -r myapp.zip ./myapp
+
+      - name: List contents of deployment package
+        run: unzip -l myapp.zip
 
       - name: Upload zipped artifact for deployment job
         uses: actions/upload-artifact@v3
