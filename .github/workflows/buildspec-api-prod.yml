@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
-          path: ./publish/myapp.zip
+          path: myapp.zip
 
   deploy:
     runs-on: ubuntu-latest
