@@ -8,9 +8,9 @@ on:
       - 'backend/**'
       
   pull_request:
-    branches:
+      branches:
       - feature/aws-prod
-    paths:
+      paths:
       - 'backend/**'
 
   workflow_dispatch: # This line adds the manual trigger option
@@ -29,41 +29,28 @@ jobs:
           include-prerelease: true
 
       - name: dotnet publish
-        run: dotnet publish ./backend/dating-app.sln -c Release -o ./myapp --self-contained false
-
-      - name: Verify .runtimeconfig.json
-        run: |
-          if ls ./myapp/*.runtimeconfig.json 1> /dev/null 2>&1; then
-            echo ".runtimeconfig.json found."
-          else
-            echo ".runtimeconfig.json not found!"
-            exit 1
-          fi
+        run: dotnet publish ./backend/dating-app.sln -c Release
 
       - name: Zip the application
-        run: zip -r myapp.zip ./myapp
+        run: zip -r myapp.zip .
 
-      - name: List contents of deployment package
-        run: unzip -l myapp.zip
+      # - name: Upload zipped artifact for deployment job
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: .net-app
+      #     path: myapp.zip
 
-      - name: Upload zipped artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: myapp.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
+  # deploy:
+    # runs-on: ubuntu-latest
+    # needs: build
+    # environment:
+    #   name: 'Production'
     
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
-
+    # steps:
+    #   - name: Download artifact from build job
+    #     uses: actions/download-artifact@v3
+    #     with:
+    #       name: .net-app
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
@@ -78,7 +65,7 @@ jobs:
 
   cleanup:
     runs-on: ubuntu-latest
-    needs: deploy
+    # needs: deploy
     steps:
       - name: Clean up artifacts and publish directory
         uses: actions/checkout@v4

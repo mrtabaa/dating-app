@@ -23,7 +23,7 @@ public class SeedUsersController : BaseApiController
     public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(IEnumerable<DummyRegisterDto> inputUsersDummy)
     {
         #region If databaseExists
-        // check if database already exists using its status.
+        // check if database already exists using its status
         // https://stackoverflow.com/a/53803908/3944285
         var command = "{ dbStats: 1, scale: 1 }";
         var dbStats = await _database.RunCommandAsync<BsonDocument>(command);
