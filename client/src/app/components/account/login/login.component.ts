@@ -90,7 +90,7 @@ export class LoginComponent implements OnDestroy {
           next: res => {
             this.snackBar.open('You logged in as: ' + res?.userName, 'Close', { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
           }
-          // complete: () => console.log('Login successful.')
+          // complete: () => console.log('Login successful.').
         });
 
       this.loginFg.markAllAsTouched();
