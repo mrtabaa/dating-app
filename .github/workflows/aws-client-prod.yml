@@ -54,7 +54,7 @@ jobs:
 
       - name: Sync files to S3
         run: |
-          aws s3 sync ./client/dist/client s3://da-client-prod --delete
+          aws s3 sync ./client/dist/client/browser/ s3://da-client-prod --delete
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
