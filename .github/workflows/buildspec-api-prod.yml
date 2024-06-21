@@ -32,7 +32,7 @@ jobs:
         run: dotnet publish ./backend/dating-app.sln -c Release -o ./publish
 
       - name: Zip the application
-        run: cd ./publish; zip -r ../myapp.zip .; cd ..
+        run: zip -r myapp.zip ./publish
 
       - name: Upload zipped artifact for deployment job
         uses: actions/upload-artifact@v3
