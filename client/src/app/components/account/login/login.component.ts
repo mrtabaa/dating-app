@@ -72,8 +72,6 @@ export class LoginComponent implements OnDestroy {
     this.validateRecaptcha();
 
     if (this._recaptchaToken) {
-      console.log('Login:', this._recaptchaToken);
-
       const userLoginInput: UserLogin = {
         emailUsername: this.EmailUsernameCtrl.value,
         password: this.PasswordCtrl.value,

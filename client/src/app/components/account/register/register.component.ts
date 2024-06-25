@@ -40,7 +40,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   minDate = new Date();
   maxDate = new Date();
-  emailExistsErrorMessage: string | undefined;
+  errorMessages: string[] | undefined;
 
   subscribedRegisterUser!: Subscription;
   subscribedRecaptcha: Subscription | undefined;
@@ -105,8 +105,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.validateRecaptcha();
 
     if (this._recaptchaToken) {
-      console.log('Register:', this._recaptchaToken);
-
       const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
       const userRegisterInput: UserRegister = {
@@ -125,7 +123,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
             this.router.navigate(['/main']);
             this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
           },
-          error: err => this.emailExistsErrorMessage = err.error,
+          error: err => this.errorMessages = err.error,
           complete: () => console.log('Register successful.')
         });
 

@@ -1,6 +1,6 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
     <div class="container">
-        <div class="inputs">
+        < class="inputs">
             <div class="gender">
                 <strong>I am a</strong>
                 <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
@@ -35,14 +35,17 @@
                 }
             </div>
             <!-- show api errors -->
-            @if(emailExistsErrorMessage) {
-            <div>
-                <mat-error>{{emailExistsErrorMessage}}</mat-error>
-            </div>
+            @if(errorMessages) {
+            <ul>
+                @for (error of errorMessages; track $index) {
+                <li>
+                    <mat-error>{{error}}</mat-error>
+                </li>
+                }
+            </ul>
             }
-        </div>
-        <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
-            class="submitBtn">Register</button>
-        <!-- <p>{{registerFg.errors | json}}</p> -->
+            <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
+                class="submitBtn">Register</button>
+            <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
 </form>
