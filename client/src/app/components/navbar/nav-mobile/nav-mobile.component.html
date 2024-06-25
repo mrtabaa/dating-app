@@ -27,8 +27,8 @@
         @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
         <mat-divider></mat-divider>
         <mat-list>
-            <mat-list-item (click)="closeDrawar()" [routerLink]="['member/' + loggedInUserSig()?.userName]" routerLinkActive="router-link-active"
-                [routerLinkActiveOptions]="{exact: true}">
+            <mat-list-item (click)="closeDrawar()" [routerLink]="['member/' + loggedInUserSig()?.userName]"
+                routerLinkActive="router-link-active" [routerLinkActiveOptions]="{exact: true}">
                 <div mat-button class="menu-items">
                     <mat-icon>account_circle</mat-icon>
                     Your Profile
@@ -52,7 +52,7 @@
     <mat-drawer-content>
         <mat-toolbar [ngStyle]="{'background-color': isWelcomeCompSig() ? 'transparent' : '#ffd9e1'}">
             <mat-toolbar-row>
-                <a [routerLink]="['/home']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
+                <a [routerLink]="['/main']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
                     'color': isWelcomeCompSig() ? 'white' : 'palevioletred'
                 }">
                     <mat-icon>eco</mat-icon>
