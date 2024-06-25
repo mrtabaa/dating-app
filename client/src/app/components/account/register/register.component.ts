@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
 import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
 
 @Component({
   selector: 'app-register',
@@ -34,14 +35,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
-
-  @Input() isRegisterShownIn = false;
+  private _recaptchaService = inject(ReCaptchaV3Service);
+  private _recaptchaToken: string | undefined;
 
   minDate = new Date();
   maxDate = new Date();
   emailExistsErrorMessage: string | undefined;
 
-  subscriptionRegisterUser!: Subscription;
+  subscribedRegisterUser!: Subscription;
+  subscribedRecaptcha: Subscription | undefined;
 
   //#region Base
   ngOnInit() {
@@ -54,8 +56,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptionRegisterUser)
-      this.subscriptionRegisterUser.unsubscribe();
+    if (this.subscribedRegisterUser)
+      this.subscribedRegisterUser.unsubscribe();
   }
   //#endregion
 
@@ -66,8 +68,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    genderCtrl: ['female', [Validators.required]],
-    turnsTileCtrl: [null, [Validators.required]]
+    genderCtrl: ['female', [Validators.required]]
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -91,38 +92,46 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
-  get TurnsTileCtrl(): FormControl {
-    return this.registerFg.get('turnsTileCtrl') as FormControl;
-  }
   //#endregion
 
-
   //#region Methods
+
+  validateRecaptcha(): void {
+    this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
+      (token: string) => this._recaptchaToken = token);
+  }
+
   registerUser(): void {
-    const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
+    this.validateRecaptcha();
 
-    const userRegisterInput: UserRegister = {
-      email: this.EmailCtrl.value,
-      username: this.UsernameCtrl.value,
-      password: this.PasswordCtrl.value,
-      confirmPassword: this.ConfirmPasswordCtrl.value,
-      dateOfBirth: dob,
-      gender: this.GenderCtrl.value,
-      turnsTileToken: this.TurnsTileCtrl.value
-    };
+    if (this._recaptchaToken) {
+      console.log('Register:', this._recaptchaToken);
 
-    this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
-      .subscribe({
-        next: res => {
-          this.router.navigate(['/main']);
-          this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
-        },
-        error: err => this.emailExistsErrorMessage = err.error,
-        complete: () => console.log('Register successful.')
-      });
+      const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
-    // to show validation mat-error on submit button (also added to DOM mat-error)
-    this.registerFg.markAllAsTouched();
+      const userRegisterInput: UserRegister = {
+        email: this.EmailCtrl.value,
+        username: this.UsernameCtrl.value,
+        password: this.PasswordCtrl.value,
+        confirmPassword: this.ConfirmPasswordCtrl.value,
+        dateOfBirth: dob,
+        gender: this.GenderCtrl.value,
+        recaptchaToken: this._recaptchaToken
+      };
+
+      this.subscribedRegisterUser = this.accountService.register(userRegisterInput)
+        .subscribe({
+          next: res => {
+            this.router.navigate(['/main']);
+            this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+          },
+          error: err => this.emailExistsErrorMessage = err.error,
+          complete: () => console.log('Register successful.')
+        });
+
+      // to show validation mat-error on submit button (also added to DOM mat-error)
+      this.registerFg.markAllAsTouched();
+    }
   }
 
   private getDateOnly(dob: string | null): string | undefined {

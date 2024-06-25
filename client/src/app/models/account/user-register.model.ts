@@ -5,5 +5,5 @@ export interface UserRegister {
     confirmPassword: string;
     dateOfBirth: string | undefined;
     gender: string;
-    turnsTileToken: string;
+    recaptchaToken: string;
 }
