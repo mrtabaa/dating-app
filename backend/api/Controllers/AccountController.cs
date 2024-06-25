@@ -12,7 +12,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return !string.IsNullOrEmpty(loggedInDto.Token) // success.
+        return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : loggedInDto.IsRecaptchaTokenInvalid
             ? BadRequest("Recaptcha token is invalid. Refresh the page and try again.")
