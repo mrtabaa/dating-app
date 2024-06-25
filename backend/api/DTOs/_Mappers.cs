@@ -73,7 +73,7 @@ namespace api.DTOs
                 Gender = appUser.Gender,
                 ProfilePhotoUrl = blobPhotoUrl,
                 IsProfileCompleted = appUser.IsProfileCompleted,
-                TurnstileToken = turnstileToken
+                RecaptchaToken = turnstileToken
             };
         }
 
