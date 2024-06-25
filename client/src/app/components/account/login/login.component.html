@@ -21,17 +21,10 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
-        @if(router.url !== '/demo' && isLoginShownIn) {
-        <mat-slide-toggle class="recaptcha" [formControl]="RecaptchaTokenCtrl" (click)="validateRecaptcha()"
-            color="primary">
-            Not a robot? Slide me!
-        </mat-slide-toggle>
-        }
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()"
-                    [disabled]="loginFg.invalid || RecaptchaTokenCtrl.value === false" class="submitBtn"
+                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn"
                     mat-raised-button color="primary">
                     Sign in
                 </button>
@@ -42,16 +35,11 @@
             @if(router.url === '/demo') {
             <mat-divider />
             <div class="demo">
-                @if(isLoginShownIn) {
-                <!-- <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" /> -->
-                }
                 <div class="demo-buttons">
-                    <button (click)="enterAdminCreds()" [disabled]="RecaptchaTokenCtrl.invalid" mat-stroked-button
-                        color="warn">
+                    <button (click)="enterAdminCreds()" mat-stroked-button color="warn">
                         Admin creds
                     </button>
-                    <button (click)="generateMemberCreds()" [disabled]="RecaptchaTokenCtrl.invalid" mat-stroked-button
-                        color="warn">
+                    <button (click)="generateMemberCreds()" mat-stroked-button color="warn">
                         Generate demo member
                     </button>
                 </div>

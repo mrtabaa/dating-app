@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, inject, Renderer2 } from '@angular/core';
+import { Component, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -14,7 +14,6 @@ import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +22,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
     RecaptchaV3Module,
-    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -38,23 +37,20 @@ export class LoginComponent implements OnDestroy {
   private _recaptchaService = inject(ReCaptchaV3Service);
   private _recaptchaToken: string | undefined;
 
-  @Input() isLoginShownIn = false;
-
   user$: Observable<LoggedInUser | null> | undefined;
   subscribedLogin: Subscription | undefined;
-  subcribedRecaptcha: Subscription | undefined;
+  subscribedRecaptcha: Subscription | undefined;
   isTurnstileActive = false;
 
   ngOnDestroy(): void {
     this.subscribedLogin?.unsubscribe();
-    this.subcribedRecaptcha?.unsubscribe();
+    this.subscribedRecaptcha?.unsubscribe();
   }
 
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
-    rememberMeCtrl: [false, []],
-    isRecaptchaValidCtrl: [false, [Validators.required]]
+    rememberMeCtrl: [false, []]
   });
 
   get EmailUsernameCtrl(): FormControl {
@@ -66,19 +62,18 @@ export class LoginComponent implements OnDestroy {
   get RememberMeCtrl(): FormControl {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
-  get RecaptchaTokenCtrl(): FormControl {
-    return this.loginFg.get('isRecaptchaValidCtrl') as FormControl;
-  }
 
   validateRecaptcha(): void {
-    this.subcribedRecaptcha = this._recaptchaService.execute('login').subscribe(
+    this.subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
       (token: string) => this._recaptchaToken = token);
   }
 
   loginEmailUsername(): void {
-    console.log(this._recaptchaToken);
+    this.validateRecaptcha();
 
     if (this._recaptchaToken) {
+      console.log('Login:', this._recaptchaToken);
+
       const userLoginInput: UserLogin = {
         emailUsername: this.EmailUsernameCtrl.value,
         password: this.PasswordCtrl.value,
@@ -105,28 +100,31 @@ export class LoginComponent implements OnDestroy {
   generateMemberCreds(): void {
     const randomAccount = 'ab' + this.generateRandomText(3);
 
-    const userRegInput: UserRegister = {
-      email: randomAccount + '@a.com',
-      username: randomAccount,
-      password: 'Aaaaaaa1',
-      confirmPassword: 'Aaaaaaa1',
-      dateOfBirth: '2000-01-01',
-      gender: 'male',
-      turnsTileToken: this.RecaptchaTokenCtrl.value
-    }
+    if (this._recaptchaToken) {
 
-    this.accountService.register(userRegInput)
-      .pipe(
-        take(1)
-      ).subscribe({
-        next: (response: LoggedInUser | null) => {
-          if (response) {
-            this.EmailUsernameCtrl.setValue(randomAccount);
-            this.PasswordCtrl.setValue('Aaaaaaa1');
-            this.RecaptchaTokenCtrl.setValue(response.turnstileToken);
+      const userRegInput: UserRegister = {
+        email: randomAccount + '@a.com',
+        username: randomAccount,
+        password: 'Aaaaaaa1',
+        confirmPassword: 'Aaaaaaa1',
+        dateOfBirth: '2000-01-01',
+        gender: 'male',
+        recaptchaToken: this._recaptchaToken
+      }
+
+      this.accountService.register(userRegInput)
+        .pipe(
+          take(1)
+        ).subscribe({
+          next: (response: LoggedInUser | null) => {
+            if (response) {
+              this.EmailUsernameCtrl.setValue(randomAccount);
+              this.PasswordCtrl.setValue('Aaaaaaa1');
+              this._recaptchaToken = response.turnstileToken;
+            }
           }
-        }
-      });
+        });
+    }
   }
 
   private generateRandomText(length: number): string {

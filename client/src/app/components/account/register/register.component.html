@@ -34,7 +34,6 @@
                 <mat-error>Password entries don't match.</mat-error>
                 }
             </div>
-
             <!-- show api errors -->
             @if(emailExistsErrorMessage) {
             <div>
@@ -42,9 +41,6 @@
             </div>
             }
         </div>
-        @if(isRegisterShownIn) {
-        <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" />
-        }
         <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
             class="submitBtn">Register</button>
         <!-- <p>{{registerFg.errors | json}}</p> -->
