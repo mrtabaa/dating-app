@@ -26,7 +26,6 @@
     "ng-recaptcha": "^13.2.1",
     "ng2-file-upload": "^5.0.0",
     "ngx-spinner": "^16.0.2",
-    "ngx-turnstile": "^0.2.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"

@@ -12,26 +12,27 @@ import { MatRadioModule } from '@angular/material/radio';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
 import { ResponsiveService } from '../../../services/responsive.service';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
+    NgxTurnstileModule, NgxTurnstileFormsModule,
     InputCvaComponent, DatePickerCvaComponent,
-    MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule
+    MatButtonModule, MatInputModule, MatRadioModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  private _accountService = inject(AccountService);
-  private _router = inject(Router);
-  private _fb = inject(FormBuilder);
-  private _snackBar = inject(MatSnackBar);
+  private accountService = inject(AccountService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+  private snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   private _recaptchaService = inject(ReCaptchaV3Service);
   private _recaptchaToken: string | undefined;
@@ -40,13 +41,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
   maxDate = new Date();
   errorMessages: string[] | undefined;
 
-  private _subscribedRegisterUser!: Subscription;
-  private _subscribedRecaptcha: Subscription | undefined;
+  subscribedRegisterUser!: Subscription;
+  subscribedRecaptcha: Subscription | undefined;
 
   //#region Base
   ngOnInit() {
     this.registerFg;
-    this.validateRecaptcha();
 
     // set datePicker year limitations
     const currentYear = new Date().getFullYear();
@@ -55,22 +55,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this._subscribedRegisterUser)
-      this._subscribedRegisterUser.unsubscribe();
-
-    this._subscribedRecaptcha?.unsubscribe();
+    if (this.subscribedRegisterUser)
+      this.subscribedRegisterUser.unsubscribe();
   }
   //#endregion
 
   //#region Forms Group/controler
-  registerFg = this._fb.group({
+  registerFg = this.fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    genderCtrl: ['female', [Validators.required]],
-    recaptchaCtrl: [false, [Validators.required]],
+    genderCtrl: ['female', [Validators.required]]
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -94,19 +91,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
-  get RecaptchaCtrl(): FormControl {
-    return this.registerFg.get('recaptchaCtrl') as FormControl;
-  }
   //#endregion
 
   //#region Methods
 
   validateRecaptcha(): void {
-    this._subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
+    this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
       (token: string) => this._recaptchaToken = token);
   }
 
   registerUser(): void {
+    this.validateRecaptcha();
+
     if (this._recaptchaToken) {
       const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
@@ -120,11 +116,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
         recaptchaToken: this._recaptchaToken
       };
 
-      this._subscribedRegisterUser = this._accountService.register(userRegisterInput)
+      this.subscribedRegisterUser = this.accountService.register(userRegisterInput)
         .subscribe({
           next: res => {
-            this._router.navigate(['/main']);
-            this._snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+            this.router.navigate(['/main']);
+            this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
           },
           error: err => this.errorMessages = err.error,
           complete: () => console.log('Register successful.')
