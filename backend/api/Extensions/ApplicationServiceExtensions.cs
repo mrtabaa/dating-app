@@ -54,7 +54,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("http://localhost:4300", "http://da-api-prod.us-east-1.elasticbeanstalk.com", "https://hallboard.com/") // Nginx, AWS
+                    .WithOrigins("http://localhost:4300", "https://dvnnu395xmoit.cloudfront.net", "https://hallboard.com/") // Nginx, AWS
                 );
             }
         });
