@@ -54,7 +54,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("https://hallboard.com") // Nginx, AWS
+                    .WithOrigins("https://hallboard.com", "https://api.hallboard.com") // Nginx, AWS
                 );
             }
         });
