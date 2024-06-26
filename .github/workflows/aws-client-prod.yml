@@ -63,8 +63,30 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     needs: deploy
+
     steps:
       - name: Clean up artifacts and publish directory
         uses: actions/checkout@v4
         with:
           clean: true
+
+      - name: Clean up old files from S3 (da-client-prod bucket)
+        run: |
+          aws s3 ls s3://da-client-prod --recursive | while read -r line;
+          do
+            createDate=$(echo $line | awk '{print $1" "$2}')
+            createDate=$(date -d"$createDate" +%s)
+            olderThan=$(date -d"2 days ago" +%s)
+            if [[ $createDate -lt $olderThan ]]
+            then
+              fileName=$(echo $line | awk '{print $4}')
+              if [[ $fileName != "" ]]
+              then
+                aws s3 rm s3://da-client-prod/$fileName
+              fi
+            fi
+          done
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'
