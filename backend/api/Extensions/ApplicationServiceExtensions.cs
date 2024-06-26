@@ -26,17 +26,17 @@ public static class ApplicationServiceExtensions
 
         #endregion MongoDbSettings
 
-        #region Azure storage
-        string? storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
+        // #region Azure storage
+        // string? storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
 
-        if (!string.IsNullOrEmpty(storageConnectionString))
-        {
-            var blobServiceClient = new BlobServiceClient(storageConnectionString);
+        // if (!string.IsNullOrEmpty(storageConnectionString))
+        // {
+        //     var blobServiceClient = new BlobServiceClient(storageConnectionString);
 
-            // Add the BlobServiceClient to the services collection
-            services.AddSingleton<BlobServiceClient>(blobServiceClient);
-        };
-        #endregion Azure storage
+        //     // Add the BlobServiceClient to the services collection
+        //     services.AddSingleton<BlobServiceClient>(blobServiceClient);
+        // };
+        // #endregion Azure storage
 
         #region Others
         services.AddCors(options =>
@@ -54,7 +54,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .WithOrigins("https://hallboard.com", "https://api.hallboard.com") // Nginx, AWS
+                    .WithOrigins("https://hallboard.com") // Nginx, AWS
                 );
             }
         });
