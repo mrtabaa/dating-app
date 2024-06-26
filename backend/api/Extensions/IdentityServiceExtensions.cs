@@ -1,6 +1,3 @@
-using AspNetCore.Identity.MongoDbCore.Extensions;
-using AspNetCore.Identity.MongoDbCore.Infrastructure;
-
 namespace api.Extensions;
 
 public static class IdentityServiceExtensions
