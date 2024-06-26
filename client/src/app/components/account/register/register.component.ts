@@ -37,7 +37,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   minDate = new Date();
   maxDate = new Date();
-  errorMessages: string[] | undefined;
 
   subscribedRegisterUser!: Subscription;
   subscribedRecaptcha: Subscription | undefined;
@@ -120,7 +119,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
             this.router.navigate(['/main']);
             this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
           },
-          error: err => this.errorMessages = err.error,
           complete: () => console.log('Register successful.')
         });
 
