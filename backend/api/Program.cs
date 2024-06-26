@@ -15,8 +15,8 @@ var app = builder.Build();
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-if (app.Environment.IsProduction()) // https for production only
-    app.UseHttpsRedirection();
+// if (app.Environment.IsProduction()) // https for production only
+//     app.UseHttpsRedirection();
 
 app.UseCors();
 
