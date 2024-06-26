@@ -28,7 +28,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsProduction()) // https for production only
     app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("AllowSpecificOrigins");
 
 app.UseAuthentication();
 
