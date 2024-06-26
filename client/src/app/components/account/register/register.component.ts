@@ -12,7 +12,6 @@ import { MatRadioModule } from '@angular/material/radio';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
 import { ResponsiveService } from '../../../services/responsive.service';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 
@@ -21,7 +20,6 @@ import { ReCaptchaV3Service } from 'ng-recaptcha';
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    NgxTurnstileModule, NgxTurnstileFormsModule,
     InputCvaComponent, DatePickerCvaComponent,
     MatButtonModule, MatInputModule, MatRadioModule
   ],
