@@ -1,6 +1,6 @@
 <form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
     <div class="container">
-        < class="inputs">
+        <div class="inputs">
             <div class="gender">
                 <strong>I am a</strong>
                 <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
@@ -47,5 +47,6 @@
             <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
                 class="submitBtn">Register</button>
             <!-- <p>{{registerFg.errors | json}}</p> -->
+        </div>
     </div>
 </form>
