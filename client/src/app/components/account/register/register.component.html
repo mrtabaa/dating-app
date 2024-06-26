@@ -34,8 +34,8 @@
                 <mat-error>Password entries don't match.</mat-error>
                 }
             </div>
-            <!-- show api errors -->
-            @if(errorMessages) {
+            <!-- show api errors
+            @if(errorMessages && errorMessages.length > 1) {
             <ul>
                 @for (error of errorMessages; track $index) {
                 <li>
@@ -44,6 +44,9 @@
                 }
             </ul>
             }
+            @else {
+            <mat-error>{{errorMessage}}</mat-error>
+            } -->
             <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
                 class="submitBtn">Register</button>
             <!-- <p>{{registerFg.errors | json}}</p> -->
