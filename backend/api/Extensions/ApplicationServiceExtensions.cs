@@ -59,6 +59,16 @@ public static class ApplicationServiceExtensions
             }
         });
 
+        services.AddLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddConsole();
+            logging.AddDebug();
+            // Add other log providers as needed
+        });
+
+        services.AddHealthChecks();
+
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
 
         #endregion Others
