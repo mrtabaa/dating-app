@@ -21,10 +21,13 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
+        <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+            Not a robot? Slide me!
+        </mat-slide-toggle>
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid" class="submitBtn"
+                <button type="submit" (click)="loginEmailUsername()" [disabled]="loginFg.invalid || !RecaptchaCtrl.value" class="submitBtn"
                     mat-raised-button color="primary">
                     Sign in
                 </button>

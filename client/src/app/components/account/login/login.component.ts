@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject, Renderer2 } from '@angular/core';
+import { Component, OnDestroy, inject, Renderer2, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -14,6 +14,7 @@ import { MatDivider } from '@angular/material/divider';
 import { UserRegister } from '../../../models/account/user-register.model';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-login',
@@ -22,12 +23,12 @@ import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
     RecaptchaV3Module,
-    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -42,6 +43,10 @@ export class LoginComponent implements OnDestroy {
   subscribedRecaptcha: Subscription | undefined;
   isTurnstileActive = false;
 
+  ngOnInit(): void {
+    this.validateRecaptcha();
+  }
+
   ngOnDestroy(): void {
     this.subscribedLogin?.unsubscribe();
     this.subscribedRecaptcha?.unsubscribe();
@@ -50,6 +55,7 @@ export class LoginComponent implements OnDestroy {
   loginFg = this.fb.group({
     emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
+    recaptchaCtrl: [false, [Validators.required]],
     rememberMeCtrl: [false, []]
   });
 
@@ -58,6 +64,9 @@ export class LoginComponent implements OnDestroy {
   }
   get PasswordCtrl(): FormControl {
     return this.loginFg.get('passwordCtrl') as FormControl;
+  }
+  get RecaptchaCtrl(): FormControl {
+    return this.loginFg.get('recaptchaCtrl') as FormControl;
   }
   get RememberMeCtrl(): FormControl {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
@@ -69,8 +78,6 @@ export class LoginComponent implements OnDestroy {
   }
 
   loginEmailUsername(): void {
-    this.validateRecaptcha();
-
     if (this._recaptchaToken) {
       const userLoginInput: UserLogin = {
         emailUsername: this.EmailUsernameCtrl.value,

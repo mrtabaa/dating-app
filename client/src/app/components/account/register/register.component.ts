@@ -14,6 +14,7 @@ import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-pick
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +22,7 @@ import { ReCaptchaV3Service } from 'ng-recaptcha';
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
     InputCvaComponent, DatePickerCvaComponent,
-    MatButtonModule, MatInputModule, MatRadioModule
+    MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
@@ -45,6 +46,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   //#region Base
   ngOnInit() {
     this.registerFg;
+    this.validateRecaptcha();
 
     // set datePicker year limitations
     const currentYear = new Date().getFullYear();
@@ -65,7 +67,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
-    genderCtrl: ['female', [Validators.required]]
+    genderCtrl: ['female', [Validators.required]],
+    recaptchaCtrl: [false, [Validators.required]],
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -89,6 +92,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
+  get RecaptchaCtrl(): FormControl {
+    return this.registerFg.get('recaptchaCtrl') as FormControl;
+  }
   //#endregion
 
   //#region Methods
@@ -99,8 +105,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   registerUser(): void {
-    this.validateRecaptcha();
-
     if (this._recaptchaToken) {
       const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
