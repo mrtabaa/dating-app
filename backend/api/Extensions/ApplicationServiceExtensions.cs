@@ -11,34 +11,33 @@ public static class ApplicationServiceExtensions
     {
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
-        // get section
-        MongoDbSettings mongoDbSettings = new();
+        // Bind MyMongoDbSettings from appsettings.json
+        var mongoDbSettingsSection = config.GetSection(nameof(MyMongoDbSettings));
+        services.Configure<MyMongoDbSettings>(mongoDbSettingsSection);
 
-        config.GetSection(nameof(MyMongoDbSettings)).Bind(mongoDbSettings);
+        // Override ConnectionString and DatabaseName if environment variables are set
+        var mongoDbSettings = new MyMongoDbSettings();
+        mongoDbSettingsSection.Bind(mongoDbSettings);
 
-        // Override ConnectionString if MONGODB_URI environment variable is set
-        string? envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
+        var envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
         if (!string.IsNullOrEmpty(envConnectionString))
         {
             mongoDbSettings.ConnectionString = envConnectionString;
         }
 
-        string? envDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DBNAME");
+        var envDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DBNAME");
         if (!string.IsNullOrEmpty(envDatabaseName))
         {
             mongoDbSettings.DatabaseName = envDatabaseName;
         }
 
-        // get values
-        services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
-            serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value
-        );
+        // Register MyMongoDbSettings instance
+        services.AddSingleton<IMyMongoDbSettings>(sp => mongoDbSettings);
 
-        // get connectionString to the db
-        services.AddSingleton<IMongoClient>(serviceProvider =>
+        // Register MongoClient
+        services.AddSingleton<IMongoClient>(sp =>
         {
-            MyMongoDbSettings settings = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
-
+            var settings = sp.GetRequiredService<IMyMongoDbSettings>();
             return new MongoClient(settings.ConnectionString);
         });
 
