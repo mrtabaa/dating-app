@@ -1,5 +1,3 @@
-using AspNetCore.Identity.MongoDbCore.Infrastructure;
-
 namespace api.Extensions;
 
 public static class ApplicationServiceExtensions
@@ -11,49 +9,34 @@ public static class ApplicationServiceExtensions
     {
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
-        // Bind MyMongoDbSettings from appsettings.json
-        var mongoDbSettingsSection = config.GetSection(nameof(MyMongoDbSettings));
-        services.Configure<MyMongoDbSettings>(mongoDbSettingsSection);
+        // get section
+        services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
 
-        // Override ConnectionString and DatabaseName if environment variables are set
-        var mongoDbSettings = new MyMongoDbSettings();
-        mongoDbSettingsSection.Bind(mongoDbSettings);
+        // get values
+        services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
+        serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value);
 
-        var envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
-        if (!string.IsNullOrEmpty(envConnectionString))
+        // get connectionString to the db
+        services.AddSingleton<IMongoClient>(serviceProvider =>
         {
-            mongoDbSettings.ConnectionString = envConnectionString;
-        }
+            MyMongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
 
-        var envDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DBNAME");
-        if (!string.IsNullOrEmpty(envDatabaseName))
-        {
-            mongoDbSettings.DatabaseName = envDatabaseName;
-        }
-
-        // Register MyMongoDbSettings instance
-        services.AddSingleton<IMyMongoDbSettings>(sp => mongoDbSettings);
-
-        // Register MongoClient
-        services.AddSingleton<IMongoClient>(sp =>
-        {
-            var settings = sp.GetRequiredService<IMyMongoDbSettings>();
-            return new MongoClient(settings.ConnectionString);
+            return new MongoClient(uri.ConnectionString);
         });
 
         #endregion MongoDbSettings
 
-        // #region Azure storage
-        // string? storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
+        #region Azure storage
+        string? storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
 
-        // if (!string.IsNullOrEmpty(storageConnectionString))
-        // {
-        //     var blobServiceClient = new BlobServiceClient(storageConnectionString);
+        if (!string.IsNullOrEmpty(storageConnectionString))
+        {
+            var blobServiceClient = new BlobServiceClient(storageConnectionString);
 
-        //     // Add the BlobServiceClient to the services collection
-        //     services.AddSingleton<BlobServiceClient>(blobServiceClient);
-        // };
-        // #endregion Azure storage
+            // Add the BlobServiceClient to the services collection
+            services.AddSingleton<BlobServiceClient>(blobServiceClient);
+        };
+        #endregion Azure storage
 
         #region Others
         services.AddCors(options =>

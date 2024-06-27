@@ -1,6 +1,6 @@
 namespace api.Settings;
 public class MyMongoDbSettings : IMyMongoDbSettings
 {
-    public string? ConnectionString { get; set; }
-    public string? DatabaseName { get; set; }
+    public string? ConnectionString { get; init; }
+    public string? DatabaseName { get; init; }
 }

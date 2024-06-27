@@ -1,6 +1,6 @@
 namespace api.Settings;
 public interface IMyMongoDbSettings
 {
-    string? ConnectionString { get; set; }
-    string? DatabaseName { get; set; }
+    string? ConnectionString { get; init; }
+    string? DatabaseName { get; init; }
 }
