@@ -6,15 +6,13 @@ name: Build, deploy and clean Node.js / Angular app to Azure Web App - da-client
 on:
   push:
     branches:
-      # - feature/azure-storage // disabled
-      - feature
+      - feature/azure-storage
     paths:
       - 'client/**'
       
   pull_request:
       branches:
-      # - feature/azure-storage // disabled
-      - feature
+      - feature/azure-storage
       paths:
       - 'client/**'
 
