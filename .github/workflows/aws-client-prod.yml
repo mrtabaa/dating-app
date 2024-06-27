@@ -3,13 +3,13 @@ name: AWS da-client-mr => Build, deploy and clean Node.js / Angular app to S3 Bu
 on:
   push:
     branches:
-      - feature/aws-prod
+      - feature/azure-storage
     paths:
       - 'client/**'
       
   pull_request:
       branches:
-      - feature/aws-prod
+      - feature/azure-storage
       paths:
       - 'client/**'
 
