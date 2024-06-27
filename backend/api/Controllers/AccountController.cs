@@ -15,7 +15,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : loggedInDto.IsRecaptchaTokenInvalid
-            ? BadRequest("Recaptcha token is invalid. Refresh the page and try again.")
+            ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
             : (loggedInDto.Errors.Count != 0)
             ? BadRequest(loggedInDto.Errors)
             : BadRequest("Registration has failed. Try again or contact the support.");
@@ -30,7 +30,7 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
             : loggedInDto.IsRecaptchaTokenInvalid
-            ? BadRequest("Recaptcha token is invalid. Refresh the page and try again.")
+            ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
             : loggedInDto.IsWrongCreds
             ? Unauthorized("Wrong username or password.")
             : (loggedInDto.Errors.Count != 0)

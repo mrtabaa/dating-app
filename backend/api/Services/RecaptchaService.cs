@@ -6,6 +6,9 @@ public class RecaptchaService(HttpClient _httpClient, IConfiguration _config) : 
 {
     public async Task<bool> ValidateTokenAsync(string? recaptchaToken, CancellationToken cancellationToken)
     {
+        _httpClient = _httpClient ?? throw new ArgumentNullException(nameof(_httpClient));
+        _config = _config ?? throw new ArgumentNullException(nameof(_config));
+
         if (string.IsNullOrEmpty(recaptchaToken)) return false;
 
         string? secretKey = _config.GetValue<string>(AppVariablesExtensions.recaptchaSecretKey);
