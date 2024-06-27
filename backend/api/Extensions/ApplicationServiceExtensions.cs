@@ -1,3 +1,5 @@
+using AspNetCore.Identity.MongoDbCore.Infrastructure;
+
 namespace api.Extensions;
 
 public static class ApplicationServiceExtensions
@@ -10,18 +12,28 @@ public static class ApplicationServiceExtensions
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
         // get section
-        services.Configure<MyMongoDbSettings>(config.GetSection("ConnectionString"));
+        MongoDbSettings mongoDbSettings = new();
+
+        config.GetSection(nameof(MyMongoDbSettings)).Bind(mongoDbSettings);
+
+        // Override ConnectionString if MONGODB_URI environment variable is set
+        var envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
+        if (!string.IsNullOrEmpty(envConnectionString))
+        {
+            mongoDbSettings.ConnectionString = envConnectionString;
+        }
 
         // get values
         services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
-        serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value);
+            serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value
+        );
 
         // get connectionString to the db
         services.AddSingleton<IMongoClient>(serviceProvider =>
         {
-            MyMongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
+            MyMongoDbSettings settings = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
 
-            return new MongoClient(uri.ConnectionString);
+            return new MongoClient(settings.ConnectionString);
         });
 
         #endregion MongoDbSettings
