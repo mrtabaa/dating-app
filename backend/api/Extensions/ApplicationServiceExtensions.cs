@@ -10,7 +10,7 @@ public static class ApplicationServiceExtensions
         #region MongoDbSettings
         ///// get values from this file: appsettings.Development.json /////
         // get section
-        services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
+        services.Configure<MyMongoDbSettings>(config.GetSection("ConnectionString"));
 
         // get values
         services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
