@@ -8,8 +8,6 @@ public class AccountController(IAccountRepository _accountRepository) : BaseApiC
     [HttpPost("register")]
     public async Task<ActionResult<LoggedInDto>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
-        return Ok("All good");
-
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
         LoggedInDto? loggedInDto = await _accountRepository.CreateAsync(userIn, cancellationToken);
