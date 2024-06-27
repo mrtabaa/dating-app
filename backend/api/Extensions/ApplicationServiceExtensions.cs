@@ -17,10 +17,16 @@ public static class ApplicationServiceExtensions
         config.GetSection(nameof(MyMongoDbSettings)).Bind(mongoDbSettings);
 
         // Override ConnectionString if MONGODB_URI environment variable is set
-        var envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
+        string? envConnectionString = Environment.GetEnvironmentVariable("MONGODB_URI");
         if (!string.IsNullOrEmpty(envConnectionString))
         {
             mongoDbSettings.ConnectionString = envConnectionString;
+        }
+
+        string? envDatabaseName = Environment.GetEnvironmentVariable("MONGODB_DBNAME");
+        if (!string.IsNullOrEmpty(envDatabaseName))
+        {
+            mongoDbSettings.DatabaseName = envDatabaseName;
         }
 
         // get values
