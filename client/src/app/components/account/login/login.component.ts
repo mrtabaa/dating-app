@@ -39,17 +39,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   private _recaptchaToken: string | undefined;
 
   user$: Observable<LoggedInUser | null> | undefined;
-  subscribedLogin: Subscription | undefined;
-  subscribedRecaptcha: Subscription | undefined;
-  isTurnstileActive = false;
+  private _subscribedLogin: Subscription | undefined;
+  private _subscribedRecaptcha: Subscription | undefined;
 
   ngOnInit(): void {
     this.validateRecaptcha();
   }
 
   ngOnDestroy(): void {
-    this.subscribedLogin?.unsubscribe();
-    this.subscribedRecaptcha?.unsubscribe();
+    this._subscribedLogin?.unsubscribe();
+    this._subscribedRecaptcha?.unsubscribe();
   }
 
   loginFg = this.fb.group({
@@ -73,7 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   validateRecaptcha(): void {
-    this.subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
+    this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
       (token: string) => this._recaptchaToken = token);
   }
 
@@ -85,7 +84,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         recaptchaToken: this._recaptchaToken
       };
 
-      this.subscribedLogin = this.accountService.login(userLoginInput)
+      this._subscribedLogin = this.accountService.login(userLoginInput)
         .subscribe({
           next: res => {
             this.snackBar.open('You logged in as: ' + res?.userName, 'Close', { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
@@ -125,7 +124,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             if (response) {
               this.EmailUsernameCtrl.setValue(randomAccount);
               this.PasswordCtrl.setValue('Aaaaaaa1');
-              this._recaptchaToken = response.turnstileToken;
+              this._recaptchaToken = response.recaptchaToken;
             }
           }
         });
