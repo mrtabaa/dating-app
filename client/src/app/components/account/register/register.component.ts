@@ -28,10 +28,10 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  private accountService = inject(AccountService);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
-  private snackBar = inject(MatSnackBar);
+  private _accountService = inject(AccountService);
+  private _router = inject(Router);
+  private _fb = inject(FormBuilder);
+  private _snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   private _recaptchaService = inject(ReCaptchaV3Service);
   private _recaptchaToken: string | undefined;
@@ -40,8 +40,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   maxDate = new Date();
   errorMessages: string[] | undefined;
 
-  subscribedRegisterUser!: Subscription;
-  subscribedRecaptcha: Subscription | undefined;
+  private _subscribedRegisterUser!: Subscription;
+  private _subscribedRecaptcha: Subscription | undefined;
 
   //#region Base
   ngOnInit() {
@@ -55,13 +55,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscribedRegisterUser)
-      this.subscribedRegisterUser.unsubscribe();
+    if (this._subscribedRegisterUser)
+      this._subscribedRegisterUser.unsubscribe();
+
+    this._subscribedRecaptcha?.unsubscribe();
   }
   //#endregion
 
   //#region Forms Group/controler
-  registerFg = this.fb.group({
+  registerFg = this._fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
@@ -100,7 +102,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   //#region Methods
 
   validateRecaptcha(): void {
-    this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
+    this._subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
       (token: string) => this._recaptchaToken = token);
   }
 
@@ -118,11 +120,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
         recaptchaToken: this._recaptchaToken
       };
 
-      this.subscribedRegisterUser = this.accountService.register(userRegisterInput)
+      this._subscribedRegisterUser = this._accountService.register(userRegisterInput)
         .subscribe({
           next: res => {
-            this.router.navigate(['/main']);
-            this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+            this._router.navigate(['/main']);
+            this._snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
           },
           error: err => this.errorMessages = err.error,
           complete: () => console.log('Register successful.')
