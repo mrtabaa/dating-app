@@ -45,10 +45,15 @@
             </ul>
             }
             <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
-                Not a robot? Slide me!
+                @if(!RecaptchaCtrl.value) {
+                <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                }
+                @else {
+                <span style="color: #ba005c;">Good job!</span>
+                }
             </mat-slide-toggle>
-            <button type="submit" [disabled]="registerFg.invalid || !RecaptchaCtrl.value" mat-raised-button color="primary"
-                class="submitBtn">Register</button>
+            <button type="submit" [disabled]="registerFg.invalid || !RecaptchaCtrl.value" mat-raised-button
+                color="primary" class="submitBtn">Register</button>
             <!-- <p>{{registerFg.errors | json}}</p> -->
         </div>
     </div>

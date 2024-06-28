@@ -22,7 +22,12 @@
             </app-input-cva>
         </div>
         <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
-            Not a robot? Slide me!
+            @if(!RecaptchaCtrl.value) {
+            <span style="color: palevioletred;">Not a robot? Slide me!</span>
+            }
+            @else {
+            <span style="color: #ba005c;">Good job!</span>
+            }
         </mat-slide-toggle>
         <div class="buttons">
             <div class="signin">
