@@ -1,4 +1,9 @@
 .page { // include ngx-spinner
+    p {
+        color: white;
+        font-size: 1rem;
+    }
+
     .container {
         min-height: 100dvh;
         display: flex;
