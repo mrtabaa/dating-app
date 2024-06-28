@@ -100,9 +100,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
     dateOfBirthCtrl: [null, [Validators.required]],
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
-    interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
-    recaptchaCtrl: [false, [Validators.required]],
+    interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]]
   });
+
+  recaptchaCtrl: FormControl = this._fb.control(false, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.userEditFg.get('knownAsCtrl') as FormControl;
@@ -118,9 +119,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
   get InterestsCtrl(): AbstractControl {
     return this.userEditFg.get('interestsCtrl') as FormControl;
-  }
-  get RecaptchaCtrl(): FormControl {
-    return this.userEditFg.get('recaptchaCtrl') as FormControl;
   }
 
   initContollersValues(member: Member) {
@@ -175,7 +173,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   validateRecaptcha(): void {
-    this._subscribedRecaptcha = this._recaptchaService.execute('user-edit').subscribe(
+    this._subscribedRecaptcha = this._recaptchaService.execute('edit').subscribe(
       (token: string) => this._recaptchaToken = token);
   }
 

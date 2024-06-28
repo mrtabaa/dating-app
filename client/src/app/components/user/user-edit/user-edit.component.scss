@@ -28,8 +28,12 @@
                 flex-direction: column;
                 gap: 0.5rem;
 
-                .recaptcha-message {
-                    color: palevioletred;
+                mat-slide-toggle {
+                    align-self: flex-start;
+
+                    .recaptcha-message {
+                        color: palevioletred;
+                    }
                 }
 
                 button {

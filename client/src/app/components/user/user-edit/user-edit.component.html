@@ -40,9 +40,8 @@
                     </div>
                 </mat-card-content>
                 <mat-card-actions>
-                    <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" [disabled]="true"
-                        color="primary">
-                        @if(!RecaptchaCtrl.value) {
+                    <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+                        @if(!recaptchaCtrl.value) {
                         <span style="color: palevioletred;">Not a robot? Slide me!</span>
                         }
                         @else {
