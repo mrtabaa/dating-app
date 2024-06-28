@@ -41,6 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   user$: Observable<LoggedInUser | null> | undefined;
   private _subscribedLogin: Subscription | undefined;
   private _subscribedRecaptcha: Subscription | undefined;
+  hasLoginCreds = false;
 
   ngOnInit(): void {
     this.validateRecaptcha();
@@ -99,6 +100,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   enterAdminCreds(): void {
     this.EmailUsernameCtrl.setValue('admin@a.com');
     this.PasswordCtrl.setValue('Aaaaaaa1')
+
+    this.hasLoginCreds = true;
   }
 
   generateMemberCreds(): void {
@@ -116,15 +119,18 @@ export class LoginComponent implements OnInit, OnDestroy {
         recaptchaToken: this._recaptchaToken
       }
 
-      this.accountService.register(userRegInput)
+      this.accountService.registerDemo(userRegInput)
         .pipe(
           take(1)
         ).subscribe({
-          next: (response: LoggedInUser | null) => {
-            if (response) {
+          next: (userRes: LoggedInUser | null) => {
+            if (userRes) {
               this.EmailUsernameCtrl.setValue(randomAccount);
               this.PasswordCtrl.setValue('Aaaaaaa1');
-              this._recaptchaToken = response.recaptchaToken;
+              this._recaptchaToken = userRes.recaptchaToken;
+
+              this.hasLoginCreds = true;
+              this.RecaptchaCtrl.setValue(false);
             }
           }
         });
