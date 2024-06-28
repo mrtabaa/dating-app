@@ -28,6 +28,10 @@
                 flex-direction: column;
                 gap: 0.5rem;
 
+                .recaptcha-message {
+                    color: palevioletred;
+                }
+
                 button {
 
                     width: 100%;
