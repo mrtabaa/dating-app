@@ -125,8 +125,6 @@ export class CompleteProfileComponent implements OnInit {
     this.IntroductionCtrl.setValue(member.introduction);
     this.InterestsCtrl.setValue(member.interests);
     this.LookingForCtrl.setValue(member.lookingFor);
-
-    console.log(this.KnownAsCtrl.value);
   }
 
   saveAngNext(): void {
