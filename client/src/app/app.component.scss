@@ -1,4 +1,6 @@
-.page { // include ngx-spinner
+.page {
+
+    // include ngx-spinner
     p {
         color: white;
         font-size: 1rem;
@@ -22,11 +24,16 @@
             padding: 2% 4% 0; // left/right 4%
             margin-top: 4rem;
 
-            >* { // router-outlet objects
+            >* {
+                // router-outlet objects
                 width: 100%;
             }
         }
     }
+}
+
+::ng-deep .grecaptcha-badge {
+    visibility: hidden !important;
 }
 
 @media only screen and (min-width: 51rem) {

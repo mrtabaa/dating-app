@@ -4,10 +4,6 @@ mat-tab-group {
   }
 }
 
-::ng-deep .grecaptcha-badge {
-  visibility: hidden !important;
-}
-
 ::ng-deep .mat-mdc-tab-body-content {
   overflow: hidden;
 }

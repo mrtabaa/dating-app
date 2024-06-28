@@ -62,6 +62,12 @@
     }
 }
 
+::ng-deep .grecaptcha-badge {
+    visibility: visible !important;
+    scale: (0.9);
+    z-index: 2;
+}
+
 @media only screen and (min-width: 40rem) {
     .container {
         .warning {
@@ -70,5 +76,9 @@
             left: 50%;
             font-size: 1rem;
         }
+    }
+
+    ::ng-deep .grecaptcha-badge {
+        scale: (1);
     }
 }
