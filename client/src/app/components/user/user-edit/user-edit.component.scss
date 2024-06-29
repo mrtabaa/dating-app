@@ -57,6 +57,7 @@
                     bottom: 0;
                     display: flex;
                     flex-direction: column;
+                    align-self: center;
                     gap: 0.5rem;
                     padding: 0.5rem;
                     border-radius: 1rem 1rem 0 0;
@@ -66,7 +67,7 @@
                     .mobile-buttons {
                         display: flex;
                         justify-content: center;
-                        gap: 1rem;
+                        gap: 0.1rem;
                     }
                 }
             }
