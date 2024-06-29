@@ -103,7 +103,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]]
   });
 
-  recaptchaCtrl: FormControl = this._fb.control(false, [Validators.required]);
+  recaptchaCtrl: FormControl = this._fb.control({ value: false, disabled: true }, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.userEditFg.get('knownAsCtrl') as FormControl;
@@ -148,7 +148,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  disableItemsOnNoChangeValues(): boolean {
+  isAnyValueChanged(): boolean {
     if (
       this.member
       && this.member.knownAs === this.KnownAsCtrl.value
@@ -162,14 +162,18 @@ export class UserEditComponent implements OnInit, OnDestroy {
       && this.member.city === this._googlePlacesService.citySig()
     ) {
 
-      this._commonService.isPreventingLeavingPage = false
+      this._commonService.isPreventingLeavingPage = false;
 
-      return true;
+      this.recaptchaCtrl.disable();
+
+      return false;
     }
 
     this._commonService.isPreventingLeavingPage = true;
 
-    return false;
+    this.recaptchaCtrl.enable();
+
+    return true;
   }
 
   validateRecaptcha(): void {

@@ -1,5 +1,5 @@
 <div class="container">
-    @if (!disableItemsOnNoChangeValues() && !isLoadingSig()) {
+    @if (isAnyValueChanged() && !isLoadingSig() && !isMobileSig()) {
     <mat-card class="warning">
         <mat-card-content>
             <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
@@ -45,14 +45,14 @@
                         <span style="color: palevioletred;">Not a robot? Slide me!</span>
                         }
                         @else {
-                        <span style="color: #ba005c;">Good job!</span>
+                        <span style="color: #ba005c;">Validated</span>
                         }
                     </mat-slide-toggle>
                     <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
-                        || disableItemsOnNoChangeValues()" mat-raised-button color="primary">
+                        || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button color="primary">
                         Save Changes
                     </button>
-                    <button (click)="(initContollersValues(member))" [disabled]="disableItemsOnNoChangeValues()"
+                    <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
                         mat-stroked-button color="warn">
                         Reset
                     </button>
@@ -60,8 +60,10 @@
             </mat-card>
         </section>
         }
-        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab label="Edit About {{KnownAsCtrl.value}}">
+        <mat-tab-group
+            [ngStyle]="{'padding-bottom': editAbout.isActive && isMobileSig() && isAnyValueChanged() ? '2rem' : '0'}"
+            mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
+            <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value }}">
                 <div class="tab-contents">
                     <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
@@ -126,16 +128,28 @@
                         </mat-card>
                         <app-google-places />
 
-                        @if(isMobileSig()) {
-                        <div class="mobile-buttons">
-                            <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
-                                                || disableItemsOnNoChangeValues()" mat-raised-button color="primary">
-                                Save Changes
-                            </button>
-                            <button (click)="(initContollersValues(member))" [disabled]="disableItemsOnNoChangeValues()"
-                                mat-stroked-button color="warn">
-                                Reset
-                            </button>
+                        @if(isMobileSig() && isAnyValueChanged()) {
+                        <div class="mobile-submit">
+                            <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()"
+                                color="primary">
+                                @if(!recaptchaCtrl.value) {
+                                <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                                }
+                                @else {
+                                <span style="color: #ba005c;">Validated</span>
+                                }
+                            </mat-slide-toggle>
+                            <div class="mobile-buttons">
+                                <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
+                                                || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button
+                                    color="primary">
+                                    Save Changes
+                                </button>
+                                <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
+                                    mat-stroked-button color="warn">
+                                    Reset
+                                </button>
+                            </div>
                         </div>
                         }
                     </form>
