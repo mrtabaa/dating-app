@@ -25,6 +25,7 @@ import { ResponsiveService } from '../../../services/responsive.service';
 import { LoadingService } from '../../../services/loading.service';
 import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 
 @Component({
   selector: 'app-user-edit',
@@ -34,7 +35,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     PhotoEditorComponent, DatePickerCvaComponent, GooglePlacesComponent,
     RecaptchaV3Module,
     MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSlideToggleModule,
-    IntlModule
+    IntlModule, ShortenStringPipe
   ],
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']

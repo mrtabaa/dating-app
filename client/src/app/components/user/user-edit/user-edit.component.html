@@ -63,7 +63,7 @@
         <mat-tab-group
             [ngStyle]="{'padding-bottom': editAbout.isActive && isMobileSig() && isAnyValueChanged() ? '2rem' : '0'}"
             mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value }}">
+            <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value | shortenString: isMobileSig() ? 4 : 20}}">
                 <div class="tab-contents">
                     <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
                         <mat-form-field appearaance="outline">
