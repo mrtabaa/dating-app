@@ -1,46 +1,61 @@
-name: Azure Static Web Apps CI/CD
+name: Azure Build and Deploy Static Web App
 
 on:
   push:
     branches:
-      - feature/azure-storage
+      - feature/azure-storage  # Trigger the workflow on push to the feature/azure-storage branch
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - feature/azure-storage
 
 jobs:
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  build-and-upload:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
-      - name: Build And Deploy
-        id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_SAND_07151630F }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+    - name: Checkout GitHub repository
+      uses: actions/checkout@v2
 
-  close_pull_request_job:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20.x'  # Use the appropriate Node.js version for your Angular app
+
+    - name: Install dependencies
+      run: |
+        cd client
+        npm install --legacy-peer-deps
+
+    - name: Build Angular app
+      run: |
+        cd client
+        npm run build --prod
+
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v2
+      with:
+        name: angular-app
+        path: client/dist/client/browser  # Adjusted path to your Angular app’s build output
+
+  deploy:
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
+    needs: build-and-upload
+    environment: 'production'
     steps:
-      - name: Close Pull Request
-        id: closepullrequest
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_SAND_07151630F }}
-          action: "close"
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v2
+      with:
+        name: angular-app
+        path: client/dist/client/browser  # Adjusted path to match the uploaded artifact location
+
+    - name: Deploy to Azure Static Web Apps
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_SALMON_SAND_07151630F }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
+        action: 'upload'
+        app_location: '/'  # Adjust as per your Azure Static Web Apps configuration
+        output_location: 'client/dist/client/browser'  # Path to your build directory from the repository root
+
+    - name: Cleanup
+      run: rm -rf client/dist  # Adjusted cleanup path to remove the Angular build directory
