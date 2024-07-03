@@ -3,11 +3,11 @@ name: Azure => Build and Deploy Static Web App
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the main branch
+      - feature/azure-storage  # Trigger the workflow on push to the main branch
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - main
+      - feature/azure-storage
 
 jobs:
   build-and-deploy:
