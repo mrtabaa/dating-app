@@ -3,7 +3,7 @@ name: Azure => Build and Deploy Static Web App
 on:
   push:
     branches:
-      - feature/azure-storage  # Trigger the workflow on push to the main branch
+      - feature/azure-storage  # Trigger the workflow on push to the feature/azure-storage branch
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -35,7 +35,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: angular-app
-        path: client/dist/client/browser # Update with the path to your Angular app’s build output
+        path: client/dist/client/browser # Path to your Angular app’s build output
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: angular-app
-        path: ./build
+        path: ./angular-app
 
     - name: Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
@@ -54,9 +54,9 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_024A7AE0F }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
-        app_location: 'client' # App base directory
-        output_location: './build/client/browser' # Path to your build directory from the repository root
+        app_location: '/' # App base directory (this might need adjustment based on Azure Static Web Apps configuration)
+        output_location: 'angular-app/client/dist/client/browser' # Path to your build directory from the repository root
         api_location: '' # Optional: if you have an API backend, specify the directory for the API source code here
 
     - name: Cleanup
-      run: rm -rf ./build
+      run: rm -rf ./angular-app
