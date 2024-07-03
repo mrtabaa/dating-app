@@ -54,7 +54,7 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_024A7AE0F }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
-        app_location: '/' # App base directory (this might need adjustment based on Azure Static Web Apps configuration)
+        app_location: 'client' # App base directory (this might need adjustment based on Azure Static Web Apps configuration)
         output_location: 'angular-app/client/dist/client/browser' # Path to your build directory from the repository root
         api_location: '' # Optional: if you have an API backend, specify the directory for the API source code here
 
