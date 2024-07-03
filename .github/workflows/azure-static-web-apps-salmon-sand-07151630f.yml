@@ -55,7 +55,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
         app_location: '/'  # Adjust as per your Azure Static Web Apps configuration
-        output_location: './build/client/dist/client/browser'  # Path to your build directory from the repository root
+        output_location: './build'  # Path to your build directory from the repository root
 
     - name: Cleanup
       run: rm -rf ./build  # Adjusted cleanup path to remove the Angular build directory
