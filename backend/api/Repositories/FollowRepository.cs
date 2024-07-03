@@ -13,8 +13,8 @@ public class FollowRepository : IFollowRepository
 
     // constructor - dependency injections
     public FollowRepository(
-        IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository,
-        IPhotoService photoService, ILogger<FollowRepository> logger
+            IMongoClient client, IMyMongoDbSettings dbSettings, IUserRepository userRepository,
+            IPhotoService photoService, ILogger<FollowRepository> logger
         )
     {
         _client = client; // used for Session
@@ -71,7 +71,7 @@ public class FollowRepository : IFollowRepository
 
         bool IsAlreadyFollowed = await _collection.Find<Follow>(follow =>
             follow.FollowerId == userId && follow.FollowedMemberId == followedMemberId)
-            .AnyAsync(cancellationToken);
+                .AnyAsync(cancellationToken);
 
         if (IsAlreadyFollowed)
         {
@@ -79,14 +79,9 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-        Follow? follow = Mappers.ConvertAppUsertoFollow(userId, followedMemberId.Value);
+        Follow follow = Mappers.ConvertAppUsertoFollow(userId, followedMemberId.Value);
 
-        if (follow is not null)
-        {
-            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsAdded, cancellationToken, follow);
-
-            followStatus.IsSuccess = isSuccess;
-        }
+        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsAdded, cancellationToken, follow);
 
         return followStatus; // Faild for any other reason
     }
@@ -112,10 +107,7 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-        bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsRemoved, cancellationToken);
-
-        if (isSuccess)
-            followStatus.IsSuccess = true;
+        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsRemoved, cancellationToken);
 
         return followStatus;
     }
