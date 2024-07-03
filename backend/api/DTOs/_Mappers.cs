@@ -89,7 +89,7 @@ namespace api.DTOs
             };
         }
 
-        public static Follow? ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId)
+        public static Follow ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId)
         {
             return new Follow(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
@@ -97,6 +97,35 @@ namespace api.DTOs
                     FollowerId: followerId,
                     FollowedMemberId: followedMemberId
                 );
+        }
+
+        public static Message ConvertMessageInDtoToMessage(string content, AppUser loggedInAppUser, AppUser targetAppUser)
+        {
+            return new Message(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                Id: ObjectId.GenerateNewId(),
+                SenderId: loggedInAppUser.Id,
+                SenderUserName: loggedInAppUser.NormalizedUserName ?? "Contact Support!",
+                RecieverId: targetAppUser.Id,
+                ReceiverUserName: targetAppUser.NormalizedUserName ?? "Contact Support!",
+                Content: content,
+                SentOn: DateTime.UtcNow,
+                ReadOn: null,
+                SenderDeleted: false,
+                ReceiverDeleted: false
+            );
+        }
+
+        public static MessageDto ConvertMessageToMessageDto(Message message)
+        {
+            return new MessageDto(
+                Id: message.Id.ToString(),
+                SenderUserName: message.SenderUserName,
+                ReceiverUserName: message.ReceiverUserName,
+                Content: message.Content,
+                ReadOn: message.ReadOn,
+                SentOn: message.SentOn
+            );
         }
 
         #endregion Generator Methods

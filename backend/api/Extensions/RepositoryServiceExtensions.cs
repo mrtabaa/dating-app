@@ -4,6 +4,7 @@ public static class RepositoryServiceExtensions
 {
     public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
     {
+        services.AddScoped<IRecaptchaService, RecaptchaService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
@@ -12,7 +13,7 @@ public static class RepositoryServiceExtensions
         services.AddScoped<IPhotoModifySaveService, PhotoModifySaveService>();
         services.AddScoped<IFollowRepository, FollowRepository>();
         services.AddScoped<IAdminRepository, AdminRepository>();
-        services.AddScoped<IRecaptchaService, RecaptchaService>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
 
         return services;
     }
