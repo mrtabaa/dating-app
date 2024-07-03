@@ -48,13 +48,13 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
         FollowStatus followStatus = await _followRepository.AddFollowAsync(userId.Value, targetMemberUserName, cancellationToken);
 
         return followStatus.IsSuccess // success
-            ? Ok(new Response(Message: $"You are now following '{followStatus.KnownAs}'."))
+            ? Ok(new Response(Message: $"You are now following '{targetMemberUserName}'."))
             : followStatus.IsTargetMemberNotFound
-            ? BadRequest($"'{followStatus.KnownAs}' is not found.")
+            ? NotFound($"'{targetMemberUserName}' is not found.")
             : followStatus.IsFollowingThemself
             ? BadRequest("Following yourself is great but is not stored!")
             : followStatus.IsAlreadyFollowed
-            ? BadRequest($"{followStatus.KnownAs} is already followed.")
+            ? BadRequest($"{targetMemberUserName} is already followed.")
             : BadRequest("Follwoing has failed. Please try again later or contact the support");
     }
 
@@ -68,7 +68,7 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
         FollowStatus followStatus = await _followRepository.RemoveFollowAsync(userId.Value, targetMemberUserName, cancellationToken);
 
         return followStatus.IsSuccess
-            ? Ok(new Response(Message: $"You've unfollowed '{followStatus.KnownAs}'."))
-            : BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support");
+            ? Ok(new Response(Message: $"You've unfollowed '{targetMemberUserName}'."))
+            : BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support.");
     }
 }
