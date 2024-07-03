@@ -23,6 +23,9 @@ import { GooglePlacesService } from '../../../services/google-places.service';
 import { CommonService } from '../../../services/common.service';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { LoadingService } from '../../../services/loading.service';
+import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 
 @Component({
   selector: 'app-user-edit',
@@ -30,24 +33,28 @@ import { LoadingService } from '../../../services/loading.service';
   imports: [
     CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
     PhotoEditorComponent, DatePickerCvaComponent, GooglePlacesComponent,
-    MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule,
-    IntlModule
+    RecaptchaV3Module,
+    MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSlideToggleModule,
+    IntlModule, ShortenStringPipe
   ],
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.scss']
 })
 export class UserEditComponent implements OnInit, OnDestroy {
-  private userService = inject(UserService);
-  private memberService = inject(MemberService);
-  private accountService = inject(AccountService);
-  private googlePlacesService = inject(GooglePlacesService);
-  private commonService = inject(CommonService);
-  private fb = inject(FormBuilder);
-  private matSnak = inject(MatSnackBar);
+  private _userService = inject(UserService);
+  private _memberService = inject(MemberService);
+  private _accountService = inject(AccountService);
+  private _googlePlacesService = inject(GooglePlacesService);
+  private _commonService = inject(CommonService);
+  private _fb = inject(FormBuilder);
+  private _matSnak = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
+  private _recaptchaService = inject(ReCaptchaV3Service);
+  private _recaptchaToken: string | undefined;
 
-  private userEditFgSubscribed: Subscription | undefined;
+  private _userEditFgSubscribed: Subscription | undefined;
+  private _subscribedRecaptcha: Subscription | undefined;
 
   member: Member | undefined;
 
@@ -65,18 +72,22 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.maxDate = new Date(currentYear - 18, 0, 1); // not earlier than 18 years
 
     this.getMember();
+
+    this.validateRecaptcha();
   }
 
   ngOnDestroy(): void {
-    if (this.userEditFgSubscribed)
-      this.userEditFgSubscribed.unsubscribe();
+    if (this._userEditFgSubscribed)
+      this._userEditFgSubscribed.unsubscribe();
+
+    this._subscribedRecaptcha?.unsubscribe();
   }
 
   getMember(): void {
     const loggedInUser: LoggedInUser | null = this.getLoggedInUserLocalStorage();
 
     if (loggedInUser)
-      this.memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
+      this._memberService.getMemberByUsername(loggedInUser.userName)?.pipe(take(1)).subscribe(member => {
         if (member) {
           this.member = member;
 
@@ -85,13 +96,15 @@ export class UserEditComponent implements OnInit, OnDestroy {
       });
   }
 
-  userEditFg: FormGroup = this.fb.group({
+  userEditFg: FormGroup = this._fb.group({
     knownAsCtrl: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     dateOfBirthCtrl: [null, [Validators.required]],
     introductionCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
     lookingForCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
-    interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]],
+    interestsCtrl: ['', [Validators.maxLength(this.maxTextAreaChars)]]
   });
+
+  recaptchaCtrl: FormControl = this._fb.control({ value: false, disabled: true }, [Validators.required]);
 
   get KnownAsCtrl(): AbstractControl {
     return this.userEditFg.get('knownAsCtrl') as FormControl;
@@ -115,11 +128,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.IntroductionCtrl.setValue(member.introduction);
     this.LookingForCtrl.setValue(member.lookingFor);
     this.InterestsCtrl.setValue(member.interests);
-    this.googlePlacesService.isCountrySelectedSig.set(true);
-    this.googlePlacesService.countryAcrSig.set(member.countryAcr);
-    this.googlePlacesService.countrySig.set(member.country);
-    this.googlePlacesService.stateSig.set(member.state);
-    this.googlePlacesService.citySig.set(member.city);
+    this._googlePlacesService.isCountrySelectedSig.set(true);
+    this._googlePlacesService.countryAcrSig.set(member.countryAcr);
+    this._googlePlacesService.countrySig.set(member.country);
+    this._googlePlacesService.stateSig.set(member.state);
+    this._googlePlacesService.citySig.set(member.city);
   }
 
   updateMemberAfterUpdateSucceed(): void {
@@ -129,14 +142,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
       this.member.introduction = this.IntroductionCtrl.value;
       this.member.lookingFor = this.LookingForCtrl.value;
       this.member.interests = this.InterestsCtrl.value;
-      this.member.countryAcr = this.googlePlacesService.countryAcrSig() as string;
-      this.member.country = this.googlePlacesService.countrySig() as string;
-      this.member.state = this.googlePlacesService.stateSig() as string;
-      this.member.city = this.googlePlacesService.citySig() as string;
+      this.member.countryAcr = this._googlePlacesService.countryAcrSig() as string;
+      this.member.country = this._googlePlacesService.countrySig() as string;
+      this.member.state = this._googlePlacesService.stateSig() as string;
+      this.member.city = this._googlePlacesService.citySig() as string;
     }
   }
 
-  disableItemsOnNoChangeValues(): boolean {
+  isAnyValueChanged(): boolean {
     if (
       this.member
       && this.member.knownAs === this.KnownAsCtrl.value
@@ -144,24 +157,33 @@ export class UserEditComponent implements OnInit, OnDestroy {
       && this.member.introduction === this.IntroductionCtrl.value
       && this.member.lookingFor === this.LookingForCtrl.value
       && this.member.interests === this.InterestsCtrl.value
-      && this.member.countryAcr === this.googlePlacesService.countryAcrSig()
-      && this.member.country === this.googlePlacesService.countrySig()
-      && this.member.state === this.googlePlacesService.stateSig()
-      && this.member.city === this.googlePlacesService.citySig()
+      && this.member.countryAcr === this._googlePlacesService.countryAcrSig()
+      && this.member.country === this._googlePlacesService.countrySig()
+      && this.member.state === this._googlePlacesService.stateSig()
+      && this.member.city === this._googlePlacesService.citySig()
     ) {
 
-      this.commonService.isPreventingLeavingPage = false
+      this._commonService.isPreventingLeavingPage = false;
 
-      return true;
+      this.recaptchaCtrl.disable();
+
+      return false;
     }
 
-    this.commonService.isPreventingLeavingPage = true;
+    this._commonService.isPreventingLeavingPage = true;
 
-    return false;
+    this.recaptchaCtrl.enable();
+
+    return true;
+  }
+
+  validateRecaptcha(): void {
+    this._subscribedRecaptcha = this._recaptchaService.execute('edit').subscribe(
+      (token: string) => this._recaptchaToken = token);
   }
 
   updateUser(member: Member): void {
-    if (member) {
+    if (member && this._recaptchaToken) {
       const updatedUser: UserUpdate = {
         username: member.userName,
         knownAs: this.KnownAsCtrl.value,
@@ -169,26 +191,26 @@ export class UserEditComponent implements OnInit, OnDestroy {
         introduction: this.IntroductionCtrl.value,
         lookingFor: this.LookingForCtrl.value,
         interests: this.InterestsCtrl.value,
-        countryAcr: this.googlePlacesService.countryAcrSig() as string,
-        country: this.googlePlacesService.countrySig() as string,
-        state: this.googlePlacesService.stateSig() as string,
-        city: this.googlePlacesService.citySig() as string,
+        countryAcr: this._googlePlacesService.countryAcrSig() as string,
+        country: this._googlePlacesService.countrySig() as string,
+        state: this._googlePlacesService.stateSig() as string,
+        city: this._googlePlacesService.citySig() as string,
         isProfileCompleted: true
       }
 
-      this.userService.updateUser(updatedUser)
+      this._userService.updateUser(updatedUser)
         .pipe(take(1))
         .subscribe({
           next: (response: ApiResponseMessage) => {
             if (response.message) {
-              this.matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
+              this._matSnak.open(response.message, "Close", { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 10000 });
 
               const loggedInUser: LoggedInUser | null = this.getLoggedInUserLocalStorage();
 
               if (loggedInUser) {
                 loggedInUser.knownAs = this.KnownAsCtrl.value;
 
-                this.accountService.setCurrentUser(loggedInUser);
+                this._accountService.setCurrentUser(loggedInUser);
 
                 this.updateMemberAfterUpdateSucceed();
               }

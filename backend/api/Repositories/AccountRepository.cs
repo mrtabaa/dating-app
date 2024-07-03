@@ -38,7 +38,7 @@ public class AccountRepository : IAccountRepository
 
         if (!isValid)
         {
-            loggedInDto.IsTurnstileTokenInvalid = true;
+            loggedInDto.IsRecaptchaTokenInvalid = true;
 
             return loggedInDto;
         }
@@ -83,7 +83,7 @@ public class AccountRepository : IAccountRepository
 
         if (!isValid)
         {
-            loggedInDto.IsTurnstileTokenInvalid = true;
+            loggedInDto.IsRecaptchaTokenInvalid = true;
 
             return loggedInDto;
         }

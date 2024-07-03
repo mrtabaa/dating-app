@@ -4,8 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5100/api/',
-  turnstileSiteKey: '0x4AAAAAAAbhVW2R7apa2VTG'
+  apiUrl: 'http://localhost:5100/api/'
 };
 
 /*

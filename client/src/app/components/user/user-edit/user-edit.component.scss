@@ -28,6 +28,14 @@
                 flex-direction: column;
                 gap: 0.5rem;
 
+                mat-slide-toggle {
+                    align-self: flex-start;
+
+                    .recaptcha-message {
+                        color: palevioletred;
+                    }
+                }
+
                 button {
 
                     width: 100%;
@@ -40,12 +48,27 @@
             flex-grow: 3;
 
             .tab-contents {
+                position: relative;
                 padding: 1rem 0;
 
-                .mobile-buttons {
+                .mobile-submit {
+                    background-color: white;
+                    position: fixed;
+                    bottom: 0;
                     display: flex;
-                    justify-content: center;
-                    gap: 1rem;
+                    flex-direction: column;
+                    align-self: center;
+                    gap: 0.5rem;
+                    padding: 0.5rem;
+                    border-radius: 1rem 1rem 0 0;
+                    border: solid rgb(185, 185, 185) 1px;
+                    z-index: 1;
+
+                    .mobile-buttons {
+                        display: flex;
+                        justify-content: center;
+                        gap: 0.1rem;
+                    }
                 }
             }
 
@@ -62,6 +85,12 @@
     }
 }
 
+::ng-deep .grecaptcha-badge {
+    visibility: visible !important;
+    scale: (0.9);
+    z-index: 1;
+}
+
 @media only screen and (min-width: 40rem) {
     .container {
         .warning {
@@ -70,5 +99,9 @@
             left: 50%;
             font-size: 1rem;
         }
+    }
+
+    ::ng-deep .grecaptcha-badge {
+        scale: (1);
     }
 }

@@ -31,11 +31,23 @@ public class UserRepository : IUserRepository
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
       await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
-    public async Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-         await _collection.AsQueryable<AppUser>()
-            .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
-            .Select(appUser => appUser.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+    /// <summary>
+    /// Obtain userId using userName. Check if ObjectId.HasValue and is NOT ObjectId.Empty.
+    /// </summary>
+    /// <param name="userName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>userId / null if !HasValue or Empty</returns>
+    public async Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+    {
+        ObjectId? userId = await _collection.AsQueryable<AppUser>()
+           .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
+           .Select(appUser => appUser.Id)
+           .SingleOrDefaultAsync(cancellationToken);
+
+        return userId is null || !userId.HasValue || userId.Equals(ObjectId.Empty)
+        ? null
+        : userId;
+    }
 
     public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>
         await _collection.AsQueryable<AppUser>()

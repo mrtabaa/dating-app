@@ -51,6 +51,13 @@ export class AccountService {
       );
   }
 
+  registerDemo(userInput: UserRegister): Observable<LoggedInUser | null> {
+    return this.http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
+      .pipe(
+        map((user: LoggedInUser) => { return user ? user : null })
+      );
+  }
+
   /**
    * Check if user's token is still valid or log them out. 
    * Called in app.component.ts

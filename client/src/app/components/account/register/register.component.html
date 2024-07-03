@@ -34,19 +34,27 @@
                 <mat-error>Password entries don't match.</mat-error>
                 }
             </div>
-
             <!-- show api errors -->
-            @if(emailExistsErrorMessage) {
-            <div>
-                <mat-error>{{emailExistsErrorMessage}}</mat-error>
-            </div>
+            @if(errorMessages) {
+            <ul>
+                @for (error of errorMessages; track $index) {
+                <li>
+                    <mat-error>{{error}}</mat-error>
+                </li>
+                }
+            </ul>
             }
+            <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+                @if(!RecaptchaCtrl.value) {
+                <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                }
+                @else {
+                <span style="color: #ba005c;">Validated</span>
+                }
+            </mat-slide-toggle>
+            <button type="submit" [disabled]="registerFg.invalid || !RecaptchaCtrl.value" mat-raised-button
+                color="primary" class="submitBtn">Register</button>
+            <!-- <p>{{registerFg.errors | json}}</p> -->
         </div>
-        @if(isRegisterShownIn) {
-        <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" />
-        }
-        <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
-            class="submitBtn">Register</button>
-        <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
 </form>

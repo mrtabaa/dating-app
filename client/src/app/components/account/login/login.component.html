@@ -1,11 +1,33 @@
-<form [formGroup]="loginFg" (ngSubmit)="loginFg.value">
+<form [formGroup]="loginFg" (ngSubmit)="loginEmailUsername()">
     <div class="container">
+        @if(router.url === '/demo' && !hasLoginCreds) {
+        <div class="demo">
+            <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+                @if(!RecaptchaCtrl.value) {
+                <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                }
+                @else {
+                <span style="color: #ba005c;">Validated</span>
+                }
+            </mat-slide-toggle>
+            <button type="button" (click)="generateMemberCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
+                Generate demo member
+            </button>
+            <button type="button" (click)="enterAdminCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
+                Admin creds
+            </button>
+            <button type="button" (click)="hasLoginCreds = true" mat-button>
+                Already have login creds?
+            </button>
+        </div>
+        }
+        @else {
         <div class="inputs">
             @if(
             router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com"
             && PasswordCtrl.valid && EmailUsernameCtrl.valid) {
             <p class="demo-text">
-                NOTE: Keep the generated username & password to login again. <br />
+                NOTE: Keep the generated username & password to login again with it! <br />
                 <span>Username/Email:</span> {{EmailUsernameCtrl.value}}
                 <br />
                 <span>Password:</span> {{PasswordCtrl.value}}
@@ -21,17 +43,18 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
-        @if(router.url !== '/demo' && isLoginShownIn) {
-        <mat-slide-toggle class="recaptcha" [formControl]="RecaptchaTokenCtrl" (click)="validateRecaptcha()"
-            color="primary">
-            Not a robot? Slide me!
+        <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+            @if(!RecaptchaCtrl.value) {
+            <span style="color: palevioletred;">Not a robot? Slide me!</span>
+            }
+            @else {
+            <span style="color: #ba005c;">Validated</span>
+            }
         </mat-slide-toggle>
-        }
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" (click)="loginEmailUsername()"
-                    [disabled]="loginFg.invalid || RecaptchaTokenCtrl.value === false" class="submitBtn"
+                <button type="submit" [disabled]="loginFg.invalid || !RecaptchaCtrl.value" class="submitBtn"
                     mat-raised-button color="primary">
                     Sign in
                 </button>
@@ -39,24 +62,7 @@
             <div class="recovery">
                 <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
             </div>
-            @if(router.url === '/demo') {
-            <mat-divider />
-            <div class="demo">
-                @if(isLoginShownIn) {
-                <!-- <app-turnstile [turnstileCtrlIn]="TurnsTileCtrl" /> -->
-                }
-                <div class="demo-buttons">
-                    <button (click)="enterAdminCreds()" [disabled]="RecaptchaTokenCtrl.invalid" mat-stroked-button
-                        color="warn">
-                        Admin creds
-                    </button>
-                    <button (click)="generateMemberCreds()" [disabled]="RecaptchaTokenCtrl.invalid" mat-stroked-button
-                        color="warn">
-                        Generate demo member
-                    </button>
-                </div>
-            </div>
-            }
         </div>
+        }
     </div>
 </form>

@@ -38,7 +38,7 @@ public static class ApplicationServiceExtensions
         };
         #endregion Azure storage
 
-        #region Others
+        #region CORS
         services.AddCors(options =>
         {
             if (env.IsDevelopment())
@@ -59,8 +59,12 @@ public static class ApplicationServiceExtensions
             }
         });
 
+        #endregion CORS
+
+        #region Others
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
 
+        services.AddHttpClient();
         #endregion Others
 
         return services;

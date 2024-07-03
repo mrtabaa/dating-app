@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -12,40 +12,41 @@ import { MatRadioModule } from '@angular/material/radio';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NgxTurnstileModule, NgxTurnstileFormsModule } from "ngx-turnstile"; // CloudFlare
-import { TurnstileComponent } from '../../_helpers/turnstile/turnstile.component';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,
-    NgxTurnstileModule, NgxTurnstileFormsModule,
-    InputCvaComponent, DatePickerCvaComponent, TurnstileComponent,
-    MatButtonModule, MatInputModule, MatRadioModule
+    InputCvaComponent, DatePickerCvaComponent,
+    MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit, OnDestroy {
-  private accountService = inject(AccountService);
-  private router = inject(Router);
-  private fb = inject(FormBuilder);
-  private snackBar = inject(MatSnackBar);
+  private _accountService = inject(AccountService);
+  private _router = inject(Router);
+  private _fb = inject(FormBuilder);
+  private _snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
-
-  @Input() isRegisterShownIn = false;
+  private _recaptchaService = inject(ReCaptchaV3Service);
+  private _recaptchaToken: string | undefined;
 
   minDate = new Date();
   maxDate = new Date();
-  emailExistsErrorMessage: string | undefined;
+  errorMessages: string[] | undefined;
 
-  subscriptionRegisterUser!: Subscription;
+  private _subscribedRegisterUser!: Subscription;
+  private _subscribedRecaptcha: Subscription | undefined;
 
   //#region Base
   ngOnInit() {
     this.registerFg;
+    this.validateRecaptcha();
 
     // set datePicker year limitations
     const currentYear = new Date().getFullYear();
@@ -54,20 +55,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscriptionRegisterUser)
-      this.subscriptionRegisterUser.unsubscribe();
+    if (this._subscribedRegisterUser)
+      this._subscribedRegisterUser.unsubscribe();
+
+    this._subscribedRecaptcha?.unsubscribe();
   }
   //#endregion
 
   //#region Forms Group/controler
-  registerFg = this.fb.group({
+  registerFg = this._fb.group({
     emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
     dateOfBirthCtrl: ['', [Validators.required]],
     genderCtrl: ['female', [Validators.required]],
-    turnsTileCtrl: [null, [Validators.required]]
+    recaptchaCtrl: [false, [Validators.required]],
   }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
   //#endregion
 
@@ -91,38 +94,45 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get GenderCtrl(): FormControl {
     return this.registerFg.get('genderCtrl') as FormControl;
   }
-  get TurnsTileCtrl(): FormControl {
-    return this.registerFg.get('turnsTileCtrl') as FormControl;
+  get RecaptchaCtrl(): FormControl {
+    return this.registerFg.get('recaptchaCtrl') as FormControl;
   }
   //#endregion
 
-
   //#region Methods
+
+  validateRecaptcha(): void {
+    this._subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
+      (token: string) => this._recaptchaToken = token);
+  }
+
   registerUser(): void {
-    const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
+    if (this._recaptchaToken) {
+      const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
-    const userRegisterInput: UserRegister = {
-      email: this.EmailCtrl.value,
-      username: this.UsernameCtrl.value,
-      password: this.PasswordCtrl.value,
-      confirmPassword: this.ConfirmPasswordCtrl.value,
-      dateOfBirth: dob,
-      gender: this.GenderCtrl.value,
-      turnsTileToken: this.TurnsTileCtrl.value
-    };
+      const userRegisterInput: UserRegister = {
+        email: this.EmailCtrl.value,
+        username: this.UsernameCtrl.value,
+        password: this.PasswordCtrl.value,
+        confirmPassword: this.ConfirmPasswordCtrl.value,
+        dateOfBirth: dob,
+        gender: this.GenderCtrl.value,
+        recaptchaToken: this._recaptchaToken
+      };
 
-    this.subscriptionRegisterUser = this.accountService.register(userRegisterInput)
-      .subscribe({
-        next: res => {
-          this.router.navigate(['/main']);
-          this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
-        },
-        error: err => this.emailExistsErrorMessage = err.error,
-        complete: () => console.log('Register successful.')
-      });
+      this._subscribedRegisterUser = this._accountService.register(userRegisterInput)
+        .subscribe({
+          next: res => {
+            this._router.navigate(['/main']);
+            this._snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+          },
+          error: err => this.errorMessages = err.error,
+          complete: () => console.log('Register successful.')
+        });
 
-    // to show validation mat-error on submit button (also added to DOM mat-error)
-    this.registerFg.markAllAsTouched();
+      // to show validation mat-error on submit button (also added to DOM mat-error)
+      this.registerFg.markAllAsTouched();
+    }
   }
 
   private getDateOnly(dob: string | null): string | undefined {

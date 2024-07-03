@@ -6,5 +6,5 @@ export interface LoggedInUser {
     profilePhotoUrl: string | undefined;
     roles: string[];
     isProfileCompleted: boolean;
-    turnstileToken: string;
+    recaptchaToken: string;
 }

@@ -12,6 +12,7 @@ public static class RepositoryServiceExtensions
         services.AddScoped<IPhotoModifySaveService, PhotoModifySaveService>();
         services.AddScoped<IFollowRepository, FollowRepository>();
         services.AddScoped<IAdminRepository, AdminRepository>();
+        services.AddScoped<IRecaptchaService, RecaptchaService>();
 
         return services;
     }

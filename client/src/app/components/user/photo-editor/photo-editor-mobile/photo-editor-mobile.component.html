@@ -21,7 +21,7 @@
                 <img ngSrc="{{photo.url_165}}" width="40" height="40" priority alt="{{memberIn.knownAs}} photo">
                 <div class="buttons">
                     <button class="set-main" (click)="setMainPhoto(photo.url_165)" mat-stroked-button color="primary"
-                        [disabled]="photo.isMain">Set profile</button>
+                        [disabled]="photo.isMain">Set</button>
                     <button (click)="deletePhoto(photo.url_165, $index)" mat-mini-fab color="warn">
                         <mat-icon>delete</mat-icon>
                     </button>
