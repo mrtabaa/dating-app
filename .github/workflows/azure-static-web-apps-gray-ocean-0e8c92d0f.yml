@@ -4,14 +4,14 @@ on:
   push:
     branches:
       - feature/azure-storage  # Trigger the workflow on push to the feature/azure-storage branch
-    paths:
-      - 'client/**'
+    # paths:
+    #   - 'client/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - feature/azure-storage
-    paths:
-      - 'client/**'
+    # paths:
+    #   - 'client/**'
 
 jobs:
   build-and-upload:
