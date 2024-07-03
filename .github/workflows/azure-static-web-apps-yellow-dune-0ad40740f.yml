@@ -1,4 +1,4 @@
-name: Azure => Build and Deploy Static Web App
+name: Azure Build and Deploy Static Web App
 
 on:
   push:
@@ -17,9 +17,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v2
       with:
-        node-version: '20.x'  # Use the appropriate Node.js version for your Angular app
+        node-version: '14'  # Use the appropriate Node.js version for your Angular app
 
     - name: Install dependencies
       run: |
@@ -35,7 +35,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: angular-app
-        path: client/dist/client/browser # Path to your Angular app’s build output
+        path: client/dist/client/browser  # Adjusted path to your Angular app’s build output
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: angular-app
-        path: ./build
+        path: client/dist/client/browser  # Adjusted path to match the uploaded artifact location
 
     - name: Deploy to Azure Static Web Apps
       uses: Azure/static-web-apps-deploy@v1
@@ -54,9 +54,8 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_DUNE_0AD40740F }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
-        app_location: '/' # Adjust as per your Azure Static Web Apps configuration
-        output_location: 'client/dist/client/browser' # Path to your build directory from the repository root
-        api_location: '' # Optional: if you have an API backend, specify the directory for the API source code here
+        app_location: '/'  # Adjust as per your Azure Static Web Apps configuration
+        output_location: 'client/dist/client/browser'  # Path to your build directory from the repository root
 
     - name: Cleanup
-      run: rm -rf ./build
+      run: rm -rf client/dist  # Adjusted cleanup path to remove the Angular build directory
