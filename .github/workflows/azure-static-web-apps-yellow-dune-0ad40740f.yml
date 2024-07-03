@@ -10,7 +10,7 @@ on:
       - feature/azure-storage
 
 jobs:
-  build-and-deploy:
+  build-and-upload:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout GitHub repository
@@ -39,7 +39,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-deploy
+    needs: build-and-upload
     environment: 'production'
     steps:
     - name: Download artifact from build job
@@ -54,7 +54,7 @@ jobs:
         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_DUNE_0AD40740F }}
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
-        app_location: 'client' # Adjust as per your Azure Static Web Apps configuration
+        app_location: '/client' # Adjust as per your Azure Static Web Apps configuration
         output_location: 'client/dist/client/browser' # Path to your build directory from the repository root
         api_location: '' # Optional: if you have an API backend, specify the directory for the API source code here
 
