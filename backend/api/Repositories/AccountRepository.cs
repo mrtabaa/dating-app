@@ -119,7 +119,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoggedInDto?> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 
@@ -132,7 +132,7 @@ public class AccountRepository : IAccountRepository
 
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(userIdHashed, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
         if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
 

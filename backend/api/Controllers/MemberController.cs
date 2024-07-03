@@ -13,7 +13,7 @@ public class MemberController(
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge");
 
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
@@ -52,7 +52,7 @@ public class MemberController(
     [HttpGet("id/{memberId}")]
     public async Task<ActionResult<MemberDto>> GetById(string memberId, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
@@ -69,7 +69,7 @@ public class MemberController(
     [HttpGet("username/{userName}")]
     public async Task<ActionResult<MemberDto>> GetByUserName(string userName, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 

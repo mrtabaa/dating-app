@@ -75,12 +75,13 @@ public class TokenService : ITokenService
     }
 
     /// <summary>
-    /// Get a hashed ObjecdId of the AppUser and return the user's actual ObjectId from DB or null if conversion failes.
+    /// Gets a the userIdHashed of the AppUser and returns the user's actual ObjectId from DB. 
+    /// It returns null if ObjectId or userIdHashed is invalid, Empty or null. 
     /// </summary>
     /// <param name="userIdHashed"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Decrypted AppUser ObjedId OR null</returns>
-    public async Task<ObjectId?> GetActualUserId(string? userIdHashed, CancellationToken cancellationToken)
+    public async Task<ObjectId?> GetActualUserIdAsync(string? userIdHashed, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(userIdHashed)) return null;
 

@@ -8,7 +8,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     [HttpPut]
     public async Task<ActionResult> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
@@ -29,7 +29,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     {
         if (file is null) return BadRequest("No file is selected with this request.");
 
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
@@ -48,7 +48,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     [HttpPut("set-main-photo")]
     public async Task<ActionResult> SetMainPhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 
@@ -62,7 +62,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     [HttpDelete("delete-one-photo")]
     public async Task<ActionResult<PhotoDeleteResponse>> DeleteOnePhoto(string photoUrlIn, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return BadRequest("User id is invalid. Login again.");
 

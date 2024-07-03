@@ -6,13 +6,13 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto>>> GetFollows([FromQuery] FollowParams followParams, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         PagedList<AppUser>? pagedAppUsers = await _followRepository.GetFollowMembersAsync(userId.Value, followParams, cancellationToken);
 
-        if (pagedAppUsers is null) return BadRequest("Getting members faild");
+        if (pagedAppUsers is null) return BadRequest("Getting members faild.");
 
         if (pagedAppUsers.Count == 0) return NoContent();
 
@@ -41,9 +41,9 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
     [HttpPost("{targetMemberUserName}")]
     public async Task<ActionResult> Add(string targetMemberUserName, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         FollowStatus followStatus = await _followRepository.AddFollowAsync(userId.Value, targetMemberUserName, cancellationToken);
 
@@ -55,20 +55,22 @@ public class FollowController(IFollowRepository _followRepository, ITokenService
             ? BadRequest("Following yourself is great but is not stored!")
             : followStatus.IsAlreadyFollowed
             ? BadRequest($"{targetMemberUserName} is already followed.")
-            : BadRequest("Follwoing has failed. Please try again later or contact the support");
+            : BadRequest("Follwoing failed. Please try again later or contact the support");
     }
 
     [HttpDelete("{targetMemberUserName}")]
     public async Task<ActionResult> Delete(string targetMemberUserName, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserId(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         FollowStatus followStatus = await _followRepository.RemoveFollowAsync(userId.Value, targetMemberUserName, cancellationToken);
 
         return followStatus.IsSuccess
             ? Ok(new Response(Message: $"You've unfollowed '{targetMemberUserName}'."))
-            : BadRequest("Operation failed. Is member already unfollowed?! Please try again later or contact the support.");
+            : followStatus.IsTargetMemberNotFound
+            ? NotFound($"'{targetMemberUserName}' is not found.")
+            : BadRequest("Unfollowing failed. Is member already unfollowed?! Please try again later or contact the support.");
     }
 }
