@@ -55,7 +55,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
         action: 'upload'
         app_location: 'client' # App base directory
-        output_location: 'build/client/browser # Path to your build directory from the repository root
+        output_location: 'build/client/browser' # Path to your build directory from the repository root
         api_location: '' # Optional: if you have an API backend, specify the directory for the API source code here
 
     - name: Cleanup
