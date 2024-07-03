@@ -55,26 +55,23 @@ public class FollowRepository : IFollowRepository
     {
         FollowStatus followStatus = new();
 
-        AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
+        ObjectId? followedMemberId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
 
-        if (followedMember is null)
+        if (followedMemberId is null)
         {
             followStatus.IsTargetMemberNotFound = true;
             return followStatus;
         }
 
-        if (userId == followedMember.Id)
+        if (userId == followedMemberId)
         {
             followStatus.IsFollowingThemself = true;
             return followStatus;
         }
 
         bool IsAlreadyFollowed = await _collection.Find<Follow>(follow =>
-            follow.FollowerId == userId && follow.FollowedMemberId == followedMember.Id)
+            follow.FollowerId == userId && follow.FollowedMemberId == followedMemberId)
             .AnyAsync(cancellationToken);
-
-        // set knownAs to show in controller's messages
-        followStatus.KnownAs = followedMember.KnownAs;
 
         if (IsAlreadyFollowed)
         {
@@ -82,11 +79,11 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-        Follow? follow = Mappers.ConvertAppUsertoFollow(userId, followedMember);
+        Follow? follow = Mappers.ConvertAppUsertoFollow(userId, followedMemberId.Value);
 
         if (follow is not null)
         {
-            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMember.Id, FollowAddOrRemove.IsAdded, cancellationToken, follow);
+            bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsAdded, cancellationToken, follow);
 
             followStatus.IsSuccess = isSuccess;
         }
@@ -107,18 +104,15 @@ public class FollowRepository : IFollowRepository
     {
         FollowStatus followStatus = new();
 
-        AppUser? followedMember = await _userRepository.GetByUserNameAsync(followedMemberUserName, cancellationToken);
+        ObjectId? followedMemberId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
 
-        if (followedMember is null)
+        if (followedMemberId is null)
         {
             followStatus.IsTargetMemberNotFound = true;
             return followStatus;
         }
 
-        // set knownAs to show in controller's messages
-        followStatus.KnownAs = followedMember.KnownAs;
-
-        bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMember.Id, FollowAddOrRemove.IsRemoved, cancellationToken);
+        bool isSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsRemoved, cancellationToken);
 
         if (isSuccess)
             followStatus.IsSuccess = true;

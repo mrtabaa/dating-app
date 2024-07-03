@@ -89,13 +89,13 @@ namespace api.DTOs
             };
         }
 
-        public static Follow? ConvertAppUsertoFollow(ObjectId? followerId, AppUser followedMember)
+        public static Follow? ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId)
         {
             return new Follow(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                     Id: ObjectId.GenerateNewId(),
                     FollowerId: followerId,
-                    FollowedMemberId: followedMember.Id
+                    FollowedMemberId: followedMemberId
                 );
         }
 
