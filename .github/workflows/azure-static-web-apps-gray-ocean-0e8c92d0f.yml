@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - feature/azure-storage
+    paths:
+      - 'client/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - feature/azure-storage
+    paths:
+      - 'client/**'
 
 jobs:
   build_and_deploy_job:
