@@ -42,6 +42,7 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "client" # App source code path
           output_location: "client/dist/client" # Built app content directory - optionals
+          app_build_command: "npm install --legacy-peer-deps && npm run build --configuration=production"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
