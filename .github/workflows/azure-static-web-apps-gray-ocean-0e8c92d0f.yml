@@ -39,6 +39,8 @@ jobs:
           api_location: "" # Api source code path - optional
           output_location: "dist/client/browser" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
+      - name: Create output directory
+        run: mkdir -p dist/client/browser
       - name: Copy routes.json to build output directory
         run: cp client/routes.json dist/client/browser
 
