@@ -41,8 +41,11 @@ jobs:
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "client" # App source code path
-          output_location: "client/dist/client" # Built app content directory
+          output_location: "client/dist/client/browser" # Built app content directory
+          app_build_command: "npm install --legacy-peer-deps && npm run build --configuration=production"
+          api_location: ""
           ###### End of Repository/Build Configurations ######
+          node_version: "20.x"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
