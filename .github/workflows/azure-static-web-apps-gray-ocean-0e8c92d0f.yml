@@ -25,6 +25,12 @@ jobs:
         with:
           node-version: '20.x'  # Specify Node.js version 20.x
 
+      - name: npm install, build
+        working-directory: client
+        run: |
+          npm install --legacy-peer-deps
+          npm run build --configuration=production
+          
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -36,7 +42,6 @@ jobs:
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
           app_location: "client" # App source code path
           output_location: "client/dist/client" # Built app content directory - optionals
-          app_build_command: "npm install --legacy-peer-deps && npm run build --configuration=production"
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
