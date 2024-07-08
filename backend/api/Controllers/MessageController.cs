@@ -89,8 +89,8 @@ public class MessageController(
     private async Task<IEnumerable<AppUser>> GetAllMembers(PagedList<Message> pagedMessages, CancellationToken cancellationToken)
     {
         // Get all Ids in the messages (sender & receiver)
-        IEnumerable<ObjectId> allIds = pagedMessages.Select(m => m.SenderId)
-            .Concat(pagedMessages.Select(m => m.Id))
+        IEnumerable<ObjectId> allIds = pagedMessages.Select(message => message.SenderId) // Get senders' Ids
+            .Concat(pagedMessages.Select(message => message.RecieverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
         return await _memberRepository.GetMembersByIdsAsync(allIds, cancellationToken);
