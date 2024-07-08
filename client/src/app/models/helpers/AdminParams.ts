@@ -1,5 +1,5 @@
-import { BaseParams } from "./BaseParams";
+import { PaginationParams } from "./paginationParams";
 
-export class AdminParams extends BaseParams {
+export class AdminParams extends PaginationParams {
     search: string | undefined;
 }

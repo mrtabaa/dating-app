@@ -1,4 +1,4 @@
-export class BaseParams {
+export class PaginationParams {
     pageNumber = 1;
     pageSize = 9;
 }

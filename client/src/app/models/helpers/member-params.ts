@@ -1,6 +1,6 @@
-import { BaseParams } from "./BaseParams";
+import { PaginationParams } from "./paginationParams";
 
-export class MemberParams extends BaseParams {
+export class MemberParams extends PaginationParams {
     gender: string;
     minAge = 18;
     maxAge = 99;
