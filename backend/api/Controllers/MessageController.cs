@@ -4,8 +4,9 @@ namespace api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class MessageController(
-    ITokenService _tokenService, IMessageRepository _messageRepository,
-    IUserRepository _userRepository, IMemberRepository _memberRepository) : BaseApiController
+        ITokenService _tokenService, IMessageRepository _messageRepository, IUserRepository _userRepository,
+        IMemberRepository _memberRepository, IPhotoService _photoService
+    ) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
@@ -46,6 +47,16 @@ public class MessageController(
 
         IEnumerable<AppUser> targetMembers = await GetAllMembers(pagedMessages, cancellationToken);
 
+        foreach (AppUser targetMember in targetMembers)
+        {
+            Photo? profilePhoto = targetMember.Photos.FirstOrDefault(photo => photo.IsMain);
+
+            string? sasUrl = _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhoto?.Url_165);
+
+            if (!(profilePhoto is null || string.IsNullOrEmpty(sasUrl)))
+                profilePhoto.Url_165 = sasUrl;
+        }
+
         foreach (var message in pagedMessages)
         {
             messageDtos.Add(Mappers.ConvertMessageToMessageDto(message, loggedInUser, targetMembers));
@@ -60,6 +71,8 @@ public class MessageController(
         IEnumerable<ObjectId> allIds = pagedMessages.Select(message => message.SenderId) // Get senders' Ids
             .Concat(pagedMessages.Select(message => message.RecieverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
+
+
 
         return await _memberRepository.GetMembersByIdsAsync(allIds, cancellationToken);
     }
