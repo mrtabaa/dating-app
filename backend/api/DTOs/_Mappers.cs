@@ -123,10 +123,10 @@ namespace api.DTOs
                 return 
                     new MessageDto(
                         Id: message.Id.ToString(),
-                        Content: message.Content,
                         SenderUserName: loggedInUser.UserName,
                         ReceiverUserName: targetMember?.UserName,
                         TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        Content: message.Content,
                         ReadOn: message.ReadOn,
                         SentOn: message.SentOn
                     );
@@ -138,10 +138,10 @@ namespace api.DTOs
                 return
                     new MessageDto( // sender is targetMember
                         Id: message.Id.ToString(),
-                        Content: message.Content,
                         SenderUserName: targetMember?.UserName,
                         ReceiverUserName: loggedInUser.UserName,
                         TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        Content: message.Content,
                         ReadOn: message.ReadOn,
                         SentOn: message.SentOn
                     );
