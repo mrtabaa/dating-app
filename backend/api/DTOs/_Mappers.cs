@@ -99,16 +99,14 @@ namespace api.DTOs
                 );
         }
 
-        public static Message ConvertMessageInDtoToMessage(string content, AppUser loggedInAppUser, AppUser targetAppUser)
+        public static Message ConvertMessageInDtoToMessage(string content, ObjectId userId, ObjectId receiverId)
         {
             return new Message(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 Id: ObjectId.GenerateNewId(),
-                SenderId: loggedInAppUser.Id,
-                SenderUserName: loggedInAppUser.NormalizedUserName ?? "Contact Support!",
-                RecieverId: targetAppUser.Id,
-                ReceiverUserName: targetAppUser.NormalizedUserName ?? "Contact Support!",
-                Content: content,
+                SenderId: userId,
+                RecieverId: receiverId,
+                Content: content.Trim(),
                 SentOn: DateTime.UtcNow,
                 ReadOn: null,
                 SenderDeleted: false,
@@ -116,17 +114,18 @@ namespace api.DTOs
             );
         }
 
-        public static MessageDto ConvertMessageToMessageDto(Message message)
-        {
-            return new MessageDto(
-                Id: message.Id.ToString(),
-                SenderUserName: message.SenderUserName,
-                ReceiverUserName: message.ReceiverUserName,
-                Content: message.Content,
-                ReadOn: message.ReadOn,
-                SentOn: message.SentOn
-            );
-        }
+        // public static MessageDto ConvertMessageToMessageDto(Message message, AppUser senderAppUser, AppUser receiverAppUser)
+        // {
+        //     return new MessageDto(
+        //         Id: message.Id.ToString(),
+        //         Content: message.Content,
+        //         SenderUserName: senderAppUser.UserName,
+        //         ReceiverUserName: receiverAppUser.UserName,
+        //         ReceiverProfilePhoto: receiverAppUser.Photos.Where(ph => ph.IsMain).Select(prop => prop.Url_165).FirstOrDefault(),
+        //         ReadOn: message.ReadOn,
+        //         SentOn: message.SentOn
+        //     );
+        // }
 
         #endregion Generator Methods
 

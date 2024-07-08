@@ -25,25 +25,26 @@ public class MessageRepository : IMessageRepository
     #region CRUD
     public async Task<MessageStatus> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
-        AppUser? loggedInAppUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        ObjectId? receiverId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
 
-        if (loggedInAppUser is null)
+        if (receiverId is null)
         {
-            return new MessageStatus(IsUnauthorized: true);
+            return new MessageStatus(IsReceiverNotFound: true);
         }
 
-        AppUser? targetMemberAppUser = await _userRepository.GetByUserNameAsync(messageInDto.TargetMemberUserName, cancellationToken);
-
-        if (targetMemberAppUser is null)
-        {
-            return new MessageStatus(IsTargetMemberNotFound: true);
-        }
-
-        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, loggedInAppUser, targetMemberAppUser);
+        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, receiverId.Value);
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
         return new MessageStatus(IsSuccess: true);
     }
+
+    // public async Task<PagedList<Message>> GetUserMessagesAsync(ObjectId userId, PaginationParams paginationParams, CancellationToken cancellationToken)
+    // {
+    //     IMongoQueryable<Message> query = _collection.AsQueryable()
+    //         .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+
+    //     return await PagedList<Message>.CreatePagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
+    // }
     #endregion CRUD
 }
