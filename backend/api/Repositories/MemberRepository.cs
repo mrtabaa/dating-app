@@ -33,7 +33,7 @@ public class MemberRepository : IMemberRepository
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
         query = query.Where(appUser => appUser.Id != memberParams.UserId); // don't request/show the currentUser in the list
-        query = query.Where(appUser =>  !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // don't show admin/moderator
+        query = query.Where(appUser => !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // don't show admin/moderator
         query = query.Where(appUser => appUser.Gender == memberParams.Gender); // get the opposite gender by default. It's set in MemberController
         query = query.Where(appUser => appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob); // get ages between 2 age inputs
         query = memberParams.OrderBy switch
@@ -77,6 +77,9 @@ public class MemberRepository : IMemberRepository
             ? Mappers.ConvertAppUserToMemberDto(appUser, isFollowing: true)
             : Mappers.ConvertAppUserToMemberDto(appUser);
     }
+
+    public async Task<IEnumerable<AppUser>> GetMembersByIdsAsync(IEnumerable<ObjectId> membersIds, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable().Where(appUser => membersIds.Contains(appUser.Id)).ToListAsync(cancellationToken);
 
     public async Task<MemberDto?> GetByUserNameAsync(ObjectId userId, string userName, CancellationToken cancellationToken)
     {

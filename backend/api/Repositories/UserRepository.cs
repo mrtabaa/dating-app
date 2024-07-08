@@ -29,7 +29,11 @@ public class UserRepository : IUserRepository
         await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-      await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+        await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+
+    public async Task<string?> GetUserNameById(ObjectId userId, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Id == userId).Select(user => user.UserName).FirstOrDefaultAsync(cancellationToken);
 
     /// <summary>
     /// Obtain userId using userName. Check if ObjectId.HasValue and is NOT ObjectId.Empty.

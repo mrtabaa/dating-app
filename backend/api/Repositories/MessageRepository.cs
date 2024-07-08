@@ -39,12 +39,14 @@ public class MessageRepository : IMessageRepository
         return new MessageStatus(IsSuccess: true);
     }
 
-    // public async Task<PagedList<Message>> GetUserMessagesAsync(ObjectId userId, PaginationParams paginationParams, CancellationToken cancellationToken)
-    // {
-    //     IMongoQueryable<Message> query = _collection.AsQueryable()
-    //         .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+    public async Task<PagedList<Message>> GetInboxMessagesAsync(ObjectId userId, PaginationParams paginationParams, CancellationToken cancellationToken)
+    {
+        MessageStatus messageStatus = new();
 
-    //     return await PagedList<Message>.CreatePagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
-    // }
+        IMongoQueryable<Message> query = _collection.AsQueryable()
+            .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+
+        return await PagedList<Message>.CreatePagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
+    }
     #endregion CRUD
 }

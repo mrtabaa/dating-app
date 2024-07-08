@@ -3,7 +3,9 @@ namespace api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class MessageController(ITokenService _tokenService, IMessageRepository _messageRepository) : BaseApiController
+public class MessageController(
+    ITokenService _tokenService, IMessageRepository _messageRepository,
+    IUserRepository _userRepository, IMemberRepository _memberRepository) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
@@ -21,29 +23,76 @@ public class MessageController(ITokenService _tokenService, IMessageRepository _
         : BadRequest("Sending message faild. Try again or contact the support.");
     }
 
-    // [HttpGet]
-    // public async Task<ActionResult<IEnumerable<MessageDto>>> GetUserMessages([FromQuery] PaginationParams pageParams, CancellationToken cancellationToken)
-    // {
-    //     ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
-    //     if (userId is null)
-    //         return Unauthorized("User id is invalid. Login again.");
+    [HttpGet("inbox")]
+    public async Task<ActionResult<IEnumerable<MessageDto>>> GetInboxMessages([FromQuery] PaginationParams pageParams, CancellationToken cancellationToken)
+    {
+        List<MessageDto> messageDtos = [];
 
-    //     PagedList<Message> pagedMessages = await _messageRepository.GetUserMessagesAsync(userId.Value, pageParams, cancellationToken);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        if (userId is null)
+            return Unauthorized("User id is invalid. Login again.");
 
-    //     Response.AddPaginationHeader(new PaginationHeader(
-    //         pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));
+        PagedList<Message> pagedMessages = await _messageRepository.GetInboxMessagesAsync(userId.Value, pageParams, cancellationToken);
 
-    //     if (pagedMessages.Count == 0) return NoContent();
+        Response.AddPaginationHeader(new PaginationHeader(
+            pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));
 
-    //     List<MessageDto> messageDtos = [];
+        if (pagedMessages.Count == 0) return NoContent();
 
-    //     foreach (var message in pagedMessages)
-    //     {
-    //         messageDtos.Add(
-    //             Mappers.ConvertMessageToMessageDto(message, )
-    //         );
-    //     }
+        string? loggedInUserName = await _userRepository.GetUserNameById(userId.Value, cancellationToken);
 
-    //     return messageDtos;
-    // }
+        if (loggedInUserName is null)
+            return Unauthorized("Logged in user's Username is invalid. Login again.");
+
+        IEnumerable<AppUser> targetMembers = await GetAllMembers(pagedMessages, cancellationToken);
+
+        foreach (var message in pagedMessages)
+        {
+
+            if (message.SenderId == userId) // sender is loggedInUser
+            {
+                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.RecieverId);
+
+                messageDtos.Add(
+                    new MessageDto(
+                        Id: message.Id.ToString(),
+                        Content: message.Content,
+                        SenderUserName: loggedInUserName,
+                        ReceiverUserName: targetMember?.UserName,
+                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        ReadOn: message.ReadOn,
+                        SentOn: message.SentOn
+                    )
+                );
+            }
+            else
+            {
+                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.SenderId);
+
+                messageDtos.Add(
+                    new MessageDto( // sender is targetMember
+                        Id: message.Id.ToString(),
+                        Content: message.Content,
+                        SenderUserName: targetMember?.UserName,
+                        ReceiverUserName: loggedInUserName,
+                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        ReadOn: message.ReadOn,
+                        SentOn: message.SentOn
+                    )
+                );
+            }
+        }
+
+        return messageDtos;
+    }
+
+    private async Task<IEnumerable<AppUser>> GetAllMembers(PagedList<Message> pagedMessages, CancellationToken cancellationToken)
+    {
+        // Get all Ids in the messages (sender & receiver)
+        IEnumerable<ObjectId> allIds = pagedMessages.Select(m => m.SenderId)
+            .Concat(pagedMessages.Select(m => m.Id))
+            .Distinct(); // Eliminates duplicate Ids
+
+        return await _memberRepository.GetMembersByIdsAsync(allIds, cancellationToken);
+    }
 }
