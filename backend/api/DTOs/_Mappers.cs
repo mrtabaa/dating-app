@@ -114,18 +114,39 @@ namespace api.DTOs
             );
         }
 
-        // public static MessageDto ConvertMessageToMessageDto(Message message, AppUser senderAppUser, AppUser receiverAppUser)
-        // {
-        //     return new MessageDto(
-        //         Id: message.Id.ToString(),
-        //         Content: message.Content,
-        //         SenderUserName: senderAppUser.UserName,
-        //         ReceiverUserName: receiverAppUser.UserName,
-        //         ReceiverProfilePhoto: receiverAppUser.Photos.Where(ph => ph.IsMain).Select(prop => prop.Url_165).FirstOrDefault(),
-        //         ReadOn: message.ReadOn,
-        //         SentOn: message.SentOn
-        //     );
-        // }
+        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser loggedInUser, IEnumerable<AppUser> targetMembers)
+        {
+            if (message.SenderId == loggedInUser.Id) // sender is loggedInUser
+            {
+                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.RecieverId);
+
+                return 
+                    new MessageDto(
+                        Id: message.Id.ToString(),
+                        Content: message.Content,
+                        SenderUserName: loggedInUser.UserName,
+                        ReceiverUserName: targetMember?.UserName,
+                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        ReadOn: message.ReadOn,
+                        SentOn: message.SentOn
+                    );
+            }
+            else
+            {
+                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.SenderId);
+
+                return
+                    new MessageDto( // sender is targetMember
+                        Id: message.Id.ToString(),
+                        Content: message.Content,
+                        SenderUserName: targetMember?.UserName,
+                        ReceiverUserName: loggedInUser.UserName,
+                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
+                        ReadOn: message.ReadOn,
+                        SentOn: message.SentOn
+                    );
+            }
+        }
 
         #endregion Generator Methods
 

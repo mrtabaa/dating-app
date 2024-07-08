@@ -39,48 +39,16 @@ public class MessageController(
 
         if (pagedMessages.Count == 0) return NoContent();
 
-        string? loggedInUserName = await _userRepository.GetUserNameById(userId.Value, cancellationToken);
+        AppUser? loggedInUser = await _userRepository.GetByIdAsync(userId.Value, cancellationToken);
 
-        if (loggedInUserName is null)
+        if (loggedInUser is null)
             return Unauthorized("Logged in user's Username is invalid. Login again.");
 
         IEnumerable<AppUser> targetMembers = await GetAllMembers(pagedMessages, cancellationToken);
 
         foreach (var message in pagedMessages)
         {
-
-            if (message.SenderId == userId) // sender is loggedInUser
-            {
-                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.RecieverId);
-
-                messageDtos.Add(
-                    new MessageDto(
-                        Id: message.Id.ToString(),
-                        Content: message.Content,
-                        SenderUserName: loggedInUserName,
-                        ReceiverUserName: targetMember?.UserName,
-                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
-                        ReadOn: message.ReadOn,
-                        SentOn: message.SentOn
-                    )
-                );
-            }
-            else
-            {
-                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.SenderId);
-
-                messageDtos.Add(
-                    new MessageDto( // sender is targetMember
-                        Id: message.Id.ToString(),
-                        Content: message.Content,
-                        SenderUserName: targetMember?.UserName,
-                        ReceiverUserName: loggedInUserName,
-                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
-                        ReadOn: message.ReadOn,
-                        SentOn: message.SentOn
-                    )
-                );
-            }
+            messageDtos.Add(Mappers.ConvertMessageToMessageDto(message, loggedInUser, targetMembers));
         }
 
         return messageDtos;
