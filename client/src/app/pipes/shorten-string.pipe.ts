@@ -10,7 +10,7 @@ export class ShortenStringPipe implements PipeTransform {
     if (!value)
       return null;
     
-    return limit ? value.substring(0, limit) : value.substring(0, 35); // set 35 for website URL lengths
+    return limit ? value.substring(0, limit) : value.substring(0, 100); // set 50 for website URL lengths
   }
 
 }
