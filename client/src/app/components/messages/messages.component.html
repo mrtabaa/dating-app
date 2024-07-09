@@ -1,28 +1,28 @@
 <div class="container">
     <nav class="side">
         <mat-list>
-            <mat-list-item (click)="toggleTabs(Tabs.inbox); getInbox()"
+            <mat-list-item (click)="toggleTabs(Tabs.inbox);"
                 [ngClass]="{'selected-tab': selectedTab === Tabs.inbox}">
                 <div mat-button class="menu-items">
                     <mat-icon>inbox</mat-icon>
                     Inbox
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.unread); getUnread()"
+            <mat-list-item (click)="toggleTabs(Tabs.unread);"
                 [ngClass]="{'selected-tab': selectedTab === Tabs.unread}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
                     Unread
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.read); getRead()"
+            <mat-list-item (click)="toggleTabs(Tabs.read);"
                 [ngClass]="{'selected-tab': selectedTab === Tabs.read}">
                 <div class="menu-items">
                     <mat-icon>mark_as_unread</mat-icon>
                     Read
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.sent); getSent()"
+            <mat-list-item (click)="toggleTabs(Tabs.sent);"
                 [ngClass]="{'selected-tab': selectedTab === Tabs.sent}">
                 <div class="menu-items">
                     <mat-icon>send</mat-icon>
@@ -67,11 +67,11 @@
             }
         </div>
 
-        @if (pagination && pageParams) {
+        @if (pagination && messageParams) {
         <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
-            [pageSize]="pageParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+            [pageSize]="messageParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
             [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-            [pageIndex]="pageParams.pageNumber - 1" aria-label="Select page" class="paginator">
+            [pageIndex]="messageParams.pageNumber - 1" aria-label="Select page" class="paginator">
             <!-- pageIndex must start from 0 -->
         </mat-paginator>
         }

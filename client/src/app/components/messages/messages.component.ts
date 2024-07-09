@@ -4,7 +4,6 @@ import { CommonService } from '../../services/common.service';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MessageService } from '../../services/message.service';
-import { PaginationParams } from '../../models/helpers/paginationParams';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Message } from '../../models/message.model';
 import { Pagination } from '../../models/helpers/pagination';
@@ -14,6 +13,7 @@ import { MatTableModule } from '@angular/material/table';
 import { AccountService } from '../../services/account.service';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
 import { Tabs } from './tabs.enum';
+import { MessageParams } from '../../models/helpers/message-params';
 
 @Component({
   selector: 'app-messages',
@@ -31,12 +31,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;
   private _messageService = inject(MessageService);
 
-  selectedTab = Tabs.inbox;
   Tabs = Tabs;
+  selectedTab = Tabs.inbox;
+  predicate = Tabs.inbox;
+
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
 
-  pageParams = new PaginationParams();
+  messageParams = new MessageParams();
   pagination: Pagination | undefined;
   pageSizeOptions = [9, 25, 50];
   hidePageSize = false;
@@ -47,7 +49,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._isMessageCompSig.set(true);
-    this.getInbox();
+    this.getMessages();
   }
 
   ngOnDestroy(): void {
@@ -56,59 +58,33 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   toggleTabs(tab: number): void {
     this.selectedTab = tab;
+    this.messageParams.predicate = tab;
+
+    this.getMessages();
   }
 
-  getInbox(): void {
-    this._messageService.getInbox(this.pageParams)
+  getMessages(): void {
+    this._messageService.getInbox(this.messageParams)
       .pipe(
         take(1)
       ).subscribe({
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
-            this.messages = []; // reset
 
-            for (const message of response.result) {
-              if (message.senderUserName !== this._loggedInUserSig()?.userName) {
-                this.messages.push(message);
-              }
-            }
-
+            this.messages = response.result;
             this.pagination = response.pagination;
           }
         }
       });
   }
 
-  getUnread(): void {
-
-  }
-
-  getRead(): void {
-
-  }
-
-  getSent(): void {
-
-  }
-
   handlePageEvent(e: PageEvent) {
-    if (this.pageParams) {
+    if (this.messageParams) {
       this.pageEvent = e;
-      this.pageParams.pageSize = e.pageSize;
-      this.pageParams.pageNumber = e.pageIndex + 1;
+      this.messageParams.pageSize = e.pageSize;
+      this.messageParams.pageNumber = e.pageIndex + 1;
 
-      this.getOnPagination();
+      this.getMessages();
     }
-  }
-
-  getOnPagination(): void {
-    if (this.selectedTab === Tabs.inbox)
-      this.getInbox();
-    else if (this.selectedTab === Tabs.unread)
-      this.getUnread();
-    else if (this.selectedTab === Tabs.read)
-      this.getRead();
-    else
-      this.getSent();
   }
 }
