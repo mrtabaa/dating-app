@@ -4,6 +4,6 @@ export interface Message {
     receiverUserName: string;
     targetUserProfilePhoto: string;
     content: string;
-    readOn: Date;
     sentOn: Date
+    readOn: Date;
 }

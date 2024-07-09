@@ -6,6 +6,6 @@ public record MessageDto(
     string? ReceiverUserName,
     string? TargetUserProfilePhoto,
     string Content,
-    DateTime? ReadOn,
-    DateTime SentOn
+    DateTime SentOn,
+    DateTime? ReadOn
 );
