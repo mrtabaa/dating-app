@@ -29,15 +29,14 @@
                 width: 100%;
             }
         }
+
+        .main-no-padding-margin {
+            padding: 0;
+            margin: 0;
+        }
     }
 }
 
 ::ng-deep .grecaptcha-badge {
     visibility: hidden !important;
-}
-
-@media only screen and (min-width: 51rem) {
-    main {
-        margin-top: 0;
-    }
 }

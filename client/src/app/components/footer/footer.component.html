@@ -1,6 +1,6 @@
 <mat-toolbar [ngStyle]="{
     'background-color': loggedInUserSig() || !isMobileSig() || !isWelcomeCompSig() ? '#ffd9e1' : 'transparent',
-    'margin-top': !isMobileSig() ? '1rem' : '0'
+    'margin-top': isMobileSig() || isMessageCompSig() ? '0' : '1rem'
     }">
     <p [ngStyle]="{
         'color': loggedInUserSig() || !isMobileSig() || !isWelcomeCompSig() ? 'black' : 'white',
