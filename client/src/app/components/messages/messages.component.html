@@ -1,6 +1,12 @@
 <div class="container">
     <nav class="side">
         <mat-list>
+            <mat-list-item (click)="toggleTabs('inbox')" [ngClass]="{'selected-tab': selectedTab === 'inbox'}">
+                <div mat-button class="menu-items">
+                    <mat-icon>inbox</mat-icon>
+                    Inbox
+                </div>
+            </mat-list-item>
             <mat-list-item (click)="toggleTabs('unread')" [ngClass]="{'selected-tab': selectedTab === 'unread'}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
@@ -22,7 +28,10 @@
         </mat-list>
     </nav>
     <section class="main">
-        @if(selectedTab === 'unread') {
+        @if(selectedTab === 'inbox') {
+        <app-messages-inbox />
+        }
+        @else if(selectedTab === 'unread') {
         <app-messages-unread />
         }
         @else if(selectedTab === 'read') {
