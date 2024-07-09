@@ -44,7 +44,8 @@ public class MessageRepository : IMessageRepository
         MessageStatus messageStatus = new();
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
-            .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+            .Where(doc => doc.SenderId == userId || doc.RecieverId == userId)
+            .OrderByDescending(doc => doc.SentOn);
 
         return await PagedList<Message>.CreatePagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
     }
