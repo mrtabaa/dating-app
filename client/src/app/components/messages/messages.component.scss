@@ -50,7 +50,7 @@ $height: calc(100dvh - 8rem);
         .example-table-container {
             position: relative;
             min-height: 200px;
-            max-height: $height;
+            max-height: calc($height - 4rem);
             overflow: auto;
 
             table {
@@ -60,7 +60,8 @@ $height: calc(100dvh - 8rem);
                     width: 12rem;
                 }
 
-                .mat-column-sentOn, .mat-column-readOn {
+                .mat-column-sentOn,
+                .mat-column-readOn {
                     width: 8rem;
                 }
             }
