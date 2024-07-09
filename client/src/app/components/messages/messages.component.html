@@ -1,27 +1,29 @@
 <div class="container">
     <nav class="side">
         <mat-list>
-            <mat-list-item (click)="toggleTabs('inbox'); getInbox()"
-                [ngClass]="{'selected-tab': selectedTab === 'inbox'}">
+            <mat-list-item (click)="toggleTabs(Tabs.inbox); getInbox()"
+                [ngClass]="{'selected-tab': selectedTab === Tabs.inbox}">
                 <div mat-button class="menu-items">
                     <mat-icon>inbox</mat-icon>
                     Inbox
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('unread'); getUnread()"
-                [ngClass]="{'selected-tab': selectedTab === 'unread'}">
+            <mat-list-item (click)="toggleTabs(Tabs.unread); getUnread()"
+                [ngClass]="{'selected-tab': selectedTab === Tabs.unread}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
                     Unread
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('read'); getRead()" [ngClass]="{'selected-tab': selectedTab === 'read'}">
+            <mat-list-item (click)="toggleTabs(Tabs.read); getRead()"
+                [ngClass]="{'selected-tab': selectedTab === Tabs.read}">
                 <div class="menu-items">
                     <mat-icon>mark_as_unread</mat-icon>
                     Read
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('sent'); getSent()" [ngClass]="{'selected-tab': selectedTab === 'sent'}">
+            <mat-list-item (click)="toggleTabs(Tabs.sent); getSent()"
+                [ngClass]="{'selected-tab': selectedTab === Tabs.sent}">
                 <div class="menu-items">
                     <mat-icon>send</mat-icon>
                     Sent
@@ -65,7 +67,13 @@
             }
         </div>
 
-        <!-- <mat-paginator [length]="resultsLength" [pageSize]="30"
-            aria-label="Select page of GitHub search results"></mat-paginator> -->
+        @if (pagination && pageParams) {
+        <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
+            [pageSize]="pageParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+            [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+            [pageIndex]="pageParams.pageNumber - 1" aria-label="Select page" class="paginator">
+            <!-- pageIndex must start from 0 -->
+        </mat-paginator>
+        }
     </main>
 </div>

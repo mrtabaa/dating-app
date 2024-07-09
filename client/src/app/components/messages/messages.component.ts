@@ -13,6 +13,7 @@ import { PaginatedResult } from '../../models/helpers/paginatedResult';
 import { MatTableModule } from '@angular/material/table';
 import { AccountService } from '../../services/account.service';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
+import { Tabs } from './tabs.enum';
 
 @Component({
   selector: 'app-messages',
@@ -30,13 +31,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;
   private _messageService = inject(MessageService);
 
-  selectedTab = 'inbox';
-  params = new PaginationParams();
+  selectedTab = Tabs.inbox;
+  Tabs = Tabs;
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
 
+  pageParams = new PaginationParams();
   pagination: Pagination | undefined;
-  pageSizeOptions = [5, 10, 25];
+  pageSizeOptions = [9, 25, 50];
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
@@ -52,24 +54,25 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this._isMessageCompSig.set(false);
   }
 
-  toggleTabs(tab: string): void {
+  toggleTabs(tab: number): void {
     this.selectedTab = tab;
   }
 
   getInbox(): void {
-    this._messageService.getInbox(this.params)
+    this._messageService.getInbox(this.pageParams)
       .pipe(
         take(1)
       ).subscribe({
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
+            this.messages = []; // reset
+
             for (const message of response.result) {
-              // if (message.senderUserName !== this._loggedInUserSig()?.userName) {
-              this.messages.push(message);
-              // }
+              if (message.senderUserName !== this._loggedInUserSig()?.userName) {
+                this.messages.push(message);
+              }
             }
 
-            console.log(this.messages);
             this.pagination = response.pagination;
           }
         }
@@ -86,5 +89,26 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   getSent(): void {
 
+  }
+
+  handlePageEvent(e: PageEvent) {
+    if (this.pageParams) {
+      this.pageEvent = e;
+      this.pageParams.pageSize = e.pageSize;
+      this.pageParams.pageNumber = e.pageIndex + 1;
+
+      this.getOnPagination();
+    }
+  }
+
+  getOnPagination(): void {
+    if (this.selectedTab === Tabs.inbox)
+      this.getInbox();
+    else if (this.selectedTab === Tabs.unread)
+      this.getUnread();
+    else if (this.selectedTab === Tabs.read)
+      this.getRead();
+    else
+      this.getSent();
   }
 }
