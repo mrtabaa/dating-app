@@ -2,7 +2,7 @@ namespace api.Helpers;
 
 public class PaginationParams
 {
-    private const int MaxPageSize = 25;
+    private const int MaxPageSize = 50;
 
     public int PageNumber { get; init; } = 1;
 
