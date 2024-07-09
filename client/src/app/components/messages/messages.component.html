@@ -1,25 +1,27 @@
 <div class="container">
     <nav class="side">
         <mat-list>
-            <mat-list-item (click)="toggleTabs('inbox')" [ngClass]="{'selected-tab': selectedTab === 'inbox'}">
+            <mat-list-item (click)="toggleTabs('inbox'); getInbox()"
+                [ngClass]="{'selected-tab': selectedTab === 'inbox'}">
                 <div mat-button class="menu-items">
                     <mat-icon>inbox</mat-icon>
                     Inbox
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('unread')" [ngClass]="{'selected-tab': selectedTab === 'unread'}">
+            <mat-list-item (click)="toggleTabs('unread'); getUnread()"
+                [ngClass]="{'selected-tab': selectedTab === 'unread'}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
                     Unread
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('read')" [ngClass]="{'selected-tab': selectedTab === 'read'}">
+            <mat-list-item (click)="toggleTabs('read'); getRead()" [ngClass]="{'selected-tab': selectedTab === 'read'}">
                 <div class="menu-items">
                     <mat-icon>mark_as_unread</mat-icon>
                     Read
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs('sent')" [ngClass]="{'selected-tab': selectedTab === 'sent'}">
+            <mat-list-item (click)="toggleTabs('sent'); getSent()" [ngClass]="{'selected-tab': selectedTab === 'sent'}">
                 <div class="menu-items">
                     <mat-icon>send</mat-icon>
                     Sent
@@ -27,18 +29,43 @@
             </mat-list-item>
         </mat-list>
     </nav>
-    <section class="main">
-        @if(selectedTab === 'inbox') {
-        <app-messages-inbox />
-        }
-        @else if(selectedTab === 'unread') {
-        <app-messages-unread />
-        }
-        @else if(selectedTab === 'read') {
-        <app-messages-read />
-        }
-        @else {
-        <app-messages-sent />
-        }
-    </section>
+    <main>
+        <div class="example-table-container">
+            @if(messages.length > 0) {
+            <table mat-table [dataSource]="messages">
+                <!-- From Column -->
+                <ng-container matColumnDef="from">
+                    <th mat-header-cell *matHeaderCellDef>From</th>
+                    <td mat-cell *matCellDef="let element">{{element.senderUserName}}</td>
+                </ng-container>
+
+                <!-- Message Column -->
+                <ng-container matColumnDef="content">
+                    <th mat-header-cell *matHeaderCellDef>Message</th>
+                    <td mat-cell *matCellDef="let element">{{element.content | shortenString: 100}}</td>
+                </ng-container>
+
+                <!-- Sent On Column -->
+                <ng-container matColumnDef="sentOn">
+                    <th mat-header-cell *matHeaderCellDef>Sent on</th>
+                    <td mat-cell *matCellDef="let element">{{element.sentOn | date}}</td>
+                </ng-container>
+
+                <!-- Read On Column -->
+                <ng-container matColumnDef="readOn">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="times">
+                        Read on
+                    </th>
+                    <td mat-cell *matCellDef="let element">{{element.readOn | date}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            }
+        </div>
+
+        <!-- <mat-paginator [length]="resultsLength" [pageSize]="30"
+            aria-label="Select page of GitHub search results"></mat-paginator> -->
+    </main>
 </div>

@@ -41,10 +41,29 @@ $height: calc(100dvh - 8rem);
         }
     }
 
-    .main {
+    main {
         flex-grow: 4;
         height: $height;
         background-color: white;
         border-radius: 1rem 0 0 1rem;
+
+        .example-table-container {
+            position: relative;
+            min-height: 200px;
+            max-height: $height;
+            overflow: auto;
+
+            table {
+                width: 100%;
+
+                .mat-column-from {
+                    width: 12rem;
+                }
+
+                .mat-column-sentOn, .mat-column-readOn {
+                    width: 8rem;
+                }
+            }
+        }
     }
 }

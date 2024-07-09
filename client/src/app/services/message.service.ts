@@ -14,12 +14,11 @@ export class MessageService {
   private _baseUrl: string = environment.apiUrl + 'message/';
   private _paginationHandler = new PaginationHandler();
 
-  getInboxMessages(pageParams: PaginationParams): Observable<PaginatedResult<Message[]>> {
+  getInbox(pageParams: PaginationParams): Observable<PaginatedResult<Message[]>> {
     let params = new HttpParams();
     params = params.append('pageNumber', pageParams.pageNumber);
     params = params.append('pageSize', pageParams.pageSize);
 
-    this._paginationHandler.getPaginatedResult(this._baseUrl + 'inbox', params).subscribe(res => console.log(res));
     return this._paginationHandler.getPaginatedResult(this._baseUrl + 'inbox', params);
   }
 }
