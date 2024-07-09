@@ -1,0 +1,50 @@
+$height: calc(100dvh - 8rem);
+
+.container {
+    display: flex;
+    flex: 1;
+    height: $height;
+    background-color: rgb(255, 233, 237);
+
+    .side {
+        height: $height;
+        width: 10rem;
+        min-width: fit-content;
+
+        mat-list {
+            padding: 0;
+            margin: 0;
+
+            mat-list-item {
+                padding: 0;
+                margin: 0;
+            }
+
+            .menu-items {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                line-height: 47px;
+                padding-left: 1rem;
+                margin: 0;
+
+                &:hover {
+                    background-color: rgb(255, 176, 255);
+                    cursor: pointer;
+                }
+            }
+
+            .selected-tab {
+                background-color: rgb(255, 176, 255);
+                border-radius: 1rem;
+            }
+        }
+    }
+
+    .main {
+        flex-grow: 4;
+        height: $height;
+        background-color: white;
+        border-radius: 1rem 0 0 1rem;
+    }
+}

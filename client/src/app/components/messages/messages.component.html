@@ -1,1 +1,35 @@
-<p>Under development. Come back soon!</p>
+<div class="container">
+    <nav class="side">
+        <mat-list>
+            <mat-list-item (click)="toggleTabs('unread')" [ngClass]="{'selected-tab': selectedTab === 'unread'}">
+                <div mat-button class="menu-items">
+                    <mat-icon>mark_email_unread</mat-icon>
+                    Unread
+                </div>
+            </mat-list-item>
+            <mat-list-item (click)="toggleTabs('read')" [ngClass]="{'selected-tab': selectedTab === 'read'}">
+                <div class="menu-items">
+                    <mat-icon>mark_as_unread</mat-icon>
+                    Read
+                </div>
+            </mat-list-item>
+            <mat-list-item (click)="toggleTabs('sent')" [ngClass]="{'selected-tab': selectedTab === 'sent'}">
+                <div class="menu-items">
+                    <mat-icon>send</mat-icon>
+                    Sent
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </nav>
+    <section class="main">
+        @if(selectedTab === 'unread') {
+        <app-messages-unread />
+        }
+        @else if(selectedTab === 'read') {
+        <app-messages-read />
+        }
+        @else {
+        <app-messages-sent />
+        }
+    </section>
+</div>
