@@ -39,7 +39,7 @@ public class MessageRepository : IMessageRepository
         return new MessageStatus(IsSuccess: true);
     }
 
-    public async Task<PagedList<Message>> GetInboxMessagesAsync(ObjectId userId, PaginationParams paginationParams, CancellationToken cancellationToken)
+    public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
     {
         MessageStatus messageStatus = new();
 
@@ -47,7 +47,16 @@ public class MessageRepository : IMessageRepository
             .Where(doc => doc.SenderId == userId || doc.RecieverId == userId)
             .OrderByDescending(doc => doc.SentOn);
 
-        return await PagedList<Message>.CreatePagedListAsync(query, paginationParams.PageNumber, paginationParams.PageSize, cancellationToken);
+        query = messageParams.Predicate switch
+        {
+            MessagePredicate.Inbox => query.Where(doc => doc.SenderId != userId),
+            MessagePredicate.Unread => query.Where(doc => doc.ReadOn == null),
+            MessagePredicate.Read => query.Where(doc => doc.ReadOn != null),
+            MessagePredicate.Sent => query.Where(doc => doc.SenderId == userId),
+            _ => query
+        };
+
+        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
     #endregion CRUD
 }
