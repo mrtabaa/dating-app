@@ -1,6 +1,7 @@
-import { Tabs } from "../../components/messages/tabs.enum";
+import { MessagePredicate } from "../../components/messages/MessageEnum.enum";
 import { PaginationParams } from "./paginationParams";
 
 export class MessageParams extends PaginationParams {
-    predicate = Tabs.inbox;
+    predicate = MessagePredicate.inbox;
+    targetUserName: string | undefined;
 }

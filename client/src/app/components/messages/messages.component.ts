@@ -11,7 +11,7 @@ import { take } from 'rxjs/operators';
 import { PaginatedResult } from '../../models/helpers/paginatedResult';
 import { MatTableModule } from '@angular/material/table';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
-import { Tabs } from './tabs.enum';
+import { MessagePredicate } from './MessageEnum.enum';
 import { MessageParams } from '../../models/helpers/message-params';
 import { LoadingService } from '../../services/loading.service';
 import { RouterModule } from '@angular/router';
@@ -32,8 +32,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   private _messageService = inject(MessageService);
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
-  Tabs = Tabs;
-  selectedTab = Tabs.inbox;
+  Tabs = MessagePredicate;
+  selectedTab = MessagePredicate.inbox;
 
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
