@@ -32,12 +32,17 @@
         <h5 class="warning">This box is still empty.</h5>
         }
         @else {
-        <div class="example-table-container">
+        <div class="table-wrapper">
             <table mat-table [dataSource]="messages">
-                <!-- From Column -->
+                <!-- From/To Column -->
                 <ng-container matColumnDef="from">
                     <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.sent ? 'To' : 'From'}}</th>
-                    <td mat-cell *matCellDef="let element">{{element.userOrTargetKnownAs}}</td>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="user-info">
+                            <img ngSrc="{{element.userOrTargetProfilePhoto}}" priority width="32" height="32" alt="Loading">
+                            {{element.userOrTargetKnownAs | shortenString: 20}}
+                        </div>
+                    </td>
                 </ng-container>
 
                 <!-- Message Column -->

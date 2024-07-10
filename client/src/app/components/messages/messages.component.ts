@@ -1,5 +1,5 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { CommonService } from '../../services/common.service';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +19,7 @@ import { LoadingService } from '../../services/loading.service';
   selector: 'app-messages',
   standalone: true,
   imports: [
-    CommonModule,
+    CommonModule, NgOptimizedImage,
     ShortenStringPipe,
     MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
   ],
