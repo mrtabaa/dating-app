@@ -48,10 +48,23 @@ public class MessageRepository : IMessageRepository
 
         query = messageParams.Predicate switch
         {
-            MessagePredicate.Inbox => query.Where(doc => doc.RecieverId == userId), // Inbox
-            MessagePredicate.Unread => query.Where(doc => doc.RecieverId == userId && doc.ReadOn == null), // Unread
-            MessagePredicate.Read => query.Where(doc => doc.RecieverId == userId && doc.ReadOn != null), // Read
-            MessagePredicate.Sent => query.Where(doc => doc.SenderId == userId), // Sent
+            // Group all messages based on SenderId then Select the first one which is the latest message since they're OrderByDescending
+            MessagePredicate.Inbox => query
+                .Where(doc => doc.RecieverId == userId)
+                .GroupBy(doc => doc.SenderId)
+                .Select(group => group.First()), // Inbox
+            MessagePredicate.Unread => query
+                .Where(doc => doc.RecieverId == userId && doc.ReadOn == null)
+                .GroupBy(doc => doc.SenderId)
+                .Select(group => group.First()), // Unread
+            MessagePredicate.Read => query
+                .Where(doc => doc.RecieverId == userId && doc.ReadOn != null)
+                .GroupBy(doc => doc.SenderId)
+                .Select(group => group.First()), // Read
+            MessagePredicate.Sent => query
+                .Where(doc => doc.SenderId == userId)
+                .GroupBy(doc => doc.SenderId)
+                .Select(group => group.First()), // Sent
             _ => query
         };
 
