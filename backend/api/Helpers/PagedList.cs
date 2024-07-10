@@ -18,17 +18,33 @@ public class PagedList<T> : List<T>
     public int TotalItemsCount { get; set; }
 
     /// <summary>
-    /// call MongoDB collection and get a limited number of items based on the pageSize and pageNumber.
+    /// call MongoDB collection and get a limited number of items based on the pageSize and pageNumber by Ascending order.
     /// </summary>
     /// <param name="query"></param>: getting a query to use agains MongoDB _collection
     /// <param name="pageNumber"></param>
     /// <param name="pageSize"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>PageList<T> object with its prop values</returns>
-    public static async Task<PagedList<T>> CreatePagedListAsync(IMongoQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    public static async Task<PagedList<T>> CreatePagedListAscendingAsync(IMongoQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken)
     {
         int count = await query.CountAsync(cancellationToken);
         IEnumerable<T> items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+
+        return new PagedList<T>(items, count, pageNumber, pageSize);
+    }
+
+    /// <summary>
+    /// call MongoDB collection and get a limited number of items based on the pageSize and pageNumber By descending order.
+    /// </summary>
+    /// <param name="query"></param>: getting a query to use agains MongoDB _collection
+    /// <param name="pageNumber"></param>
+    /// <param name="pageSize"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>PageList<T> object with its prop values</returns>
+    public static async Task<PagedList<T>> CreatePagedListDescendingAsync(IMongoQueryable<T> query, int pageNumber, int pageSize, CancellationToken cancellationToken)
+    {
+        int count = await query.CountAsync(cancellationToken);
+        IEnumerable<T> items = await query.Skip(count - (pageSize * pageSize) - 1).Take(pageSize).ToListAsync(cancellationToken);
 
         return new PagedList<T>(items, count, pageNumber, pageSize);
     }

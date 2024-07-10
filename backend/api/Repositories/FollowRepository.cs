@@ -200,7 +200,7 @@ public class FollowRepository : IFollowRepository
                             appUser => appUser.Id,
                             (follow, appUser) => appUser); // project the AppUser
 
-            PagedList<AppUser>? appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+            PagedList<AppUser>? appUsers = await PagedList<AppUser>.CreatePagedListAscendingAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
 
             appUsers = GetAppUsersWithBlobPhotos(appUsers);
 
@@ -216,7 +216,7 @@ public class FollowRepository : IFollowRepository
                     (follow, appUser) => appUser);
 
             PagedList<AppUser>? appUsers = await PagedList<AppUser>
-                .CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+                .CreatePagedListAscendingAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
 
             appUsers = GetAppUsersWithBlobPhotos(appUsers);
 

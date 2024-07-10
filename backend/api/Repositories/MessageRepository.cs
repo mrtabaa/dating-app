@@ -27,23 +27,25 @@ public class MessageRepository : IMessageRepository
     #region CRUD
     public async Task<MessageStatus> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
-        AppUser? targetUser = await _userRepository.GetByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
+        ObjectId? targetUserId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
 
-        if (targetUser is null)
-        {
+        if (targetUserId is null)
             return new MessageStatus(IsReceiverNotFound: true);
-        }
 
-        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, targetUser.Id);
+        AppUser? loggedInUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        if (loggedInUser is null)
+            return new MessageStatus(IsLoggedInUserNotFound: true);
+
+        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, targetUserId.Value);
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
         // Convert all targetMember profile photo to blob Sas format
-        string? profilePhotoUrl = targetUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165;
+        string? profilePhotoUrl = loggedInUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165;
 
         string? profilePhotoSasUrl = _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
 
-        MessageDto messageDto = Mappers.ConvertMessageToMessageDto(message, targetUser, profilePhotoSasUrl);
+        MessageDto messageDto = Mappers.ConvertMessageToMessageDto(message, loggedInUser, profilePhotoSasUrl);
 
         return new MessageStatus(MessageDto: messageDto);
     }
@@ -75,7 +77,7 @@ public class MessageRepository : IMessageRepository
             _ => query
         };
 
-        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+        return await PagedList<Message>.CreatePagedListDescendingAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
 
     public async Task<PagedList<Message>?> GetThreadAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
@@ -92,7 +94,7 @@ public class MessageRepository : IMessageRepository
             )
             .OrderBy(doc => doc.SentOn);
 
-        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+        return await PagedList<Message>.CreatePagedListDescendingAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
     #endregion CRUD
 }
