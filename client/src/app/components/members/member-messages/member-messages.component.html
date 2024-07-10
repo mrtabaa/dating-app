@@ -1,1 +1,34 @@
-<p>member-messages works!</p>
+@for (message of messages; track $index) {
+@if(message.userOrTargetUserName === memberIn?.userName) {
+<ul>
+    <div>
+        <li class="title">
+            <mat-icon>schedule</mat-icon>
+            <p>{{message.sentOn | intlRelativeTime}}</p>
+            <mat-icon [ngStyle]="{'color': message.readOn ? 'green' : 'red'}">{{message.readOn ? 'done_all' :
+                'check'}}</mat-icon>
+        </li>
+        <li class="content">{{message.content}}</li>
+    </div>
+    <img ngSrc="{{message.userOrTargetProfilePhoto}}" priority width="{{photoWH}}" height="{{photoWH}}"
+        alt="{{memberIn?.userName}}">
+</ul>
+<mat-divider />
+}
+@else {
+<ul>
+    <div>
+        <li class="title">
+            <mat-icon>schedule</mat-icon>
+            <p>{{message.sentOn | intlRelativeTime}}</p>
+        </li>
+        <li class="content">{{message.content}}</li>
+    </div>
+    <img ngSrc="{{message.userOrTargetProfilePhoto}}" priority width="{{photoWH}}" height="{{photoWH}}"
+        alt="{{memberIn?.userName}}">
+</ul>
+<mat-divider />
+}
+}
+
+<button (click)="create()">Send</button>

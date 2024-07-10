@@ -18,6 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { MemberDetailMobileComponent } from './member-detail-mobile/member-detail-mobile.component';
+import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 
 @Component({
   selector: 'app-user-detail',
@@ -25,7 +26,7 @@ import { MemberDetailMobileComponent } from './member-detail-mobile/member-detai
   imports: [
     CommonModule, NgOptimizedImage, RouterModule,
     MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
-    MemberDetailMobileComponent,
+    MemberDetailMobileComponent, MemberMessagesComponent,
     MatCardModule, MatTabsModule, MatButtonModule,
     GalleryModule, LightboxModule, IntlModule
   ],
