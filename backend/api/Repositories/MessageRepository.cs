@@ -6,18 +6,20 @@ public class MessageRepository : IMessageRepository
     #region Db and Token Settings
     private readonly IMongoCollection<Message> _collection;
     private readonly IUserRepository _userRepository;
+    private readonly IPhotoService _photoService;
     private readonly ILogger<UserRepository> _logger;
 
     // constructor - dependency injections
     public MessageRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        IUserRepository userRepository,
+        IUserRepository userRepository, IPhotoService photoService,
         ILogger<UserRepository> logger
         )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<Message>(AppVariablesExtensions.collectionMessages);
         _userRepository = userRepository;
+        _photoService = photoService;
         _logger = logger;
     }
     #endregion Db and Token Settings
@@ -25,24 +27,29 @@ public class MessageRepository : IMessageRepository
     #region CRUD
     public async Task<MessageStatus> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
-        ObjectId? receiverId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
+        AppUser? targetUser = await _userRepository.GetByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
 
-        if (receiverId is null)
+        if (targetUser is null)
         {
             return new MessageStatus(IsReceiverNotFound: true);
         }
 
-        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, receiverId.Value);
+        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, targetUser.Id);
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
-        return new MessageStatus(IsSuccess: true);
+        // Convert all targetMember profile photo to blob Sas format
+        string? profilePhotoUrl = targetUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165;
+
+        string? profilePhotoSasUrl = _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
+
+        MessageDto messageDto = Mappers.ConvertMessageToMessageDto(message, targetUser, profilePhotoSasUrl);
+
+        return new MessageStatus(MessageDto: messageDto);
     }
 
     public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
     {
-        MessageStatus messageStatus = new();
-
         IMongoQueryable<Message> query = _collection.AsQueryable()
             .OrderByDescending(doc => doc.SentOn);
 
@@ -73,13 +80,13 @@ public class MessageRepository : IMessageRepository
 
     public async Task<PagedList<Message>?> GetThreadAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
     {
-        ObjectId? targetUserId = await _userRepository.GetIdByUserNameAsync(messageParams.targetUserName, cancellationToken);
+        ObjectId? targetUserId = await _userRepository.GetIdByUserNameAsync(messageParams.TargetUserName, cancellationToken);
 
         if (targetUserId == null)
             return null;
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
-            .Where(doc => 
+            .Where(doc =>
                 (doc.SenderId == userId && doc.RecieverId == targetUserId) ||
                 (doc.RecieverId == userId && doc.SenderId == targetUserId)
             )
