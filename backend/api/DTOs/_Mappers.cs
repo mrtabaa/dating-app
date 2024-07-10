@@ -119,7 +119,7 @@ namespace api.DTOs
             return
                 new MessageDto(
                     Id: message.Id.ToString(), // To delete/update
-                    UserOrTargetUserName: userOrTarget.NormalizedUserName,
+                    UserOrTargetUserName: userOrTarget.UserName,
                     UserOrTargetKnownAs: userOrTarget?.KnownAs,
                     UserOrTargetProfilePhoto: profilePhotoSasUrl,
                     Content: message.Content,
