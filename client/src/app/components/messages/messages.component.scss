@@ -82,15 +82,10 @@ $height: calc(100dvh - 8rem);
                     width: 8rem;
                 }
 
-                .mat-mdc-row .mat-mdc-cell {
-                    border-bottom: 1px solid transparent;
-                    border-top: 1px solid transparent;
+                .mat-mdc-row:hover {
                     cursor: pointer;
-                }
-
-                .mat-mdc-row:hover .mat-mdc-cell {
-                    border-color: palevioletred;
-                    background-color: rgb(255, 235, 238);
+                    border-radius: 1rem;
+                    background-color: rgb(255, 233, 237);
                 }
             }
         }
