@@ -33,7 +33,15 @@ public class MessageController(
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        PagedList<Message> pagedMessages = await _messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
+        PagedList<Message>? pagedMessages;
+
+        if (messageParams.Predicate == MessagePredicate.Thread)
+            pagedMessages = await _messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
+        else
+        {
+            pagedMessages = await _messageRepository.GetThreadAsync(userId.Value, messageParams, cancellationToken);
+            if (pagedMessages is null) return NotFound("Target user was not found.");
+        }
 
         Response.AddPaginationHeader(new PaginationHeader(
             pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));

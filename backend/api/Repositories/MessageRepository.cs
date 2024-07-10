@@ -70,5 +70,19 @@ public class MessageRepository : IMessageRepository
 
         return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
+
+    public async Task<PagedList<Message>?> GetThreadAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
+    {
+        ObjectId? targetUserId = await _userRepository.GetIdByUserNameAsync(messageParams.targetUserName, cancellationToken);
+
+        if (targetUserId == null)
+            return null;
+
+        IMongoQueryable<Message> query = _collection.AsQueryable()
+        .OrderBy(doc => doc.SentOn)
+        .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+
+        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+    }
     #endregion CRUD
 }
