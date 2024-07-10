@@ -47,11 +47,19 @@ $height: calc(100dvh - 8rem);
         background-color: white;
         border-radius: 1rem 0 0 1rem;
 
+        .warning {
+            height: $height;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .example-table-container {
             position: relative;
             min-height: 200px;
             max-height: calc($height - 4rem);
             overflow: auto;
+            border-radius: 1rem;
 
             table {
                 width: 100%;

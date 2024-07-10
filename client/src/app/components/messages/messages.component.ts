@@ -10,10 +10,10 @@ import { Pagination } from '../../models/helpers/pagination';
 import { take } from 'rxjs/operators';
 import { PaginatedResult } from '../../models/helpers/paginatedResult';
 import { MatTableModule } from '@angular/material/table';
-import { AccountService } from '../../services/account.service';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
 import { Tabs } from './tabs.enum';
 import { MessageParams } from '../../models/helpers/message-params';
+import { LoadingService } from '../../services/loading.service';
 
 @Component({
   selector: 'app-messages',
@@ -27,13 +27,12 @@ import { MessageParams } from '../../models/helpers/message-params';
   styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit, OnDestroy {
-  private _loggedInUserSig = inject(AccountService).loggedInUserSig;
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;
   private _messageService = inject(MessageService);
+  isLoadingSig = inject(LoadingService).isLoadingsig;
 
   Tabs = Tabs;
   selectedTab = Tabs.inbox;
-  predicate = Tabs.inbox;
 
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
@@ -64,13 +63,14 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
 
   getMessages(): void {
+    this.messages = []; // reset
+
     this._messageService.getInbox(this.messageParams)
       .pipe(
         take(1)
       ).subscribe({
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
-
             this.messages = response.result;
             this.pagination = response.pagination;
           }

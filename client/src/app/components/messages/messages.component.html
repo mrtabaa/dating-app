@@ -1,29 +1,25 @@
 <div class="container">
     <nav class="side">
         <mat-list>
-            <mat-list-item (click)="toggleTabs(Tabs.inbox);"
-                [ngClass]="{'selected-tab': selectedTab === Tabs.inbox}">
+            <mat-list-item (click)="toggleTabs(Tabs.inbox);" [ngClass]="{'selected-tab': selectedTab === Tabs.inbox}">
                 <div mat-button class="menu-items">
                     <mat-icon>inbox</mat-icon>
                     Inbox
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.unread);"
-                [ngClass]="{'selected-tab': selectedTab === Tabs.unread}">
+            <mat-list-item (click)="toggleTabs(Tabs.unread);" [ngClass]="{'selected-tab': selectedTab === Tabs.unread}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
                     Unread
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.read);"
-                [ngClass]="{'selected-tab': selectedTab === Tabs.read}">
+            <mat-list-item (click)="toggleTabs(Tabs.read);" [ngClass]="{'selected-tab': selectedTab === Tabs.read}">
                 <div class="menu-items">
                     <mat-icon>mark_as_unread</mat-icon>
                     Read
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.sent);"
-                [ngClass]="{'selected-tab': selectedTab === Tabs.sent}">
+            <mat-list-item (click)="toggleTabs(Tabs.sent);" [ngClass]="{'selected-tab': selectedTab === Tabs.sent}">
                 <div class="menu-items">
                     <mat-icon>send</mat-icon>
                     Sent
@@ -32,13 +28,16 @@
         </mat-list>
     </nav>
     <main>
+        @if(messages.length === 0 && !isLoadingSig()) {
+        <h5 class="warning">This box is still empty.</h5>
+        }
+        @else {
         <div class="example-table-container">
-            @if(messages.length > 0) {
             <table mat-table [dataSource]="messages">
                 <!-- From Column -->
                 <ng-container matColumnDef="from">
-                    <th mat-header-cell *matHeaderCellDef>From</th>
-                    <td mat-cell *matCellDef="let element">{{element.senderUserName}}</td>
+                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.sent ? 'To' : 'From'}}</th>
+                    <td mat-cell *matCellDef="let element">{{element.userOrTargetKnownAs}}</td>
                 </ng-container>
 
                 <!-- Message Column -->
@@ -64,7 +63,6 @@
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
-            }
         </div>
 
         @if (pagination && messageParams) {
@@ -74,6 +72,7 @@
             [pageIndex]="messageParams.pageNumber - 1" aria-label="Select page" class="paginator">
             <!-- pageIndex must start from 0 -->
         </mat-paginator>
+        }
         }
     </main>
 </div>
