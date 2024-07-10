@@ -127,11 +127,11 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
       });
   }
 
-  selectTab(tabIndex: number, userName?: string): void {
+  selectTab(tabIndex: number): void {
     if (this.tabGroup && this.initLoad) {
       this.tabGroup.selectedIndex = tabIndex;
     }
     else
-      this.router.navigate(['/member/' + userName], { queryParams: { tab: tabIndex } });
+      this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
   }
 }
