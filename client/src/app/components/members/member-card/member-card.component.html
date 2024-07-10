@@ -27,7 +27,7 @@
                 }
             </li>
             <li>
-                <button mat-mini-fab>
+                <button [routerLink]="['/member/' + memberIn.userName]" [queryParams]="{tab: 3}" mat-mini-fab>
                     <mat-icon color="primary">mail</mat-icon>
                 </button>
             </li>
