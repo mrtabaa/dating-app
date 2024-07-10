@@ -1,7 +1,7 @@
 export enum MessagePredicate {
-    inbox,
-    unread,
-    read,
-    sent,
-    thread
+    INBOX,
+    UNREAD,
+    READ,
+    SENT,
+    THREAD
 }

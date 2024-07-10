@@ -1,25 +1,25 @@
 <div class="container">
     <nav class="side">
         <mat-list>
-            <mat-list-item (click)="toggleTabs(Tabs.inbox);" [ngClass]="{'selected-tab': selectedTab === Tabs.inbox}">
+            <mat-list-item (click)="toggleTabs(Tabs.INBOX);" [ngClass]="{'selected-tab': selectedTab === Tabs.INBOX}">
                 <div mat-button class="menu-items">
                     <mat-icon>inbox</mat-icon>
                     Inbox
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.unread);" [ngClass]="{'selected-tab': selectedTab === Tabs.unread}">
+            <mat-list-item (click)="toggleTabs(Tabs.UNREAD);" [ngClass]="{'selected-tab': selectedTab === Tabs.UNREAD}">
                 <div mat-button class="menu-items">
                     <mat-icon>mark_email_unread</mat-icon>
                     Unread
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.read);" [ngClass]="{'selected-tab': selectedTab === Tabs.read}">
+            <mat-list-item (click)="toggleTabs(Tabs.READ);" [ngClass]="{'selected-tab': selectedTab === Tabs.READ}">
                 <div class="menu-items">
                     <mat-icon>mark_as_unread</mat-icon>
                     Read
                 </div>
             </mat-list-item>
-            <mat-list-item (click)="toggleTabs(Tabs.sent);" [ngClass]="{'selected-tab': selectedTab === Tabs.sent}">
+            <mat-list-item (click)="toggleTabs(Tabs.SENT);" [ngClass]="{'selected-tab': selectedTab === Tabs.SENT}">
                 <div class="menu-items">
                     <mat-icon>send</mat-icon>
                     Sent
@@ -36,7 +36,7 @@
             <table mat-table [dataSource]="messages">
                 <!-- From/To Column -->
                 <ng-container matColumnDef="from">
-                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.sent ? 'To' : 'From'}}</th>
+                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.SENT ? 'To' : 'From'}}</th>
                     <td mat-cell *matCellDef="let row">
                         <div class="user-info">
                             <img ngSrc="{{row.userOrTargetProfilePhoto}}" priority width="32" height="32"

@@ -33,7 +33,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
   Tabs = MessagePredicate;
-  selectedTab = MessagePredicate.inbox;
+  selectedTab = MessagePredicate.INBOX;
 
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
