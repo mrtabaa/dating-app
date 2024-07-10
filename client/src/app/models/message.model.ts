@@ -1,8 +1,8 @@
 export interface Message {
     Id: string;
-    senderUserName: string;
-    receiverUserName: string;
-    targetUserProfilePhoto: string;
+    userOrTargetUserName: string;
+    userOrTargetKnownAs: string;
+    userOrTargetProfilePhoto: string;
     content: string;
     sentOn: Date
     readOn: Date;
