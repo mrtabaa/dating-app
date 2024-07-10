@@ -14,21 +14,29 @@ import { Member } from '../../../models/member.model';
 import { IntlModule } from 'angular-ecmascript-intl';
 import { MatDividerModule } from '@angular/material/divider';
 import { MessageIn } from '../../../models/messageIn.model';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
+import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
   selector: 'app-member-messages',
   standalone: true,
   imports: [
-    CommonModule, NgOptimizedImage,
-    ShortenStringPipe, IntlModule,
-    MatIconModule, MatPaginatorModule, MatDividerModule
+    CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
+    ShortenStringPipe, IntlModule, InputCvaComponent,
+    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule
   ],
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
 export class MemberMessagesComponent implements OnInit {
-  private _messageService = inject(MessageService);
   @Input() memberIn: Member | undefined;
+
+  private _messageService = inject(MessageService);
+  private fb = inject(FormBuilder);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
 
   messages: Message[] = [];
 
@@ -43,6 +51,8 @@ export class MemberMessagesComponent implements OnInit {
 
   photoWH = 40;
 
+  createMessageCtrl = this.fb.control('', [Validators.required, Validators.maxLength(500)]);
+
   ngOnInit(): void {
     this.messageParams.predicate = MessagePredicate.THREAD;
     this.messageParams.targetUserName = this.memberIn?.userName;
@@ -51,9 +61,9 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   create(): void {
-    if (this.memberIn?.userName) {
+    if (this.memberIn?.userName && this.createMessageCtrl.value) {
       const messageIn: MessageIn = {
-        content: 'test 1',
+        content: this.createMessageCtrl.value,
         receiverUserName: this.memberIn?.userName
       }
 
