@@ -44,15 +44,14 @@ public class MessageRepository : IMessageRepository
         MessageStatus messageStatus = new();
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
-            .Where(doc => doc.SenderId == userId || doc.RecieverId == userId)
             .OrderByDescending(doc => doc.SentOn);
 
         query = messageParams.Predicate switch
         {
-            MessagePredicate.Inbox => query.Where(doc => doc.SenderId != userId),
-            MessagePredicate.Unread => query.Where(doc => doc.ReadOn == null),
-            MessagePredicate.Read => query.Where(doc => doc.ReadOn != null),
-            MessagePredicate.Sent => query.Where(doc => doc.SenderId == userId),
+            MessagePredicate.Inbox => query.Where(doc => doc.RecieverId == userId), // Inbox
+            MessagePredicate.Unread => query.Where(doc => doc.RecieverId == userId && doc.ReadOn == null), // Unread
+            MessagePredicate.Read => query.Where(doc => doc.RecieverId == userId && doc.ReadOn != null), // Read
+            MessagePredicate.Sent => query.Where(doc => doc.SenderId == userId), // Sent
             _ => query
         };
 

@@ -114,38 +114,18 @@ namespace api.DTOs
             );
         }
 
-        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser loggedInUser, IEnumerable<AppUser> targetMembers)
+        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl)
         {
-            if (message.SenderId == loggedInUser.Id) // sender is loggedInUser
-            {
-                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.RecieverId);
-
-                return 
-                    new MessageDto(
-                        Id: message.Id.ToString(),
-                        SenderUserName: loggedInUser.UserName,
-                        ReceiverUserName: targetMember?.UserName,
-                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
-                        Content: message.Content,
-                        ReadOn: message.ReadOn,
-                        SentOn: message.SentOn
-                    );
-            }
-            else
-            {
-                AppUser? targetMember = targetMembers.FirstOrDefault(member => member.Id == message.SenderId);
-
-                return
-                    new MessageDto( // sender is targetMember
-                        Id: message.Id.ToString(),
-                        SenderUserName: targetMember?.UserName,
-                        ReceiverUserName: loggedInUser.UserName,
-                        TargetUserProfilePhoto: targetMember?.Photos.FirstOrDefault(ph => ph.IsMain)?.Url_165,
-                        Content: message.Content,
-                        ReadOn: message.ReadOn,
-                        SentOn: message.SentOn
-                    );
-            }
+            return
+                new MessageDto(
+                    Id: message.Id.ToString(), // To delete/update
+                    UserOrTargetUserName: userOrTarget.NormalizedUserName,
+                    UserOrTargetKnownAs: userOrTarget?.KnownAs,
+                    UserOrTargetProfilePhoto: profilePhotoSasUrl,
+                    Content: message.Content,
+                    ReadOn: message.ReadOn,
+                    SentOn: message.SentOn
+                );
         }
 
         #endregion Generator Methods
