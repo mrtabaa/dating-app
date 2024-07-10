@@ -14,12 +14,13 @@ import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
 import { Tabs } from './tabs.enum';
 import { MessageParams } from '../../models/helpers/message-params';
 import { LoadingService } from '../../services/loading.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
   imports: [
-    CommonModule, NgOptimizedImage,
+    CommonModule, NgOptimizedImage, RouterModule,
     ShortenStringPipe,
     MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
   ],

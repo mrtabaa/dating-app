@@ -37,10 +37,11 @@
                 <!-- From/To Column -->
                 <ng-container matColumnDef="from">
                     <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.sent ? 'To' : 'From'}}</th>
-                    <td mat-cell *matCellDef="let element">
+                    <td mat-cell *matCellDef="let row">
                         <div class="user-info">
-                            <img ngSrc="{{element.userOrTargetProfilePhoto}}" priority width="32" height="32" alt="{{element.userOrTargetKnownAs[0]}}">
-                            {{element.userOrTargetKnownAs | shortenString: 20}}
+                            <img ngSrc="{{row.userOrTargetProfilePhoto}}" priority width="32" height="32"
+                                alt="{{row.userOrTargetKnownAs[0]}}">
+                            {{row.userOrTargetKnownAs | shortenString: 20}}
                         </div>
                     </td>
                 </ng-container>
@@ -48,13 +49,13 @@
                 <!-- Message Column -->
                 <ng-container matColumnDef="content">
                     <th mat-header-cell *matHeaderCellDef>Message</th>
-                    <td mat-cell *matCellDef="let element">{{element.content | shortenString: 100}}</td>
+                    <td mat-cell *matCellDef="let row">{{row.content | shortenString: 100}}</td>
                 </ng-container>
 
                 <!-- Sent On Column -->
                 <ng-container matColumnDef="sentOn">
                     <th mat-header-cell *matHeaderCellDef>Sent on</th>
-                    <td mat-cell *matCellDef="let element">{{element.sentOn | date}}</td>
+                    <td mat-cell *matCellDef="let row">{{row.sentOn | date}}</td>
                 </ng-container>
 
                 <!-- Read On Column -->
@@ -62,11 +63,12 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="times">
                         Read on
                     </th>
-                    <td mat-cell *matCellDef="let element">{{element.readOn | date}}</td>
+                    <td mat-cell *matCellDef="let row">{{row.readOn | date}}</td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    [routerLink]="['/member/' + row.userOrTargetUserName]" [queryParams]="{tab: 3}"></tr>
             </table>
         </div>
 

@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewChecked, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Observable, Subscription, take } from 'rxjs';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MemberService } from '../../../services/member.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
@@ -32,7 +32,9 @@ import { MemberDetailMobileComponent } from './member-detail-mobile/member-detai
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.scss']
 })
-export class MemberDetailComponent implements OnInit, OnDestroy {
+export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
+
   private memberService = inject(MemberService);
   private followService = inject(FollowService);
   isMobileSig = inject(ResponsiveService).isMobileSig;
@@ -41,6 +43,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
+  initLoad = true;
 
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
@@ -49,6 +52,14 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getMember();
     this.setGalleryImages();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.initLoad && this.tabGroup) {
+      this.setTabGroupParam(); // ViewChild is read in this lifeCycle only since it's in @if(async)
+
+      this.initLoad = false;
+    }
   }
 
   ngOnDestroy(): void {
@@ -105,5 +116,22 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
         galleryRef.load(this.images)
       }
     );
+  }
+
+  setTabGroupParam(): void {
+    this.route.queryParams.pipe(
+      take(1)).subscribe(params => {
+        const tab = params['tab'];
+        if (tab)
+          this.selectTab(tab);
+      });
+  }
+
+  selectTab(tabIndex: number, userName?: string): void {
+    if (this.tabGroup && this.initLoad) {
+      this.tabGroup.selectedIndex = tabIndex;
+    }
+    else
+      this.router.navigate(['/member/' + userName], { queryParams: { tab: tabIndex } });
   }
 }
