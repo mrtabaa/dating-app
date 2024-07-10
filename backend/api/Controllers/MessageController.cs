@@ -36,12 +36,12 @@ public class MessageController(
         PagedList<Message>? pagedMessages;
 
         if (messageParams.Predicate == MessagePredicate.Thread)
-            pagedMessages = await _messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
-        else
         {
             pagedMessages = await _messageRepository.GetThreadAsync(userId.Value, messageParams, cancellationToken);
             if (pagedMessages is null) return NotFound("Target user was not found.");
         }
+        else
+            pagedMessages = await _messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
 
         Response.AddPaginationHeader(new PaginationHeader(
             pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));

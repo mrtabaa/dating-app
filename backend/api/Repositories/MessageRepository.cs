@@ -79,8 +79,11 @@ public class MessageRepository : IMessageRepository
             return null;
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
-        .OrderBy(doc => doc.SentOn)
-        .Where(doc => doc.SenderId == userId || doc.RecieverId == userId);
+            .Where(doc => 
+                (doc.SenderId == userId && doc.RecieverId == targetUserId) ||
+                (doc.RecieverId == userId && doc.SenderId == targetUserId)
+            )
+            .OrderBy(doc => doc.SentOn);
 
         return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
