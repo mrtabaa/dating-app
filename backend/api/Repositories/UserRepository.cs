@@ -44,9 +44,7 @@ public class UserRepository : IUserRepository
            .Select(appUser => appUser.Id)
            .SingleOrDefaultAsync(cancellationToken);
 
-        return userId is null || !userId.HasValue || userId.Equals(ObjectId.Empty)
-        ? null
-        : userId;
+        return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
     }
 
     public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>
