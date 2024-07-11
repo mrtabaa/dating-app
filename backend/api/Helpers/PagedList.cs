@@ -49,3 +49,20 @@ public class PagedList<T> : List<T>
         return new PagedList<T>(items, count, pageNumber, pageSize);
     }
 }
+
+/*
+Count = 10;
+
+pageSize = 3;
+
+pages = 4;
+
+pageNumber = 1;
+count - (pageSize * pageNumber)
+10 - (3 * 1) = 7 => take 3
+
+
+pageNumber = 2;
+count - (pageSize * pageNumber)
+10 - (3 * 2) = 4 => take 3
+*/
