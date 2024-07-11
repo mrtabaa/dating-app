@@ -44,7 +44,7 @@ public class MemberRepository : IMemberRepository
         };
         #endregion Filters
 
-        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreatePagedListAscendingAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
+        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
 
         #region Convert all members' appUser.Photos to BlobLinkFormat
         for (int i = 0; i < appUsers.Count; i++)
