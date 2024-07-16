@@ -10,14 +10,13 @@ import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { ResponsiveService } from '../../services/responsive.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
-import { CommentComponent } from '../comment/comment.component';
 
 @Component({
   selector: 'app-main',
   standalone: true,
   imports: [
     RouterModule, CommonModule,
-    MemberListComponent, MemberListMobileComponent, FollowsComponent, MessagesComponent, AdminPanelComponent, CommentComponent,
+    MemberListComponent, MemberListMobileComponent, FollowsComponent, MessagesComponent, AdminPanelComponent,
     MatTabsModule, MatIconModule
   ],
   templateUrl: './main.component.html',
