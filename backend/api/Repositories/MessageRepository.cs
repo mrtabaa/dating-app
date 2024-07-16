@@ -90,7 +90,7 @@ public class MessageRepository : IMessageRepository
                 (doc.SenderId == userId && doc.RecieverId == targetUserId) ||
                 (doc.RecieverId == userId && doc.SenderId == targetUserId)
             )
-            .OrderBy(doc => doc.SentOn);
+            .OrderByDescending(doc => doc.SentOn);
 
         return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
     }
