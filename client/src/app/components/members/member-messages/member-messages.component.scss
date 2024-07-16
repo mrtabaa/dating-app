@@ -1,46 +1,60 @@
 main {
+    height: 66dvh;
+    overflow: hidden;
+
     display: flex;
     flex-direction: column;
+    justify-content: flex-end;
     gap: 1rem;
 
-    .messages {
-        ul {
-            list-style: none;
-            margin: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-right: 1rem;
+    .message-wrapper {
+        max-height: 60dvh;
+        overflow-y: auto;
 
-            * {
-                padding: 0;
+        .messages {
+
+            ul {
+                list-style: none;
                 margin: 0;
-            }
-
-            .title {
                 display: flex;
+                justify-content: space-between;
                 align-items: center;
-                color: rgb(116, 116, 116);
+                padding-right: 1rem;
 
                 * {
-                    font-size: 1rem;
+                    padding: 0;
+                    margin: 0;
                 }
 
-                p {
-                    font-size: 0.8rem;
-                }
-
-
-                mat-icon {
+                .title {
                     display: flex;
-                    justify-content: center;
                     align-items: center;
-                }
-            }
+                    color: rgb(116, 116, 116);
 
-            img {
-                border-radius: 50%;
+                    * {
+                        font-size: 1rem;
+                    }
+
+                    p {
+                        font-size: 0.8rem;
+                    }
+
+
+                    mat-icon {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                }
+
+                img {
+                    border-radius: 50%;
+                }
             }
         }
+    }
+
+    .create {
+        width: 100%;
     }
 }
