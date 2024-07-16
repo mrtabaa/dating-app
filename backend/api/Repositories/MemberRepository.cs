@@ -34,6 +34,7 @@ public class MemberRepository : IMemberRepository
 
         query = query.Where(appUser => appUser.Id != memberParams.UserId); // don't request/show the currentUser in the list
         query = query.Where(appUser => !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // don't show admin/moderator
+        query = query.Where(appUser => !(string.IsNullOrEmpty(appUser.NormalizedUserName) || appUser.NormalizedUserName.StartsWith("DEMO"))); // don't show demo users
         query = query.Where(appUser => appUser.Gender == memberParams.Gender); // get the opposite gender by default. It's set in MemberController
         query = query.Where(appUser => appUser.DateOfBirth >= MinDob && appUser.DateOfBirth <= MaxDob); // get ages between 2 age inputs
         query = memberParams.OrderBy switch

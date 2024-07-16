@@ -105,7 +105,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   generateMemberCreds(): void {
-    const randomAccount = 'ab' + this.generateRandomText(3);
+    const randomAccount = 'demo' + this.generateRandomText(3);
 
     if (this._recaptchaToken) {
 
