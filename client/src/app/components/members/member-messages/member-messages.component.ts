@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
 import { take } from 'rxjs';
@@ -19,6 +19,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
 import { ResponsiveService } from '../../../services/responsive.service';
+import { AccountService } from '../../../services/account.service';
+import { CreatedMessage } from '../../../models/createdMessage.model';
 
 @Component({
   selector: 'app-member-messages',
@@ -31,12 +33,14 @@ import { ResponsiveService } from '../../../services/responsive.service';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit {
+export class MemberMessagesComponent implements OnInit, AfterViewChecked {
   @Input() memberIn: Member | undefined;
+  @ViewChild('messagesContainer') private messagesContainer: ElementRef | undefined;
 
   private _messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   isMobileSig = inject(ResponsiveService).isMobileSig;
+  loggedInUserSig = inject(AccountService).loggedInUserSig;
 
   messages: Message[] = [];
 
@@ -54,10 +58,13 @@ export class MemberMessagesComponent implements OnInit {
   createMessageCtrl = this.fb.control('', [Validators.required, Validators.maxLength(500)]);
 
   ngOnInit(): void {
-    this.messageParams.predicate = MessagePredicate.THREAD;
-    this.messageParams.targetUserName = this.memberIn?.userName;
+    this.initMessageParams();
 
     this.getMessages();
+  }
+
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
   }
 
   create(): void {
@@ -70,7 +77,21 @@ export class MemberMessagesComponent implements OnInit {
       this._messageService.create(messageIn).pipe(
         take(1)
       ).subscribe({
-        next: (message: Message) => this.messages.push(message)
+        next: (createdMessage: CreatedMessage) => {
+          if (createdMessage) {
+            const message: Message = {
+              Id: createdMessage.Id,
+              userOrTargetUserName: this.loggedInUserSig()?.userName,
+              userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
+              userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
+              content: createdMessage.content,
+              sentOn: createdMessage.sentOn,
+              readOn: createdMessage.readOn,
+            }
+
+            this.messages.push(message);
+          }
+        }
       });
     }
   }
@@ -84,20 +105,36 @@ export class MemberMessagesComponent implements OnInit {
       ).subscribe({
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
-            this.messages = response.result;
+            // this.messages = response.result.reverse(); // reverse to sort messages from bottom(newer) to top(older)
+            this.messages = [...this.messages, ...response.result.reverse()]; // reverse to sort messages from bottom(newer) to top(older)
             this.pagination = response.pagination;
           }
         }
       });
   }
 
-  handlePageEvent(e: PageEvent) {
-    if (this.messageParams) {
-      this.pageEvent = e;
-      this.messageParams.pageSize = e.pageSize;
-      this.messageParams.pageNumber = e.pageIndex + 1;
+  loadMoreMessages(): void {
+    // this.messagesContainer?.nativeElement
+  }
 
-      this.getMessages();
-    }
+  scrollToBottom() {
+    try {
+      if (this.messagesContainer)
+        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+    } catch (err) { console.error(err) }
+  }
+
+  initMessageParams(): void {
+    this.messageParams.predicate = MessagePredicate.THREAD;
+    this.messageParams.targetUserName = this.memberIn?.userName;
+    this.messageParams.pageNumber = 1;
+    this.messageParams.pageSize = 25;
+  }
+
+  handlePagination(): void {
+    this.messageParams.pageNumber++;
+    this.messageParams.pageSize += 25;
+
+    this.getMessages();
   }
 }
