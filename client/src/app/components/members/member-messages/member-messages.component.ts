@@ -44,15 +44,20 @@ export class MemberMessagesComponent implements OnInit {
   loggedInUserSig = inject(AccountService).loggedInUserSig;
 
   messages: Message[] = [];
-  private isAutoScrolling: boolean = true;
   bufferSize = 0;
+  readonly MAX_BUFFER_SIZE = 1000 * 50; // Assuming 1000 messages as an upper limit
+  isFirstLoad = true;
 
   messageParams = new MessageParams();
   pagination: Pagination | undefined;
 
   photoWH = 40;
 
-  createMessageCtrl = this.fb.control('', [Validators.required, Validators.maxLength(500)]);
+  createMessageCtrl = this.fb.control('', [Validators.maxLength(500)]);
+
+  constructor() {
+    
+  }
 
   ngOnInit(): void {
     this.initMessageParams();
@@ -82,13 +87,15 @@ export class MemberMessagesComponent implements OnInit {
               readOn: createdMessage.readOn,
             }
 
-            this.messages.splice(0, 1); // to keep the bufferSize so scrollToBottom() works properly
-
             this.messages = [...this.messages, message];
+
+            this.bufferSize = Math.min(this.messages.length * 50, this.MAX_BUFFER_SIZE); // temprorarly increase the size to either of the length or the max size. 
 
             setTimeout(() => {
               this.scrollToBottom();
             }, 0)
+
+            this.createMessageCtrl.setValue(null);
           }
         }
       });
@@ -96,36 +103,49 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   getMessages(): void {
-    this.messages = []; // reset
-
     this._messageService.getInbox(this.messageParams)
-      .pipe(
-        take(1)
-      ).subscribe({
+      .subscribe({
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
-            // this.messages = response.result.reverse(); // reverse to sort messages from bottom(newer) to top(older)
-            this.messages = [...this.messages, ...response.result.reverse()]; // reverse to sort messages from bottom(newer) to top(older)
+            this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+
             this.pagination = response.pagination;
 
             this.bufferSize = this.messageParams.pageSize * 50; // 50 is the cdk's itemSize
 
-            setTimeout(() => {
-              this.scrollToBottom();
-            }, 0)
+            if (this.isFirstLoad) {
+              setTimeout(() => {
+                this.scrollToBottom();
+
+                this.isFirstLoad = false;
+              }, 0)
+            }
           }
         }
       });
   }
 
-  loadMoreMessages(): void {
-    // this.messagesContainer?.nativeElement
+  loadMoreMessages(event: number): void {
+    if (event === 0 && !this.isFirstLoad && this.pagination?.totalItems && this.pagination.totalItems > this.messages.length) {
+      this.messageParams.pageNumber++;
+      this.getMessages();
+      this.scrollToLoaded();
+    }
   }
 
   scrollToBottom() {
     try {
       if (this.viewPort) {
         this.viewPort.scrollToIndex(this.messages.length - 1, 'smooth');
+        this.bufferSize = this.messageParams.pageSize * 50; // reset to the actual size
+      }
+    } catch (err) { console.error(err) }
+  }
+
+  scrollToLoaded() {
+    try {
+      if (this.viewPort) {
+        this.viewPort.scrollToIndex(this.messageParams.pageSize, 'auto');
       }
     } catch (err) { console.error(err) }
   }
@@ -134,13 +154,6 @@ export class MemberMessagesComponent implements OnInit {
     this.messageParams.predicate = MessagePredicate.THREAD;
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
-    this.messageParams.pageSize = 50;
-  }
-
-  handlePagination(): void {
-    this.messageParams.pageNumber++;
-    this.messageParams.pageSize += 25;
-
-    this.getMessages();
+    this.messageParams.pageSize = 25;
   }
 }
