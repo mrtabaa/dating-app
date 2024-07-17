@@ -2,7 +2,7 @@ namespace api.Models;
 
 public record Message(
     string? Schema,
-    [property: BsonId, BsonRepresentation(BsonType.ObjectId)] ObjectId Id,
+    [Optional][property: BsonId, BsonRepresentation(BsonType.ObjectId)] ObjectId Id,
     ObjectId SenderId,
     ObjectId RecieverId,
     string Content,
