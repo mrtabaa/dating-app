@@ -1,11 +1,11 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewChecked, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Observable, Subscription, take } from 'rxjs';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MemberService } from '../../../services/member.service';
 import { MatButtonModule } from '@angular/material/button';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
@@ -18,6 +18,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { MemberDetailMobileComponent } from './member-detail-mobile/member-detail-mobile.component';
+import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 
 @Component({
   selector: 'app-user-detail',
@@ -25,14 +26,16 @@ import { MemberDetailMobileComponent } from './member-detail-mobile/member-detai
   imports: [
     CommonModule, NgOptimizedImage, RouterModule,
     MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
-    MemberDetailMobileComponent,
+    MemberDetailMobileComponent, MemberMessagesComponent,
     MatCardModule, MatTabsModule, MatButtonModule,
     GalleryModule, LightboxModule, IntlModule
   ],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.scss']
 })
-export class MemberDetailComponent implements OnInit, OnDestroy {
+export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
+  @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
+
   private memberService = inject(MemberService);
   private followService = inject(FollowService);
   isMobileSig = inject(ResponsiveService).isMobileSig;
@@ -41,6 +44,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
+  initLoad = true;
 
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
@@ -49,6 +53,14 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getMember();
     this.setGalleryImages();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.initLoad && this.tabGroup) {
+      this.setTabGroupParam(); // ViewChild is read in this lifeCycle only since it's in @if(async)
+
+      this.initLoad = false;
+    }
   }
 
   ngOnDestroy(): void {
@@ -105,5 +117,21 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
         galleryRef.load(this.images)
       }
     );
+  }
+
+  setTabGroupParam(): void {
+    this.route.queryParams.pipe(
+      take(1)).subscribe(params => {
+        const tab = params['tab'];
+        if (tab)
+          this.selectTab(tab);
+      });
+  }
+
+  selectTab(tabIndex: number): void {
+    if (this.tabGroup) {
+      this.tabGroup.selectedIndex = tabIndex;
+      this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
+    }
   }
 }

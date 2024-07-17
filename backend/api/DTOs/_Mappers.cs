@@ -93,22 +93,18 @@ namespace api.DTOs
         {
             return new Follow(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Id: ObjectId.GenerateNewId(),
                     FollowerId: followerId,
                     FollowedMemberId: followedMemberId
                 );
         }
 
-        public static Message ConvertMessageInDtoToMessage(string content, AppUser loggedInAppUser, AppUser targetAppUser)
+        public static Message ConvertMessageInDtoToMessage(string content, ObjectId userId, ObjectId receiverId)
         {
             return new Message(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: ObjectId.GenerateNewId(),
-                SenderId: loggedInAppUser.Id,
-                SenderUserName: loggedInAppUser.NormalizedUserName ?? "Contact Support!",
-                RecieverId: targetAppUser.Id,
-                ReceiverUserName: targetAppUser.NormalizedUserName ?? "Contact Support!",
-                Content: content,
+                SenderId: userId,
+                RecieverId: receiverId,
+                Content: content.Trim(),
                 SentOn: DateTime.UtcNow,
                 ReadOn: null,
                 SenderDeleted: false,
@@ -116,16 +112,29 @@ namespace api.DTOs
             );
         }
 
-        public static MessageDto ConvertMessageToMessageDto(Message message)
+        public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message)
         {
-            return new MessageDto(
-                Id: message.Id.ToString(),
-                SenderUserName: message.SenderUserName,
-                ReceiverUserName: message.ReceiverUserName,
-                Content: message.Content,
-                ReadOn: message.ReadOn,
-                SentOn: message.SentOn
-            );
+            return
+                new CreatedMessageDto(
+                    Id: message.Id.ToString(), // To delete/update
+                    Content: message.Content,
+                    ReadOn: message.ReadOn,
+                    SentOn: message.SentOn
+                );
+        }
+
+        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl)
+        {
+            return
+                new MessageDto(
+                    Id: message.Id.ToString(), // To delete/update
+                    UserOrTargetUserName: userOrTarget.UserName,
+                    UserOrTargetKnownAs: userOrTarget?.KnownAs,
+                    UserOrTargetProfilePhoto: profilePhotoSasUrl,
+                    Content: message.Content,
+                    ReadOn: message.ReadOn,
+                    SentOn: message.SentOn
+                );
         }
 
         #endregion Generator Methods

@@ -1,10 +1,7 @@
 namespace api.DTOs;
 
-public record MessageDto(
+public record CreatedMessageDto(
     string Id, // Use to update/delete message
-    string? UserOrTargetUserName,
-    string? UserOrTargetKnownAs,
-    string? UserOrTargetProfilePhoto,
     string Content,
     DateTime SentOn,
     DateTime? ReadOn

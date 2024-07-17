@@ -24,6 +24,7 @@ export class InputCvaComponent implements ControlValueAccessor {
   @Input() error = '';
   @Input() hint = '';
   @Input() isFocused = false;
+  @Input() isButtonSuffix = false;
 
   isPasswordHidden = true;
 

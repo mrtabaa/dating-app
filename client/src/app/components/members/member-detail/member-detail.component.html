@@ -45,19 +45,19 @@
             @else {
             <button (click)="addFollow(member)" mat-raised-button color="primary">Follow</button>
             }
-            <button mat-raised-button color="accent">Messages</button>
+            <button (click)="selectTab(3)" mat-raised-button color="accent">Messages</button>
             }
         </mat-card-actions>
     </mat-card>
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab-group #tabGroup (selectedTabChange)="(selectTab($event.index))" mat-stretch-tabs="false"
+        mat-align-tabs="start">
         <mat-tab label="Photos">
             <div class="tab-contents">
                 @if (images.length > 0) {
                 <div class="gallery">
                     @for (image of images; track $index) {
                     <div class="photo" [lightbox]="$index">
-                        <img gallerize [src]="image.data?.thumb"
-                            alt="{{member.knownAs + '\'s' + ' image'}}">
+                        <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
                         <mat-icon color="primary">zoom_in</mat-icon>
                     </div>
                     }
@@ -95,8 +95,8 @@
             </div>
         </mat-tab>
         <mat-tab label="Messages">
-            <div class="tab-contents">
-                Messages goes here...
+            <div class="tab-contents" style="padding: 0;">
+                <app-member-messages [memberIn]="member" />
             </div>
         </mat-tab>
     </mat-tab-group>

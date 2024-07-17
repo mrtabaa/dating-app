@@ -1,8 +1,9 @@
 export interface Message {
     Id: string;
-    senderUserName: string;
-    recipientUserName: string;
+    userOrTargetUserName: string | undefined;
+    userOrTargetKnownAs: string | undefined;
+    userOrTargetProfilePhoto: string | undefined;
     content: string;
-    readOn: Date;
     sentOn: Date
+    readOn: Date;
 }

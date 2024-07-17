@@ -37,3 +37,12 @@ public enum FollowAddOrRemove
     IsAdded,
     IsRemoved
 }
+
+public enum MessagePredicate
+{
+    Inbox,
+    Unread,
+    Read,
+    Sent,
+    Thread
+}

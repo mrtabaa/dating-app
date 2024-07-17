@@ -1,1 +1,85 @@
-<p>Under development. Come back soon!</p>
+<div class="container">
+    <nav class="side">
+        <mat-list>
+            <mat-list-item (click)="toggleTabs(Tabs.INBOX);" [ngClass]="{'selected-tab': selectedTab === Tabs.INBOX}">
+                <div mat-button class="menu-items">
+                    <mat-icon>inbox</mat-icon>
+                    Inbox
+                </div>
+            </mat-list-item>
+            <mat-list-item (click)="toggleTabs(Tabs.UNREAD);" [ngClass]="{'selected-tab': selectedTab === Tabs.UNREAD}">
+                <div mat-button class="menu-items">
+                    <mat-icon>mark_email_unread</mat-icon>
+                    Unread
+                </div>
+            </mat-list-item>
+            <mat-list-item (click)="toggleTabs(Tabs.READ);" [ngClass]="{'selected-tab': selectedTab === Tabs.READ}">
+                <div class="menu-items">
+                    <mat-icon>mark_as_unread</mat-icon>
+                    Read
+                </div>
+            </mat-list-item>
+            <mat-list-item (click)="toggleTabs(Tabs.SENT);" [ngClass]="{'selected-tab': selectedTab === Tabs.SENT}">
+                <div class="menu-items">
+                    <mat-icon>send</mat-icon>
+                    Sent
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </nav>
+    <main>
+        @if(messages.length === 0 && !isLoadingSig()) {
+        <h5 class="warning">This box is still empty.</h5>
+        }
+        @else {
+        <div class="table-wrapper">
+            <table mat-table [dataSource]="messages">
+                <!-- From/To Column -->
+                <ng-container matColumnDef="from">
+                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.SENT ? 'To' : 'From'}}</th>
+                    <td mat-cell *matCellDef="let row">
+                        <div class="user-info">
+                            <img ngSrc="{{row.userOrTargetProfilePhoto}}" priority width="32" height="32"
+                                alt="{{row.userOrTargetKnownAs[0]}}">
+                            {{row.userOrTargetKnownAs | shortenString: 20}}
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- Message Column -->
+                <ng-container matColumnDef="content">
+                    <th mat-header-cell *matHeaderCellDef>Message</th>
+                    <td mat-cell *matCellDef="let row">{{row.content | shortenString: 100}}</td>
+                </ng-container>
+
+                <!-- Sent On Column -->
+                <ng-container matColumnDef="sentOn">
+                    <th mat-header-cell *matHeaderCellDef>Sent on</th>
+                    <td mat-cell *matCellDef="let row">{{row.sentOn | date}}</td>
+                </ng-container>
+
+                <!-- Read On Column -->
+                <ng-container matColumnDef="readOn">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="times">
+                        Read on
+                    </th>
+                    <td mat-cell *matCellDef="let row">{{row.readOn | date}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    [routerLink]="['/member/' + row.userOrTargetUserName]" [queryParams]="{tab: 3}"></tr>
+            </table>
+        </div>
+
+        @if (pagination && messageParams) {
+        <mat-paginator class="paginator" #paginator (page)="handlePageEvent($event)" [length]="pagination.totalItems"
+            [pageSize]="messageParams.pageSize" [disabled]="false" [showFirstLastButtons]="showFirstLastButtons"
+            [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
+            [pageIndex]="messageParams.pageNumber - 1" aria-label="Select page" class="paginator">
+            <!-- pageIndex must start from 0 -->
+        </mat-paginator>
+        }
+        }
+    </main>
+</div>

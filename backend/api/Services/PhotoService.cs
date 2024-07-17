@@ -83,6 +83,18 @@ public class PhotoService(
     }
 
     /// <summary>
+    /// Gets a photo URL and convert it to the full blob format.
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns>'string on success OR 'null' on fail</returns>
+    public string? ConvertPhotoUrlToBlobLinkWithSas(string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return null;
+
+        return BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(url, _configuration, _blobContainerClient);
+    }
+
+    /// <summary>
     /// Gets a list of appUser.Photos from db and completes all their links to the full blob format.
     /// </summary>
     /// <param name="photos"></param>

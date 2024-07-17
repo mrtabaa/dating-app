@@ -90,8 +90,6 @@ public class TokenService : ITokenService
             .Select(appUser => appUser.Id)
             .SingleOrDefaultAsync(cancellationToken);
 
-        return (userId is null || !userId.HasValue || userId.Value.Equals(ObjectId.Empty))
-            ? null // user id is not found
-            : userId;
+        return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
     }
 }

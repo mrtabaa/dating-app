@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ResponsiveService } from '../../services/responsive.service';
 import { AccountService } from '../../services/account.service';
+import { CommonService } from '../../services/common.service';
 
 @Component({
   selector: 'app-footer',
@@ -18,6 +19,7 @@ export class FooterComponent {
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+  isMessageCompSig = inject(CommonService).isMessageCompSig;
 
   currentYear: number = new Date().getFullYear();
 }

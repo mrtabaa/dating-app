@@ -1,0 +1,66 @@
+main {
+    height: 66dvh;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .messages-container {
+        height: 60dvh;
+
+        .item {
+            border-bottom: rgb(194, 194, 194) dotted 1px;
+            list-style: none;
+            margin: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 1rem;
+            height: 50px;
+
+            * {
+                padding: 0;
+                margin: 0;
+            }
+
+            .details {
+                max-width: 100%;
+
+                .title {
+                    display: flex;
+                    align-items: center;
+                    color: rgb(116, 116, 116);
+
+                    * {
+                        font-size: 1rem;
+                    }
+
+                    p {
+                        font-size: 0.8rem;
+                    }
+
+
+                    mat-icon {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                }
+
+                .content {
+                    word-wrap: normal;
+                }
+            }
+
+            img {
+                border-radius: 50%;
+            }
+        }
+    }
+
+    .create {
+        width: 100%;
+    }
+}

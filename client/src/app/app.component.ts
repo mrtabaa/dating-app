@@ -11,6 +11,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Observable, map } from 'rxjs';
 import { ResponsiveService } from './services/responsive.service';
 import { NavMobileComponent } from './components/navbar/nav-mobile/nav-mobile.component';
+import { CommonService } from './services/common.service';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
-  isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+  isMessageCompSig = inject(CommonService).isMessageCompSig;
 
   isMobileView$: Observable<boolean>;
 

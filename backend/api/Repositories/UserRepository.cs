@@ -29,7 +29,7 @@ public class UserRepository : IUserRepository
         await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-      await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+        await _collection.Find<AppUser>(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
 
     /// <summary>
     /// Obtain userId using userName. Check if ObjectId.HasValue and is NOT ObjectId.Empty.
@@ -44,9 +44,7 @@ public class UserRepository : IUserRepository
            .Select(appUser => appUser.Id)
            .SingleOrDefaultAsync(cancellationToken);
 
-        return userId is null || !userId.HasValue || userId.Equals(ObjectId.Empty)
-        ? null
-        : userId;
+        return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
     }
 
     public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>

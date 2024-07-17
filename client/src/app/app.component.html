@@ -15,7 +15,7 @@
       </nav>
     </header>
 
-    <main>
+    <main [ngClass]="{ 'main-no-padding-margin': isMessageCompSig()}">
       <div class="wrapper">
         <router-outlet />
       </div>
