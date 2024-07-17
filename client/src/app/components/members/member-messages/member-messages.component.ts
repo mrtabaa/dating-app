@@ -1,8 +1,8 @@
-import { AfterViewChecked, Component, ElementRef, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
 import { take } from 'rxjs';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MessageParams } from '../../../models/helpers/message-params';
 import { Pagination } from '../../../models/helpers/pagination';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
@@ -21,6 +21,7 @@ import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component'
 import { ResponsiveService } from '../../../services/responsive.service';
 import { AccountService } from '../../../services/account.service';
 import { CreatedMessage } from '../../../models/createdMessage.model';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-member-messages',
@@ -28,14 +29,14 @@ import { CreatedMessage } from '../../../models/createdMessage.model';
   imports: [
     CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
     ShortenStringPipe, IntlModule, InputCvaComponent,
-    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule
+    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
   ],
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit, AfterViewChecked {
+export class MemberMessagesComponent implements OnInit {
   @Input() memberIn: Member | undefined;
-  @ViewChild('messagesContainer') private messagesContainer: ElementRef | undefined;
+  @ViewChild(CdkVirtualScrollViewport) private viewPort: CdkVirtualScrollViewport | undefined;
 
   private _messageService = inject(MessageService);
   private fb = inject(FormBuilder);
@@ -43,15 +44,11 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
   loggedInUserSig = inject(AccountService).loggedInUserSig;
 
   messages: Message[] = [];
+  private isAutoScrolling: boolean = true;
+  bufferSize = 0;
 
   messageParams = new MessageParams();
   pagination: Pagination | undefined;
-  pageSizeOptions = [9, 25, 50];
-  hidePageSize = false;
-  showPageSizeOptions = true;
-  showFirstLastButtons = true;
-  disabled = false;
-  pageEvent: PageEvent | undefined;
 
   photoWH = 40;
 
@@ -61,10 +58,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
     this.initMessageParams();
 
     this.getMessages();
-  }
-
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
   }
 
   create(): void {
@@ -89,7 +82,13 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
               readOn: createdMessage.readOn,
             }
 
-            this.messages.push(message);
+            this.messages.splice(0, 1); // to keep the bufferSize so scrollToBottom() works properly
+
+            this.messages = [...this.messages, message];
+
+            setTimeout(() => {
+              this.scrollToBottom();
+            }, 0)
           }
         }
       });
@@ -108,6 +107,12 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
             // this.messages = response.result.reverse(); // reverse to sort messages from bottom(newer) to top(older)
             this.messages = [...this.messages, ...response.result.reverse()]; // reverse to sort messages from bottom(newer) to top(older)
             this.pagination = response.pagination;
+
+            this.bufferSize = this.messageParams.pageSize * 50; // 50 is the cdk's itemSize
+
+            setTimeout(() => {
+              this.scrollToBottom();
+            }, 0)
           }
         }
       });
@@ -119,8 +124,9 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
 
   scrollToBottom() {
     try {
-      if (this.messagesContainer)
-        this.messagesContainer.nativeElement.scrollTop = this.messagesContainer.nativeElement.scrollHeight;
+      if (this.viewPort) {
+        this.viewPort.scrollToIndex(this.messages.length - 1, 'smooth');
+      }
     } catch (err) { console.error(err) }
   }
 
@@ -128,7 +134,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewChecked {
     this.messageParams.predicate = MessagePredicate.THREAD;
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
-    this.messageParams.pageSize = 25;
+    this.messageParams.pageSize = 50;
   }
 
   handlePagination(): void {
