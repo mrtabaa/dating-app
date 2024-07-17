@@ -93,7 +93,6 @@ namespace api.DTOs
         {
             return new Follow(
                     Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    Id: ObjectId.GenerateNewId(),
                     FollowerId: followerId,
                     FollowedMemberId: followedMemberId
                 );
@@ -103,7 +102,6 @@ namespace api.DTOs
         {
             return new Message(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                Id: ObjectId.GenerateNewId(),
                 SenderId: userId,
                 RecieverId: receiverId,
                 Content: content.Trim(),
@@ -113,7 +111,7 @@ namespace api.DTOs
                 ReceiverDeleted: false
             );
         }
-        
+
         public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message)
         {
             return
