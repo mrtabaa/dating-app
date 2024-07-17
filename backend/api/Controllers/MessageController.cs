@@ -9,19 +9,17 @@ public class MessageController(
     ) : BaseApiController
 {
     [HttpPost]
-    public async Task<ActionResult<MessageDto>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<CreatedMessageDto?>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        MessageStatus mS = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
+        CreatedMessageDto? createdMessageDto = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
 
-        return mS.MessageDto is not null
-        ? mS.MessageDto
-        : mS.IsReceiverNotFound
-        ? NotFound($"The target member {messageInDto.ReceiverUserName} is not found.")
-        : BadRequest("Sending message faild. Try again or contact the support.");
+        return createdMessageDto is null
+        ? BadRequest("Sending message faild. Try again or contact the support.")
+        : createdMessageDto;
     }
 
     [HttpGet]

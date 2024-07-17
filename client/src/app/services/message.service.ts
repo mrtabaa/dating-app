@@ -7,6 +7,7 @@ import { PaginatedResult } from '../models/helpers/paginatedResult';
 import { PaginationHandler } from '../extensions/paginationHandler';
 import { MessageParams } from '../models/helpers/message-params';
 import { MessageIn } from '../models/messageIn.model';
+import { CreatedMessage } from '../models/createdMessage.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +17,8 @@ export class MessageService {
   private _baseUrl: string = environment.apiUrl + 'message/';
   private _paginationHandler = new PaginationHandler();
 
-  create(messageIn: MessageIn): Observable<Message> {
-    return this._http.post<Message>(this._baseUrl, messageIn);
+  create(messageIn: MessageIn): Observable<CreatedMessage> {
+    return this._http.post<CreatedMessage>(this._baseUrl, messageIn);
   }
 
   getInbox(messageParams: MessageParams): Observable<PaginatedResult<Message[]>> {

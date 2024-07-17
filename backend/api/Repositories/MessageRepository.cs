@@ -25,27 +25,18 @@ public class MessageRepository : IMessageRepository
     #endregion Db and Token Settings
 
     #region CRUD
-    public async Task<MessageStatus> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
+    public async Task<CreatedMessageDto?> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
         AppUser? targetUser = await _userRepository.GetByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
 
         if (targetUser is null)
-        {
-            return new MessageStatus(IsReceiverNotFound: true);
-        }
+            return null;
 
         Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, targetUser.Id);
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
-        // Convert all targetMember profile photo to blob Sas format
-        string? profilePhotoUrl = targetUser.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165;
-
-        string? profilePhotoSasUrl = _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
-
-        MessageDto messageDto = Mappers.ConvertMessageToMessageDto(message, targetUser, profilePhotoSasUrl);
-
-        return new MessageStatus(MessageDto: messageDto);
+        return Mappers.ConvertMessageToCreatedMessageDto(message);
     }
 
     public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)

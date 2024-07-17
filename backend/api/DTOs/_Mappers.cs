@@ -113,12 +113,23 @@ namespace api.DTOs
                 ReceiverDeleted: false
             );
         }
+        
+        public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message)
+        {
+            return
+                new CreatedMessageDto(
+                    Id: message.Id.ToString(), // To delete/update // TODO test ObjectId
+                    Content: message.Content,
+                    ReadOn: message.ReadOn,
+                    SentOn: message.SentOn
+                );
+        }
 
         public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl)
         {
             return
                 new MessageDto(
-                    Id: message.Id.ToString(), // To delete/update
+                    Id: message.Id.ToString(), // To delete/update // TODO test ObjectId
                     UserOrTargetUserName: userOrTarget.UserName,
                     UserOrTargetKnownAs: userOrTarget?.KnownAs,
                     UserOrTargetProfilePhoto: profilePhotoSasUrl,
