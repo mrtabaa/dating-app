@@ -104,7 +104,7 @@
                     <mat-icon [color]="messages.isActive ? 'primary' : ''">mail</mat-icon>
                 </ng-template>
                 <div class="messages">
-                    Live messaging system will be here soon...
+                    <app-member-messages [memberIn]="member" />
                 </div>
             </div>
         </mat-tab>
