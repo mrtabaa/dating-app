@@ -17,12 +17,14 @@ import { LightboxModule } from 'ng-gallery/lightbox';
 import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MemberMessagesComponent } from '../../member-messages/member-messages.component';
 
 @Component({
   selector: 'app-member-detail-mobile',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, RouterModule, ShortenStringPipe,
+    MemberMessagesComponent,
     MatCardModule, MatTabsModule, MatButtonModule, MatDividerModule, MatIconModule,
     GalleryModule, LightboxModule, IntlModule
   ],

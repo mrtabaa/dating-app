@@ -22,13 +22,14 @@ import { ResponsiveService } from '../../../services/responsive.service';
 import { AccountService } from '../../../services/account.service';
 import { CreatedMessage } from '../../../models/createdMessage.model';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
+import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-height.directive';
 
 @Component({
   selector: 'app-member-messages',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
-    ShortenStringPipe, IntlModule, InputCvaComponent,
+    ShortenStringPipe, IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
     MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
   ],
   templateUrl: './member-messages.component.html',
@@ -36,7 +37,7 @@ import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrollin
 })
 export class MemberMessagesComponent implements OnInit {
   @Input() memberIn: Member | undefined;
-  @ViewChild(CdkVirtualScrollViewport) private viewPort: CdkVirtualScrollViewport | undefined;
+  @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
 
   private _messageService = inject(MessageService);
   private fb = inject(FormBuilder);
@@ -45,7 +46,8 @@ export class MemberMessagesComponent implements OnInit {
 
   messages: Message[] = [];
   bufferSize = 0;
-  readonly MAX_BUFFER_SIZE = 1000 * 50; // Assuming 1000 messages as an upper limit
+  defaultItemSize = 50;
+  readonly MAX_BUFFER_SIZE = 1000 * this.defaultItemSize; // Assuming 1000 messages as an upper limit
   isFirstLoad = true;
 
   messageParams = new MessageParams();
@@ -53,11 +55,7 @@ export class MemberMessagesComponent implements OnInit {
 
   photoWH = 40;
 
-  createMessageCtrl = this.fb.control('', [Validators.maxLength(500)]);
-
-  constructor() {
-    
-  }
+  createMessageCtrl = this.fb.control('', [Validators.maxLength(1000)]);
 
   ngOnInit(): void {
     this.initMessageParams();
@@ -84,16 +82,14 @@ export class MemberMessagesComponent implements OnInit {
               userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
               content: createdMessage.content,
               sentOn: createdMessage.sentOn,
-              readOn: createdMessage.readOn,
+              readOn: createdMessage.readOn
             }
 
             this.messages = [...this.messages, message];
 
-            this.bufferSize = Math.min(this.messages.length * 50, this.MAX_BUFFER_SIZE); // temprorarly increase the size to either of the length or the max size. 
+            this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE); // temprorarly increase the size to either of the length or the max size. 
 
-            setTimeout(() => {
-              this.scrollToBottom();
-            }, 0)
+            this.scrollToBottom();
 
             this.createMessageCtrl.setValue(null);
           }
@@ -111,14 +107,16 @@ export class MemberMessagesComponent implements OnInit {
 
             this.pagination = response.pagination;
 
-            this.bufferSize = this.messageParams.pageSize * 50; // 50 is the cdk's itemSize
+            this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // 50 is the cdk's itemSize
 
             if (this.isFirstLoad) {
-              setTimeout(() => {
-                this.scrollToBottom();
 
-                this.isFirstLoad = false;
-              }, 0)
+              this.scrollToBottom();
+
+              this.isFirstLoad = false;
+            }
+            else {
+              this.scrollToReloaded();
             }
           }
         }
@@ -129,24 +127,32 @@ export class MemberMessagesComponent implements OnInit {
     if (event === 0 && !this.isFirstLoad && this.pagination?.totalItems && this.pagination.totalItems > this.messages.length) {
       this.messageParams.pageNumber++;
       this.getMessages();
-      this.scrollToLoaded();
     }
   }
 
   scrollToBottom() {
     try {
-      if (this.viewPort) {
-        this.viewPort.scrollToIndex(this.messages.length - 1, 'smooth');
-        this.bufferSize = this.messageParams.pageSize * 50; // reset to the actual size
-      }
+      setTimeout(() => {
+        if (this.viewport) {
+          this.viewport.scrollToIndex(this.messages.length - 1, 'smooth');
+          this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // reset to the actual size for performance
+        }
+      }, 0);
     } catch (err) { console.error(err) }
   }
 
-  scrollToLoaded() {
+  scrollChangeIndex = 10;
+
+  scrollToReloaded() {
     try {
-      if (this.viewPort) {
-        this.viewPort.scrollToIndex(this.messageParams.pageSize, 'auto');
-      }
+      setTimeout(() => {
+        if (this.viewport) {
+          if (this.messages.length > this.messageParams.pageSize) {
+
+            this.viewport.scrollToIndex((this.messages.length - 1) - (this.messageParams.pageSize * (this.messageParams.pageNumber - 1)), 'instant');
+          }
+        }
+      }, 0);
     } catch (err) { console.error(err) }
   }
 
