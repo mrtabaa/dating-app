@@ -87,7 +87,8 @@ export class MemberMessagesComponent implements OnInit {
 
             this.messages = [...this.messages, message];
 
-            this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE); // temprorarly increase the size to either of the length or the max size. 
+            // temprorarly increase the size to either of the length or the max size. 
+            this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE);
 
             this.scrollToBottom();
 
@@ -107,41 +108,35 @@ export class MemberMessagesComponent implements OnInit {
 
             this.pagination = response.pagination;
 
-            this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // 50 is the cdk's itemSize
-
-            if (this.isFirstLoad) {
-
+            if (this.isFirstLoad)
               this.scrollToBottom();
-
-              this.isFirstLoad = false;
-            }
-            else {
-              this.scrollToReloaded();
-            }
           }
         }
       });
   }
 
   loadMoreMessages(event: number): void {
-    if (event === 0 && !this.isFirstLoad && this.pagination?.totalItems && this.pagination.totalItems > this.messages.length) {
+    console.log('before');
+
+    if (event === 0 && !this.isFirstLoad) {
       this.messageParams.pageNumber++;
       this.getMessages();
+      console.log('after');
     }
   }
 
   scrollToBottom() {
+    this.initBufferSize();
+
     try {
       setTimeout(() => {
         if (this.viewport) {
           this.viewport.scrollToIndex(this.messages.length - 1, 'smooth');
-          this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // reset to the actual size for performance
+          this.initBufferSize();
         }
       }, 0);
     } catch (err) { console.error(err) }
   }
-
-  scrollChangeIndex = 10;
 
   scrollToReloaded() {
     try {
@@ -161,5 +156,10 @@ export class MemberMessagesComponent implements OnInit {
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
     this.messageParams.pageSize = 25;
+  }
+
+  initBufferSize(): void {
+    // Set/Reset bufferSize for performance.
+    this.bufferSize = this.messageParams.pageSize * this.defaultItemSize;
   }
 }
