@@ -23,6 +23,7 @@ import { AccountService } from '../../../services/account.service';
 import { CreatedMessage } from '../../../models/createdMessage.model';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-height.directive';
+import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-member-messages',
@@ -43,6 +44,7 @@ export class MemberMessagesComponent implements OnInit {
   private fb = inject(FormBuilder);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
+  isLoadingSig = inject(LoadingService).isLoadingsig;
 
   messages: Message[] = [];
   bufferSize = 0;

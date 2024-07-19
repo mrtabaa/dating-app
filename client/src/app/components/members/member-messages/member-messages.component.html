@@ -1,8 +1,12 @@
 <main>
-    @if(messages.length < 1) {
-        <h5>Empty box</h5>
-        <p>Chatting can increase your chance of finding a right match.</p>
-        <p>Start now by sending your first message!</p>
+    @if(!isLoadingSig() && messages.length < 1) {
+        <div class="warning">
+            <h5>Empty box</h5>
+            <p>
+                Chatting can increase your chance of finding a right match. <br />
+                Start now by sending your first message!
+            </p>
+        </div>
     }
     @else {
     <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
