@@ -4,11 +4,21 @@ main {
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    gap: 1rem;
+    justify-content: space-between;
+
+    .warning {
+        height: 50dvh;
+        color: rgb(121, 121, 121);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
     .messages-container {
         height: 60dvh;
+        padding: 1rem 0;
 
         .item {
             border-bottom: rgb(194, 194, 194) dotted 1px;

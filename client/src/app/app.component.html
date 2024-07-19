@@ -1,7 +1,9 @@
 <div class="page">
+  @if(!commonService.isCreatingMessageSig()) {
   <ngx-spinner type="ball-atom">
     <p>Loading...</p>
   </ngx-spinner>
+  }
 
   <section class="container">
     <header>
@@ -15,7 +17,7 @@
       </nav>
     </header>
 
-    <main [ngClass]="{ 'main-no-padding-margin': isMessageCompSig()}">
+    <main [ngClass]="{ 'main-no-padding-margin': commonService.isMessageCompSig()}">
       <div class="wrapper">
         <router-outlet />
       </div>

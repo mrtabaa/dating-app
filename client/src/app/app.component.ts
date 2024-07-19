@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
-  isMessageCompSig = inject(CommonService).isMessageCompSig;
+  commonService = inject(CommonService);
 
   isMobileView$: Observable<boolean>;
 

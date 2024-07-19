@@ -23,6 +23,9 @@ import { AccountService } from '../../../services/account.service';
 import { CreatedMessage } from '../../../models/createdMessage.model';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-height.directive';
+import { LoadingService } from '../../../services/loading.service';
+import { v4 as uuidv4 } from 'uuid';
+import { CommonService } from '../../../services/common.service';
 
 @Component({
   selector: 'app-member-messages',
@@ -43,6 +46,8 @@ export class MemberMessagesComponent implements OnInit {
   private fb = inject(FormBuilder);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
+  isLoadingSig = inject(LoadingService).isLoadingsig;
+  isCreatingMessageSig = inject(CommonService).isCreatingMessageSig;
 
   messages: Message[] = [];
   bufferSize = 0;
@@ -59,41 +64,65 @@ export class MemberMessagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.initMessageParams();
+    this.initBufferSize();
 
     this.getMessages();
   }
 
   create(): void {
+    this.isCreatingMessageSig.set(true); // disable loading ngx-spinner
+
     if (this.memberIn?.userName && this.createMessageCtrl.value) {
+      const tempId = uuidv4(); // Generate a UUID
+
       const messageIn: MessageIn = {
+        tempId: tempId,
         content: this.createMessageCtrl.value,
         receiverUserName: this.memberIn?.userName
       }
 
+      //#region Create and add to messages for Optimistic approach
+      const message: Message = {
+        tempId: tempId, // to find the message from messages after API response to update the list's message props
+        userOrTargetUserName: this.loggedInUserSig()?.userName,
+        userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
+        userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
+        content: messageIn.content,
+        sentOn: new Date()
+      }
+
+      this.messages = [...this.messages, message];
+
+      // temprorarly increase the size to either of the length or the max size. 
+      this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE);
+
+      this.scrollToBottom();
+
+      this.createMessageCtrl.setValue(null);
+      //#endregion Create and add to messages for Optimistic approach
+
+      // Send it to API
       this._messageService.create(messageIn).pipe(
         take(1)
       ).subscribe({
         next: (createdMessage: CreatedMessage) => {
           if (createdMessage) {
-            const message: Message = {
-              Id: createdMessage.Id,
-              userOrTargetUserName: this.loggedInUserSig()?.userName,
-              userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
-              userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
-              content: createdMessage.content,
-              sentOn: createdMessage.sentOn,
-              readOn: createdMessage.readOn
-            }
+            // Update message of the messages with API validated values
+            const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
 
-            this.messages = [...this.messages, message];
+            this.messages[index].Id = createdMessage.Id;
+            this.messages[index].sentOn = createdMessage.sentOn;
+            this.messages[index].readOn = createdMessage.readOn;
 
-            this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE); // temprorarly increase the size to either of the length or the max size. 
+            delete this.messages[index].tempId; // Remove the tempId once updated 
 
-            this.scrollToBottom();
-
-            this.createMessageCtrl.setValue(null);
+            setTimeout(() => {
+              this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
+            }, 100);
           }
-        }
+        },
+        // delete message for API BadRequest response. 
+        error: () => this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
       });
     }
   }
@@ -104,29 +133,26 @@ export class MemberMessagesComponent implements OnInit {
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
             this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-
             this.pagination = response.pagination;
 
-            this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // 50 is the cdk's itemSize
-
-            if (this.isFirstLoad) {
-
+            if (this.isFirstLoad)
               this.scrollToBottom();
-
-              this.isFirstLoad = false;
-            }
-            else {
+            else
               this.scrollToReloaded();
-            }
           }
         }
       });
   }
 
-  loadMoreMessages(event: number): void {
-    if (event === 0 && !this.isFirstLoad && this.pagination?.totalItems && this.pagination.totalItems > this.messages.length) {
-      this.messageParams.pageNumber++;
-      this.getMessages();
+  loadOlderMessages(event: number): void {
+    if (this.viewport && !this.isFirstLoad) {
+      const range = this.viewport.getRenderedRange();
+
+      if (event === range.start) {
+        this.messageParams.pageNumber++;
+        this.getMessages();
+        this.scrollToReloaded();
+      }
     }
   }
 
@@ -135,22 +161,19 @@ export class MemberMessagesComponent implements OnInit {
       setTimeout(() => {
         if (this.viewport) {
           this.viewport.scrollToIndex(this.messages.length - 1, 'smooth');
-          this.bufferSize = this.messageParams.pageSize * this.defaultItemSize; // reset to the actual size for performance
+
+          this.initBufferSize();
+          this.isFirstLoad = false;
         }
       }, 0);
     } catch (err) { console.error(err) }
   }
 
-  scrollChangeIndex = 10;
-
   scrollToReloaded() {
     try {
       setTimeout(() => {
         if (this.viewport) {
-          if (this.messages.length > this.messageParams.pageSize) {
-
-            this.viewport.scrollToIndex((this.messages.length - 1) - (this.messageParams.pageSize * (this.messageParams.pageNumber - 1)), 'instant');
-          }
+          this.viewport.scrollToIndex((this.messages.length) - this.messageParams.pageSize * (this.messageParams.pageNumber - 1), 'instant');
         }
       }, 0);
     } catch (err) { console.error(err) }
@@ -161,5 +184,10 @@ export class MemberMessagesComponent implements OnInit {
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
     this.messageParams.pageSize = 25;
+  }
+
+  initBufferSize(): void {
+    // Set/Reset bufferSize for performance.
+    this.bufferSize = this.messageParams.pageSize * this.defaultItemSize;
   }
 }

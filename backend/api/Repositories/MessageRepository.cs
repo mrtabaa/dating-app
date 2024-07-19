@@ -36,7 +36,7 @@ public class MessageRepository : IMessageRepository
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
-        return Mappers.ConvertMessageToCreatedMessageDto(message);
+        return Mappers.ConvertMessageToCreatedMessageDto(message, messageInDto.TempId);
     }
 
     public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
