@@ -35,6 +35,7 @@ import { MemberMessagesComponent } from '../member-messages/member-messages.comp
 })
 export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
+  @ViewChild('memberMessage') memberMessage: MemberMessagesComponent | undefined;
 
   private memberService = inject(MemberService);
   private followService = inject(FollowService);
@@ -132,6 +133,9 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
+
+      this.memberMessage?.initBufferSize();
+      this.memberMessage?.scrollToBottom();
     }
   }
 }
