@@ -112,10 +112,11 @@ namespace api.DTOs
             );
         }
 
-        public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message)
+        public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message, string tempId)
         {
             return
                 new CreatedMessageDto(
+                    TempId: tempId,
                     Id: message.Id.ToString(), // To delete/update
                     Content: message.Content,
                     ReadOn: message.ReadOn,

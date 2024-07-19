@@ -6,4 +6,5 @@ import { Injectable, signal } from '@angular/core';
 export class CommonService {
   isPreventingLeavingPage: boolean = false;
   isMessageCompSig = signal<boolean>(false);
+  isCreatingMessageSig = signal<boolean>(false);
 }

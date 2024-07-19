@@ -24,6 +24,8 @@ import { CreatedMessage } from '../../../models/createdMessage.model';
 import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-height.directive';
 import { LoadingService } from '../../../services/loading.service';
+import { v4 as uuidv4 } from 'uuid';
+import { CommonService } from '../../../services/common.service';
 
 @Component({
   selector: 'app-member-messages',
@@ -45,6 +47,7 @@ export class MemberMessagesComponent implements OnInit {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
+  isCreatingMessageSig = inject(CommonService).isCreatingMessageSig;
 
   messages: Message[] = [];
   bufferSize = 0;
@@ -67,37 +70,59 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   create(): void {
+    this.isCreatingMessageSig.set(true); // disable loading ngx-spinner
+
     if (this.memberIn?.userName && this.createMessageCtrl.value) {
+      const tempId = uuidv4(); // Generate a UUID
+
       const messageIn: MessageIn = {
+        tempId: tempId,
         content: this.createMessageCtrl.value,
         receiverUserName: this.memberIn?.userName
       }
 
+      //#region Create and add to messages for Optimistic approach
+      const message: Message = {
+        tempId: tempId, // to find the message from messages after API response to update the list's message props
+        userOrTargetUserName: this.loggedInUserSig()?.userName,
+        userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
+        userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
+        content: messageIn.content,
+        sentOn: new Date()
+      }
+
+      this.messages = [...this.messages, message];
+
+      // temprorarly increase the size to either of the length or the max size. 
+      this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE);
+
+      this.scrollToBottom();
+
+      this.createMessageCtrl.setValue(null);
+      //#endregion Create and add to messages for Optimistic approach
+
+      // Send it to API
       this._messageService.create(messageIn).pipe(
         take(1)
       ).subscribe({
         next: (createdMessage: CreatedMessage) => {
           if (createdMessage) {
-            const message: Message = {
-              Id: createdMessage.Id,
-              userOrTargetUserName: this.loggedInUserSig()?.userName,
-              userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
-              userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
-              content: createdMessage.content,
-              sentOn: createdMessage.sentOn,
-              readOn: createdMessage.readOn
-            }
+            // Update message of the messages with API validated values
+            const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
 
-            this.messages = [...this.messages, message];
+            this.messages[index].Id = createdMessage.Id;
+            this.messages[index].sentOn = createdMessage.sentOn;
+            this.messages[index].readOn = createdMessage.readOn;
 
-            // temprorarly increase the size to either of the length or the max size. 
-            this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE);
+            delete this.messages[index].tempId; // Remove the tempId once updated 
 
-            this.scrollToBottom();
-
-            this.createMessageCtrl.setValue(null);
+            setTimeout(() => {
+              this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
+            }, 100);
           }
-        }
+        },
+        // delete message for API BadRequest response. 
+        error: () => this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
       });
     }
   }
