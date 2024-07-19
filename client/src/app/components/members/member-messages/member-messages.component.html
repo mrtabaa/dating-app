@@ -5,7 +5,7 @@
         <p>Start now by sending your first message!</p>
     }
     @else {
-    <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadMoreMessages($event)" [minBufferPx]="bufferSize"
+    <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
         [maxBufferPx]="bufferSize" itemSize="50" class="messages-container">
         <div *cdkVirtualFor="let message of messages" [appCdkDynamicHeightDir]="message" class="item">
             <div class="details">

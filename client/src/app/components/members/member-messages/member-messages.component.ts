@@ -59,6 +59,7 @@ export class MemberMessagesComponent implements OnInit {
 
   ngOnInit(): void {
     this.initMessageParams();
+    this.initBufferSize();
 
     this.getMessages();
   }
@@ -105,34 +106,37 @@ export class MemberMessagesComponent implements OnInit {
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
             this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-
             this.pagination = response.pagination;
 
             if (this.isFirstLoad)
               this.scrollToBottom();
+            else
+              this.scrollToReloaded();
           }
         }
       });
   }
 
-  loadMoreMessages(event: number): void {
-    console.log('before');
+  loadOlderMessages(event: number): void {
+    if (this.viewport && !this.isFirstLoad) {
+      const range = this.viewport.getRenderedRange();
 
-    if (event === 0 && !this.isFirstLoad) {
-      this.messageParams.pageNumber++;
-      this.getMessages();
-      console.log('after');
+      if (event === range.start) {
+        this.messageParams.pageNumber++;
+        this.getMessages();
+        this.scrollToReloaded();
+      }
     }
   }
 
   scrollToBottom() {
-    this.initBufferSize();
-
     try {
       setTimeout(() => {
         if (this.viewport) {
           this.viewport.scrollToIndex(this.messages.length - 1, 'smooth');
+
           this.initBufferSize();
+          this.isFirstLoad = false;
         }
       }, 0);
     } catch (err) { console.error(err) }
@@ -142,10 +146,7 @@ export class MemberMessagesComponent implements OnInit {
     try {
       setTimeout(() => {
         if (this.viewport) {
-          if (this.messages.length > this.messageParams.pageSize) {
-
-            this.viewport.scrollToIndex((this.messages.length - 1) - (this.messageParams.pageSize * (this.messageParams.pageNumber - 1)), 'instant');
-          }
+          this.viewport.scrollToIndex((this.messages.length) - this.messageParams.pageSize * (this.messageParams.pageNumber - 1), 'instant');
         }
       }, 0);
     } catch (err) { console.error(err) }
