@@ -1,8 +1,8 @@
-$navbar-footer: 56px * 2;
-$detailsAndNav: 14rem;
+$navbar-footer_h: 56px * 2;
+$detailsAndNav_h: 14rem;
 
 main {
-    height: calc(100dvh - $navbar-footer - $detailsAndNav);
+    height: calc(100dvh - $navbar-footer_h - $detailsAndNav_h);
     overflow: hidden;
 
     display: flex;
