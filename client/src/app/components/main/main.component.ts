@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, effect, inject, ViewChild } from '@angular/core';
 import { MemberListComponent } from '../members/member-list/member-list.component';
 import { MemberListMobileComponent } from '../members/member-list/member-list-mobile/member-list-mobile.component';
 import { FollowsComponent } from '../follows/follows.component';
@@ -10,6 +10,7 @@ import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { ResponsiveService } from '../../services/responsive.service';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { CommonService } from '../../services/common.service';
 
 @Component({
   selector: 'app-main',
@@ -23,15 +24,19 @@ import { CommonModule } from '@angular/common';
   styleUrl: './main.component.scss'
 })
 export class MainComponent {
+  @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
-
-  @ViewChild('matTabGroup') matTabGroup: MatTabGroup | undefined;
+  private isNavMobileBrandClickedSig = inject(CommonService).isNavMobileBrandClickedSig;
 
   links = ['members', 'friends', 'messages', 'admin'];
-  isTabSelected = false;
 
-  detectTabSelection(): void {
-
+  constructor() {
+    effect(() => {
+      if (this.tabGroup && this.isNavMobileBrandClickedSig()) {
+        this.tabGroup.selectedIndex = 0;
+        this.isNavMobileBrandClickedSig.set(false);
+      }
+    }, { allowSignalWrites: true });
   }
 }

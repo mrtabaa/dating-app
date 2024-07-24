@@ -3,12 +3,13 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AccountService } from '../../../services/account.service';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
+import { CommonService } from '../../../services/common.service';
 
 @Component({
   selector: 'app-nav-mobile',
@@ -24,10 +25,10 @@ import { MatDividerModule } from '@angular/material/divider';
 export class NavMobileComponent {
   @ViewChild('drawer') drawer: MatDrawer | undefined;
 
-  private router = inject(Router);
   private accountService = inject(AccountService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+  isNavMobileBrandClickedSig = inject(CommonService).isNavMobileBrandClickedSig;
 
   /**
      * Set isWelcomeCompSig to true to show WelcomeComponent if brand is clicked. 
@@ -39,6 +40,10 @@ export class NavMobileComponent {
 
   closeDrawar(): void {
     this.drawer?.close();
+  }
+
+  resetMainCompTabGroupIndex(): void {
+    this.isNavMobileBrandClickedSig.set(true);
   }
 
   logout() {
