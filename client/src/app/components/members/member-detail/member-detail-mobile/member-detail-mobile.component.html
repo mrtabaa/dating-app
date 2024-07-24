@@ -105,7 +105,7 @@
                     <mat-icon [color]="messages.isActive ? 'primary' : ''">mail</mat-icon>
                 </ng-template>
                 <div class="messages">
-                    <app-member-messages [memberIn]="member" />
+                    <app-member-messages #memberMessages [memberIn]="member" />
                 </div>
             </div>
         </mat-tab>

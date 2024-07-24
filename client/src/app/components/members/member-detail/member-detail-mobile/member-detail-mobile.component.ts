@@ -33,6 +33,7 @@ import { MemberMessagesComponent } from '../../member-messages/member-messages.c
 })
 export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
+  @ViewChild(MemberMessagesComponent) memberMessages: MemberMessagesComponent | undefined;
   private memberService = inject(MemberService);
   private followService = inject(FollowService);
   username = inject(AccountService).loggedInUserSig()?.userName;
@@ -41,6 +42,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   private gallery = inject(Gallery);
   router = inject(Router);
   initLoad = true;
+  readonly messagesTabIndex = 2;
 
   member$: Observable<Member | null> | undefined;
   subscribed: Subscription | undefined;
@@ -139,6 +141,11 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
+
+      if (tabIndex === this.messagesTabIndex) {
+        this.memberMessages?.initBufferSize();
+        this.memberMessages?.scrollToBottom();
+      }
     }
   }
 }
