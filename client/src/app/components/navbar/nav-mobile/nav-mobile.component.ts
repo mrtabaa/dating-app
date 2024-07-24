@@ -9,6 +9,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AccountService } from '../../../services/account.service';
 import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
+import { CommonService } from '../../../services/common.service';
 
 @Component({
   selector: 'app-nav-mobile',
@@ -27,6 +28,7 @@ export class NavMobileComponent {
   private accountService = inject(AccountService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+  isNavMobileBrandClickedSig = inject(CommonService).isNavMobileBrandClickedSig;
 
   /**
      * Set isWelcomeCompSig to true to show WelcomeComponent if brand is clicked. 
@@ -38,6 +40,10 @@ export class NavMobileComponent {
 
   closeDrawar(): void {
     this.drawer?.close();
+  }
+
+  resetMainCompTabGroupIndex(): void {
+    this.isNavMobileBrandClickedSig.set(true);
   }
 
   logout() {

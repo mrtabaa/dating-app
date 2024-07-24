@@ -52,7 +52,8 @@
     <mat-drawer-content>
         <mat-toolbar [ngStyle]="{'background-color': isWelcomeCompSig() ? 'transparent' : '#ffd9e1'}">
             <mat-toolbar-row>
-                <a [routerLink]="['/main']" (click)="setIsWelcomeCompSig()" class="brand" [ngStyle]="{
+                <a [routerLink]="['/main']" (click)="setIsWelcomeCompSig(); resetMainCompTabGroupIndex()" class="brand"
+                    [ngStyle]="{
                     'color': isWelcomeCompSig() ? 'white' : 'palevioletred'
                 }">
                     <mat-icon>eco</mat-icon>
