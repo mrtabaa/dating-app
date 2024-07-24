@@ -50,7 +50,8 @@
         </div>
     </header>
     <mat-divider />
-    <mat-tab-group mat-stretch-tabs="true" disablePagination="true">
+    <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="true"
+        disablePagination="true">
         <mat-tab #photos>
             <div class="tab-container">
                 <ng-template mat-tab-label>
@@ -99,7 +100,7 @@
             </div>
         </mat-tab>
         <mat-tab #messages>
-            <div class="tab-container">
+            <div class="tab-container" style="padding: 0;">
                 <ng-template mat-tab-label>
                     <mat-icon [color]="messages.isActive ? 'primary' : ''">mail</mat-icon>
                 </ng-template>

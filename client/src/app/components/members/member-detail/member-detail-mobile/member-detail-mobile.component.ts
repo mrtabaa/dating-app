@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { AfterViewChecked, Component, OnInit, ViewChild, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
@@ -11,7 +11,7 @@ import { MemberService } from '../../../../services/member.service';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { IntlModule } from 'angular-ecmascript-intl';
 import { LightboxModule } from 'ng-gallery/lightbox';
 import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
@@ -31,7 +31,8 @@ import { MemberMessagesComponent } from '../../member-messages/member-messages.c
   templateUrl: './member-detail-mobile.component.html',
   styleUrl: './member-detail-mobile.component.scss'
 })
-export class MemberDetailMobileComponent implements OnInit {
+export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
+  @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
   private memberService = inject(MemberService);
   private followService = inject(FollowService);
   username = inject(AccountService).loggedInUserSig()?.userName;
@@ -39,6 +40,7 @@ export class MemberDetailMobileComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
+  initLoad = true;
 
   member$: Observable<Member | null> | undefined;
   subscribed: Subscription | undefined;
@@ -47,6 +49,14 @@ export class MemberDetailMobileComponent implements OnInit {
 
   ngOnInit(): void {
     this.getMember();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.initLoad && this.tabGroup) {
+      this.setTabGroupParam(); // ViewChild is read in this lifeCycle only since it's in @if(async)
+
+      this.initLoad = false;
+    }
   }
 
   getMember(): void {
@@ -104,7 +114,7 @@ export class MemberDetailMobileComponent implements OnInit {
   setGalleryImages(): void {
     this.subscribed = this.member$?.subscribe((member: Member | null) => {
       this.images = []; // reset images for new member$ before loading in galleryRef
-      
+
       if (member)
         for (const photo of member.photos) {
           this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
@@ -114,5 +124,21 @@ export class MemberDetailMobileComponent implements OnInit {
       const galleryRef = this.gallery.ref();
       galleryRef.load(this.images)
     });
+  }
+
+  setTabGroupParam(): void {
+    this.route.queryParams.pipe(
+      take(1)).subscribe(params => {
+        const tab = params['tab'];
+        if (tab)
+          this.setSelectTabIndex(tab);
+      });
+  }
+
+  setSelectTabIndex(tabIndex: number): void {
+    if (this.tabGroup) {
+      this.tabGroup.selectedIndex = tabIndex;
+      this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
+    }
   }
 }
