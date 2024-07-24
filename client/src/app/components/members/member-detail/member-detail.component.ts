@@ -46,11 +46,11 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   private gallery = inject(Gallery);
   router = inject(Router);
   initLoad = true;
+  readonly messageTabIndex = 3;
 
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
   images: GalleryItem[] = [];
-  messageTabIndex = 3;
 
   ngOnInit(): void {
     this.getMember();
