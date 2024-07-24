@@ -1,6 +1,7 @@
 <!-- #region Mobile -->
 @if(isMobileSig()) {
-<mat-tab-group #tabGroup mat-stretch-tabs="true" disablePagination="true">
+<mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
+    disablePagination="true">
     @if(loggedInUserSig()?.roles?.includes("admin")) {
     <mat-tab #admin>
         <div class="tab-container">
