@@ -46,6 +46,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   private gallery = inject(Gallery);
   router = inject(Router);
   initLoad = true;
+  readonly messageTabIndex = 3;
 
   member$: Observable<Member> | undefined;
   subscribed: Subscription | undefined;
@@ -125,11 +126,11 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
       take(1)).subscribe(params => {
         const tab = params['tab'];
         if (tab)
-          this.selectTab(tab);
+          this.setSelectTabIndex(tab);
       });
   }
 
-  selectTab(tabIndex: number): void {
+  setSelectTabIndex(tabIndex: number): void {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });

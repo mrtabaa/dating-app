@@ -45,11 +45,11 @@
             @else {
             <button (click)="addFollow(member)" mat-raised-button color="primary">Follow</button>
             }
-            <button (click)="selectTab(3)" mat-raised-button color="accent">Messages</button>
+            <button (click)="setSelectTabIndex(messageTabIndex)" mat-raised-button color="accent">Messages</button>
             }
         </mat-card-actions>
     </mat-card>
-    <mat-tab-group #tabGroup (selectedTabChange)="(selectTab($event.index))" mat-stretch-tabs="false"
+    <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="false"
         mat-align-tabs="start">
         <mat-tab label="Photos">
             <div class="tab-contents">
@@ -94,7 +94,7 @@
                 }
             </div>
         </mat-tab>
-        <mat-tab label="Messages">
+        <mat-tab class="test-padding" label="Messages">
             <div class="tab-contents" style="padding: 0;">
                 <app-member-messages #memberMessage [memberIn]="member" />
             </div>
