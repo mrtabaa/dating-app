@@ -128,20 +128,21 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   getMessages(): void {
-    this._messageService.getInbox(this.messageParams)
-      .subscribe({
-        next: (response: PaginatedResult<Message[]>) => {
-          if (response.result && response.pagination) {
-            this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-            this.pagination = response.pagination;
+    this._messageService.getInbox(this.messageParams).pipe(
+      take(1)
+    ).subscribe({
+      next: (response: PaginatedResult<Message[]>) => {
+        if (response.result && response.pagination) {
+          this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+          this.pagination = response.pagination;
 
-            if (this.isFirstLoad)
-              this.scrollToBottom();
-            else
-              this.scrollToReloaded();
-          }
+          if (this.isFirstLoad)
+            this.scrollToBottom();
+          else
+            this.scrollToReloaded();
         }
-      });
+      }
+    });
   }
 
   loadOlderMessages(event: number): void {
