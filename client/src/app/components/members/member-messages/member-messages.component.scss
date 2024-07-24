@@ -1,13 +1,19 @@
+$navbar-footer: 56px * 2;
+$detailsAndNav: 14rem;
+
 main {
-    height: 66dvh;
+    height: calc(100dvh - $navbar-footer - $detailsAndNav);
     overflow: hidden;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 
+    .warning-layout-helper {
+        color: transparent;
+    }
+
     .warning {
-        height: 50dvh;
         color: rgb(121, 121, 121);
         text-align: center;
         display: flex;
@@ -17,7 +23,7 @@ main {
     }
 
     .messages-container {
-        height: 60dvh;
+        height: inherit;
         padding: 1rem 0;
 
         .item {
