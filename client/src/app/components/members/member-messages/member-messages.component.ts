@@ -4,7 +4,6 @@ import { MessageService } from '../../../services/message.service';
 import { take } from 'rxjs';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MessageParams } from '../../../models/helpers/message-params';
-import { Pagination } from '../../../models/helpers/pagination';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
@@ -56,7 +55,6 @@ export class MemberMessagesComponent implements OnInit {
   isFirstLoad = true;
 
   messageParams = new MessageParams();
-  pagination: Pagination | undefined;
 
   photoWH = 40;
 
@@ -134,7 +132,6 @@ export class MemberMessagesComponent implements OnInit {
       next: (response: PaginatedResult<Message[]>) => {
         if (response.result && response.pagination) {
           this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-          this.pagination = response.pagination;
 
           if (this.isFirstLoad)
             this.scrollToBottom();
