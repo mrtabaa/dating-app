@@ -3,7 +3,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { AccountService } from '../../../services/account.service';
@@ -24,7 +24,6 @@ import { MatDividerModule } from '@angular/material/divider';
 export class NavMobileComponent {
   @ViewChild('drawer') drawer: MatDrawer | undefined;
 
-  private router = inject(Router);
   private accountService = inject(AccountService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;

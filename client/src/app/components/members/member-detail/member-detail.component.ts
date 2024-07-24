@@ -41,10 +41,10 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   private followService = inject(FollowService);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   username = inject(AccountService).loggedInUserSig()?.userName;
-  private route = inject(ActivatedRoute);
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
+  private route = inject(ActivatedRoute);
   initLoad = true;
   readonly messageTabIndex = 3;
 
