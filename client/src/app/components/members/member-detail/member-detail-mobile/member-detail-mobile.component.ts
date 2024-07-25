@@ -42,6 +42,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   private gallery = inject(Gallery);
   router = inject(Router);
   initLoad = true;
+  isChatActive = false;
   readonly messagesTabIndex = 2;
 
   member$: Observable<Member | null> | undefined;
@@ -142,9 +143,13 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
 
-      if (tabIndex === this.messagesTabIndex) {
+      if (tabIndex === this.messagesTabIndex) { // TODO change var to enum
+        this.isChatActive = true;
         this.memberMessages?.initBufferSize();
         this.memberMessages?.scrollToBottom();
+      }
+      else {
+        this.isChatActive = false;
       }
     }
   }

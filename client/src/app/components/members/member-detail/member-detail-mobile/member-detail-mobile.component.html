@@ -1,6 +1,7 @@
 @if (member$ | async; as member) {
 <main>
-    <header>
+    @if(!isChatActive) {
+    <section class="details">
         <section class="title">
             <div class="photo-info">
                 <div class="photo">
@@ -48,8 +49,9 @@
             <p>Since:<span class="gray-text"> {{member.created | date}}</span></p>
             <p class="location">{{member.city}}, {{member.state}}, {{member.country}}</p>
         </div>
-    </header>
+    </section>
     <mat-divider />
+}
     <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="true"
         disablePagination="true">
         <mat-tab #photos>

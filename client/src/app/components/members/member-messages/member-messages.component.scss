@@ -1,8 +1,8 @@
 $navbar-footer_h: 56px * 2;
-$detailsAndNav_h: 14rem;
+$tabGroup_h: 4.5rem;
 
 main {
-    height: calc(100dvh - $navbar-footer_h - $detailsAndNav_h);
+    height: calc(100dvh - $navbar-footer_h - $tabGroup_h);
     overflow: hidden;
 
     display: flex;
