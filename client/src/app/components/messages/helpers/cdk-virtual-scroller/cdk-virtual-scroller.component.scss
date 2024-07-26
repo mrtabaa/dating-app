@@ -1,0 +1,51 @@
+.messages-container {
+    height: 50rem;
+    padding: 1rem 0;
+    // background-color: blueviolet;
+
+    .item {
+        border-bottom: rgb(194, 194, 194) dotted 1px;
+        list-style: none;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-right: 1rem;
+        min-height: 50px;
+
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+
+            .row1 {
+                display: flex;
+                justify-content: space-between;
+                color: rgb(116, 116, 116);
+
+                .dates {
+                        font-size: 0.8rem;
+                }
+            }
+
+            .row2 {
+                // background-color: purple;
+            }
+        }
+
+        img {
+            border-radius: 50%;
+        }
+    }
+}
+
+@media only screen and (min-width: 51rem) {
+    .row2 {
+        word-wrap: normal;
+    }
+}

@@ -1,21 +1,16 @@
-<!-- <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize" -->
 @if(messagesIn) {
-<cdk-virtual-scroll-viewport [minBufferPx]="bufferSize" [maxBufferPx]="bufferSize" itemSize="50"
+<cdk-virtual-scroll-viewport [minBufferPx]="bufferSize" [maxBufferPx]="bufferSize" itemSize="{{defaultItemSize}}"
     class="messages-container">
     <div *cdkVirtualFor="let message of messagesIn" class="item">
-        <div class="details">
-            <li class="title">
-                <p>{{message.sentOn | date}}</p>
-                @if(message.userOrTargetUserName !== memberIn?.userName) {
-                <mat-icon [ngStyle]="{'color': message.readOn ? 'green' : 'red'}">
-                    {{message.readOn ? 'done_all' : 'check'}}
-                </mat-icon>
-                }
-            </li>
-            <li class="content">{{message.content}}</li>
-        </div>
         <img ngSrc="{{message.userOrTargetProfilePhoto}}" priority width="{{photo_WH}}" height="{{photo_WH}}"
-            alt="{{message.userOrTargetUserName}}">
+            alt="{{message.userOrTargetUserName[0]}}">
+        <div class="details">
+            <div class="row1">
+                <p>{{message.userOrTargetUserName | shortenString: 15}}</p>
+                <p class="date">{{message.sentOn | date}}</p>
+            </div>
+            <div class="row2">{{message.content| shortenString: isMobileSig() ? 22 : 50}}</div>
+        </div>
     </div>
 </cdk-virtual-scroll-viewport>
 }
