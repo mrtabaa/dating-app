@@ -1,3 +1,7 @@
+@if(isMobileSig()) {
+<app-messages-mobile />
+}
+@else {
 <div class="container">
     <nav class="side">
         <mat-list>
@@ -68,7 +72,7 @@
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                    [routerLink]="['/member/' + row.userOrTargetUserName]" [queryParams]="{tab: 3}"></tr>
+                    [routerLink]="['/member/' + row.userOrTargetUserName]" [queryParams]="{tab: 3}"></tr> <!-- TODO Replace tab: 3 by enum -->
             </table>
         </div>
 
@@ -83,3 +87,4 @@
         }
     </main>
 </div>
+}

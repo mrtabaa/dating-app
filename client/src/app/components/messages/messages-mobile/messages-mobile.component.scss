@@ -1,0 +1,19 @@
+$navbar-footer_h: 56px * 2;
+$mainNav_h: 3rem;
+
+main {
+    height: calc(100dvh - $navbar-footer_h - $mainNav_h);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .warning-layout-helper {
+        color: transparent;
+    }
+
+    .warning {
+        color: gray;
+    }
+}

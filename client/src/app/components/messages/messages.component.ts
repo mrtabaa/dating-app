@@ -15,12 +15,15 @@ import { MessagePredicate } from './MessageEnum.enum';
 import { MessageParams } from '../../models/helpers/message-params';
 import { LoadingService } from '../../services/loading.service';
 import { RouterModule } from '@angular/router';
+import { ResponsiveService } from '../../services/responsive.service';
+import { MessagesMobileComponent } from './messages-mobile/messages-mobile.component';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, RouterModule,
+    MessagesMobileComponent,
     ShortenStringPipe,
     MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
   ],
@@ -30,6 +33,7 @@ import { RouterModule } from '@angular/router';
 export class MessagesComponent implements OnInit, OnDestroy {
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;
   private _messageService = inject(MessageService);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
   Tabs = MessagePredicate;
