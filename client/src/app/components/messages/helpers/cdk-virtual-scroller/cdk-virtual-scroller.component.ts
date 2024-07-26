@@ -4,6 +4,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Message } from '../../../../models/message.model';
 import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
 import { ResponsiveService } from '../../../../services/responsive.service';
+import { MessagesMobileComponent } from '../../messages-mobile/messages-mobile.component';
 
 @Component({
   selector: 'app-cdk-virtual-scroller',
@@ -18,25 +19,26 @@ import { ResponsiveService } from '../../../../services/responsive.service';
 export class CdkVirtualScrollerComponent implements OnInit {
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
   @Input() messagesIn: Message[] | undefined;
-  @Input() pageSizeIn: number | undefined;
+  private _messagesMobileComponent = inject(MessagesMobileComponent)
+  private _messageParams = this._messagesMobileComponent.messageParams;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   photo_WH = 40;
   defaultItemSize = 50;
   bufferSize = 0;
 
   ngOnInit(): void {
-    if (this.pageSizeIn)
-      this.bufferSize = this.defaultItemSize * this.pageSizeIn
+    this.bufferSize = this.defaultItemSize * this._messageParams.pageSize
   }
 
   loadOlderMessages(event: number): void {
+    console.log(this.viewport);
     if (this.viewport) {
       const range = this.viewport.getRenderedRange();
 
-      if (event === range.start) {
+      if (event === range.end) {
         console.log('Scrolled:', event);
-        // this.messageParams.pageNumber++;
-        // this.getMessages();
+        this._messageParams.pageNumber++;
+        this._messagesMobileComponent.getMessages();
         // this.scrollToReloaded();
       }
     }

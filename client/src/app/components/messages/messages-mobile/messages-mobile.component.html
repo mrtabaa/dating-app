@@ -1,5 +1,5 @@
 <main>
-    @if(messages.length === 0) {
+    @if(!isLoadingSig() && messages?.length === 0) {
     <div class="warning-layout-helper">.</div>
     <h5 class="warning">
         This box is empty.
@@ -9,14 +9,16 @@
     <mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
         disablePagination="true">
         <mat-tab #inbox>
+            <h6>Inbox</h6>
             <div class="tab-container">
                 <ng-template mat-tab-label>
                     <mat-icon [color]="inbox.isActive ? 'primary' : ''">inbox</mat-icon>
                 </ng-template>
-                <app-cdk-virtual-scroller [messagesIn]="messages" [memberIn]="memberIn" />
+                <app-cdk-virtual-scroller [messagesIn]="messages" />
             </div>
         </mat-tab>
         <mat-tab #unread>
+            <h6>Unread</h6>
             <div class="tab-container">
                 <ng-template mat-tab-label>
                     <mat-icon [color]="unread.isActive ? 'primary' : ''">mark_email_unread</mat-icon>
@@ -24,11 +26,13 @@
             </div>
         </mat-tab>
         <mat-tab #read>
+            <h6>Read</h6>
             <ng-template mat-tab-label>
                 <mat-icon [color]="read.isActive ? 'primary' : ''">mark_as_unread</mat-icon>
             </ng-template>
         </mat-tab>
         <mat-tab #sent>
+            <h6>Sent</h6>
             <ng-template mat-tab-label>
                 <mat-icon [color]="sent.isActive ? 'primary' : ''">send</mat-icon>
             </ng-template>
@@ -36,7 +40,3 @@
     </mat-tab-group>
     }
 </main>
-
-<!-- <main>
-    @if(!isLoadingSig() && messages.length < 1) {}
-</main> -->

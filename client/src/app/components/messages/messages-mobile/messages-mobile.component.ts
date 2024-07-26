@@ -1,8 +1,7 @@
-// import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
-import { AfterViewChecked, Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import { MessageParams } from '../../../models/helpers/message-params';
 import { Message } from '../../../models/message.model';
@@ -26,20 +25,14 @@ import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 })
 export class MessagesMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;
+  @Input() messages: Message[] | undefined;
   @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
   private _messageService = inject(MessageService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
-  private router = inject(Router);
   private route = inject(ActivatedRoute);
   initLoad = true;
-
-  messages: Message[] = [];
-  bufferSize = 0;
-  // defaultItemSize = 50;
-  // readonly MAX_BUFFER_SIZE = 1000 * this.defaultItemSize; // Assuming 1000 messages as an upper limit
-  // isFirstLoad = true;
 
   messageParams = new MessageParams();
 
@@ -47,18 +40,9 @@ export class MessagesMobileComponent implements OnInit {
 
   ngOnInit(): void {
     this.initMessageParams();
-      // this.initBufferSize();
 
-      this.getMessages();
+    this.getMessages();
   }
-
-  // ngAfterViewChecked(): void {
-  //   if (this.initLoad && this.tabGroup) {
-  //     this.setTabGroupParam(); // ViewChild is read in this lifeCycle only since it's in @if(async)
-
-  //     this.initLoad = false;
-  //   }
-  // }
 
   setTabGroupParam(): void {
     this.route.queryParams.pipe(
@@ -72,7 +56,6 @@ export class MessagesMobileComponent implements OnInit {
   setSelectTabIndex(tabIndex: number): void {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
-      // this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
 
       this.messageParams.predicate = tabIndex;
     }
@@ -85,8 +68,6 @@ export class MessagesMobileComponent implements OnInit {
       next: (response: PaginatedResult<Message[]>) => {
         if (response.result && response.pagination) {
           this.messages = response.result;
-
-          // this.scrollToReloaded();
         }
       }
     });
@@ -98,9 +79,4 @@ export class MessagesMobileComponent implements OnInit {
     this.messageParams.pageNumber = 1;
     this.messageParams.pageSize = 25;
   }
-
-  // initBufferSize(): void {
-  //   // Set/Reset bufferSize for performance.
-  //   this.bufferSize = this.messageParams.pageSize * this.defaultItemSize;
-  // }
 }
