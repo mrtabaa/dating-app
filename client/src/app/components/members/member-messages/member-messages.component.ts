@@ -56,7 +56,7 @@ export class MemberMessagesComponent implements OnInit {
 
   messageParams = new MessageParams();
 
-  photoWH = 40;
+  photo_WH = 40;
 
   createMessageCtrl = this.fb.control('', [Validators.maxLength(1000)]);
 
