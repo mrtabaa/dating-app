@@ -1,7 +1,9 @@
+$navbar-footer_h: 56px * 2;
+$mainNav_h: 3.5rem * 3;
+
 .messages-container {
-    height: 50rem;
+    height: calc(100dvh - $navbar-footer_h - $mainNav_h);
     padding: 1rem 0;
-    // background-color: blueviolet;
 
     .item {
         border-bottom: rgb(194, 194, 194) dotted 1px;

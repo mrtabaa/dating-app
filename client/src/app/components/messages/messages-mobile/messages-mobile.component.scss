@@ -1,5 +1,5 @@
 $navbar-footer_h: 56px * 2;
-$mainNav_h: 3rem;
+$mainNav_h: 3.3rem;
 
 main {
     height: calc(100dvh - $navbar-footer_h - $mainNav_h);
@@ -18,10 +18,16 @@ main {
     }
 
     mat-tab-group {
-        // background-color: yellow;
         width: 100%;
-
+        
+        h6 {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+        
         .tab-container {
+            max-height: inherit;
             padding: 0 0.5rem;
         }
     }
