@@ -6,21 +6,16 @@ public class MessageRepository : IMessageRepository
     #region Db and Token Settings
     private readonly IMongoCollection<Message> _collection;
     private readonly IUserRepository _userRepository;
-    private readonly IPhotoService _photoService;
-    private readonly ILogger<UserRepository> _logger;
 
     // constructor - dependency injections
     public MessageRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        IUserRepository userRepository, IPhotoService photoService,
-        ILogger<UserRepository> logger
+        IUserRepository userRepository
         )
     {
         var dbName = client.GetDatabase(dbSettings.DatabaseName);
         _collection = dbName.GetCollection<Message>(AppVariablesExtensions.collectionMessages);
         _userRepository = userRepository;
-        _photoService = photoService;
-        _logger = logger;
     }
     #endregion Db and Token Settings
 
@@ -80,10 +75,31 @@ public class MessageRepository : IMessageRepository
             .Where(doc =>
                 (doc.SenderId == userId && doc.RecieverId == targetUserId) ||
                 (doc.RecieverId == userId && doc.SenderId == targetUserId)
-            )
-            .OrderByDescending(doc => doc.SentOn);
+            ).OrderByDescending(doc => doc.SentOn);
 
-        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+        PagedList<Message> pagedMessages = await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+
+        // update ReadOn
+        if (pagedMessages.Count > 0)
+            await UpdateReadOn(userId, targetUserId.Value, cancellationToken);
+
+        return pagedMessages;
     }
     #endregion CRUD
+
+    #region Helpers
+    private async Task UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    {
+        var filter = Builders<Message>.Filter.Where(doc =>
+                ((doc.SenderId == userId && doc.RecieverId == targetUserId) ||
+                 (doc.RecieverId == userId && doc.SenderId == targetUserId))
+                && doc.ReadOn == null
+            );
+
+        UpdateDefinition<Message> updateDefReadOn = Builders<Message>.Update
+            .Set(message => message.ReadOn, DateTime.UtcNow);
+
+        await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
+    }
+    #endregion Helpers
 }
