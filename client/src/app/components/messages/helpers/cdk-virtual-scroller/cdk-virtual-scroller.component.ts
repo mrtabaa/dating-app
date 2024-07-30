@@ -25,34 +25,22 @@ export class CdkVirtualScrollerComponent implements OnInit {
   photo_WH = 40;
   defaultItemSize = 50;
   bufferSize = 0;
+  isFirstLoad = true;
 
   ngOnInit(): void {
     this.bufferSize = this.defaultItemSize * this._messageParams.pageSize
   }
 
-  loadOlderMessages(event: number): void {
-    if (this.viewport) {
-      const range = this.viewport.getRenderedRange();
-      console.log('event', event);
-      console.log('end', range.end);
+  loadOlderMessages(): void {
+    if (this.viewport && this.viewport.measureScrollOffset('bottom') < 15) {
+      this._messageParams.pageNumber++;
+      this._messagesMobileComponent.getMessages();
 
-      if (event === range.end) {
-        console.log('loaded:', event);
-        this._messageParams.pageNumber++;
-        this._messagesMobileComponent.getMessages();
-        // this.scrollToReloaded();
+      // scroll to index 0 on first load
+      if (this.isFirstLoad) {
+        this.viewport.scrollToIndex(0);
+        this.isFirstLoad = false;
       }
     }
   }
-
-  // TODO remove if not used
-  // scrollToReloaded() {
-  //   try {
-  //     setTimeout(() => {
-  //       if (this.viewport) {
-  //         this.viewport.scrollToIndex((this.messages.length) - this.messageParams.pageSize * (this.messageParams.pageNumber - 1), 'instant');
-  //       }
-  //     }, 0);
-  //   } catch (err) { console.error(err) }
-  // }
 }
