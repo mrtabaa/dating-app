@@ -19,6 +19,7 @@ import { MessagesMobileComponent } from '../../messages-mobile/messages-mobile.c
 export class CdkVirtualScrollerComponent implements OnInit {
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
   @Input() messagesIn: Message[] | undefined;
+  @Input() totalItemsCountIn: number | undefined;
   private _messagesMobileComponent = inject(MessagesMobileComponent)
   private _messageParams = this._messagesMobileComponent.messageParams;
   isMobileSig = inject(ResponsiveService).isMobileSig;
@@ -31,15 +32,20 @@ export class CdkVirtualScrollerComponent implements OnInit {
     this.bufferSize = this.defaultItemSize * this._messageParams.pageSize
   }
 
-  loadOlderMessages(): void {
-    if (this.viewport && this.viewport.measureScrollOffset('bottom') < 15) {
-      this._messageParams.pageNumber++;
-      this._messagesMobileComponent.getMessages();
+  loadOlderMessages(event: number): void {
+    if (this.viewport) {
+      const range = this.viewport.getRenderedRange();
+      event += 7; // adjust event to match the range.end. Event is init 7 items less than actual range.end
 
-      // scroll to index 0 on first load
-      if (this.isFirstLoad) {
-        this.viewport.scrollToIndex(0);
-        this.isFirstLoad = false;
+      if (event === range?.end && this.messagesIn?.length !== this.totalItemsCountIn) {
+        this._messageParams.pageNumber++;
+        this._messagesMobileComponent.getMessages();
+
+        // scroll to index 0 on first load
+        if (this.isFirstLoad) {
+          this.viewport.scrollToIndex(0);
+          this.isFirstLoad = false;
+        }
       }
     }
   }
