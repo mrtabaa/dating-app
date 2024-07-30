@@ -80,3 +80,12 @@ main {
         width: 100%;
     }
 }
+
+@media only screen and (min-width: 51rem) {
+    $navbar-footer_h: 64px * 2;
+    $tabGroup_h: 9rem;
+
+    main {
+        height: calc(100dvh - $navbar-footer_h - $tabGroup_h);
+    }
+}
