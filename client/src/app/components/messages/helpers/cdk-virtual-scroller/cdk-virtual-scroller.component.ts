@@ -5,12 +5,14 @@ import { Message } from '../../../../models/message.model';
 import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
 import { ResponsiveService } from '../../../../services/responsive.service';
 import { MessagesMobileComponent } from '../../messages-mobile/messages-mobile.component';
+import { MemberDetailTabs } from '../../../../enums/member-detail-tabs.enum';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cdk-virtual-scroller',
   standalone: true,
   imports: [
-    CommonModule, NgOptimizedImage,
+    CommonModule, NgOptimizedImage, RouterModule,
     ScrollingModule, ShortenStringPipe
   ],
   templateUrl: './cdk-virtual-scroller.component.html',
@@ -27,6 +29,7 @@ export class CdkVirtualScrollerComponent implements OnInit {
   defaultItemSize = 50;
   bufferSize = 0;
   isFirstLoad = true;
+  MemberDetailTabs = MemberDetailTabs;
 
   ngOnInit(): void {
     this.bufferSize = this.defaultItemSize * this._messageParams.pageSize

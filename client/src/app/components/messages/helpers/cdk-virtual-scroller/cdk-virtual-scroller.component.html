@@ -1,9 +1,10 @@
 @if(messagesIn) {
 <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
     [maxBufferPx]="bufferSize" itemSize="{{defaultItemSize}}" class="messages-container">
-    <div *cdkVirtualFor="let message of messagesIn" class="item">
-            <img ngSrc="{{message.userOrTargetProfilePhoto? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}" priority width="{{photo_WH}}" height="{{photo_WH}}"
-            alt="{{message.userOrTargetUserName[0]}}">
+    <div *cdkVirtualFor="let message of messagesIn" class="item"
+        [routerLink]="['/member/' + message.userOrTargetUserName]" [queryParams]="{tab: MemberDetailTabs.MESSAGES}">
+        <img ngSrc="{{message.userOrTargetProfilePhoto? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
+            priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName[0]}}">
         <div class="details">
             <div class="row1">
                 <p>{{message.userOrTargetUserName | shortenString: 15}}</p>
