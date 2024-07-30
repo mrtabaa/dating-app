@@ -53,7 +53,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._isMessageCompSig.set(true);
-    this.getMessages();
+
+    if (!this.isMobileSig())
+      this.getMessages();
   }
 
   ngOnDestroy(): void {
