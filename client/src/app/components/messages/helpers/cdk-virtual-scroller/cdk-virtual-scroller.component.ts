@@ -31,12 +31,13 @@ export class CdkVirtualScrollerComponent implements OnInit {
   }
 
   loadOlderMessages(event: number): void {
-    console.log(this.viewport);
     if (this.viewport) {
       const range = this.viewport.getRenderedRange();
+      console.log('event', event);
+      console.log('end', range.end);
 
       if (event === range.end) {
-        console.log('Scrolled:', event);
+        console.log('loaded:', event);
         this._messageParams.pageNumber++;
         this._messagesMobileComponent.getMessages();
         // this.scrollToReloaded();
