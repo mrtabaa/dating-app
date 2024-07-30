@@ -1,11 +1,4 @@
 <main>
-    @if(!isLoadingSig() && messages.length === 0) {
-    <div class="warning-layout-helper">.</div>
-    <h5 class="warning">
-        This box is empty.
-    </h5>
-    }
-    @else {
     <mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
         disablePagination="true">
         <mat-tab #inbox>
@@ -14,7 +7,15 @@
                 <ng-template mat-tab-label>
                     <mat-icon [color]="inbox.isActive ? 'primary' : ''">inbox</mat-icon>
                 </ng-template>
-                <app-cdk-virtual-scroller [messagesIn]="messages" />
+                @if(!isLoadingSig() && messages.length === 0) {
+                <div class="warning-layout-helper">.</div>
+                <h5 class="warning">
+                    This box is empty.
+                </h5>
+                }
+                @else {
+                <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount"/>
+                }
             </div>
         </mat-tab>
         <mat-tab #unread>
@@ -23,6 +24,15 @@
                 <ng-template mat-tab-label>
                     <mat-icon [color]="unread.isActive ? 'primary' : ''">mark_email_unread</mat-icon>
                 </ng-template>
+                @if(!isLoadingSig() && messages.length === 0) {
+                <div class="warning-layout-helper">.</div>
+                <h5 class="warning">
+                    This box is empty.
+                </h5>
+                }
+                @else {
+                <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount"/>
+                }
             </div>
         </mat-tab>
         <mat-tab #read>
@@ -30,13 +40,30 @@
             <ng-template mat-tab-label>
                 <mat-icon [color]="read.isActive ? 'primary' : ''">mark_as_unread</mat-icon>
             </ng-template>
+            @if(!isLoadingSig() && messages.length === 0) {
+            <div class="warning-layout-helper">.</div>
+            <h5 class="warning">
+                This box is empty.
+            </h5>
+            }
+            @else {
+            <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount"/>
+            }
         </mat-tab>
         <mat-tab #sent>
             <h6>Sent</h6>
             <ng-template mat-tab-label>
                 <mat-icon [color]="sent.isActive ? 'primary' : ''">send</mat-icon>
             </ng-template>
+            @if(!isLoadingSig() && messages.length === 0) {
+            <div class="warning-layout-helper">.</div>
+            <h5 class="warning">
+                This box is empty.
+            </h5>
+            }
+            @else {
+            <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount"/>
+            }
         </mat-tab>
     </mat-tab-group>
-    }
 </main>
