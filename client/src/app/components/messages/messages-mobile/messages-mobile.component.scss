@@ -9,26 +9,27 @@ main {
     justify-content: space-between;
     width: 100%;
 
-    .warning-layout-helper {
-        color: transparent;
-    }
-
-    .warning {
-        color: gray;
-    }
-
     mat-tab-group {
         width: 100%;
-        
+        height: inherit;
+
         h6 {
             display: flex;
             justify-content: center;
             margin: 0;
         }
-        
+
         .tab-container {
             max-height: inherit;
             padding: 0 0.5rem;
+
+            .warning {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: calc(100dvh - $navbar-footer_h - $mainNav_h);
+                color: gray;
+            }
         }
     }
 }
