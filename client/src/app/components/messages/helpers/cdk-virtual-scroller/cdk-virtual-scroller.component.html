@@ -10,7 +10,8 @@
                 <p>{{message.userOrTargetUserName | shortenString: 15}}</p>
                 <p class="date">{{message.sentOn | date}}</p>
             </div>
-            <div class="row2">{{message.content| shortenString: isMobileSig() ? 22 : 50}}</div>
+            <p [ngStyle]="{'font-weight': message.readOn ? 'normal' : 'bold'}" class="row2">{{message.content|
+                shortenString: isMobileSig() ? 22 : 50}}</p>
         </div>
     </div>
 </cdk-virtual-scroll-viewport>
