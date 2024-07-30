@@ -40,11 +40,11 @@
             <table mat-table [dataSource]="messages">
                 <!-- From/To Column -->
                 <ng-container matColumnDef="from">
-                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate == Tabs.SENT ? 'To' : 'From'}}</th>
+                    <th mat-header-cell *matHeaderCellDef>{{messageParams.predicate === Tabs.SENT ? 'To' : 'From'}}</th>
                     <td mat-cell *matCellDef="let row">
                         <div class="user-info">
-                            <img ngSrc="{{row.userOrTargetProfilePhoto}}" priority width="32" height="32"
-                                alt="{{row.userOrTargetKnownAs[0]}}">
+                            <img ngSrc="{{row.userOrTargetProfilePhoto ? row.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
+                                priority width="32" height="32" alt="{{row.userOrTargetKnownAs[0]}}">
                             {{row.userOrTargetKnownAs | shortenString: 20}}
                         </div>
                     </td>
