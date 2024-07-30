@@ -36,8 +36,7 @@ public class MessageRepository : IMessageRepository
 
     public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
     {
-        IMongoQueryable<Message> query = _collection.AsQueryable()
-            .OrderByDescending(doc => doc.SentOn);
+        IMongoQueryable<Message> query = _collection.AsQueryable();
 
         query = messageParams.Predicate switch
         {
@@ -45,19 +44,23 @@ public class MessageRepository : IMessageRepository
             MessagePredicate.Inbox => query
                 .Where(doc => doc.RecieverId == userId)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()),
+                .Select(group => group.First())
+                .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Unread => query
                 .Where(doc => doc.RecieverId == userId && doc.ReadOn == null)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()),
+                .Select(group => group.First())
+                .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Read => query
                 .Where(doc => doc.RecieverId == userId && doc.ReadOn != null)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()),
+                .Select(group => group.First())
+                .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Sent => query
                 .Where(doc => doc.SenderId == userId)
                 .GroupBy(doc => doc.RecieverId)
-                .Select(group => group.First()),
+                .Select(group => group.First())
+                .OrderByDescending(doc => doc.SentOn),
             _ => query
         };
 
