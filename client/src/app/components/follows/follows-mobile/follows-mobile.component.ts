@@ -4,7 +4,7 @@ import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { Subscription, take } from 'rxjs';
 import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
 import { FollowParams } from '../../../models/helpers/follow-params';
-import { FollowPredicate } from '../../../models/helpers/follow-predicate';
+import { FollowPredicate } from '../../../enums/follow-predicate.enum';
 import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 import { Pagination } from '../../../models/helpers/pagination';
 import { Member } from '../../../models/member.model';

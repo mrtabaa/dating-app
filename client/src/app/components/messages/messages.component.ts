@@ -11,16 +11,20 @@ import { take } from 'rxjs/operators';
 import { PaginatedResult } from '../../models/helpers/paginatedResult';
 import { MatTableModule } from '@angular/material/table';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
-import { MessagePredicate } from './MessageEnum.enum';
+import { MessagePredicate } from '../../enums/MessagePredicate.enum';
 import { MessageParams } from '../../models/helpers/message-params';
 import { LoadingService } from '../../services/loading.service';
 import { RouterModule } from '@angular/router';
+import { ResponsiveService } from '../../services/responsive.service';
+import { MessagesMobileComponent } from './messages-mobile/messages-mobile.component';
+import { MemberDetailTabs } from '../../enums/member-detail-tabs.enum';
 
 @Component({
   selector: 'app-messages',
   standalone: true,
   imports: [
     CommonModule, NgOptimizedImage, RouterModule,
+    MessagesMobileComponent,
     ShortenStringPipe,
     MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
   ],
@@ -30,10 +34,13 @@ import { RouterModule } from '@angular/router';
 export class MessagesComponent implements OnInit, OnDestroy {
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;
   private _messageService = inject(MessageService);
+  isMobileSig = inject(ResponsiveService).isMobileSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
   Tabs = MessagePredicate;
+  MemberDetailTabs = MemberDetailTabs;
   selectedTab = MessagePredicate.INBOX;
+
 
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
@@ -49,7 +56,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._isMessageCompSig.set(true);
-    this.getMessages();
+
+    if (!this.isMobileSig())
+      this.getMessages();
   }
 
   ngOnDestroy(): void {

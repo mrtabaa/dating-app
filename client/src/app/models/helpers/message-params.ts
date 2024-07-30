@@ -1,4 +1,4 @@
-import { MessagePredicate } from "../../components/messages/MessageEnum.enum";
+import { MessagePredicate } from "../../enums/MessagePredicate.enum";
 import { PaginationParams } from "./paginationParams";
 
 export class MessageParams extends PaginationParams {

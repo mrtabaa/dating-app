@@ -1,0 +1,36 @@
+$navbar-footer_h: 56px * 2;
+$mainNav_h: 3.3rem;
+
+main {
+    height: calc(100dvh - $navbar-footer_h - $mainNav_h);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    mat-tab-group {
+        width: 100%;
+        height: inherit;
+
+        h6 {
+            display: flex;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .tab-container {
+            max-height: inherit;
+            padding: 0 0.5rem;
+
+            .warning {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                height: calc(100dvh - $navbar-footer_h - $mainNav_h);
+                color: gray;
+            }
+        }
+    }
+}

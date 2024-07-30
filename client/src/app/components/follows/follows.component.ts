@@ -10,7 +10,7 @@ import { Pagination } from '../../models/helpers/pagination';
 import { PaginatedResult } from "../../models/helpers/paginatedResult";
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { LoadingService } from '../../services/loading.service';
-import { FollowPredicate } from '../../models/helpers/follow-predicate';
+import { FollowPredicate } from '../../enums/follow-predicate.enum';
 import { FollowModifiedEmit } from '../../models/helpers/follow-modified-emit';
 import { FollowParams } from '../../models/helpers/follow-params';
 import { ResponsiveService } from '../../services/responsive.service';

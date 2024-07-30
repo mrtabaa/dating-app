@@ -7,7 +7,7 @@ import { MessageParams } from '../../../models/helpers/message-params';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
-import { MessagePredicate } from '../../messages/MessageEnum.enum';
+import { MessagePredicate } from '../../../enums/MessagePredicate.enum';
 import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 import { Member } from '../../../models/member.model';
 import { IntlModule } from 'angular-ecmascript-intl';
@@ -56,7 +56,7 @@ export class MemberMessagesComponent implements OnInit {
 
   messageParams = new MessageParams();
 
-  photoWH = 40;
+  photo_WH = 40;
 
   createMessageCtrl = this.fb.control('', [Validators.maxLength(1000)]);
 

@@ -143,7 +143,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
 
-      if (tabIndex === this.messagesTabIndex) { // TODO change var to enum
+      if (tabIndex === this.messagesTabIndex) {
         this.isChatActive = true;
         this.memberMessages?.initBufferSize();
         this.memberMessages?.scrollToBottom();

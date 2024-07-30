@@ -1,0 +1,67 @@
+<main>
+    <mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
+        disablePagination="true" headerPosition="below">
+        <mat-tab #inbox>
+            <h6>Inbox</h6>
+            <div class="tab-container">
+                <ng-template mat-tab-label>
+                    <mat-icon [color]="inbox.isActive ? 'primary' : ''">inbox</mat-icon>
+                </ng-template>
+                @if(!isLoadingSig() && messages.length === 0) {
+                <h5 class="warning">
+                    You have not received any message yet.
+                </h5>
+                }
+                @else {
+                <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount" />
+                }
+            </div>
+        </mat-tab>
+        <mat-tab #unread>
+            <h6>Unread</h6>
+            <div class="tab-container">
+                <ng-template mat-tab-label>
+                    <mat-icon [color]="unread.isActive ? 'primary' : ''">mark_email_unread</mat-icon>
+                </ng-template>
+                @if(!isLoadingSig() && messages.length === 0) {
+                <h5 class="warning">
+                    Your unread messages will be here.
+                </h5>
+                }
+                @else {
+                <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount" />
+                }
+            </div>
+        </mat-tab>
+        <mat-tab #read>
+            <h6>Read</h6>
+            <div class="tab-container">
+                <ng-template mat-tab-label>
+                    <mat-icon [color]="read.isActive ? 'primary' : ''">mark_as_unread</mat-icon>
+                </ng-template>
+                @if(!isLoadingSig() && messages.length === 0) {
+                <h5 class="warning">
+                    Your read messages will be here.
+                </h5>
+                }
+                @else {
+                <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount" />
+                }
+            </div>
+        </mat-tab>
+        <mat-tab #sent>
+            <h6>Sent</h6>
+            <ng-template mat-tab-label>
+                <mat-icon [color]="sent.isActive ? 'primary' : ''">send</mat-icon>
+            </ng-template>
+            @if(!isLoadingSig() && messages.length === 0) {
+            <h5 class="warning">
+                Messages you sent will be here.
+            </h5>
+            }
+            @else {
+            <app-cdk-virtual-scroller [messagesIn]="messages" [totalItemsCountIn]="totalItemsCount" />
+            }
+        </mat-tab>
+    </mat-tab-group>
+</main>

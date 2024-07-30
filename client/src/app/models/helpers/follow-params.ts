@@ -1,5 +1,5 @@
 import { PaginationParams } from "./paginationParams";
-import { FollowPredicate } from "./follow-predicate";
+import { FollowPredicate } from "../../enums/follow-predicate.enum";
 
 export class FollowParams extends PaginationParams {
     predicate = FollowPredicate.followings;
