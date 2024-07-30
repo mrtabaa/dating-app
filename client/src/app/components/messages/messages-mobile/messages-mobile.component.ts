@@ -25,8 +25,8 @@ import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 })
 export class MessagesMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;
-  @Input() messages: Message[] | undefined;
   @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
+  messages: Message[] = [];
   private _messageService = inject(MessageService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
@@ -67,7 +67,7 @@ export class MessagesMobileComponent implements OnInit {
     ).subscribe({
       next: (response: PaginatedResult<Message[]>) => {
         if (response.result && response.pagination) {
-          this.messages = response.result;
+          this.messages = [...this.messages, ...response.result];
         }
       }
     });
@@ -77,6 +77,6 @@ export class MessagesMobileComponent implements OnInit {
     this.messageParams.predicate = MessagePredicate.INBOX;
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
-    this.messageParams.pageSize = 25;
+    this.messageParams.pageSize = 9;
   }
 }
