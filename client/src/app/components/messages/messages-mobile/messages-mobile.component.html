@@ -9,7 +9,7 @@
                 </ng-template>
                 @if(!isLoadingSig() && messages.length === 0) {
                 <h5 class="warning">
-                    Your inbox is empty.
+                    You have not received any message yet.
                 </h5>
                 }
                 @else {
@@ -25,7 +25,7 @@
                 </ng-template>
                 @if(!isLoadingSig() && messages.length === 0) {
                 <h5 class="warning">
-                    Your unread box is empty.
+                    Your unread messages will be here.
                 </h5>
                 }
                 @else {
@@ -41,7 +41,7 @@
                 </ng-template>
                 @if(!isLoadingSig() && messages.length === 0) {
                 <h5 class="warning">
-                    This read box is empty.
+                    Your read messages will be here.
                 </h5>
                 }
                 @else {
@@ -56,7 +56,7 @@
             </ng-template>
             @if(!isLoadingSig() && messages.length === 0) {
             <h5 class="warning">
-                This sent box is empty.
+                Messages you sent will be here.
             </h5>
             }
             @else {
