@@ -25,11 +25,11 @@ import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 export class MessagesMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;
   @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
-  messages: Message[] = [];
-  totalItemsCount = 0;
   private _messageService = inject(MessageService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
+  messages: Message[] = [];
+  totalItemsCount = 0;
 
   messageParams = new MessageParams();
 
