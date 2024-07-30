@@ -17,6 +17,7 @@ import { LoadingService } from '../../services/loading.service';
 import { RouterModule } from '@angular/router';
 import { ResponsiveService } from '../../services/responsive.service';
 import { MessagesMobileComponent } from './messages-mobile/messages-mobile.component';
+import { MemberDetailTabs } from '../../enums/member-detail-tabs.enum';
 
 @Component({
   selector: 'app-messages',
@@ -37,7 +38,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
   Tabs = MessagePredicate;
+  MemberDetailTabs = MemberDetailTabs;
   selectedTab = MessagePredicate.INBOX;
+
 
   displayedColumns: string[] = ['from', 'content', 'sentOn', 'readOn'];
   messages: Message[] = [];
