@@ -7,7 +7,7 @@ import { Message } from '../../../models/message.model';
 import { AccountService } from '../../../services/account.service';
 import { LoadingService } from '../../../services/loading.service';
 import { MessageService } from '../../../services/message.service';
-import { MessagePredicate } from '../MessageEnum.enum';
+import { MessagePredicate } from '../../../enums/MessagePredicate.enum';
 import { Member } from '../../../models/member.model';
 import { CdkVirtualScrollerComponent } from '../helpers/cdk-virtual-scroller/cdk-virtual-scroller.component';
 import { PaginatedResult } from '../../../models/helpers/paginatedResult';

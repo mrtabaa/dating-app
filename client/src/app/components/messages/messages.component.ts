@@ -11,7 +11,7 @@ import { take } from 'rxjs/operators';
 import { PaginatedResult } from '../../models/helpers/paginatedResult';
 import { MatTableModule } from '@angular/material/table';
 import { ShortenStringPipe } from '../../pipes/shorten-string.pipe';
-import { MessagePredicate } from './MessageEnum.enum';
+import { MessagePredicate } from '../../enums/MessagePredicate.enum';
 import { MessageParams } from '../../models/helpers/message-params';
 import { LoadingService } from '../../services/loading.service';
 import { RouterModule } from '@angular/router';
