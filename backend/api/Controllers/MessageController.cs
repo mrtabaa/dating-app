@@ -51,9 +51,9 @@ public class MessageController(
         AppUser? userOrTarget;
         foreach (var message in pagedMessages)
         {
-            if (messageParams.Predicate == MessagePredicate.Sent)
+            if (messageParams.Predicate == MessagePredicate.Sent) // To set receiver photo instead of sender's photo
                 userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.RecieverId);
-            else
+            else // This already showes receiver photo
                 userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
 
             if (userOrTarget is not null)
