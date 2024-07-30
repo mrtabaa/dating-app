@@ -1,7 +1,6 @@
 import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
-import { ActivatedRoute } from '@angular/router';
 import { take } from 'rxjs';
 import { MessageParams } from '../../../models/helpers/message-params';
 import { Message } from '../../../models/message.model';
@@ -27,16 +26,12 @@ export class MessagesMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;
   @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;
   messages: Message[] = [];
+  totalItemsCount = 0;
   private _messageService = inject(MessageService);
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
 
-  private route = inject(ActivatedRoute);
-  initLoad = true;
-
   messageParams = new MessageParams();
-
-  photoWH = 40;
 
   ngOnInit(): void {
     this.initMessageParams();
@@ -44,21 +39,11 @@ export class MessagesMobileComponent implements OnInit {
     this.getMessages();
   }
 
-  setTabGroupParam(): void {
-    this.route.queryParams.pipe(
-      take(1)).subscribe(params => {
-        const tab = params['tab'];
-        if (tab)
-          this.setSelectTabIndex(tab);
-      });
-  }
-
   setSelectTabIndex(tabIndex: number): void {
-    if (this.tabGroup) {
-      this.tabGroup.selectedIndex = tabIndex;
-
-      this.messageParams.predicate = tabIndex;
-    }
+    this.messageParams.predicate = tabIndex;
+    this.messageParams.pageNumber = 1; // reset on tab change
+    this.messages = []; // reset on tab change
+    this.getMessages();
   }
 
   getMessages(): void {
@@ -68,6 +53,7 @@ export class MessagesMobileComponent implements OnInit {
       next: (response: PaginatedResult<Message[]>) => {
         if (response.result && response.pagination) {
           this.messages = [...this.messages, ...response.result];
+          this.totalItemsCount = response.pagination.totalItems;
         }
       }
     });
@@ -77,6 +63,6 @@ export class MessagesMobileComponent implements OnInit {
     this.messageParams.predicate = MessagePredicate.INBOX;
     this.messageParams.targetUserName = this.memberIn?.userName;
     this.messageParams.pageNumber = 1;
-    this.messageParams.pageSize = 9;
+    this.messageParams.pageSize = 25;
   }
 }
