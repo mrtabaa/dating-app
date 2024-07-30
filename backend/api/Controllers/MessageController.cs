@@ -51,7 +51,10 @@ public class MessageController(
         AppUser? userOrTarget;
         foreach (var message in pagedMessages)
         {
-            userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
+            if (messageParams.Predicate == MessagePredicate.Sent)
+                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.RecieverId);
+            else
+                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
 
             if (userOrTarget is not null)
             {

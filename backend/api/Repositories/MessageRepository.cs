@@ -50,19 +50,19 @@ public class MessageRepository : IMessageRepository
             MessagePredicate.Inbox => query
                 .Where(doc => doc.RecieverId == userId)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()), // Inbox
+                .Select(group => group.First()),
             MessagePredicate.Unread => query
                 .Where(doc => doc.RecieverId == userId && doc.ReadOn == null)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()), // Unread
+                .Select(group => group.First()),
             MessagePredicate.Read => query
                 .Where(doc => doc.RecieverId == userId && doc.ReadOn != null)
                 .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()), // Read
+                .Select(group => group.First()),
             MessagePredicate.Sent => query
                 .Where(doc => doc.SenderId == userId)
-                .GroupBy(doc => doc.SenderId)
-                .Select(group => group.First()), // Sent
+                .GroupBy(doc => doc.RecieverId)
+                .Select(group => group.First()),
             _ => query
         };
 
