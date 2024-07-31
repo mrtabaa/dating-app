@@ -125,8 +125,8 @@ public class UserRepository : IUserRepository
         try
         {
             var updatedUser = Builders<AppUser>.Update
-                        .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                        .Set(doc => doc.Photos, appUser.Photos);
+                .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                .Set(doc => doc.Photos, appUser.Photos);
 
             UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
 
