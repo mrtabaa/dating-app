@@ -46,6 +46,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
+                    .AllowCredentials()
                     .WithOrigins("http://localhost:4300")
                 );
             }
@@ -54,6 +55,7 @@ public static class ApplicationServiceExtensions
                 options.AddDefaultPolicy(policy => policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
+                    .AllowCredentials()
                     .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com/") // Nginx, Azure
                 );
             }
@@ -65,6 +67,8 @@ public static class ApplicationServiceExtensions
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
 
         services.AddHttpClient();
+
+        services.AddSignalR();
         #endregion Others
 
         return services;
