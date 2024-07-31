@@ -81,7 +81,7 @@ public class FollowRepository : IFollowRepository
 
         Follow follow = Mappers.ConvertAppUsertoFollow(userId, followedMemberId.Value);
 
-        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsAdded, cancellationToken, follow);
+        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAction.IsAdded, cancellationToken, follow);
 
         return followStatus; // Faild for any other reason
     }
@@ -107,7 +107,7 @@ public class FollowRepository : IFollowRepository
             return followStatus;
         }
 
-        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAddOrRemove.IsRemoved, cancellationToken);
+        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAction.IsRemoved, cancellationToken);
 
         return followStatus;
     }
@@ -136,7 +136,7 @@ public class FollowRepository : IFollowRepository
     private async Task<bool> SaveInDbWithSessionAsync(
         ObjectId userId,
         ObjectId followedId,
-        FollowAddOrRemove followAddOrRemove,
+        FollowAction followAddOrRemove,
         CancellationToken cancellationToken,
         Follow? follow = null
     )
@@ -150,7 +150,7 @@ public class FollowRepository : IFollowRepository
 
         try
         {
-            if (follow is not null && FollowAddOrRemove.IsAdded == followAddOrRemove) // Add follow
+            if (follow is not null && FollowAction.IsAdded == followAddOrRemove) // Add follow
                 // added session to this part so if UpdateFollowedByCount failed, undo the InsertOnce.
                 await _collection.InsertOneAsync(session, follow, null, cancellationToken);
             else // if (FollowAddOrRemove.IsRemoved == followAddOrRemove) // Remove follow
@@ -231,11 +231,11 @@ public class FollowRepository : IFollowRepository
     /// <param name="followerId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId followerId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId followerId, FollowAction followAddOrRemove, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateFollowedByCount;
 
-        if (followAddOrRemove == FollowAddOrRemove.IsAdded)
+        if (followAddOrRemove == FollowAction.IsAdded)
         {
             updateFollowedByCount = Builders<AppUser>.Update
                 .Inc(appUser => appUser.FollowingsCount, 1); // Increament by 1 for each follow
@@ -257,11 +257,11 @@ public class FollowRepository : IFollowRepository
     /// <param name="followedId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId followedId, FollowAddOrRemove followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId followedId, FollowAction followAddOrRemove, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateFollowerCount;
 
-        if (followAddOrRemove == FollowAddOrRemove.IsAdded)
+        if (followAddOrRemove == FollowAction.IsAdded)
         {
             updateFollowerCount = Builders<AppUser>.Update
                 .Inc(appUser => appUser.FollowersCount, 1); // Increament by 1 for each follow

@@ -18,31 +18,3 @@ public static class AppVariablesExtensions
             new() {Name = Roles.member.ToString()}
         ];
 }
-
-public enum Roles
-{
-    admin,
-    moderator,
-    member
-}
-
-public enum FollowPredicate
-{
-    Followings,
-    Followers
-}
-
-public enum FollowAddOrRemove
-{
-    IsAdded,
-    IsRemoved
-}
-
-public enum MessagePredicate
-{
-    Inbox,
-    Unread,
-    Read,
-    Sent,
-    Thread
-}
