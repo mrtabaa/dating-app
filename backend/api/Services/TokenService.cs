@@ -26,10 +26,11 @@ public class TokenService : ITokenService
 
         string? identifierHash = await InsertEncryptedUserId(user.Id, jtiValue, cancellationToken); // this securedId is stored in users collection to associate with the AppUser.
 
-        if (!string.IsNullOrEmpty(identifierHash))
+        if (!string.IsNullOrEmpty(identifierHash) && !string.IsNullOrEmpty(user.NormalizedUserName))
         {
             var claims = new List<Claim> {
             new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
+            new(JwtRegisteredClaimNames.UniqueName, user.NormalizedUserName),
             new(JwtRegisteredClaimNames.Jti, jtiValue), // TODO store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 
