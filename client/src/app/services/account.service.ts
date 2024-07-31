@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { LoggedInUser } from '../models/logged-in-user.model';
 import { GooglePlacesService } from './google-places.service';
 import { ResponsiveService } from './responsive.service';
+import { PresenceService } from './hubs/presence.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class AccountService {
   private _responsiveService = inject(ResponsiveService);
   private _http = inject(HttpClient);
   private _router = inject(Router);
+  private _presenceService = inject(PresenceService);
 
   private baseUrl = environment.apiUrl + "account/";
 
@@ -77,6 +79,7 @@ export class AccountService {
     this.loggedInUserSig.set(undefined);
     this._router.navigate(['account/login'])
     this._googlePlacesService.resetCountry();
+    this._presenceService.stopHubConnection();
   }
 
   /**
@@ -90,6 +93,8 @@ export class AccountService {
     this.setLoggedInUserRoles(loggedInUser);
 
     this.loggedInUserSig.set(loggedInUser);
+
+    this._presenceService.createHubConnection(loggedInUser);
 
     // Set it to false to show Hallboard in color to the loggedInUser. Default was true
     this._responsiveService.isWelcomeCompSig.set(false);
