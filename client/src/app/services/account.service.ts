@@ -13,17 +13,17 @@ import { ResponsiveService } from './responsive.service';
   providedIn: 'root'
 })
 export class AccountService {
-  private googlePlacesService = inject(GooglePlacesService);
-  private responsiveService = inject(ResponsiveService);
+  private _googlePlacesService = inject(GooglePlacesService);
+  private _responsiveService = inject(ResponsiveService);
+  private _http = inject(HttpClient);
+  private _router = inject(Router);
 
   private baseUrl = environment.apiUrl + "account/";
 
   loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
 
-  constructor(private http: HttpClient, private router: Router) { }
-
   register(userInput: UserRegister): Observable<LoggedInUser | null> {
-    return this.http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
+    return this._http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
@@ -36,7 +36,7 @@ export class AccountService {
   }
 
   login(userInput: UserLogin): Observable<LoggedInUser | null> {
-    return this.http.post<LoggedInUser>(this.baseUrl + 'login', userInput)
+    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput)
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
@@ -52,7 +52,7 @@ export class AccountService {
   }
 
   registerDemo(userInput: UserRegister): Observable<LoggedInUser | null> {
-    return this.http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
+    return this._http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
       .pipe(
         map((user: LoggedInUser) => { return user ? user : null })
       );
@@ -65,7 +65,7 @@ export class AccountService {
    */
   reloadLoggedInUser(): void {
     if (localStorage.getItem("loggedInUser"))
-      this.http.get<LoggedInUser>(this.baseUrl)
+      this._http.get<LoggedInUser>(this.baseUrl)
         .pipe(take(1)).subscribe({
           next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
           error: () => this.logout()
@@ -75,8 +75,8 @@ export class AccountService {
   logout(): void {
     localStorage.clear();
     this.loggedInUserSig.set(undefined);
-    this.router.navigate(['account/login'])
-    this.googlePlacesService.resetCountry();
+    this._router.navigate(['account/login'])
+    this._googlePlacesService.resetCountry();
   }
 
   /**
@@ -92,17 +92,17 @@ export class AccountService {
     this.loggedInUserSig.set(loggedInUser);
 
     // Set it to false to show Hallboard in color to the loggedInUser. Default was true
-    this.responsiveService.isWelcomeCompSig.set(false);
+    this._responsiveService.isWelcomeCompSig.set(false);
   }
 
   setGetReturnUrl(): void {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
 
     this.loggedInUserSig()?.roles.includes('admin')
-      ? this.router.navigate(['/admin'])
+      ? this._router.navigate(['/admin'])
       : returnUrl
-        ? this.router.navigate([returnUrl])
-        : this.router.navigate(['/main']);
+        ? this._router.navigate([returnUrl])
+        : this._router.navigate(['/main']);
 
     localStorage.removeItem('returnUrl');
   }
