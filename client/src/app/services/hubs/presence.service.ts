@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { LoggedInUser } from '../../models/logged-in-user.model';
@@ -13,6 +13,8 @@ export class PresenceService {
   private _matSnack = inject(MatSnackBar);
   private readonly _CheckUserIsOnline = "CheckUserIsOnline";
   private readonly _CheckUserIsOffline = "CheckUserIsOffline";
+  private readonly _GetOnlineUsers = "GetOnlineUsers";
+  onlineUsersSig = signal<string[]>([]);
 
   createHubConnection(loggedInUser: LoggedInUser): void {
     this._hubConnection = new HubConnectionBuilder()
@@ -25,14 +27,16 @@ export class PresenceService {
     this._hubConnection.start().catch(err => console.log(err));
 
     this._hubConnection.on(this._CheckUserIsOnline, username => {
-      console.log(username + ' is online.');
       this._matSnack.open(username + ' is online.', 'Close', { duration: 7000, horizontalPosition: 'center', verticalPosition: 'bottom' });
     });
 
     this._hubConnection.on(this._CheckUserIsOffline, username => {
-      console.log(username + ' went offline.');
       this._matSnack.open(username + ' went offline.', 'Close', { duration: 7000, horizontalPosition: 'center', verticalPosition: 'top' });
     });
+
+    this._hubConnection.on(this._GetOnlineUsers, onlineUsers => {
+      this.onlineUsersSig.set(onlineUsers);
+    })
   }
 
   stopHubConnection(): void {

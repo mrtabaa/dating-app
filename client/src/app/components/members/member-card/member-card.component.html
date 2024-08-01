@@ -1,4 +1,7 @@
 @if (memberIn) {
+@if(onlineUsersSig().includes(memberIn.userName)) {
+{{memberIn.userName}}
+}
 <mat-card class="card">
     <div class="card-img-wrapper">
         @if (memberIn.photos.length === 0) {
