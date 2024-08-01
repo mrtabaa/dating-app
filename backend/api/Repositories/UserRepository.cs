@@ -111,9 +111,6 @@ public class UserRepository : IUserRepository
             photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, isMain: false);
         }
 
-        // save to DB
-        appUser.Photos.Add(photo);
-
         #region MongoDb Session
         //// Session is NOT supported in MongoDb Standalone servers!
         // Create a session object that is used when leveraging transactions
@@ -126,7 +123,7 @@ public class UserRepository : IUserRepository
         {
             var updatedUser = Builders<AppUser>.Update
                 .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                .Set(doc => doc.Photos, appUser.Photos);
+                .AddToSet(doc => doc.Photos, photo);
 
             UpdateResult result = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
 
