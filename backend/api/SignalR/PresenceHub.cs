@@ -11,13 +11,12 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
         string? userName = Context.User?.GetUserName();
         if (!string.IsNullOrEmpty(userName))
         {
-            await _presenceTrackerService.CheckUserConnectedAsync(userName, Context.ConnectionId);
+            await _presenceTrackerService.SaveConnectedUserAsync(userName, Context.ConnectionId);
 
             await Clients.Others.SendAsync(_CheckUserIsOnline, userName);
 
-            // IEnumerable<string> onlineUsers = await _presenceTrackerService.GetOnlineUsersAsync();
-
-            // await Clients.All.SendAsync(_GetOnlineUsers, onlineUsers);
+            IEnumerable<string> onlineUserNames = await _presenceTrackerService.GetOnlineUserNamesAsync();
+            await Clients.All.SendAsync(_GetOnlineUsers, onlineUserNames);
         }
     }
 
@@ -26,9 +25,12 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
         string? userName = Context.User?.GetUserName();
         if (!string.IsNullOrEmpty(userName))
         {
-            await _presenceTrackerService.CheckUserDisconnectedAsync(userName, Context.ConnectionId);
+            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
 
             await Clients.Others.SendAsync(_CheckUserIsOffline, userName);
+
+            IEnumerable<string> onlineUserNames = await _presenceTrackerService.GetOnlineUserNamesAsync();
+            await Clients.All.SendAsync(_GetOnlineUsers, onlineUserNames);
 
             await base.OnDisconnectedAsync(exception);
         }
