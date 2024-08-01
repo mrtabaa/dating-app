@@ -1,19 +1,36 @@
 namespace api.SignalR;
 
-public class PresenceHub : Hub
+public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
 {
     private const string _CheckUserIsOnline = "CheckUserIsOnline";
     private const string _CheckUserIsOffline = "CheckUserIsOffline";
+    private const string _GetOnlineUsers = "GetOnlineUsers";
 
     public override async Task OnConnectedAsync()
     {
-        await Clients.Others.SendAsync(_CheckUserIsOnline, Context.User?.GetUserName());
+        string? userName = Context.User?.GetUserName();
+        if (!string.IsNullOrEmpty(userName))
+        {
+            await _presenceTrackerService.CheckUserConnectedAsync(userName, Context.ConnectionId);
+
+            await Clients.Others.SendAsync(_CheckUserIsOnline, userName);
+
+            // IEnumerable<string> onlineUsers = await _presenceTrackerService.GetOnlineUsersAsync();
+
+            // await Clients.All.SendAsync(_GetOnlineUsers, onlineUsers);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await Clients.Others.SendAsync(_CheckUserIsOffline, Context.User?.GetUserName());
+        string? userName = Context.User?.GetUserName();
+        if (!string.IsNullOrEmpty(userName))
+        {
+            await _presenceTrackerService.CheckUserDisconnectedAsync(userName, Context.ConnectionId);
 
-        await base.OnDisconnectedAsync(exception);
+            await Clients.Others.SendAsync(_CheckUserIsOffline, userName);
+
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }
