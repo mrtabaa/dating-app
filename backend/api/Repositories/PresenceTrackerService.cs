@@ -12,25 +12,25 @@ public class PresenceTrackerService : IPresenceTrackerService
         _logger = logger;
     }
 
-    public async Task CheckUserConnectedAsync(string userName, string connectionId)
+    public async Task SaveConnectedUserAsync(string userName, string connectionId)
     {
         try
         {
-            PresenceTracker? tracker = await _collection.Find(doc => doc.UserName == userName).FirstOrDefaultAsync();
+            bool doesTrackerExist = await _collection.Find(doc => doc.UserName == userName).AnyAsync();
 
-            if (tracker is not null) // User is already connected. Add the newer connection
+            if (doesTrackerExist) // User is already connected. Add the newer connection
             {
-                tracker.ConnectionIds.Add(connectionId);
-
                 UpdateDefinition<PresenceTracker> updateDefinition = Builders<PresenceTracker>.Update
-                    .Set(doc => doc.ConnectionIds, tracker.ConnectionIds);
+                    .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                    .AddToSet(doc => doc.ConnectionIds, connectionId);
 
                 await _collection.UpdateOneAsync(doc => doc.UserName == userName, updateDefinition);
             }
             else  // First connection of the user
             {
-                tracker = new()
+                PresenceTracker tracker = new()
                 {
+                    Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                     UserName = userName
                 };
                 tracker.ConnectionIds.Add(connectionId);
@@ -44,7 +44,7 @@ public class PresenceTrackerService : IPresenceTrackerService
         }
     }
 
-    public async Task CheckUserDisconnectedAsync(string userName, string connectionId)
+    public async Task RemoveDisconnectedUserAsync(string userName, string connectionId)
     {
         try
         {
@@ -70,10 +70,10 @@ public class PresenceTrackerService : IPresenceTrackerService
         }
     }
 
-    // public async Task<IEnumerable<string>> GetOnlineUsersAsync()
-    // {
-    //     return await _collection.AsQueryable()
-    //         .Select(doc => doc.UserName)
-    //         .ToListAsync();
-    // }
+    public async Task<IEnumerable<string>> GetOnlineUserNamesAsync()
+    {
+        return await _collection.AsQueryable()
+            .Select(doc => doc.UserName)
+            .ToListAsync();
+    }
 }
