@@ -12,6 +12,21 @@
         padding-left: 4px;
         padding-bottom: 4px;
 
+        @keyframes m-icon {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        .is-online {
+            animation: m-icon 1.5s linear infinite;
+            color: #ba005c;
+        }
+
         p {
             font-size: 1rem;
             padding: 0;

@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
 import { Observable, map } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { PresenceService } from '../../../../services/hubs/presence.service';
 
 @Component({
   selector: 'app-member-card-mobile',
@@ -25,6 +26,7 @@ export class MemberCardMobileComponent {
   isSmallPhone$: Observable<boolean> | undefined;
   isLargePhone$: Observable<boolean> | undefined;
   isTablet$: Observable<boolean> | undefined;
+  onlineUsersSig = inject(PresenceService).onlineUsersSig;
 
   constructor() {
     this.isSmallPhone$ = this.breakpointObserver.observe('(min-width: 350px)')

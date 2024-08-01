@@ -1,7 +1,4 @@
 @if (memberIn) {
-@if(onlineUsersSig().includes(memberIn.userName)) {
-{{memberIn.userName}}
-}
 <mat-card class="card">
     <div class="card-img-wrapper">
         @if (memberIn.photos.length === 0) {
@@ -40,13 +37,17 @@
         <div class="title">
             @switch (memberIn.gender) {
             @case ('male') {
-            <mat-icon color="primary">boy</mat-icon>
+            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+                boy
+            </mat-icon>
             }
             @case ('female') {
-            <mat-icon color="primary">girl</mat-icon>
+            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+                girl</mat-icon>
             }
             @default {
-            <mat-icon color="primary">group_add</mat-icon>
+            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+                group_add</mat-icon>
             }
             }
             <mat-card-title>{{memberIn.knownAs | shortenString:7 | titlecase}}, {{memberIn.age}}</mat-card-title>

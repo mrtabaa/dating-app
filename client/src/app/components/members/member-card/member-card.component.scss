@@ -64,7 +64,7 @@ $min_card_size: 9rem;
         align-items: center;
         padding: 0.5rem 0;
         cursor: pointer;
-        
+
         &:hover {
             background-color: rgb(255, 228, 255);
         }
@@ -86,6 +86,21 @@ $min_card_size: 9rem;
     .title {
         display: flex;
         align-items: center;
+
+        @keyframes m-icon {
+            0% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.4;
+            }
+        }
+
+        .is-online {
+            animation: m-icon 1.5s linear infinite;
+            color: #ba005c;
+        }
 
         mat-card-title {
             font-size: 1rem;

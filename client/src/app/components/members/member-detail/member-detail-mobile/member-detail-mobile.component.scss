@@ -38,6 +38,29 @@ main {
                 gap: 1rem;
             }
         }
+
+        .extra-info {
+            @keyframes m-icon {
+                0% {
+                    opacity: 1;
+                }
+
+                100% {
+                    opacity: 0.4;
+                }
+            }
+
+            .presence {
+                display: flex;
+                align-items: center;
+                gap: 0.2rem;
+
+                .is-online {
+                    animation: m-icon 1.5s linear infinite;
+                    color: #ba005c;
+                }
+            }
+        }
     }
 
     mat-tab-group {
