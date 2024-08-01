@@ -18,6 +18,7 @@ import { ShortenStringPipe } from '../../../../pipes/shorten-string.pipe';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MemberMessagesComponent } from '../../member-messages/member-messages.component';
+import { PresenceService } from '../../../../services/hubs/presence.service';
 
 @Component({
   selector: 'app-member-detail-mobile',
@@ -41,6 +42,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
   router = inject(Router);
+  onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
   isChatActive = false;
   readonly messagesTabIndex = 2;

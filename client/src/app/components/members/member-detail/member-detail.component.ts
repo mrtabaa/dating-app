@@ -19,6 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { MemberDetailMobileComponent } from './member-detail-mobile/member-detail-mobile.component';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
+import { PresenceService } from '../../../services/hubs/presence.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -45,6 +46,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   private gallery = inject(Gallery);
   router = inject(Router);
   private route = inject(ActivatedRoute);
+  onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
   readonly messageTabIndex = 3;
 

@@ -8,6 +8,7 @@ public static class AppVariablesExtensions
     public const string collectionUsers = "users";
     public const string collectionFollows = "follows";
     public const string collectionMessages = "messages";
+    public const string collectionOnlineTrackers = "online-trackers";
     public const string collectionExceptionLogs = "exception-logs";
 
     public readonly static string[] AppVersions = ["1", "1.0.2"];
@@ -17,32 +18,4 @@ public static class AppVariablesExtensions
             new() {Name = Roles.moderator.ToString()},
             new() {Name = Roles.member.ToString()}
         ];
-}
-
-public enum Roles
-{
-    admin,
-    moderator,
-    member
-}
-
-public enum FollowPredicate
-{
-    Followings,
-    Followers
-}
-
-public enum FollowAddOrRemove
-{
-    IsAdded,
-    IsRemoved
-}
-
-public enum MessagePredicate
-{
-    Inbox,
-    Unread,
-    Read,
-    Sent,
-    Thread
 }

@@ -14,6 +14,7 @@ public static class RepositoryServiceExtensions
         services.AddScoped<IFollowRepository, FollowRepository>();
         services.AddScoped<IAdminRepository, AdminRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddSingleton<IPresenceTrackerService, PresenceTrackerService>();
 
         return services;
     }

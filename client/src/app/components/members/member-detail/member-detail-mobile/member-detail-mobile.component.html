@@ -45,13 +45,20 @@
             </div>
         </section>
         <div class="extra-info">
-            <p>Active:<span class="gray-text"> {{member.lastActive | intlRelativeTime}}</span></p>
+            <div class="presence">
+                @if(onlineUsersSig().includes(member.userName.toUpperCase())) {
+                <mat-icon class="is-online">person</mat-icon> Online now
+                }
+                @else {
+                <p>Active:<span class="gray-text"> {{member.lastActive | intlRelativeTime}}</span></p> | Offline
+                }
+            </div>
             <p>Since:<span class="gray-text"> {{member.created | date}}</span></p>
             <p class="location">{{member.city}}, {{member.state}}, {{member.country}}</p>
         </div>
     </section>
     <mat-divider />
-}
+    }
     <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="true"
         disablePagination="true">
         <mat-tab #photos>

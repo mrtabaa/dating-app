@@ -31,3 +31,6 @@ global using System.Text.Json;
 global using api.Models.Errors;
 global using Azure.Storage.Blobs;
 global using System.Runtime.InteropServices;
+global using api.enums;
+global using api.SignalR;
+global using Microsoft.AspNetCore.SignalR;

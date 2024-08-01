@@ -16,6 +16,19 @@
             alt="Photo of {{member.knownAs}}">
         }
         <mat-card-content>
+            <div class="presence">
+                @if(onlineUsersSig().includes(member.userName.toUpperCase()))
+                {
+                <mat-icon class="is-online">person</mat-icon> Online now
+                }
+                @else {
+                <mat-icon>person</mat-icon> Offline
+                }
+            </div>
+            <div>
+                <p>Username</p>
+                <p>{{member.userName}}</p>
+            </div>
             <div>
                 <p>Location</p>
                 <p>{{member.city}}, {{member.country}}</p>

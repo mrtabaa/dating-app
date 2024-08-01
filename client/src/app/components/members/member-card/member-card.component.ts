@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { FollowService } from '../../../services/follow.service';
 import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
 import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
+import { PresenceService } from '../../../services/hubs/presence.service';
 
 @Component({
   selector: 'app-member-card',
@@ -27,6 +28,7 @@ export class MemberCardComponent {
   @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();
 
   private followService = inject(FollowService);
+  onlineUsersSig = inject(PresenceService).onlineUsersSig;
   private snackBar = inject(MatSnackBar);
 
   addFollow(): void {

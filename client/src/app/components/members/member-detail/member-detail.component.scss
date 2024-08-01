@@ -8,11 +8,39 @@ main {
         height: fit-content;
 
         mat-card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             margin-top: 1rem;
+
+            .presence {
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                
+                @keyframes m-icon {
+                    0% {
+                        opacity: 1;
+                    }
+                    
+                    100% {
+                        opacity: 0.4;
+                    }
+                }
+                
+                .is-online {
+                    animation: m-icon 1.5s linear infinite;
+                    color: #ba005c;
+                }
+            }
 
             div {
                 :first-child {
                     font-weight: bold;
+                }
+
+                p {
+                    margin: 0;
                 }
             }
         }
