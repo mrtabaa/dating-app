@@ -1,5 +1,6 @@
 namespace api.SignalR;
 
+[Authorize]
 public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
 {
     private const string _CheckUserIsOnline = "CheckUserIsOnline";
