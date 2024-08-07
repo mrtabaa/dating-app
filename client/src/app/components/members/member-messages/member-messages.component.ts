@@ -1,14 +1,13 @@
 import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { take } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MessageParams } from '../../../models/helpers/message-params';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 import { MessagePredicate } from '../../../enums/MessagePredicate.enum';
-import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 import { Member } from '../../../models/member.model';
 import { IntlModule } from 'angular-ecmascript-intl';
 import { MatDividerModule } from '@angular/material/divider';
@@ -25,6 +24,7 @@ import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-heigh
 import { LoadingService } from '../../../services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CommonService } from '../../../services/common.service';
+import { MessagesWithPagination } from '../../../models/messagesWithPagination.model';
 
 @Component({
   selector: 'app-member-messages',
@@ -49,6 +49,7 @@ export class MemberMessagesComponent implements OnInit {
   isCreatingMessageSig = inject(CommonService).isCreatingMessageSig;
 
   messages: Message[] = [];
+  messagesWithPagination$: Observable<MessagesWithPagination> | undefined;
   bufferSize = 0;
   defaultItemSize = 50;
   readonly MAX_BUFFER_SIZE = 1000 * this.defaultItemSize; // Assuming 1000 messages as an upper limit
@@ -126,20 +127,41 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   getMessages(): void {
-    this._messageService.getInbox(this.messageParams).pipe(
-      take(1)
-    ).subscribe({
-      next: (response: PaginatedResult<Message[]>) => {
-        if (response.result && response.pagination) {
-          this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-
-          if (this.isFirstLoad)
-            this.scrollToBottom();
-          else
-            this.scrollToReloaded();
-        }
+    if (this.loggedInUserSig()) {
+      const token = this.loggedInUserSig()?.token;
+      if (token) {
+        this._messageService.createHubConnection(token, this.messageParams);
+        this._messageService.messagesWithPagination$.pipe(
+            take(1)
+          ).subscribe({
+            next: (response: MessagesWithPagination) => {
+              if (response) {
+                this.messages = [...response.messages.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+      
+                if (this.isFirstLoad)
+                  this.scrollToBottom();
+                else
+                  this.scrollToReloaded();
+              }
+            }
+          });
       }
-    });
+    }
+
+    // this._messageService.getInbox(this.messageParams).pipe(
+    //   take(1)
+    // ).subscribe({
+    //   next: (response: PaginatedResult<Message[]>) => {
+    //     if (response.result && response.pagination) {
+    //       this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+
+    //       if (this.isFirstLoad)
+    //         this.scrollToBottom();
+    //       else
+    //         this.scrollToReloaded();
+    //     }
+    //   }
+    // });
   }
 
   loadOlderMessages(event: number): void {
