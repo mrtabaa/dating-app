@@ -37,6 +37,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
 app.Run();
 #endregion
