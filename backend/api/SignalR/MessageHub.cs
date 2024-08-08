@@ -54,10 +54,7 @@ public class MessageHub(
             messageParams.Predicate = Enum.TryParse(queryCollection["predicate"], out MessagePredicate predicate) ? predicate : MessagePredicate.Thread;
         }
 
-        if (queryCollection["targetUserName"] is not null)
-        {
-            messageParams.TargetUserName = queryCollection["targetUserName"];
-        }
+        messageParams.TargetUserName = queryCollection["targetUserName"] ?? string.Empty;
 
         return messageParams;
     }
