@@ -83,16 +83,19 @@
         </mat-tab>
         <mat-tab label="About {{member.knownAs}}">
             <div class="tab-contents">
-                @if (member.introduction.length > 0) {
+                @if(
+                !(member.introduction || member.lookingFor || member.interests)) {
+                <p>There is no information provided.</p>
+                }
+                @else {
+                @if (member.introduction) {
                 <h6>Introduction</h6>
                 <p>{{member.introduction}}</p>
                 }
-                @if (member.lookingFor.length > 0) {
+                @if (member.lookingFor) {
                 <h6>Looking For</h6>
                 <p>{{member.lookingFor}}</p>
                 }
-                @if(member.introduction.length === 0 && member.lookingFor.length === 0) {
-                <p>There is no information provided.</p>
                 }
             </div>
         </mat-tab>
