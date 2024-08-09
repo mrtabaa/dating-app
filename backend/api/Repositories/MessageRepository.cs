@@ -1,4 +1,3 @@
-
 namespace api.Repositories;
 
 public class MessageRepository : IMessageRepository
