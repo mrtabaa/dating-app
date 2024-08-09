@@ -20,15 +20,6 @@ export class MessageService {
   private _hubUrl: string = environment.hubUrl + 'message';
   private _hubConnection: HubConnection | undefined;
   private _paginationHandler = new PaginationHandler();
-  // messagesWithPaginationSig = signal<MessagesWithPagination>({
-  //   messages: [],
-  //   pagination: {
-  //     currentPage: 0,
-  //     itemsPerPage: 0,
-  //     totalItems: 0,
-  //     totalPages: 0,
-  //   }
-  // });
 
   messagesWithPaginationSource = new BehaviorSubject<MessagesWithPagination>({
     messages: [],
@@ -60,19 +51,9 @@ export class MessageService {
     return this._paginationHandler.getPaginatedResult(this._baseUrl, params);
   }
 
-  createHubConnection(token: string, messageParams: MessageParams): void {
-    let params = new HttpParams();
-    params = params.append('pageNumber', messageParams.pageNumber);
-    params = params.append('pageSize', messageParams.pageSize);
-    params = params.append('predicate', messageParams.predicate);
-
-    if (messageParams.targetUserName)
-      params = params.append('targetUserName', messageParams.targetUserName); // Set for THREAD
-
-    const queryParams = params.toString();
-
+  createHubConnection(token: string): void {
     this._hubConnection = new HubConnectionBuilder()
-      .withUrl(this._hubUrl + '?' + queryParams, {
+      .withUrl(this._hubUrl, {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
@@ -80,8 +61,9 @@ export class MessageService {
 
     this._hubConnection.start().catch(err => console.log(err));
 
-    this._hubConnection.on(this._messageThread, messagesWithPagination => {
-      this.messagesWithPaginationSource.next(messagesWithPagination);
-    })
+  }
+
+  stopHubConnection(): void {
+    this._hubConnection?.stop();
   }
 }
