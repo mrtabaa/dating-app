@@ -1,7 +1,7 @@
-import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
-import { Observable, take } from 'rxjs';
+import { Subscription, take } from 'rxjs';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MessageParams } from '../../../models/helpers/message-params';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
@@ -24,7 +24,7 @@ import { CdkDynamicHeightDirective } from '../../../directives/cdk-dynamic-heigh
 import { LoadingService } from '../../../services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CommonService } from '../../../services/common.service';
-import { MessagesWithPagination } from '../../../models/messagesWithPagination.model';
+import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 
 @Component({
   selector: 'app-member-messages',
@@ -37,7 +37,7 @@ import { MessagesWithPagination } from '../../../models/messagesWithPagination.m
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit {
+export class MemberMessagesComponent implements OnInit, OnDestroy {
   @Input() memberIn: Member | undefined;
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
 
@@ -49,7 +49,9 @@ export class MemberMessagesComponent implements OnInit {
   isCreatingMessageSig = inject(CommonService).isCreatingMessageSig;
 
   messages: Message[] = [];
-  messagesWithPagination$: Observable<MessagesWithPagination> | undefined;
+  messagesSubs: Subscription | undefined;
+  totalPages = 1;
+
   bufferSize = 0;
   defaultItemSize = 50;
   readonly MAX_BUFFER_SIZE = 1000 * this.defaultItemSize; // Assuming 1000 messages as an upper limit
@@ -66,6 +68,11 @@ export class MemberMessagesComponent implements OnInit {
     this.initBufferSize();
 
     this.getMessages();
+  }
+
+  ngOnDestroy(): void {
+    this.messagesSubs?.unsubscribe();
+    this._messageService.stopHubConnection();
   }
 
   create(): void {
@@ -90,7 +97,7 @@ export class MemberMessagesComponent implements OnInit {
         sentOn: new Date()
       }
 
-      this.messages = [...this.messages, message];
+      // this.messages = [...this.messages, message];
 
       // temprorarly increase the size to either of the length or the max size. 
       this.bufferSize = Math.min(this.messages.length * this.defaultItemSize, this.MAX_BUFFER_SIZE);
@@ -101,43 +108,118 @@ export class MemberMessagesComponent implements OnInit {
       //#endregion Create and add to messages for Optimistic approach
 
       // Send it to API
-      this._messageService.create(messageIn).pipe(
-        take(1)
-      ).subscribe({
-        next: (createdMessage: CreatedMessage) => {
-          if (createdMessage) {
-            // Update message of the messages with API validated values
-            const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
+      this._messageService.create(messageIn);
 
-            this.messages[index].Id = createdMessage.Id;
-            this.messages[index].sentOn = createdMessage.sentOn;
-            this.messages[index].readOn = createdMessage.readOn;
+      setTimeout(() => {
+        const createdMessage = this._messageService.createdMessage;
+        if (createdMessage) {
+          // Update message of the messages with API validated values
+          const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
 
-            delete this.messages[index].tempId; // Remove the tempId once updated 
+          this.messages[index].Id = createdMessage.Id;
+          this.messages[index].sentOn = createdMessage.sentOn;
+          this.messages[index].readOn = createdMessage.readOn;
 
-            setTimeout(() => {
-              this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
-            }, 100);
-          }
-        },
-        // delete message for API BadRequest response. 
-        error: () => this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
-      });
+          delete this.messages[index].tempId; // Remove the tempId once updated 
+
+          setTimeout(() => {
+            this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
+          }, 100);
+
+          console.log('all', this.messages);
+        }
+        else {
+          // delete message for API BadRequest response. 
+          this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
+        }
+      }, 1000);
+
+      // ?.then((createdMessage: CreatedMessage | undefined) => {
+      //   console.log(createdMessage);
+      //   if (createdMessage) {
+      //     // Update message of the messages with API validated values
+      //     const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
+
+      //     this.messages[index].Id = createdMessage.Id;
+      //     this.messages[index].sentOn = createdMessage.sentOn;
+      //     this.messages[index].readOn = createdMessage.readOn;
+
+      //     delete this.messages[index].tempId; // Remove the tempId once updated 
+
+      //     setTimeout(() => {
+      //       this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
+      //     }, 100);
+      //   }
+      // }).catch(() => {
+      //   // delete message for API BadRequest response. 
+      //   this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
+      // });
+
+      // // Send it to API
+      // this._messageService.create(messageIn).pipe(
+      //   take(1)
+      // ).subscribe({
+      //   next: (createdMessage: CreatedMessage) => {
+      //     if (createdMessage) {
+      //       // Update message of the messages with API validated values
+      //       const index = this.messages.findIndex((msg: Message) => msg.tempId === message.tempId);
+
+      //       this.messages[index].Id = createdMessage.Id;
+      //       this.messages[index].sentOn = createdMessage.sentOn;
+      //       this.messages[index].readOn = createdMessage.readOn;
+
+      //       delete this.messages[index].tempId; // Remove the tempId once updated 
+
+      //       setTimeout(() => {
+      //         this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
+      //       }, 100);
+      //     }
+      //   },
+      //   // delete message for API BadRequest response. 
+      //   error: () => this.messages = this.messages.filter(msg => msg.tempId !== message.tempId)
+      // });
     }
   }
 
   getMessages(): void {
-    if (this.loggedInUserSig()) {
+    // if (this.loggedInUserSig()) {
+    //   const token = this.loggedInUserSig()?.token;
+    //   //   console.log('out', this.messageParams.pageNumber, this.totalPages);
+    //   if (token && this.messageParams.pageNumber <= this.totalPages) {
+    //     this._messageService.createHubConnection(token, this.messageParams);
+
+    //     this.messagesSubs = this._messageService.messagesWithPagination$.subscribe({
+    //       next: (response: MessagesWithPagination) => {
+    //         if (response.messages && response.pagination) {
+    //           this.totalPages = response.pagination.totalPages;
+    //           this.messages = [...response.messages.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+
+    //           if (this.isFirstLoad)
+    //             this.scrollToBottom();
+    //           else
+    //             this.scrollToReloaded();
+    //         }
+    //       }
+    //     })
+    //   }
+
+    if (this.messageParams.pageNumber <= this.totalPages) {
       const token = this.loggedInUserSig()?.token;
-      if (token) {
-        this._messageService.createHubConnection(token, this.messageParams);
-        this._messageService.messagesWithPagination$.pipe(
+      if (token)
+        this._messageService.createHubConnection(token);
+
+      this._messageService.getInbox(this.messageParams);
+
+      if (this._messageService.paginatedResult$) {
+        this._messageService.paginatedResult$
+          .pipe(
             take(1)
           ).subscribe({
-            next: (response: MessagesWithPagination) => {
-              if (response) {
-                this.messages = [...response.messages.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-      
+            next: (response: PaginatedResult<Message[]>) => {
+              if (response.result && response.pagination) {
+                this.totalPages = response.pagination.totalPages;
+                this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
+
                 if (this.isFirstLoad)
                   this.scrollToBottom();
                 else
@@ -147,21 +229,6 @@ export class MemberMessagesComponent implements OnInit {
           });
       }
     }
-
-    // this._messageService.getInbox(this.messageParams).pipe(
-    //   take(1)
-    // ).subscribe({
-    //   next: (response: PaginatedResult<Message[]>) => {
-    //     if (response.result && response.pagination) {
-    //       this.messages = [...response.result.reverse(), ...this.messages]; // reverse to sort messages from bottom(newer) to top(older)
-
-    //       if (this.isFirstLoad)
-    //         this.scrollToBottom();
-    //       else
-    //         this.scrollToReloaded();
-    //     }
-    //   }
-    // });
   }
 
   loadOlderMessages(event: number): void {

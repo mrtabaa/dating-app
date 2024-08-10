@@ -75,17 +75,20 @@ export class MessagesComponent implements OnInit, OnDestroy {
   getMessages(): void {
     this.messages = []; // reset
 
-    this._messageService.getInbox(this.messageParams)
-      .pipe(
-        take(1)
-      ).subscribe({
-        next: (response: PaginatedResult<Message[]>) => {
-          if (response.result && response.pagination) {
-            this.messages = response.result;
-            this.pagination = response.pagination;
+    this._messageService.getInbox(this.messageParams);
+
+    if (this._messageService.paginatedResult$)
+      this._messageService.paginatedResult$
+        .pipe(
+          take(1)
+        ).subscribe({
+          next: (response: PaginatedResult<Message[]>) => {
+            if (response.result && response.pagination) {
+              this.messages = response.result;
+              this.pagination = response.pagination;
+            }
           }
-        }
-      });
+        });
   }
 
   handlePageEvent(e: PageEvent) {
