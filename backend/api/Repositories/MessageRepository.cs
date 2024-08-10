@@ -19,7 +19,7 @@ public class MessageRepository : IMessageRepository
     #endregion Db and Token Settings
 
     #region CRUD
-    public async Task<CreatedMessageDto?> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
+    public async Task<Message?> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
         AppUser? targetUser = await _userRepository.GetByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
 
@@ -30,7 +30,9 @@ public class MessageRepository : IMessageRepository
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
-        return Mappers.ConvertMessageToCreatedMessageDto(message, messageInDto.TempId);
+        return message;
+
+        // return Mappers.ConvertMessageToCreatedMessageDto(message, messageInDto.TempId);
     }
 
     public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
