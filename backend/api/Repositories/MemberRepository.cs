@@ -19,7 +19,7 @@ public class MemberRepository : IMemberRepository
     #endregion
 
     #region CRUD
-    public async Task<PagedList<AppUser>?> GetAllAsync(MemberParams memberParams, CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>?> GetPagedListAsync(MemberParams memberParams, CancellationToken cancellationToken)
     {
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
@@ -79,7 +79,7 @@ public class MemberRepository : IMemberRepository
             : Mappers.ConvertAppUserToMemberDto(appUser);
     }
 
-    public async Task<IEnumerable<AppUser>> GetMembersByIdsAsync(IEnumerable<ObjectId> membersIds, CancellationToken cancellationToken) =>
+    public async Task<IEnumerable<AppUser>> GetAppUsersByIdsAsync(IEnumerable<ObjectId> membersIds, CancellationToken cancellationToken) =>
         await _collection.AsQueryable().Where(appUser => membersIds.Contains(appUser.Id)).ToListAsync(cancellationToken);
 
     public async Task<MemberDto?> GetByUserNameAsync(ObjectId userId, string userName, CancellationToken cancellationToken)
