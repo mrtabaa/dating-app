@@ -183,6 +183,17 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
+    public async Task<string?> GetProfilePhotoUrlBlobAsync(ObjectId userId, CancellationToken cancellationToken)
+    {
+        string? profilePhotoUrl = await _collection.AsQueryable()
+            .Where(appUser => appUser.Id == userId)
+            .SelectMany(appUser => appUser.Photos)
+            .Where(photo => photo.IsMain)
+            .Select(photo => photo.Url_165)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
+    }
     public async Task<PhotoDeleteResponse> DeletePhotoAsync(ObjectId userId, string? blob_url_165_In, CancellationToken cancellationToken)
     {
         PhotoDeleteResponse photoDeleteResponse = new();
