@@ -1,16 +1,16 @@
 <main>
-    @if(!isLoadingSig() && messages.length < 1) { <div class="warning-layout-helper">.</div> <!-- this is to  -->
-        <div class="warning">
-            <h5>Empty box</h5>
-            <p>
-                Chatting can increase your chance of finding a right match. Start now by sending your first message!
-            </p>
+    @if(!isLoadingSig() && messagesSig().length < 1) { <div class="warning">
+        <div class="warning-layout-helper">.</div>
+        <h5>Empty box</h5>
+        <p>
+            Chatting can increase your chance of finding a right match. Start now by sending your first message!
+        </p>
         </div>
-        }
-        @else {
+    }
+    @else {
         <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
             [maxBufferPx]="bufferSize" itemSize="50" class="messages-container">
-            <div *cdkVirtualFor="let message of messages" [appCdkDynamicHeightDir]="message" class="item">
+            <div *cdkVirtualFor="let message of messagesSig()" [appCdkDynamicHeightDir]="message" class="item">
                 <div class="details">
                     <div class="title">
                         <mat-icon>schedule</mat-icon>
@@ -27,11 +27,10 @@
                     priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName}}">
             </div>
         </cdk-virtual-scroll-viewport>
-        }
-        <form (ngSubmit)="create()" class="create">
-            <app-input-cva [formControl]="createMessageCtrl" [label]="'Your message'"
-                [placeHolder]="'Enter your message'" [isFocused]="!isMobileSig()" [hint]="'Up to 500 characters.'"
-                [isButtonSuffix]="true">
-            </app-input-cva>
-        </form>
+    }
+    <form (ngSubmit)="create()" class="create">
+        <app-input-cva [formControl]="createMessageCtrl" [label]="'Your message'" [placeHolder]="'Enter your message'"
+            [isFocused]="!isMobileSig()" [hint]="'Up to 500 characters.'" [isButtonSuffix]="true">
+        </app-input-cva>
+    </form>
 </main>
