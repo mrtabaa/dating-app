@@ -62,6 +62,7 @@ public class MessageHub(
     public async Task Create(MessageInDto messageInDto)
     {
         const string SendMessage = "SendMessage";
+        
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
 
@@ -70,7 +71,7 @@ public class MessageHub(
         ObjectId userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), cancellationToken)
             ?? throw new HubException("User id is invalid. Login again.");
 
-        Message message = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
+        MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
             ?? throw new HubException("Message creation failed. Try again.");
 
         string userName = Context.User?.GetUserName()
@@ -78,8 +79,8 @@ public class MessageHub(
 
         string groupName = GetGroupName(userName, messageInDto.ReceiverUserName);
 
-        // await Clients.Group(groupName).SendAsync(SendMessage, createdMessageDto, cancellationToken);
-        await Clients.All.SendAsync(SendMessage, message, cancellationToken);
+        // await Clients.Group(groupName).SendAsync(SendMessage, message, cancellationToken); // TODO Replace all with this
+        await Clients.All.SendAsync(SendMessage, messageDto, cancellationToken);
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
@@ -148,6 +149,6 @@ public class MessageHub(
             .Concat(pagedMessages.Select(message => message.RecieverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
-        return await _memberRepository.GetMembersByIdsAsync(allIds, cancellationToken);
+        return await _memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
     }
 }

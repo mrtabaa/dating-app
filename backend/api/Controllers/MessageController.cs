@@ -9,17 +9,17 @@ public class MessageController(
     ) : BaseApiController
 {
     [HttpPost]
-    public async Task<ActionResult<Message?>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<MessageDto?>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        Message? message = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
+        MessageDto? messageDto = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
 
-        return message is null
+        return messageDto is null
         ? BadRequest("Sending message faild. Try again or contact the support.")
-        : message;
+        : messageDto;
     }
 
     [HttpGet]
@@ -77,6 +77,6 @@ public class MessageController(
             .Concat(pagedMessages.Select(message => message.RecieverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
-        return await _memberRepository.GetMembersByIdsAsync(allIds, cancellationToken);
+        return await _memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
     }
 }
