@@ -5,6 +5,6 @@ export interface Message {
     userOrTargetKnownAs: string | undefined;
     userOrTargetProfilePhoto: string | undefined;
     content: string;
-    sentOn: Date
+    sentOn?: Date;
     readOn?: Date;
 }

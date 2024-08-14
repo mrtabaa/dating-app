@@ -93,7 +93,6 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
         userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
         userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
         content: messageIn.content,
-        sentOn: new Date() // TODO Set this in api
       }
 
       this.createMessageCtrl.setValue(null);
