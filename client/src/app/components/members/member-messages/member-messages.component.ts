@@ -106,17 +106,11 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
 
         if (newMessage) {
           // Update message of the messages with API validated values
-          console.log('message', message);
-          console.log('new', newMessage); // TODO fix the DTO to prevent getting users IDs
 
-          setTimeout(() => {
-            this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
-          }, 100);
+          this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
 
           // temprorarly increase the size to either of the length or the max size. 
           this.bufferSize = Math.min(this.messagesSig().length * this._defaultItemSize, this.MAX_BUFFER_SIZE);
-          if (this.viewport)
-            this._messageService.scrollToBottom();
         }
         else {
           // delete message for API BadRequest response. 
