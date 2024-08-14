@@ -59,6 +59,7 @@ export class MessageService {
       if (message) {
         this.newMessage = message; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
         this.messagesSig.update(msgs => [...msgs, message]);
+
         this.scrollToBottom();
       }
     });
@@ -68,6 +69,10 @@ export class MessageService {
     this.hubConnection?.stop();
   }
 
+  /**
+   * This moves scroll to the bottom on the first messages load and any time a new message is sent.
+   * Implemented in the service so it applies to the receiver of the message as well when this.hubConnection.on(this._sendMessage is triggered.
+   */
   scrollToBottom() {
     try {
       setTimeout(() => {
