@@ -20,6 +20,7 @@ import { ResponsiveService } from '../../../services/responsive.service';
 import { MemberDetailMobileComponent } from './member-detail-mobile/member-detail-mobile.component';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 import { PresenceService } from '../../../services/hubs/presence.service';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -38,8 +39,9 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
   @ViewChild('memberMessage') memberMessage: MemberMessagesComponent | undefined;
 
-  private memberService = inject(MemberService);
-  private followService = inject(FollowService);
+  private _memberService = inject(MemberService);
+  private _messageService = inject(MessageService);
+  private _followService = inject(FollowService);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   username = inject(AccountService).loggedInUserSig()?.userName;
   private snackBar = inject(MatSnackBar);
@@ -75,12 +77,12 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
     const userName: string | null = this.route.snapshot.paramMap.get('userName');
 
     if (userName) {
-      this.member$ = this.memberService.getMemberByUsername(userName);
+      this.member$ = this._memberService.getMemberByUsername(userName);
     }
   }
 
   addFollow(member: Member): void {
-    this.followService.addFollow(member.userName)
+    this._followService.addFollow(member.userName)
       .pipe(
         take(1))
       .subscribe({
@@ -95,7 +97,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   }
 
   removeFollow(member: Member): void {
-    this.followService.removeFollow(member.userName)
+    this._followService.removeFollow(member.userName)
       .pipe(
         take(1))
       .subscribe({
@@ -137,8 +139,8 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
       this.tabGroup.selectedIndex = tabIndex;
       this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
 
-      this.memberMessage?.initBufferSize();
-      this.memberMessage?.scrollToBottom();
+      this.memberMessage?.initBufferSizeAndViewport();
+      this._messageService.scrollToBottom();
     }
   }
 }
