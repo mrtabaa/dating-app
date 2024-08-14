@@ -112,18 +112,6 @@ namespace api.DTOs
             );
         }
 
-        public static CreatedMessageDto ConvertMessageToCreatedMessageDto(Message message, string tempId)
-        {
-            return
-                new CreatedMessageDto(
-                    TempId: tempId,
-                    Id: message.Id.ToString(), // To delete/update
-                    Content: message.Content,
-                    ReadOn: message.ReadOn,
-                    SentOn: message.SentOn
-                );
-        }
-
         public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl)
         {
             return
