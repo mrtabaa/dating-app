@@ -24,6 +24,7 @@ import { LoadingService } from '../../../services/loading.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CommonService } from '../../../services/common.service';
 import { PaginatedResult } from '../../../models/helpers/paginatedResult';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-member-messages',
@@ -41,7 +42,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
 
   private _messageService = inject(MessageService);
-  private fb = inject(FormBuilder);
+  private _fb = inject(FormBuilder);
+  private _snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isLoadingSig = inject(LoadingService).isLoadingsig;
@@ -60,14 +62,14 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
   photo_WH = 40;
 
-  createMessageCtrl = this.fb.control('', [Validators.maxLength(1000)]);
+  createMessageCtrl = this._fb.control('', [Validators.maxLength(1000)]);
 
   ngOnInit(): void {
     this.initMessageParams();
     this.initBufferSizeAndViewport();
     this.getMessages();
   }
-  
+
   ngAfterViewInit(): void {
     this.setTargetUserNameAndViewport();
     this.createHubConnection();
@@ -118,8 +120,9 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
         }
         else {
           // delete message for API BadRequest response. 
-          // TODO Warn with matSnack if offline or other errors.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== message.tempId));
+          this._snackBar.open('Sending message failed. Check your internet connection of login agian.', 'Close',
+            { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
         }
       }, 500);
     }
