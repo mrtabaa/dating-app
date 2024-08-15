@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit, Signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit, Signal, ViewChild } from '@angular/core';
 import { Message } from '../../../models/message.model';
 import { MessageService } from '../../../services/message.service';
 import { Subscription, take } from 'rxjs';
@@ -36,7 +36,7 @@ import { PaginatedResult } from '../../../models/helpers/paginatedResult';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit, OnDestroy {
+export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() memberIn: Member | undefined;
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;
 
@@ -65,8 +65,12 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initMessageParams();
     this.initBufferSizeAndViewport();
-    this.createHubConnection();
     this.getMessages();
+  }
+  
+  ngAfterViewInit(): void {
+    this.setTargetUserNameAndViewport();
+    this.createHubConnection();
   }
 
   ngOnDestroy(): void {
@@ -114,6 +118,7 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
         }
         else {
           // delete message for API BadRequest response. 
+          // TODO Warn with matSnack if offline or other errors.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== message.tempId));
         }
       }, 500);
@@ -183,5 +188,10 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
     const token = this.loggedInUserSig()?.token;
     if (token)
       this._messageService.createHubConnection(token);
+  }
+
+  private setTargetUserNameAndViewport(): void {
+    if (this.memberIn && this.viewport)
+      this._messageService.setTargetUserNameAndViewPort(this.memberIn.userName, this.viewport);
   }
 }
