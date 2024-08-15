@@ -13,7 +13,7 @@ public class UserRepository : IUserRepository
         ILogger<UserRepository> logger, IPhotoService photoService
         )
     {
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _client = client;
 

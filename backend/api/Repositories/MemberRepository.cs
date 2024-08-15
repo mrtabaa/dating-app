@@ -10,9 +10,8 @@ public class MemberRepository : IMemberRepository
     // constructor - dependency injections
     public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings, IPhotoService photoService, IFollowRepository followRepository)
     {
-        // TODO make all dbName/s nullable and handle them with dbName?.GetCollection
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = dbName?.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _photoService = photoService;
         _followRepository = followRepository;
     }

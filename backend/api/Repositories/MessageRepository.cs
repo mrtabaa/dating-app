@@ -12,7 +12,7 @@ public class MessageRepository : IMessageRepository
         IUserRepository userRepository
         )
     {
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<Message>(AppVariablesExtensions.collectionMessages);
         _userRepository = userRepository;
     }

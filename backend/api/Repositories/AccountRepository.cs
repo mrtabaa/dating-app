@@ -5,7 +5,7 @@ namespace api.Repositories;
 public class AccountRepository : IAccountRepository
 {
     #region Db and Token Settings
-    private readonly IMongoCollection<AppUser>? _collection;
+    private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
@@ -14,13 +14,13 @@ public class AccountRepository : IAccountRepository
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        Interfaces.IRecaptchaService turnstileValidatorService,
+        IRecaptchaService turnstileValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
         IPhotoService photoService
     )
     {
-        var database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _recaptchaService = turnstileValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;

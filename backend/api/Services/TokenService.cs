@@ -7,8 +7,8 @@ public class TokenService : ITokenService
 
     public TokenService(IConfiguration config, IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
-        var database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 

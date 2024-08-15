@@ -7,7 +7,7 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings, ILogger<PresenceTrackerService> logger)
     {
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<PresenceTracker>(AppVariablesExtensions.collectionOnlineTrackers);
         _logger = logger;
     }
