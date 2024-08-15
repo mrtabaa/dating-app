@@ -3,9 +3,8 @@ namespace api.DTOs
     public static class Mappers
     {
         #region Generator Methods
-        public static AppUser ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) //, int likedCount, int likedByCount
-        {
-            return new AppUser
+        public static AppUser ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) => //, int likedCount, int likedByCount
+            new AppUser
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Email = userInput.Email, // required by AspNet Identity
@@ -23,11 +22,9 @@ namespace api.DTOs
                 Photos = [],
                 FollowersCount = 0
             };
-        }
 
-        public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) //, int likedCount, int likedByCount
-        {
-            return new AppUser
+        public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) => //, int likedCount, int likedByCount
+            new AppUser
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Email = userInput.Email, // required by AspNet Identity
@@ -38,11 +35,9 @@ namespace api.DTOs
                 Photos = [],
                 FollowersCount = 0
             };
-        }
 
-        public static MemberDto ConvertAppUserToMemberDto(AppUser appUser, bool isFollowing = false)
-        {
-            return new MemberDto(
+        public static MemberDto ConvertAppUserToMemberDto(AppUser appUser, bool isFollowing = false) =>
+            new MemberDto(
                 Schema: appUser.Schema,
                 UserName: appUser.UserName,
                 Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
@@ -61,11 +56,9 @@ namespace api.DTOs
                 Photos: appUser.Photos,
                 IsFollowing: isFollowing
             );
-        }
 
-        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl, string? turnstileToken = null)
-        {
-            return new LoggedInDto
+        public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl, string? turnstileToken = null) =>
+            new LoggedInDto
             {
                 Token = token,
                 KnownAs = appUser.KnownAs,
@@ -75,11 +68,9 @@ namespace api.DTOs
                 IsProfileCompleted = appUser.IsProfileCompleted,
                 RecaptchaToken = turnstileToken
             };
-        }
 
-        public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain)
-        {
-            return new Photo
+        public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain) =>
+            new Photo
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Url_165 = photoUrls[0],
@@ -87,20 +78,16 @@ namespace api.DTOs
                 Url_enlarged = photoUrls[2],
                 IsMain = isMain
             };
-        }
 
-        public static Follow ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId)
-        {
-            return new Follow(
-                    Schema: AppVariablesExtensions.AppVersions.Last<string>(),
-                    FollowerId: followerId,
-                    FollowedMemberId: followedMemberId
-                );
-        }
+        public static Follow ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId) =>
+            new Follow(
+                Schema: AppVariablesExtensions.AppVersions.Last<string>(),
+                FollowerId: followerId,
+                FollowedMemberId: followedMemberId
+            );
 
-        public static Message ConvertMessageInDtoToMessage(string content, ObjectId userId, ObjectId receiverId)
-        {
-            return new Message(
+        public static Message ConvertMessageInDtoToMessage(string content, ObjectId userId, ObjectId receiverId) =>
+            new Message(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 SenderId: userId,
                 RecieverId: receiverId,
@@ -110,26 +97,18 @@ namespace api.DTOs
                 SenderDeleted: false,
                 ReceiverDeleted: false
             );
-        }
 
-        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl)
-        {
-            return
-                new MessageDto(
-                    Id: message.Id.ToString(), // To delete/update
-                    UserOrTargetUserName: userOrTarget.UserName,
-                    UserOrTargetKnownAs: userOrTarget?.KnownAs,
-                    UserOrTargetProfilePhoto: profilePhotoSasUrl,
-                    Content: message.Content,
-                    ReadOn: message.ReadOn,
-                    SentOn: message.SentOn
-                );
-        }
+        public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl) =>
+            new MessageDto(
+                Id: message.Id.ToString(), // To delete/update
+                UserOrTargetUserName: userOrTarget.UserName,
+                UserOrTargetKnownAs: userOrTarget?.KnownAs,
+                UserOrTargetProfilePhoto: profilePhotoSasUrl,
+                Content: message.Content,
+                ReadOn: message.ReadOn,
+                SentOn: message.SentOn
+            );
 
         #endregion Generator Methods
-
-        #region Helper Functions
-        // some Functions
-        #endregion Helper Functions
     }
 }
