@@ -25,7 +25,7 @@ public class MemberController(
             memberParams.Gender = gender == "male" ? "female" : "male"; // value is gender here
         }
 
-        PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetAllAsync(memberParams, cancellationToken);
+        PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetPagedListAsync(memberParams, cancellationToken);
 
         if (pagedAppUsers is null) return BadRequest("Returning members has failed. Try again or contact the customer support.");
 

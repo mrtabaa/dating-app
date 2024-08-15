@@ -18,7 +18,7 @@ public class FollowRepository : IFollowRepository
         )
     {
         _client = client; // used for Session
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<Follow>(AppVariablesExtensions.collectionFollows);
         _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 

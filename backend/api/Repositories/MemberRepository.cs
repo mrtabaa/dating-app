@@ -10,16 +10,15 @@ public class MemberRepository : IMemberRepository
     // constructor - dependency injections
     public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings, IPhotoService photoService, IFollowRepository followRepository)
     {
-        // TODO make all dbName/s nullable and handle them with dbName?.GetCollection
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = dbName?.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _photoService = photoService;
         _followRepository = followRepository;
     }
     #endregion
 
     #region CRUD
-    public async Task<PagedList<AppUser>?> GetAllAsync(MemberParams memberParams, CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>?> GetPagedListAsync(MemberParams memberParams, CancellationToken cancellationToken)
     {
         // For small lists
         // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
@@ -79,7 +78,7 @@ public class MemberRepository : IMemberRepository
             : Mappers.ConvertAppUserToMemberDto(appUser);
     }
 
-    public async Task<IEnumerable<AppUser>> GetMembersByIdsAsync(IEnumerable<ObjectId> membersIds, CancellationToken cancellationToken) =>
+    public async Task<IEnumerable<AppUser>> GetAppUsersByIdsAsync(IEnumerable<ObjectId> membersIds, CancellationToken cancellationToken) =>
         await _collection.AsQueryable().Where(appUser => membersIds.Contains(appUser.Id)).ToListAsync(cancellationToken);
 
     public async Task<MemberDto?> GetByUserNameAsync(ObjectId userId, string userName, CancellationToken cancellationToken)

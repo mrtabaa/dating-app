@@ -19,6 +19,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MemberMessagesComponent } from '../../member-messages/member-messages.component';
 import { PresenceService } from '../../../../services/hubs/presence.service';
+import { MessageService } from '../../../../services/message.service';
 
 @Component({
   selector: 'app-member-detail-mobile',
@@ -35,12 +36,13 @@ import { PresenceService } from '../../../../services/hubs/presence.service';
 export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
   @ViewChild(MemberMessagesComponent) memberMessages: MemberMessagesComponent | undefined;
-  private memberService = inject(MemberService);
-  private followService = inject(FollowService);
+  private _memberService = inject(MemberService);
+  private _messageService = inject(MessageService);
+  private _followService = inject(FollowService);
   username = inject(AccountService).loggedInUserSig()?.userName;
-  private route = inject(ActivatedRoute);
-  private snackBar = inject(MatSnackBar);
-  private gallery = inject(Gallery);
+  private _route = inject(ActivatedRoute);
+  private _snackBar = inject(MatSnackBar);
+  private _gallery = inject(Gallery);
   router = inject(Router);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
@@ -69,7 +71,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
     // const userName: string | null = this.route.snapshot.paramMap.get('userName'); 
 
     // Advance way: params.pipe makes Angular detect if the URL is changed to a new userName(URL change) and gets the new Member to update the DOM
-    this.member$ = this.route.params.pipe(
+    this.member$ = this._route.params.pipe(
       switchMap((params: Params): Observable<Member | null> => {
         const userName = params['userName'];
         if (!userName) {
@@ -77,7 +79,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
           return of(null);
         }
         // Call the service and ensure that an Observable is always returned
-        const memberObservable = this.memberService.getMemberByUsername(userName);
+        const memberObservable = this._memberService.getMemberByUsername(userName);
         return memberObservable ? memberObservable : of(null);
       })
     );
@@ -87,12 +89,12 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   }
 
   addFollow(member: Member): void {
-    this.followService.addFollow(member.userName)
+    this._followService.addFollow(member.userName)
       .pipe(
         take(1))
       .subscribe({
         next: (response: ApiResponseMessage) => {
-          this.snackBar.open(response.message, "Close", {
+          this._snackBar.open(response.message, "Close", {
             horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
           });
 
@@ -102,12 +104,12 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   }
 
   removeFollow(member: Member): void {
-    this.followService.removeFollow(member.userName)
+    this._followService.removeFollow(member.userName)
       .pipe(
         take(1))
       .subscribe({
         next: (response: ApiResponseMessage) => {
-          this.snackBar.open(response.message, "Close", {
+          this._snackBar.open(response.message, "Close", {
             horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000
           });
 
@@ -126,13 +128,13 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
         }
 
       // load ng-gallery and insert images
-      const galleryRef = this.gallery.ref();
+      const galleryRef = this._gallery.ref();
       galleryRef.load(this.images)
     });
   }
 
   setTabGroupParam(): void {
-    this.route.queryParams.pipe(
+    this._route.queryParams.pipe(
       take(1)).subscribe(params => {
         const tab = params['tab'];
         if (tab)
@@ -147,8 +149,8 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
 
       if (tabIndex === this.messagesTabIndex) {
         this.isChatActive = true;
-        this.memberMessages?.initBufferSize();
-        this.memberMessages?.scrollToBottom();
+        this.memberMessages?.initBufferSizeAndViewport();
+        this._messageService.scrollToBottom();
       }
       else {
         this.isChatActive = false;

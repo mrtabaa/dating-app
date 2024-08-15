@@ -10,8 +10,8 @@ public class AdminRepository : IAdminRepository
     // constructor - dependency injection
     public AdminRepository(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
-        var database = client.GetDatabase(dbSettings.DatabaseName);
-        _collection = database.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
         _userManager = userManager;
     }
@@ -23,7 +23,7 @@ public class AdminRepository : IAdminRepository
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
         if (!string.IsNullOrEmpty(adminParams.Search))
-            query = query.Where(user => 
+            query = query.Where(user =>
                 user.NormalizedUserName != null && user.NormalizedUserName.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase)
                 || user.NormalizedEmail != null && user.NormalizedEmail.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase));
 

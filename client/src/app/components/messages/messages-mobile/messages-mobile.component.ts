@@ -47,16 +47,17 @@ export class MessagesMobileComponent implements OnInit {
   }
 
   getMessages(): void {
-    this._messageService.getInbox(this.messageParams).pipe(
-      take(1)
-    ).subscribe({
-      next: (response: PaginatedResult<Message[]>) => {
-        if (response.result && response.pagination) {
-          this.messages = [...this.messages, ...response.result];
-          this.totalItemsCount = response.pagination.totalItems;
+    this._messageService.getInbox(this.messageParams)
+      .pipe(
+        take(1)
+      ).subscribe({
+        next: (response: PaginatedResult<Message[]>) => {
+          if (response.result && response.pagination) {
+            this.messages = [...this.messages, ...response.result];
+            this.totalItemsCount = response.pagination.totalItems;
+          }
         }
-      }
-    });
+      });
   }
 
   initMessageParams(): void {

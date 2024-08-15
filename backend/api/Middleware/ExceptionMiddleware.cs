@@ -15,7 +15,7 @@ public class ExceptionMiddleware
         _logger = logger;
         _env = env;
 
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
     }
 

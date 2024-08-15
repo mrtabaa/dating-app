@@ -13,7 +13,7 @@ public class UserRepository : IUserRepository
         ILogger<UserRepository> logger, IPhotoService photoService
         )
     {
-        var dbName = client.GetDatabase(dbSettings.DatabaseName);
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _client = client;
 
@@ -183,6 +183,17 @@ public class UserRepository : IUserRepository
         return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
     }
 
+    public async Task<string?> GetProfilePhotoUrlBlobAsync(ObjectId userId, CancellationToken cancellationToken)
+    {
+        string? profilePhotoUrl = await _collection.AsQueryable()
+            .Where(appUser => appUser.Id == userId)
+            .SelectMany(appUser => appUser.Photos)
+            .Where(photo => photo.IsMain)
+            .Select(photo => photo.Url_165)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
+    }
     public async Task<PhotoDeleteResponse> DeletePhotoAsync(ObjectId userId, string? blob_url_165_In, CancellationToken cancellationToken)
     {
         PhotoDeleteResponse photoDeleteResponse = new();
