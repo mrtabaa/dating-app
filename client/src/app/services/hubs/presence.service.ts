@@ -14,6 +14,7 @@ export class PresenceService {
   private _isConnectionOnClose = false;
   private _isConnectionStopped = false;
   onlineUsersSig = signal<string[]>([]);
+  private readonly _GetOnlineUsers = "GetOnlineUsers";
 
   createHubConnection(loggedInUser: LoggedInUser): void {
     this._hubConnection = new HubConnectionBuilder()
@@ -24,6 +25,13 @@ export class PresenceService {
       .build();
 
     this.handleConnection();
+    this.getOnlineUsers();
+  }
+
+  private getOnlineUsers(): void {
+    this._hubConnection?.on(this._GetOnlineUsers, onlineUsers => {
+      this.onlineUsersSig.set(onlineUsers);
+    })
   }
 
   private handleConnection(): void {
