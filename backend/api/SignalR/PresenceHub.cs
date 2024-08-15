@@ -14,8 +14,6 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
 
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
-        await Clients.Caller.SendAsync(_GetOnlineUsers, null, cancellationToken);
-
         string? userName = Context.User?.GetUserName();
         if (!(httpContext is null || string.IsNullOrEmpty(userName)))
         {
@@ -24,7 +22,7 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
             // await Clients.Others.SendAsync(_CheckUserIsOnline, userName, cancellationToken);
 
             IEnumerable<string> onlineUserNames = await _presenceTrackerService.GetOnlineUserNamesAsync();
-            await Clients.Caller.SendAsync(_GetOnlineUsers, onlineUserNames, cancellationToken);
+            await Clients.All.SendAsync(_GetOnlineUsers, onlineUserNames, cancellationToken);
         }
     }
 
