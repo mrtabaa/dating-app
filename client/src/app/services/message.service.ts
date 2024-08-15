@@ -55,7 +55,7 @@ export class MessageService {
 
     this.hubConnection.start()
       .then(() => {
-        console.log('Hub connection started.');
+        console.log('MessageHub connection started.');
 
         if (this.targetUserName && this.viewport)
           this.joinGroup();
