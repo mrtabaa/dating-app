@@ -3,10 +3,12 @@ import { inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs';
+import { AccountService } from '../services/account.service';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const snack = inject(MatSnackBar);
+  const accountService = inject(AccountService);
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
@@ -27,7 +29,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             break;
           case 401:
             snack.open(err.error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
-            router.navigate(['account/login'])
+            accountService.logout();
             break;
           case 403:
             router.navigate(['/no-access']);

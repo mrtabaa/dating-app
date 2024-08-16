@@ -15,7 +15,7 @@ public class MemberController(
 
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         string? gender = await _userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
 
@@ -54,7 +54,7 @@ public class MemberController(
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         bool isValid = ObjectId.TryParse(memberId, out ObjectId memberObjectId);
 
@@ -71,7 +71,7 @@ public class MemberController(
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         MemberDto? memberDto = await _memberRepository.GetByUserNameAsync(userId.Value, userName, cancellationToken);
 

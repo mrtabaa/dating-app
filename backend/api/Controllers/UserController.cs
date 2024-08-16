@@ -10,7 +10,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         UpdateResult? updateResult = await _userRepository.UpdateUserAsync(userUpdateDto, userId.Value, cancellationToken);
 
@@ -31,7 +31,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
 
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         /*                          ** Photo Upload Steps/Process **
             UserController => UserRepository: GetById() => PhotoService => PhotoModifySaveService
@@ -50,7 +50,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         UpdateResult? updateResult = await _userRepository.SetMainPhotoAsync(userId.Value, photoUrlIn, cancellationToken);
 
@@ -64,7 +64,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return BadRequest("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again.");
 
         PhotoDeleteResponse photoDeleteResponse = await _userRepository.DeletePhotoAsync(userId.Value, photoUrlIn, cancellationToken);
 
