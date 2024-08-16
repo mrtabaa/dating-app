@@ -40,6 +40,12 @@ export class MessageService {
     return this._paginationHandler.getPaginatedResult<Message[]>(this._baseUrl, params);
   }
 
+  /**
+   * Set targetUserName to join two parties to a group.
+   * Set viewport so scrollToBottom() works properly.
+   * @param targetUserName
+   * @param viewport 
+   */
   setTargetUserNameAndViewPort(targetUserName: string, viewport: CdkVirtualScrollViewport): void {
     this.targetUserName = targetUserName;
     this.viewport = viewport;
@@ -76,6 +82,7 @@ export class MessageService {
     this.hubConnection?.stop();
   }
 
+  // TODO If both parties are online, mark created messages as Read.
   async joinGroup(): Promise<void> {
     this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
   }

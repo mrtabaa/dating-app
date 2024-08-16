@@ -12,7 +12,7 @@
 
         <!-- #region NavLinks -->
         @if(loggedInUserSig()) {
-        <nav mat-tab-nav-bar [backgroundColor]="'primary'" [color]="'accent'" [tabPanel]="tabPanel">
+        <nav mat-tab-nav-bar backgroundColor="primary" color="accent" [tabPanel]="tabPanel">
             @for (link of links; track $index) {
             @if(loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
