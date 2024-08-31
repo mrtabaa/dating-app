@@ -18,7 +18,7 @@ export class MessageService {
   private _hubUrl: string = environment.hubUrl + 'message';
   hubConnection: HubConnection | undefined;
   private _paginationHandler = new PaginationHandler();
-  newMessage: Message | undefined;
+  newMessageRes: Message | undefined;
   messages: Message[] = [];
   messagesSig = signal<Message[]>([]);
   viewport: CdkVirtualScrollViewport | undefined;
@@ -26,7 +26,7 @@ export class MessageService {
 
   private readonly _joinGroup = "JoinGroup";
   private readonly _create = "Create";
-  private readonly _sendMessage = "SendMessage";
+  private readonly _newMessageRes = "NewMessageRes";
 
   getInbox(messageParams: MessageParams): Observable<PaginatedResult<Message[]>> {
     let params = new HttpParams();
@@ -56,7 +56,7 @@ export class MessageService {
       .withUrl(this._hubUrl, {
         accessTokenFactory: () => token
       })
-      // .withAutomaticReconnect()
+      .withAutomaticReconnect()
       .build();
 
     this.hubConnection.start()
@@ -68,10 +68,10 @@ export class MessageService {
       })
       .catch(err => console.error(err));
 
-    this.hubConnection.on(this._sendMessage, (message: Message) => {
-      if (message) {
-        this.newMessage = message; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
-        this.messagesSig.update(msgs => [...msgs, message]);
+    this.hubConnection.on(this._newMessageRes, (messageRes: Message) => {
+      if (messageRes) {
+        this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
+        this.messagesSig.update(msgs => [...msgs, messageRes]);
 
         this.scrollToBottom();
       }
@@ -88,7 +88,7 @@ export class MessageService {
   }
 
   async create(messageIn: MessageIn): Promise<void> {
-    this.newMessage = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
+    this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
     this.hubConnection?.invoke(this._create, messageIn);
   }
 

@@ -108,7 +108,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       this._messageService.create(messageIn);
 
       setTimeout(() => {
-        const newMessage = this._messageService.newMessage;
+        const newMessage = this._messageService.newMessageRes;
 
         if (newMessage) {
           // Update message of the messages with API validated values

@@ -21,7 +21,7 @@ public class MessageHub(
 
     public async Task Create(MessageInDto messageInDto)
     {
-        const string SendMessage = "SendMessage";
+        const string NewMessageRes = "NewMessageRes";
 
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
@@ -36,7 +36,7 @@ public class MessageHub(
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName.ToUpper());
 
-        await Clients.Group(groupName).SendAsync(SendMessage, messageDto, cancellationToken);
+        await Clients.Group(groupName).SendAsync(NewMessageRes, messageDto, cancellationToken);
     }
 
     private static string GetGroupName(string caller, string other)
