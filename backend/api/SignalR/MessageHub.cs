@@ -2,7 +2,7 @@ namespace api.SignalR;
 
 [Authorize]
 public class MessageHub(
-    IMessageRepository _messageRepository, ITokenService _tokenService) : Hub
+    IMessageRepository _messageRepository, ITokenService _tokenService, ILogger<MessageHub> _logger) : Hub
 {
     public async Task JoinGroup(string targetUserName)
     {
@@ -21,10 +21,14 @@ public class MessageHub(
 
     public async Task Create(MessageInDto messageInDto)
     {
+        _logger.LogWarning("CREATE: " + messageInDto);
+
         const string NewMessageRes = "NewMessageRes";
 
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
+
+        _logger.LogWarning("HTTPCONTEXT");
 
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
@@ -34,7 +38,11 @@ public class MessageHub(
         MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
             ?? throw new HubException("Message creation failed. Try again.");
 
+        _logger.LogWarning("MESSAGEDTO: " + messageDto);
+
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName.ToUpper());
+
+        _logger.LogWarning("GROUPNAME: " + groupName);
 
         await Clients.Group(groupName).SendAsync(NewMessageRes, messageDto, cancellationToken);
     }
