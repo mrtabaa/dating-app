@@ -51,6 +51,7 @@ export class MessageService {
     this.viewport = viewport;
   }
 
+  // TODO Recreate connection once page is refreshed.
   createHubConnection(token: string): void {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
@@ -65,9 +66,7 @@ export class MessageService {
 
         if (this.targetUserName && this.viewport)
           this.joinGroup();
-      })
-      .catch(err => console.error('Error create MessageHub connection: ', err))
-      .finally(() => console.log('Create MessageHub connection finally is reached.'));
+      });
 
     this.hubConnection.on(this._newMessageRes, (messageRes: Message) => {
       if (messageRes) {
@@ -90,10 +89,7 @@ export class MessageService {
 
   async create(messageIn: MessageIn): Promise<void> {
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
-    this.hubConnection?.invoke(this._create, messageIn)
-      .then(() => console.log('Success'))
-      .catch(err => console.log('Failed with:', err))
-      .finally(() => console.log('Create finally is reached.'));
+    this.hubConnection?.invoke(this._create, messageIn);
   }
 
   /**
