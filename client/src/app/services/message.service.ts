@@ -56,7 +56,7 @@ export class MessageService {
       .withUrl(this._hubUrl, {
         accessTokenFactory: () => token
       })
-      .withAutomaticReconnect()
+      // .withAutomaticReconnect()
       .build();
 
     this.hubConnection.start()
