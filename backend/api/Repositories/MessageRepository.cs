@@ -30,7 +30,6 @@ public class MessageRepository : IMessageRepository
         Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, receiverId.Value);
 
         string? profilePhotoUrl = await _userRepository.GetProfilePhotoUrlBlobAsync(userId, cancellationToken);
-        if (string.IsNullOrEmpty(profilePhotoUrl)) return null;
 
         await _collection.InsertOneAsync(message, null, cancellationToken);
 
