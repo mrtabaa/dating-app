@@ -60,8 +60,8 @@ export class PresenceService {
         }
       })
       .catch(() => {
-        console.error('Failed start connection. Retrying every 2 seconds.');
-        setTimeout(() => this.startConnection(), 2000);
+        console.error('Failed start connection. Retrying every 1 seconds.');
+        setTimeout(() => this.startConnection(), 1000);
       });
   }
 
