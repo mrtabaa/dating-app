@@ -72,6 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
 
+  // TODO Disable Login button if it's invalid
   validateRecaptcha(): void {
     this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
       (token: string) => this._recaptchaToken = token);

@@ -51,6 +51,7 @@
                 }
                 @else {
                 <p>Active:<span class="gray-text"> {{member.lastActive | intlRelativeTime}}</span></p> | Offline
+                <!-- TODO Update lastActive with SignalR-->
                 }
             </div>
             <p>Since:<span class="gray-text"> {{member.created | date}}</span></p>
