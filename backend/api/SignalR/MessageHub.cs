@@ -47,21 +47,23 @@ public class MessageHub : Hub
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
 
-        SaveLog(httpContext, messageInDto);
+        SaveLog(1, httpContext, null, messageInDto);
 
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
         ObjectId userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), cancellationToken)
             ?? throw new HubException("User id is invalid. Login again.");
 
+        SaveLog(2, httpContext, userId, messageInDto);
+
         MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
             ?? throw new HubException("Message creation failed. Try again.");
 
-        SaveLog(httpContext, messageInDto, messageDto);
+        SaveLog(3, httpContext, userId, messageInDto, messageDto);
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName.ToUpper());
 
-        SaveLog(httpContext, messageInDto, messageDto, groupName);
+        SaveLog(4, httpContext, userId, messageInDto, messageDto, groupName);
 
         await Clients.Group(groupName).SendAsync(NewMessageRes, messageDto, cancellationToken);
     }
@@ -76,12 +78,14 @@ public class MessageHub : Hub
     private string GetUserName() =>
         Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
 
-    private async void SaveLog(HttpContext context, MessageInDto? messageInDto = null, MessageDto? messageDto = null, string? groupName = null)
+    private async void SaveLog(int number, HttpContext context, ObjectId? userId = null, MessageInDto? messageInDto = null, MessageDto? messageDto = null, string? groupName = null)
     {
         ApiException response = new()
         {
             Id = ObjectId.Empty,
             StatusCode = context.Response.StatusCode,
+            Number = number,
+            UserId = userId,
             Message = groupName,
             MessageInDto = messageInDto,
             MessageDto = messageDto,
