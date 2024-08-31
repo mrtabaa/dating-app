@@ -70,7 +70,7 @@ public static class ApplicationServiceExtensions
 
         services.AddSignalR(options =>
         {
-            options.AddFilter<SignalRExceptionFilter>();
+            options.AddFilter<SignalRExceptionHandler>();
         });
 
         #endregion Others

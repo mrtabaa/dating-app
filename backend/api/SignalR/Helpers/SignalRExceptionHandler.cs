@@ -1,11 +1,11 @@
 namespace api.Middleware;
 
-public class SignalRExceptionFilter : IHubFilter
+public class SignalRExceptionHandler : IHubFilter
 {
-    private readonly ILogger<SignalRExceptionFilter> _logger;
+    private readonly ILogger<SignalRExceptionHandler> _logger;
     private readonly IMongoCollection<ApiException> _collection;
 
-    public SignalRExceptionFilter(ILogger<SignalRExceptionFilter> logger, IMongoClient client, IMyMongoDbSettings dbSettings)
+    public SignalRExceptionHandler(ILogger<SignalRExceptionHandler> logger, IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         _logger = logger;
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
