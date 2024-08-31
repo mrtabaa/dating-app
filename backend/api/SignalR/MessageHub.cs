@@ -1,9 +1,30 @@
+using System.Text.RegularExpressions;
+
 namespace api.SignalR;
 
 [Authorize]
-public class MessageHub(
-    IMessageRepository _messageRepository, ITokenService _tokenService, ILogger<MessageHub> _logger) : Hub
+public class MessageHub : Hub
+// (IMessageRepository _messageRepository, ITokenService _tokenService, ILogger<MessageHub> _logger) : Hub
 {
+    private readonly IMongoCollection<ApiException> _collection;
+    private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly IMessageRepository _messageRepository;
+    private readonly ITokenService _tokenService;
+
+    public MessageHub(
+        IMongoClient client, IMyMongoDbSettings dbSettings,
+        ITokenService tokenService, IMessageRepository messageRepository,
+        ILogger<ExceptionMiddleware> logger
+    )
+    {
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
+
+        _tokenService = tokenService;
+        _messageRepository = messageRepository;
+        _logger = logger;
+    }
+
     public async Task JoinGroup(string targetUserName)
     {
         string groupName = GetGroupName(GetUserName(), targetUserName.ToUpper());
@@ -21,14 +42,12 @@ public class MessageHub(
 
     public async Task Create(MessageInDto messageInDto)
     {
-        _logger.LogWarning("CREATE: " + messageInDto);
-
         const string NewMessageRes = "NewMessageRes";
 
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
 
-        _logger.LogWarning("HTTPCONTEXT");
+        SaveLog(httpContext, messageInDto);
 
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
@@ -38,11 +57,11 @@ public class MessageHub(
         MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
             ?? throw new HubException("Message creation failed. Try again.");
 
-        _logger.LogWarning("MESSAGEDTO: " + messageDto);
+        SaveLog(httpContext, messageInDto, messageDto);
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName.ToUpper());
 
-        _logger.LogWarning("GROUPNAME: " + groupName);
+        SaveLog(httpContext, messageInDto, messageDto, groupName);
 
         await Clients.Group(groupName).SendAsync(NewMessageRes, messageDto, cancellationToken);
     }
@@ -56,4 +75,19 @@ public class MessageHub(
 
     private string GetUserName() =>
         Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
+
+    private async void SaveLog(HttpContext context, MessageInDto? messageInDto = null, MessageDto? messageDto = null, string? groupName = null)
+    {
+        ApiException response = new()
+        {
+            Id = ObjectId.Empty,
+            StatusCode = context.Response.StatusCode,
+            Message = groupName,
+            MessageInDto = messageInDto,
+            MessageDto = messageDto,
+            Time = DateTime.Now
+        };
+
+        await _collection.InsertOneAsync(response);
+    }
 }
