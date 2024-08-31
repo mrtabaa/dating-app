@@ -1,30 +1,8 @@
-using System.Text.RegularExpressions;
-
 namespace api.SignalR;
 
 [Authorize]
-public class MessageHub : Hub
-// (IMessageRepository _messageRepository, ITokenService _tokenService, ILogger<MessageHub> _logger) : Hub
+public class MessageHub(IMessageRepository _messageRepository, ITokenService _tokenService) : Hub
 {
-    private readonly IMongoCollection<ApiException> _collection;
-    private readonly ILogger<ExceptionMiddleware> _logger;
-    private readonly IMessageRepository _messageRepository;
-    private readonly ITokenService _tokenService;
-
-    public MessageHub(
-        IMongoClient client, IMyMongoDbSettings dbSettings,
-        ITokenService tokenService, IMessageRepository messageRepository,
-        ILogger<ExceptionMiddleware> logger
-    )
-    {
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
-
-        _tokenService = tokenService;
-        _messageRepository = messageRepository;
-        _logger = logger;
-    }
-
     public async Task JoinGroup(string targetUserName)
     {
         string groupName = GetGroupName(GetUserName(), targetUserName.ToUpper());
@@ -47,24 +25,15 @@ public class MessageHub : Hub
         HttpContext httpContext = Context.GetHttpContext()
             ?? throw new HubException("httpContext cannot be null!");
 
-        await SaveLogAsync(1, httpContext, null, messageInDto);
-
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
         ObjectId userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), cancellationToken)
-            ?? throw new HubException("User id is invalid. Login again.");
+            ?? throw new HubException("UserId is invalid. Login again.");
 
-        await SaveLogAsync(2, httpContext, userId, messageInDto);
-
-        MessageDto? messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken);
-        // ?? throw new HubException("Message creation failed. Try again.");
-
-        if (messageDto is null)
-            await SaveLogAsync(3, httpContext, userId, messageInDto, messageDto);
+        MessageDto? messageDto = await _messageRepository.CreateAsync(userId, messageInDto, cancellationToken)
+            ?? throw new HubException("MessageDto is null. Message creation failed. Try again.");
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName.ToUpper());
-
-        await SaveLogAsync(4, httpContext, userId, messageInDto, messageDto, groupName);
 
         await Clients.Group(groupName).SendAsync(NewMessageRes, messageDto, cancellationToken);
     }
@@ -78,21 +47,4 @@ public class MessageHub : Hub
 
     private string GetUserName() =>
         Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
-
-    private async Task SaveLogAsync(int number, HttpContext context, ObjectId? userId = null, MessageInDto? messageInDto = null, MessageDto? messageDto = null, string? groupName = null)
-    {
-        ApiException response = new()
-        {
-            Id = ObjectId.Empty,
-            StatusCode = context.Response.StatusCode,
-            Number = number,
-            UserId = userId,
-            Message = groupName,
-            MessageInDto = messageInDto,
-            MessageDto = messageDto,
-            Time = DateTime.Now
-        };
-
-        await _collection.InsertOneAsync(response);
-    }
 }

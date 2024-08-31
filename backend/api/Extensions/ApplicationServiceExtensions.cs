@@ -68,7 +68,11 @@ public static class ApplicationServiceExtensions
 
         services.AddHttpClient();
 
-        services.AddSignalR();
+        services.AddSignalR(options =>
+        {
+            options.AddFilter<SignalRExceptionFilter>();
+        });
+
         #endregion Others
 
         return services;
