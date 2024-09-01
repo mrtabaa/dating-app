@@ -121,8 +121,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
         else {
           // delete message for API BadRequest response. 
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== message.tempId));
-          this._snackBar.open('Sending message failed. Check your internet connection or login agian.', 'Close',
-            { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+          this._snackBar.open('Is sending a message failed? Sending too many messages too fast? Is your internet connected? No?! Refresh the page or login agian.', 'Close',
+            { horizontalPosition: 'center', verticalPosition: 'top', duration: 10000 });
         }
       }, 500);
     }
