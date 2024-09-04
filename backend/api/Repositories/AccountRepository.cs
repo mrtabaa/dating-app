@@ -134,7 +134,7 @@ public class AccountRepository : IAccountRepository
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
-        if (!userId.HasValue || userId.Value.Equals(ObjectId.Empty)) return null;
+        if (userId is null) return null;
 
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
