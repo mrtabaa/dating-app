@@ -37,9 +37,6 @@ public class PresenceTrackerService : IPresenceTrackerService
         }
     }
 
-    public async Task<bool> CheckIfUserIsOnlineAsync(string userName) =>
-        await _collection.Find<PresenceTracker>(doc => doc.UserName == userName).AnyAsync();
-
     public async Task<IEnumerable<string>> GetOnlineUserNamesAsync() =>
         await _collection.AsQueryable()
             .Select(doc => doc.UserName)
