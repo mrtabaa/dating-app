@@ -14,33 +14,26 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public async Task SaveConnectedUserAsync(string userName, string connectionId)
     {
-        try
+        bool doesTrackerExist = await _collection.Find(doc => doc.UserName == userName).AnyAsync();
+
+        if (doesTrackerExist) // User is already connected. Add the newer connection
         {
-            bool doesTrackerExist = await _collection.Find(doc => doc.UserName == userName).AnyAsync();
+            UpdateDefinition<PresenceTracker> updateDefinition = Builders<PresenceTracker>.Update
+                .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                .AddToSet(doc => doc.ConnectionIds, connectionId);
 
-            if (doesTrackerExist) // User is already connected. Add the newer connection
-            {
-                UpdateDefinition<PresenceTracker> updateDefinition = Builders<PresenceTracker>.Update
-                    .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                    .AddToSet(doc => doc.ConnectionIds, connectionId);
-
-                await _collection.UpdateOneAsync(doc => doc.UserName == userName, updateDefinition);
-            }
-            else  // First connection of the user
-            {
-                PresenceTracker tracker = new()
-                {
-                    Schema = AppVariablesExtensions.AppVersions.Last<string>(),
-                    UserName = userName
-                };
-                tracker.ConnectionIds.Add(connectionId);
-
-                await _collection.InsertOneAsync(tracker);
-            }
+            await _collection.UpdateOneAsync(doc => doc.UserName == userName, updateDefinition);
         }
-        catch (Exception ex)
+        else  // First connection of the user
         {
-            _logger.LogWarning(ex.StackTrace, ex.Message);
+            PresenceTracker tracker = new()
+            {
+                Schema = AppVariablesExtensions.AppVersions.Last<string>(),
+                UserName = userName
+            };
+            tracker.ConnectionIds.Add(connectionId);
+
+            await _collection.InsertOneAsync(tracker);
         }
     }
 
