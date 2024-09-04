@@ -2,69 +2,52 @@ namespace api.Repositories;
 
 public class PresenceTrackerService : IPresenceTrackerService
 {
-    private readonly IMongoCollection<PresenceTracker> _collection;
+    private readonly IMongoCollection<AppUser> _collection;
     private readonly ILogger<PresenceTrackerService> _logger;
 
     public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings, ILogger<PresenceTrackerService> logger)
     {
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<PresenceTracker>(AppVariablesExtensions.collectionOnlineTrackers);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
         _logger = logger;
     }
 
-    public async Task SaveConnectedUserAsync(string userName, string connectionId)
+    public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {
-        bool doesTrackerExist = await _collection.Find(doc => doc.UserName == userName).AnyAsync();
+        bool doesTrackerExist = await _collection.AsQueryable()
+            .Where(appUser => appUser.Id == userId)
+            .Select(appUser => appUser.ConnectionIds)
+            .AnyAsync(cancellationToken);
 
-        if (doesTrackerExist) // User is already connected. Add the newer connection
-        {
-            UpdateDefinition<PresenceTracker> updateDefinition = Builders<PresenceTracker>.Update
-                .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-                .AddToSet(doc => doc.ConnectionIds, connectionId);
+        UpdateDefinition<AppUser> updateDefinition;
 
-            await _collection.UpdateOneAsync(doc => doc.UserName == userName, updateDefinition);
-        }
-        else  // First connection of the user
-        {
-            PresenceTracker tracker = new()
-            {
-                Schema = AppVariablesExtensions.AppVersions.Last<string>(),
-                UserName = userName
-            };
-            tracker.ConnectionIds.Add(connectionId);
+        updateDefinition = Builders<AppUser>.Update
+            .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+            .AddToSet(appUser => appUser.ConnectionIds, connectionId);
 
-            await _collection.InsertOneAsync(tracker);
-        }
+        await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updateDefinition, null, cancellationToken);
     }
 
-    public async Task<IEnumerable<string>> GetOnlineUserNamesAsync() =>
-        await _collection.AsQueryable()
-            .Select(doc => doc.UserName)
-            .ToListAsync();
-
-    public async Task RemoveDisconnectedUserAsync(string userName, string connectionId)
+    public async Task<IEnumerable<OnlineUsersDto>> GetOnlineUsersDtosAsync(CancellationToken cancellationToken)
     {
-        try
+        IEnumerable<AppUser> appUsers = await _collection.Find(appUser => appUser.ConnectionIds.Count != 0).ToListAsync(cancellationToken);
+
+        List<OnlineUsersDto> onlineUsersDtos = [];
+
+        foreach (AppUser appUser in appUsers)
         {
-            PresenceTracker? tracker = await _collection.Find(doc => doc.UserName == userName).FirstOrDefaultAsync();
-
-            if (tracker is not null && tracker.ConnectionIds.Count > 1)
-            {
-                tracker.ConnectionIds.Remove(connectionId);
-
-                UpdateDefinition<PresenceTracker> updateDefinition = Builders<PresenceTracker>.Update
-                    .Set(doc => doc.ConnectionIds, tracker.ConnectionIds);
-
-                await _collection.UpdateOneAsync(doc => doc.UserName == userName, updateDefinition);
-            }
-            else
-            {
-                await _collection.DeleteOneAsync(doc => doc.UserName == userName);
-            }
+            onlineUsersDtos.Add(Mappers.ConvertAppUserToOnlineStatusDto(appUser));
         }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex.StackTrace, ex.Message);
-        }
+
+        return onlineUsersDtos;
+    }
+
+    public async Task RemoveDisconnectedUserAsync(string userName, string connectionId, CancellationToken cancellationToken)
+    {
+        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
+            .Pull(appUser => appUser.ConnectionIds, connectionId);
+
+        await _collection.UpdateOneAsync(appUser => appUser.UserName == userName, updateDefinition, null, cancellationToken);
+
     }
 }

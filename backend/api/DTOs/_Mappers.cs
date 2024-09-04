@@ -4,7 +4,7 @@ namespace api.DTOs
     {
         #region Generator Methods
         public static AppUser ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) => //, int likedCount, int likedByCount
-            new AppUser
+            new()
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Email = userInput.Email, // required by AspNet Identity
@@ -24,7 +24,7 @@ namespace api.DTOs
             };
 
         public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) => //, int likedCount, int likedByCount
-            new AppUser
+            new()
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Email = userInput.Email, // required by AspNet Identity
@@ -37,7 +37,7 @@ namespace api.DTOs
             };
 
         public static MemberDto ConvertAppUserToMemberDto(AppUser appUser, bool isFollowing = false) =>
-            new MemberDto(
+            new(
                 Schema: appUser.Schema,
                 UserName: appUser.UserName,
                 Age: DateTimeExtenstions.CalculateAge(appUser.DateOfBirth),
@@ -58,7 +58,7 @@ namespace api.DTOs
             );
 
         public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl, string? turnstileToken = null) =>
-            new LoggedInDto
+            new()
             {
                 Token = token,
                 KnownAs = appUser.KnownAs,
@@ -70,7 +70,7 @@ namespace api.DTOs
             };
 
         public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain) =>
-            new Photo
+            new()
             {
                 Schema = AppVariablesExtensions.AppVersions.Last<string>(),
                 Url_165 = photoUrls[0],
@@ -80,14 +80,14 @@ namespace api.DTOs
             };
 
         public static Follow ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId) =>
-            new Follow(
+            new(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 FollowerId: followerId,
                 FollowedMemberId: followedMemberId
             );
 
         public static Message ConvertMessageInDtoToMessage(string content, ObjectId userId, ObjectId receiverId) =>
-            new Message(
+            new(
                 Schema: AppVariablesExtensions.AppVersions.Last<string>(),
                 SenderId: userId,
                 RecieverId: receiverId,
@@ -99,7 +99,7 @@ namespace api.DTOs
             );
 
         public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl) =>
-            new MessageDto(
+            new(
                 Id: message.Id.ToString(), // To delete/update
                 UserOrTargetUserName: userOrTarget.UserName,
                 UserOrTargetKnownAs: userOrTarget?.KnownAs,
@@ -107,6 +107,13 @@ namespace api.DTOs
                 Content: message.Content,
                 ReadOn: message.ReadOn,
                 SentOn: message.SentOn
+            );
+
+        public static OnlineUsersDto ConvertAppUserToOnlineStatusDto(AppUser appUser) =>
+            new(
+                UserName: appUser.NormalizedUserName
+                    ?? throw new ArgumentNullException("UserName cannot be null but it is.", nameof(appUser.NormalizedUserName)),
+                LastActive: appUser.LastActive
             );
 
         #endregion Generator Methods

@@ -1,7 +1,7 @@
 namespace api.SignalR;
 
 [Authorize]
-public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
+public class PresenceHub(IPresenceTrackerService _presenceTrackerService, ITokenService _tokenService) : Hub
 {
     // private const string _CheckUserIsOnline = "CheckUserIsOnline";
     // private const string _CheckUserIsOffline = "CheckUserIsOffline";
@@ -14,16 +14,16 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
 
         CancellationToken cancellationToken = httpContext.RequestAborted;
 
-        string? userName = Context.User?.GetUserName();
-        if (!(httpContext is null || string.IsNullOrEmpty(userName)))
-        {
-            await _presenceTrackerService.SaveConnectedUserAsync(userName, Context.ConnectionId);
+        ObjectId? userId = await _tokenService.GetActualUserIdAsync(httpContext.User.GetUserIdHashed(), cancellationToken)
+            ?? throw new ArgumentNullException("userId is null", nameof(userId));
 
-            // await Clients.Others.SendAsync(_CheckUserIsOnline, userName, cancellationToken);
+        await _presenceTrackerService.SaveConnectedUserAsync(userId.Value, Context.ConnectionId, cancellationToken);
 
-            IEnumerable<string> onlineUserNames = await _presenceTrackerService.GetOnlineUserNamesAsync();
-            await Clients.All.SendAsync(_GetOnlineUsers, onlineUserNames, cancellationToken);
-        }
+        // await Clients.Others.SendAsync(_CheckUserIsOnline, userName, cancellationToken);
+
+        IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(cancellationToken);
+
+        await Clients.All.SendAsync(_GetOnlineUsers, onlineUsersDtos, cancellationToken);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -35,12 +35,13 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService) : Hub
         string? userName = Context.User?.GetUserName();
         if (!string.IsNullOrEmpty(userName))
         {
-            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
+            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId, cancellationToken);
 
             // await Clients.Others.SendAsync(_CheckUserIsOffline, userName, cancellationToken);
 
-            IEnumerable<string> onlineUserNames = await _presenceTrackerService.GetOnlineUserNamesAsync();
-            await Clients.All.SendAsync(_GetOnlineUsers, onlineUserNames, cancellationToken);
+            IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(cancellationToken);
+
+            await Clients.All.SendAsync(_GetOnlineUsers, onlineUsersDtos, cancellationToken);
 
             await base.OnDisconnectedAsync(exception);
         }
