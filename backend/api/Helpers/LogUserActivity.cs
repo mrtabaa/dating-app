@@ -12,17 +12,12 @@ public class LogUserActivity(ILogger<LogUserActivity> _logger) : IAsyncActionFil
         // return if User is not authenticated
         if (resultContext.HttpContext.User.Identity is not null && !resultContext.HttpContext.User.Identity.IsAuthenticated) return;
 
-        string? loggedInUserIdHashed = resultContext.HttpContext.User.GetUserIdHashed();
+        string? loggedInUserIdHashed = resultContext.HttpContext.User.GetUserIdHashed()
+            ?? throw new ArgumentNullException("Parameter cannot be null", nameof(loggedInUserIdHashed));
 
         IAccountRepository accountRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IAccountRepository>();
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
-
-        if (string.IsNullOrEmpty(loggedInUserIdHashed))
-        {
-            _ = loggedInUserIdHashed ?? throw new ArgumentException("Parameter cannot be null", nameof(loggedInUserIdHashed));
-            return;
-        }
 
         UpdateResult? updateResult = await accountRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
 
