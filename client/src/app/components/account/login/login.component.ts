@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   router = inject(Router);
   renderer = inject(Renderer2);
   private _recaptchaService = inject(ReCaptchaV3Service);
-  private _recaptchaToken: string | undefined;
+  recaptchaToken: string | undefined;
 
   user$: Observable<LoggedInUser | null> | undefined;
   private _subscribedLogin: Subscription | undefined;
@@ -72,18 +72,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
 
-  // TODO Disable Login button if it's invalid
   validateRecaptcha(): void {
+    this.recaptchaToken = undefined; // reset
+
     this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
-      (token: string) => this._recaptchaToken = token);
+      (token: string) => this.recaptchaToken = token);
   }
 
   loginEmailUsername(): void {
-    if (this._recaptchaToken) {
+    if (this.recaptchaToken) {
       const userLoginInput: UserLogin = {
         emailUsername: this.EmailUsernameCtrl.value,
         password: this.PasswordCtrl.value,
-        recaptchaToken: this._recaptchaToken
+        recaptchaToken: this.recaptchaToken
       };
 
       this._subscribedLogin = this.accountService.login(userLoginInput)
@@ -108,7 +109,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   generateMemberCreds(): void {
     const randomAccount = 'demo' + this.generateRandomText(3);
 
-    if (this._recaptchaToken) {
+    if (this.recaptchaToken) {
 
       const userRegInput: UserRegister = {
         email: randomAccount + '@a.com',
@@ -117,7 +118,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         confirmPassword: 'Aaaaaaa1',
         dateOfBirth: '2000-01-01',
         gender: 'male',
-        recaptchaToken: this._recaptchaToken
+        recaptchaToken: this.recaptchaToken
       }
 
       this.accountService.registerDemo(userRegInput)
@@ -128,7 +129,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             if (userRes) {
               this.EmailUsernameCtrl.setValue(randomAccount);
               this.PasswordCtrl.setValue('Aaaaaaa1');
-              this._recaptchaToken = userRes.recaptchaToken;
+              this.recaptchaToken = userRes.recaptchaToken;
 
               this.hasLoginCreds = true;
               this.RecaptchaCtrl.setValue(false);

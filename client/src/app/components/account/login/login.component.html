@@ -54,8 +54,8 @@
         <div class="buttons">
             <div class="signin">
                 <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" [disabled]="loginFg.invalid || !RecaptchaCtrl.value" class="submitBtn"
-                    mat-raised-button color="primary">
+                <button type="submit" [disabled]="loginFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)"
+                    class="submitBtn" mat-raised-button color="primary">
                     Sign in
                 </button>
             </div>
