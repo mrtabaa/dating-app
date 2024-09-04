@@ -36,9 +36,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// TODO Merge these and place them in Extensions
-app.MapHub<PresenceHub>("hubs/presence");
-app.MapHub<MessageHub>("hubs/message");
+app.MapHubs();
 
 app.Run();
 #endregion
