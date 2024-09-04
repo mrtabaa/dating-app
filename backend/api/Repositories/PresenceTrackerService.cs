@@ -30,7 +30,7 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public async Task<IEnumerable<OnlineUsersDto>> GetOnlineUsersDtosAsync(CancellationToken cancellationToken)
     {
-        IEnumerable<AppUser> appUsers = await _collection.Find(appUser => appUser.ConnectionIds.Count != 0).ToListAsync(cancellationToken);
+        IEnumerable<AppUser> appUsers = await _collection.Find(appUser => appUser.ConnectionIds.Any()).ToListAsync(cancellationToken);
 
         List<OnlineUsersDto> onlineUsersDtos = [];
 
