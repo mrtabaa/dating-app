@@ -14,16 +14,9 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {
-        bool doesTrackerExist = await _collection.AsQueryable()
-            .Where(appUser => appUser.Id == userId)
-            .Select(appUser => appUser.ConnectionIds)
-            .AnyAsync(cancellationToken);
-
-        UpdateDefinition<AppUser> updateDefinition;
-
-        updateDefinition = Builders<AppUser>.Update
-            .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
-            .AddToSet(appUser => appUser.ConnectionIds, connectionId);
+        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
+                    .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last<string>())
+                    .AddToSet(appUser => appUser.ConnectionIds, connectionId);
 
         await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updateDefinition, null, cancellationToken);
     }
