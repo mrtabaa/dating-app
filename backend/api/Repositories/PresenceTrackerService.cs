@@ -47,7 +47,6 @@ public class PresenceTrackerService : IPresenceTrackerService
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .Pull(appUser => appUser.ConnectionIds, connectionId);
 
-        await _collection.UpdateOneAsync(appUser => appUser.UserName == userName, updateDefinition, null, cancellationToken);
-
+        await _collection.UpdateOneAsync(appUser => appUser.NormalizedUserName == userName, updateDefinition, null, cancellationToken);
     }
 }
