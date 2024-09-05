@@ -3,6 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { LoggedInUser } from '../../models/logged-in-user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { OnlineUser } from '../../models/online-users.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class PresenceService {
   private _matSnack = inject(MatSnackBar);
   private _isConnectionOnClose = false;
   private _isConnectionStopped = false;
-  onlineUsersSig = signal<string[]>([]);
+  onlineUsersSig = signal<OnlineUser[]>([]);
   private readonly _GetOnlineUsers = "GetOnlineUsers";
 
   createHubConnection(loggedInUser: LoggedInUser): void {

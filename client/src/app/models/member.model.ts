@@ -18,4 +18,5 @@ export interface Member {
     city: string;
     photos: Photo[];
     isFollowing: boolean;
+    isOnline: boolean;
 }

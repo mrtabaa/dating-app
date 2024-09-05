@@ -13,13 +13,13 @@
     <section class="details">
         @switch (memberIn.gender) {
         @case ('male') {
-        <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">boy</mat-icon>
+        <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">boy</mat-icon>
         }
         @case ('female') {
-        <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">girl</mat-icon>
+        <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">girl</mat-icon>
         }
         @default {
-        <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">group_add</mat-icon>
+        <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">group_add</mat-icon>
         }
         }
         <p>{{memberIn.knownAs | shortenString:7 | titlecase}}, {{memberIn.age}}</p>

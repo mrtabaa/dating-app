@@ -1,4 +1,4 @@
-@if (member$ | async; as member) {
+@if (member) {
 <main>
     @if(!isChatActive) {
     <section class="details">
@@ -46,12 +46,11 @@
         </section>
         <div class="extra-info">
             <div class="presence">
-                @if(onlineUsersSig().includes(member.userName.toUpperCase())) {
+                @if(member.isOnline) {
                 <mat-icon class="is-online">person</mat-icon> Online now
                 }
                 @else {
                 <p>Active:<span class="gray-text"> {{member.lastActive | intlRelativeTime}}</span></p> | Offline
-                <!-- TODO Update lastActive with SignalR-->
                 }
             </div>
             <p>Since:<span class="gray-text"> {{member.created | date}}</span></p>

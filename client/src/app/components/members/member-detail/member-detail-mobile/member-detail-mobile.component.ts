@@ -1,8 +1,8 @@
-import { AfterViewChecked, Component, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, Component, OnInit, ViewChild, effect, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
-import { Observable, Subscription, of, switchMap, take } from 'rxjs';
+import { take } from 'rxjs';
 import { ApiResponseMessage } from '../../../../models/helpers/api-response-message';
 import { Member } from '../../../../models/member.model';
 import { AccountService } from '../../../../services/account.service';
@@ -49,10 +49,29 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   isChatActive = false;
   readonly messagesTabIndex = 2;
 
-  member$: Observable<Member | null> | undefined;
-  subscribed: Subscription | undefined;
+  member: Member | undefined;
   images: GalleryItem[] = [];
   readonly imageWH = 50;
+
+  constructor() {
+    this.updateOnlineUser();
+  }
+
+  private updateOnlineUser(): void {
+    effect(() => {
+      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.member?.userName.toUpperCase());
+
+      if (this.member) {
+        if (onlineUser) {
+          this.member.isOnline = true;
+          this.member.lastActive = onlineUser.lastActive;
+        }
+        else {
+          this.member.isOnline = false;
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getMember();
@@ -67,25 +86,38 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   }
 
   getMember(): void {
-    // Basic way: snapshot takes current URL only once. Angular doesn't detect if another userName(URL) is entered to refresh the MemberDetails for the new URL.
-    // const userName: string | null = this.route.snapshot.paramMap.get('userName'); 
+    const userName = this.getUserNameFromParam();
+    console.log(userName);
+    if (userName) {
+      this._memberService.getMemberByUsername(userName)
+        ?.pipe(take(1))
+        .subscribe((member: Member) => {
+          if (member)
+            this.member = member;
+        });
 
-    // Advance way: params.pipe makes Angular detect if the URL is changed to a new userName(URL change) and gets the new Member to update the DOM
-    this.member$ = this._route.params.pipe(
-      switchMap((params: Params): Observable<Member | null> => {
-        const userName = params['userName'];
-        if (!userName) {
-          // Return an Observable that emits null
-          return of(null);
-        }
-        // Call the service and ensure that an Observable is always returned
-        const memberObservable = this._memberService.getMemberByUsername(userName);
-        return memberObservable ? memberObservable : of(null);
-      })
-    );
+      if (this.member !== null)
+        this.setGalleryImages();
+    }
+  }
 
-    if (this.member$ !== of(null))
-      this.setGalleryImages();
+  /**
+   * Basic way: snapshot takes current URL only once. Angular doesn't detect if another userName(URL) is entered to refresh the MemberDetails for the new URL.
+   * const userName: string | null = this.route.snapshot.paramMap.get('userName'); 
+   *
+   * Advance way: params.pipe makes Angular detect if the URL is changed to a new userName(URL change) and gets the new Member to update the DOM
+   * @returns userName: string | undefined
+   */
+  private getUserNameFromParam(): string | undefined {
+    let userName;
+
+    this._route.params.pipe(take(1))
+      .subscribe((params: Params) => {
+        if ((params['userName']))
+          userName = params['userName'];
+      });
+
+    return userName ? userName : undefined;
   }
 
   addFollow(member: Member): void {
@@ -119,18 +151,16 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   }
 
   setGalleryImages(): void {
-    this.subscribed = this.member$?.subscribe((member: Member | null) => {
-      this.images = []; // reset images for new member$ before loading in galleryRef
+    this.images = []; // reset images for new member$ before loading in galleryRef
 
-      if (member)
-        for (const photo of member.photos) {
-          this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
-        }
+    if (this.member)
+      for (const photo of this.member.photos) {
+        this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
+      }
 
-      // load ng-gallery and insert images
-      const galleryRef = this._gallery.ref();
-      galleryRef.load(this.images)
-    });
+    // load ng-gallery and insert images
+    const galleryRef = this._gallery.ref();
+    galleryRef.load(this.images);
   }
 
   setTabGroupParam(): void {

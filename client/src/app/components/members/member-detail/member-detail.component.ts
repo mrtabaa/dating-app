@@ -1,7 +1,7 @@
-import { AfterViewChecked, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, Component, OnInit, ViewChild, effect, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
-import { Observable, Subscription, take } from 'rxjs';
+import { take } from 'rxjs';
 import { Member } from '../../../models/member.model';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -35,7 +35,7 @@ import { MessageService } from '../../../services/message.service';
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.scss']
 })
-export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
+export class MemberDetailComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
   @ViewChild('memberMessage') memberMessage: MemberMessagesComponent | undefined;
 
@@ -52,9 +52,28 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   initLoad = true;
   readonly messageTabIndex = 3;
 
-  member$: Observable<Member> | undefined;
-  subscribed: Subscription | undefined;
+  member: Member | undefined;
   images: GalleryItem[] = [];
+
+  constructor() {
+    this.updateOnlineUser();
+  }
+
+  private updateOnlineUser(): void {
+    effect(() => {
+      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.member?.userName.toUpperCase());
+
+      if (this.member) {
+        if (onlineUser) {
+          this.member.isOnline = true;
+          this.member.lastActive = onlineUser.lastActive;
+        }
+        else {
+          this.member.isOnline = false;
+        }
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getMember();
@@ -69,15 +88,18 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
     }
   }
 
-  ngOnDestroy(): void {
-    this.subscribed;
-  }
-
   getMember(): void {
     const userName: string | null = this.route.snapshot.paramMap.get('userName');
 
     if (userName) {
-      this.member$ = this._memberService.getMemberByUsername(userName);
+      this._memberService.getMemberByUsername(userName)
+        ?.pipe(
+          take(1)
+        ).subscribe((member: Member) => {
+          if (member) {
+            this.member = member;
+          }
+        });
     }
   }
 
@@ -112,17 +134,14 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked, OnDestro
   }
 
   setGalleryImages(): void {
-    this.subscribed = this.member$?.subscribe(
-      (member: Member) => {
-        for (const photo of member.photos) {
-          this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
-        }
-
-        // load ng-gallery and insert images
-        const galleryRef = this.gallery.ref();
-        galleryRef.load(this.images)
+    if (this.member)
+      for (const photo of this.member.photos) {
+        this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
       }
-    );
+
+    // load ng-gallery and insert images
+    const galleryRef = this.gallery.ref();
+    galleryRef.load(this.images)
   }
 
   setTabGroupParam(): void {

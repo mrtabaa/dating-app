@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, effect, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { Member } from '../../../../models/member.model';
@@ -29,6 +29,28 @@ export class MemberCardMobileComponent {
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
 
   constructor() {
+    this.setScreenSize();
+
+    this.updateOnlineUser();
+  }
+
+  private updateOnlineUser(): void {
+    effect(() => {
+      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.memberIn?.userName.toUpperCase());
+
+      if (this.memberIn) {
+        if (onlineUser) {
+          this.memberIn.isOnline = true;
+          this.memberIn.lastActive = onlineUser.lastActive;
+        }
+        else {
+          this.memberIn.isOnline = false;
+        }
+      }
+    });
+  }
+
+  private setScreenSize(): void {
     this.isSmallPhone$ = this.breakpointObserver.observe('(min-width: 350px)')
       .pipe(map(({ matches }) => {
         matches = matches ? false : true
@@ -50,5 +72,4 @@ export class MemberCardMobileComponent {
         return matches;
       }));
   }
-
 }

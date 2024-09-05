@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, effect, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Member } from '../../../models/member.model';
@@ -30,6 +30,26 @@ export class MemberCardComponent {
   private followService = inject(FollowService);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   private snackBar = inject(MatSnackBar);
+
+  constructor() {
+    this.updateOnlineUser();
+  }
+
+  private updateOnlineUser(): void {
+    effect(() => {
+      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.memberIn?.userName.toUpperCase());
+
+      if (this.memberIn) {
+        if (onlineUser) {
+          this.memberIn.isOnline = true;
+          this.memberIn.lastActive = onlineUser.lastActive;
+        }
+        else {
+          this.memberIn.isOnline = false;
+        }
+      }
+    });
+  }
 
   addFollow(): void {
     if (this.memberIn?.userName) {

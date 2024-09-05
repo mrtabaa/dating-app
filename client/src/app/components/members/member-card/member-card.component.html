@@ -37,16 +37,16 @@
         <div class="title">
             @switch (memberIn.gender) {
             @case ('male') {
-            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+            <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">
                 boy
             </mat-icon>
             }
             @case ('female') {
-            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+            <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">
                 girl</mat-icon>
             }
             @default {
-            <mat-icon [ngClass]="{'is-online': onlineUsersSig().includes(memberIn.userName.toUpperCase())}">
+            <mat-icon [ngClass]="{'is-online': memberIn.isOnline}">
                 group_add</mat-icon>
             }
             }

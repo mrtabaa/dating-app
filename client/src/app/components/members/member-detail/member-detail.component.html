@@ -2,7 +2,7 @@
 <app-member-detail-mobile />
 }
 @else {
-@if (member$ | async; as member) {
+@if (member) {
 <main>
     <mat-card>
         @for (photo of member.photos; track $index) {
@@ -17,7 +17,7 @@
         }
         <mat-card-content>
             <div class="presence">
-                @if(onlineUsersSig().includes(member.userName.toUpperCase()))
+                @if(member.isOnline)
                 {
                 <mat-icon class="is-online">person</mat-icon> Online now
                 }
@@ -40,7 +40,6 @@
             <div>
                 <p class="title">Last Active</p>
                 <p>{{member.lastActive | intlRelativeTime}}</p>
-                <!-- TODO Update lastActive with SignalR-->
             </div>
             <div>
                 <p class="title">Member Since</p>
