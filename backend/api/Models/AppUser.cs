@@ -24,5 +24,5 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public int FollowingsCount { get; init; }
     public int FollowersCount { get; init; }
     public bool IsProfileCompleted { get; init; }
-    public List<string> ConnectionIds { get; set; } = [];
+    public List<Connection> Connections { get; set; } = [];
 }
