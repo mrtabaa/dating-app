@@ -175,6 +175,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private initMessageParams(): void {
+    this._messageService.messagesSig.set([]);
     this._messageParams.predicate = MessagePredicate.THREAD;
     this._messageParams.targetUserName = this.memberIn?.userName;
     this._messageParams.pageNumber = 1;
