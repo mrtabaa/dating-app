@@ -21,7 +21,7 @@ public class AdminController(IAdminRepository _adminRepository, UserManager<AppU
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
 
         List<UserWithRoleDto> usersWithRoles = [];
-        
+
         foreach (AppUser appUser in pagedAppUsers)
         {
             IEnumerable<string> roles = await _userManager.GetRolesAsync(appUser);
@@ -56,6 +56,14 @@ public class AdminController(IAdminRepository _adminRepository, UserManager<AppU
         return await _adminRepository.DeleteMemberAsync(userName) is null
                 ? BadRequest($"""No user exists with the username "{userName}".""")
                 : Ok(new Response(Message: $""" "{userName}" got deleted sucessfully."""));
+    }
+
+    [HttpPut("reset-connection-ids")]
+    public async Task<ActionResult> ResetConnectionIds(CancellationToken cancellationToken)
+    {
+        UpdateResult updateResult = await _adminRepository.ResetConnectionIdsAsync(cancellationToken);
+
+        return updateResult.ModifiedCount > 0 ? Ok("ConnectedIds are reset.") : BadRequest("Failed.");
     }
 
     // [Authorize(Policy = "ModeratePhotoRole")]
