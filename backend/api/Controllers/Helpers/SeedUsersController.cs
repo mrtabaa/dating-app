@@ -76,7 +76,7 @@ public class SeedUsersController : BaseApiController
             IsProfileCompleted = true
         };
 
-        await _userManager.CreateAsync(admin, "Aaaaaaa1");
+        await _userManager.CreateAsync(admin, "Aaaaaaa/1");
         await _userManager.AddToRolesAsync(admin, [Roles.admin.ToString(), Roles.moderator.ToString()]);
 
         AppUser moderator = new()
@@ -86,7 +86,7 @@ public class SeedUsersController : BaseApiController
             IsProfileCompleted = true
         };
 
-        await _userManager.CreateAsync(moderator, "Aaaaaaa1");
+        await _userManager.CreateAsync(moderator, "Aaaaaaa/1");
         await _userManager.AddToRolesAsync(moderator, [Roles.moderator.ToString()]);
 
         #endregion Roles Management
