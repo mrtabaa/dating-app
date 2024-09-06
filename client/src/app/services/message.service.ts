@@ -19,7 +19,6 @@ export class MessageService {
   hubConnection: HubConnection | undefined;
   private _paginationHandler = new PaginationHandler();
   newMessageRes: Message | undefined;
-  messages: Message[] = [];
   messagesSig = signal<Message[]>([]);
   viewport: CdkVirtualScrollViewport | undefined;
   targetUserName: string | undefined;
@@ -51,7 +50,6 @@ export class MessageService {
     this.viewport = viewport;
   }
 
-  // TODO Recreate connection once page is refreshed.
   createHubConnection(token: string): void {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
