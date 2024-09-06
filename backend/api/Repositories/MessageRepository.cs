@@ -90,10 +90,8 @@ public class MessageRepository : IMessageRepository
 
         return pagedMessages;
     }
-    #endregion CRUD
 
-    #region Helpers
-    private async Task UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    public async Task UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
     {
         var filter = Builders<Message>.Filter.Where(doc =>
                 ((doc.SenderId == userId && doc.RecieverId == targetUserId) ||
@@ -106,5 +104,5 @@ public class MessageRepository : IMessageRepository
 
         await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
     }
-    #endregion Helpers
+    #endregion CRUD
 }
