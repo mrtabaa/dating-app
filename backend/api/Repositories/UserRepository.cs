@@ -201,13 +201,13 @@ public class UserRepository : IUserRepository
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blob_url_165_In, containerName: "photos");
 
         // Find the photo to delete
-        Photo photo = await _collection.AsQueryable()
+        Photo photoToDelete = await _collection.AsQueryable()
             .Where(appUser => appUser.Id == userId) // filter by user id
             .SelectMany(appUser => appUser.Photos) // flatten the Photos array
             .Where(photo => photo.Url_165 == dbUri) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
 
-        if (photo is null)
+        if (photoToDelete is null)
         {
             photoDeleteResponse.IsDeletionFailed = true;
             return photoDeleteResponse;
@@ -235,11 +235,11 @@ public class UserRepository : IUserRepository
             await _collection.UpdateOneAsync(session, filterDef, updateDef, null, cancellationToken);
 
             // SET the next photo to main (if any)
-            if (photo.IsMain)
+            if (photoToDelete.IsMain)
                 photoDeleteResponse.NewMainUrl = await SetNextPhotoAsMain(session, filterDef, userId, cancellationToken);
 
             // Delete blob
-            bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photo, cancellationToken);
+            bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photoToDelete, cancellationToken);
             if (!isDeleteSuccess)
                 throw new InvalidOperationException("Deleting blob failed.");
 
