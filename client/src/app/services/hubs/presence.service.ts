@@ -31,7 +31,10 @@ export class PresenceService {
 
   private getOnlineUsers(): void {
     this._hubConnection?.on(this._GetOnlineUsers, onlineUsers => {
-      this.onlineUsersSig.set(onlineUsers);
+      if (onlineUsers)
+        this.onlineUsersSig.set(onlineUsers);
+      else
+        this._matSnack.open('Checking user status failed. Refresh the page or login again.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top' });
     })
   }
 
