@@ -36,7 +36,7 @@ export class MemberCardMobileComponent {
 
   private updateOnlineUser(): void {
     effect(() => {
-      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.memberIn?.userName.toUpperCase());
+      const onlineUser = this.onlineUsersSig().find(member => member.userName === this.memberIn?.userName.toUpperCase());
 
       if (this.memberIn) {
         if (onlineUser) {

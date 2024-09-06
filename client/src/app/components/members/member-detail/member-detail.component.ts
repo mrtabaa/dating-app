@@ -61,7 +61,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
 
   private updateOnlineUser(): void {
     effect(() => {
-      const onlineUser = this.onlineUsersSig().find(x => x.userName === this.member?.userName.toUpperCase());
+      const onlineUser = this.onlineUsersSig().find(member => member.userName === this.member?.userName.toUpperCase());
 
       if (this.member) {
         if (onlineUser) {
