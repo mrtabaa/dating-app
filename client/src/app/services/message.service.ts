@@ -66,7 +66,11 @@ export class MessageService {
           this.joinGroup();
       });
 
-    this.hubConnection.on(this._newMessageRes, (messageRes: Message) => {
+    this.getNewMessageResFromHub();
+  }
+
+  getNewMessageResFromHub(): void {
+    this.hubConnection?.on(this._newMessageRes, (messageRes: Message) => {
       if (messageRes) {
         this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
         this.messagesSig.update(msgs => [...msgs, messageRes]);
@@ -74,10 +78,6 @@ export class MessageService {
         this.scrollToBottom();
       }
     });
-  }
-
-  stopHubConnection(): void {
-    this.hubConnection?.stop();
   }
 
   // TODO If both parties are online, mark created messages as Read.
@@ -89,6 +89,10 @@ export class MessageService {
   async create(messageIn: MessageIn): Promise<void> {
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
     this.hubConnection?.invoke(this._create, messageIn);
+  }
+
+  stopHubConnection(): void {
+    this.hubConnection?.stop();
   }
 
   /**
