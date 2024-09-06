@@ -60,7 +60,7 @@ public class AdminRepository : IAdminRepository
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .Set(appUser => appUser.ConnectionIds, []);
 
-        return await _collection.UpdateManyAsync<AppUser>(appUser => appUser.Id != null, updateDefinition, null, cancellationToken);
+        return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
     }
 
     #endregion
