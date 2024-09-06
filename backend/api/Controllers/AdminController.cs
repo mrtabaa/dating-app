@@ -58,7 +58,7 @@ public class AdminController(IAdminRepository _adminRepository, UserManager<AppU
                 : Ok(new Response(Message: $""" "{userName}" got deleted sucessfully."""));
     }
 
-    [HttpPut("reset-connection-ids")]
+    [HttpPut("reset-connections")]
     public async Task<ActionResult> ResetConnectionIds(CancellationToken cancellationToken)
     {
         UpdateResult updateResult = await _adminRepository.ResetConnectionIdsAsync(cancellationToken);

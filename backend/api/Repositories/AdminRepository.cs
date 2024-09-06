@@ -1,4 +1,6 @@
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace api.Repositories;
 
 public class AdminRepository : IAdminRepository
@@ -58,7 +60,7 @@ public class AdminRepository : IAdminRepository
     public async Task<UpdateResult> ResetConnectionIdsAsync(CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .Set(appUser => appUser.ConnectionIds, []);
+            .Set(appUser => appUser.Connections, []);
 
         return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
     }
