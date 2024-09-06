@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
+builder.Services.AddHubServices();
 #endregion
 
 if (builder.Environment.IsProduction())

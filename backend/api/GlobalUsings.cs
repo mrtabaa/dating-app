@@ -34,3 +34,6 @@ global using System.Runtime.InteropServices;
 global using api.enums;
 global using api.SignalR;
 global using Microsoft.AspNetCore.SignalR;
+global using api.SignalR.Interfaces;
+global using api.SignalR.Models;
+global using api.SignalR.Services;

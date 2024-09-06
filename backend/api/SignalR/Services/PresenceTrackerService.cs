@@ -1,16 +1,16 @@
-namespace api.Repositories;
+namespace api.SignalR.Services;
 
 public class PresenceTrackerService : IPresenceTrackerService
 {
+    #region Fields and constructors
     private readonly IMongoCollection<AppUser> _collection;
-    private readonly ILogger<PresenceTrackerService> _logger;
 
-    public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings, ILogger<PresenceTrackerService> logger)
+    public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-        _logger = logger;
     }
+    #endregion Fields and constructors
 
     public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {

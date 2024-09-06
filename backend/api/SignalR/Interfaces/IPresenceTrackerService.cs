@@ -1,4 +1,4 @@
-namespace api.Interfaces;
+namespace api.SignalR.Interfaces;
 
 public interface IPresenceTrackerService
 {
