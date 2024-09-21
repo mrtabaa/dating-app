@@ -14,6 +14,13 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {
+        bool isProfileCompleted = await _collection.AsQueryable<AppUser>()
+            .Where(appUser => appUser.Id == userId)
+            .Select(appUser => appUser.IsProfileCompleted)
+            .FirstAsync(cancellationToken);
+            
+        if (!isProfileCompleted) return;
+
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .AddToSet(appUser => appUser.ConnectionsPresence, connectionId);
 
