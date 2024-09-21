@@ -57,10 +57,18 @@ public class AdminRepository : IAdminRepository
     public async Task<AppUser?> DeleteMemberAsync(string userName) =>
         await _collection.FindOneAndDeleteAsync(user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
 
-    public async Task<UpdateResult> ResetConnectionIdsAsync(CancellationToken cancellationToken)
+    public async Task<UpdateResult> ResetConnectionsPresenceAsync(CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .Set(appUser => appUser.Connections, []);
+            .Set(appUser => appUser.ConnectionsPresence, []);
+
+        return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
+    }
+
+    public async Task<UpdateResult> ResetGroupNamesAsync(CancellationToken cancellationToken)
+    {
+        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
+            .Set(appUser => appUser.MessageGroups, []);
 
         return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
     }

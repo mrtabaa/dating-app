@@ -58,12 +58,20 @@ public class AdminController(IAdminRepository _adminRepository, UserManager<AppU
                 : Ok(new Response(Message: $""" "{userName}" got deleted sucessfully."""));
     }
 
-    [HttpPut("reset-connections")]
-    public async Task<ActionResult> ResetConnectionIds(CancellationToken cancellationToken)
+    [HttpPut("reset-connections-presence")]
+    public async Task<ActionResult> ResetConnectionsPresence(CancellationToken cancellationToken)
     {
-        UpdateResult updateResult = await _adminRepository.ResetConnectionIdsAsync(cancellationToken);
+        UpdateResult updateResult = await _adminRepository.ResetConnectionsPresenceAsync(cancellationToken);
 
         return updateResult.ModifiedCount > 0 ? Ok("ConnectedIds are reset.") : BadRequest("Failed.");
+    }
+
+    [HttpPut("reset-group-names")]
+    public async Task<ActionResult> ResetGroupNames(CancellationToken cancellationToken)
+    {
+        UpdateResult updateResult = await _adminRepository.ResetGroupNamesAsync(cancellationToken);
+
+        return updateResult.ModifiedCount > 0 ? Ok("GroupNames are reset.") : BadRequest("Failed.");
     }
 
     // [Authorize(Policy = "ModeratePhotoRole")]
