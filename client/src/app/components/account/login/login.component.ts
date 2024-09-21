@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject, Renderer2, OnInit } from '@angular/core';
+import { Component, OnDestroy, inject, Renderer2 } from '@angular/core';
 import { FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subscription, take } from 'rxjs';
@@ -29,7 +29,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnDestroy {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
@@ -44,10 +44,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   private _subscribedLogin: Subscription | undefined;
   private _subscribedRecaptcha: Subscription | undefined;
   hasLoginCreds = false;
-
-  ngOnInit(): void {
-    this.validateRecaptcha();
-  }
 
   ngOnDestroy(): void {
     this._subscribedLogin?.unsubscribe();
@@ -81,6 +77,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
       (token: string) => {
         if (token) {
+          console.log('LOG', token);
           this.recaptchaToken = token;
           this.isRecaptchaValidating = false;
         }
