@@ -43,9 +43,16 @@
                 [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
             </app-input-cva>
         </div>
-        <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+        <mat-slide-toggle class="recaptcha" formControlName="recaptchaCtrl" (change)="validateRecaptcha()"
+            color="primary">
             @if(!RecaptchaCtrl.value) {
-            <span style="color: palevioletred;">Not a robot? Slide me!</span>
+            <p>Not a robot? Slide me!</p>
+            }
+            @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
+            <div class="validating-recaptcha">
+                <p>Validating</p>
+                <mat-spinner></mat-spinner>
+            </div>
             }
             @else {
             <span style="color: #ba005c;">Validated</span>

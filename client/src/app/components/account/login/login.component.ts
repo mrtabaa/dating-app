@@ -15,6 +15,7 @@ import { UserRegister } from '../../../models/account/user-register.model';
 import { ResponsiveService } from '../../../services/responsive.service';
 import { RecaptchaV3Module, ReCaptchaV3Service } from "ng-recaptcha";
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
     InputCvaComponent, RouterLink,
     FormsModule, ReactiveFormsModule,
     RecaptchaV3Module,
-    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule
+    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule, MatProgressSpinnerModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -37,6 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   renderer = inject(Renderer2);
   private _recaptchaService = inject(ReCaptchaV3Service);
   recaptchaToken: string | undefined;
+  isRecaptchaValidating = false;
 
   user$: Observable<LoggedInUser | null> | undefined;
   private _subscribedLogin: Subscription | undefined;
@@ -74,9 +76,15 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   validateRecaptcha(): void {
     this.recaptchaToken = undefined; // reset
+    this.isRecaptchaValidating = true;
 
     this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
-      (token: string) => this.recaptchaToken = token);
+      (token: string) => {
+        if (token) {
+          this.recaptchaToken = token;
+          this.isRecaptchaValidating = false;
+        }
+      });
   }
 
   loginEmailUsername(): void {
