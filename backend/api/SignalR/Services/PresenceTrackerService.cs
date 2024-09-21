@@ -14,20 +14,15 @@ public class PresenceTrackerService : IPresenceTrackerService
 
     public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {
-        Connection connection = new(
-            ConnectionId: connectionId,
-            GroupNames: []
-        );
-
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .AddToSet(appUser => appUser.Connections, connection);
+            .AddToSet(appUser => appUser.ConnectionsPresence, connectionId);
 
         await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updateDefinition, null, cancellationToken);
     }
 
     public async Task<IEnumerable<OnlineUsersDto>> GetOnlineUsersDtosAsync(CancellationToken cancellationToken)
     {
-        IEnumerable<AppUser> appUsers = await _collection.Find(appUser => appUser.Connections.Any()).ToListAsync(cancellationToken);
+        IEnumerable<AppUser> appUsers = await _collection.Find(appUser => appUser.ConnectionsPresence.Any()).ToListAsync(cancellationToken);
 
         List<OnlineUsersDto> onlineUsersDtos = [];
 
@@ -42,7 +37,7 @@ public class PresenceTrackerService : IPresenceTrackerService
     public async Task RemoveDisconnectedUserAsync(string userName, string connectionId, CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .PullFilter(appUser => appUser.Connections, c => c.ConnectionId == connectionId);
+            .Pull(appUser => appUser.ConnectionsPresence, connectionId);
 
         await _collection.UpdateOneAsync(appUser => appUser.NormalizedUserName == userName, updateDefinition, null, cancellationToken);
     }

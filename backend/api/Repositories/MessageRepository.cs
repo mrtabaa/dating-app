@@ -91,7 +91,7 @@ public class MessageRepository : IMessageRepository
         return pagedMessages;
     }
 
-    public async Task UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    public async Task<DateTime?> UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
     {
         var filter = Builders<Message>.Filter.Where(doc =>
                 ((doc.SenderId == userId && doc.RecieverId == targetUserId) ||
@@ -103,6 +103,17 @@ public class MessageRepository : IMessageRepository
             .Set(message => message.ReadOn, DateTime.UtcNow);
 
         await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
+
+        return await GetDateTimeAsync(userId, targetUserId, cancellationToken);
     }
+
+    private async Task<DateTime?> GetDateTimeAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable()
+            .Where<Message>(doc =>
+                doc.SenderId == userId && doc.RecieverId == targetUserId ||
+                doc.RecieverId == userId && doc.SenderId == targetUserId)
+            .Select(doc => doc.ReadOn)
+            .FirstOrDefaultAsync(cancellationToken);
+
     #endregion CRUD
 }

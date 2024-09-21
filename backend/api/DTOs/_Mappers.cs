@@ -99,15 +99,16 @@ namespace api.DTOs
             );
 
         public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget, string? profilePhotoSasUrl) =>
-            new(
-                Id: message.Id.ToString(), // To delete/update
-                UserOrTargetUserName: userOrTarget.UserName,
-                UserOrTargetKnownAs: userOrTarget?.KnownAs,
-                UserOrTargetProfilePhoto: profilePhotoSasUrl,
-                Content: message.Content,
-                ReadOn: message.ReadOn,
-                SentOn: message.SentOn
-            );
+            new()
+            {
+                Id = message.Id.ToString(), // To delete/update
+                UserOrTargetUserName = userOrTarget.UserName,
+                UserOrTargetKnownAs = userOrTarget?.KnownAs,
+                UserOrTargetProfilePhoto = profilePhotoSasUrl,
+                Content = message.Content,
+                ReadOn = message.ReadOn,
+                SentOn = message.SentOn
+            };
 
         public static OnlineUsersDto ConvertAppUserToOnlineStatusDto(AppUser appUser) =>
             new(
