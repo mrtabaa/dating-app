@@ -56,7 +56,7 @@ public static class ApplicationServiceExtensions
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
-                    .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com/") // Nginx, Azure
+                    .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com", "https://www.hallboard.com") // Nginx, Azure
                 );
             }
         });
