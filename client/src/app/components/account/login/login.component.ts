@@ -77,7 +77,6 @@ export class LoginComponent implements OnDestroy {
     this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
       (token: string) => {
         if (token) {
-          console.log('LOG', token);
           this.recaptchaToken = token;
           this.isRecaptchaValidating = false;
         }

@@ -106,7 +106,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
       (token: string) => {
         if (token) {
-          console.log('REG', token);
           this.recaptchaToken = token;
           this.isRecaptchaValidating = false;
         }
