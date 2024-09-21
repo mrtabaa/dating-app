@@ -127,7 +127,7 @@ export class CompleteProfileComponent implements OnInit {
     this.LookingForCtrl.setValue(member.lookingFor);
   }
 
-  saveAngNext(): void {
+  saveAndNext(): void {
     const updatedUser: UserUpdate = this.createUpdatedUser();
     updatedUser.isProfileCompleted = false;
 

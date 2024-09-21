@@ -77,7 +77,7 @@ export class AccountService {
   logout(): void {
     localStorage.clear();
     this.loggedInUserSig.set(undefined);
-    this._router.navigate(['account/login'])
+    this._router.navigate(['account/login']);
     this._googlePlacesService.resetCountry();
     this._presenceService.stopHubConnection();
   }
