@@ -33,16 +33,9 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        #region Turnstile validation
-        bool isValid = await _recaptchaService.ValidateTokenAsync(registerDto.RecaptchaToken, cancellationToken);
-
-        if (!isValid)
-        {
-            loggedInDto.IsRecaptchaTokenInvalid = true;
-
+        loggedInDto = await ValidateRecaptcha(registerDto.RecaptchaToken, loggedInDto, cancellationToken);
+        if (loggedInDto.IsRecaptchaTokenInvalid)
             return loggedInDto;
-        }
-        #endregion
 
         #region Create user, token and add role
 
@@ -78,16 +71,9 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        #region Turnstile validation
-        bool isValid = await _recaptchaService.ValidateTokenAsync(userInput.RecaptchaToken, cancellationToken);
-
-        if (!isValid)
-        {
-            loggedInDto.IsRecaptchaTokenInvalid = true;
-
+        loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
+        if (loggedInDto.IsRecaptchaTokenInvalid)
             return loggedInDto;
-        }
-        #endregion
 
         AppUser? appUser;
 
@@ -153,4 +139,13 @@ public class AccountRepository : IAccountRepository
     /// <returns>string blobUriWithSas</returns>
     private string? GetMainPhoto(AppUser appUser) =>
      _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url_165;
+
+    private async Task<LoggedInDto> ValidateRecaptcha(string recaptchaToken, LoggedInDto loggedInDto, CancellationToken cancellationToken)
+    {
+        bool isValid = await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
+
+        loggedInDto.IsRecaptchaTokenInvalid = !isValid;
+
+        return loggedInDto;
+    }
 }
