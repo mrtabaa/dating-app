@@ -47,7 +47,22 @@
             @else {
             <mat-error>{{errorMessage}}</mat-error>
             } -->
-            <button type="submit" [disabled]="registerFg.invalid" mat-raised-button color="primary"
+            <mat-slide-toggle class="recaptcha" formControlName="recaptchaCtrl" (change)="validateRecaptcha()"
+                color="primary">
+                @if(!RecaptchaCtrl.value) {
+                <p>Not a robot? Slide me!</p>
+                }
+                @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
+                <div class="validating-recaptcha">
+                    <p>Validating</p>
+                    <mat-spinner></mat-spinner>
+                </div>
+                }
+                @else {
+                <span style="color: #ba005c;">Validated</span>
+                }
+            </mat-slide-toggle>
+            <button type="submit" [disabled]="registerFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)" mat-raised-button color="primary"
                 class="submitBtn">Register</button>
             <!-- <p>{{registerFg.errors | json}}</p> -->
         </div>

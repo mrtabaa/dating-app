@@ -25,6 +25,23 @@
         }
     }
 
+    .recaptcha {
+        * {
+            color: palevioletred;
+            margin: 0;
+        }
+
+        .validating-recaptcha {
+            display: flex;
+            gap: 0.5rem;
+
+            mat-spinner {
+                max-height: 1rem;
+                max-width: 1rem;
+            }
+        }
+    }
+
     .buttons {
         .signin {
             width: 100%;
