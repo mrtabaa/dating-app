@@ -35,7 +35,7 @@ export class FollowService {
   removeFollow(username: string): Observable<ApiResponseMessage> {
     this.memberServie.resetMembersAfterFollowModified(username, false); // Reasign MemberService's cached members.
 
-    return this.http.delete<ApiResponseMessage>(this.baseUrl + username, {});
+    return this.http.delete<ApiResponseMessage>(this.baseUrl + username);
   }
 
   modifyFollowUnfollowIcon(members: Member[], followEmit: FollowModifiedEmit): Member[] {
