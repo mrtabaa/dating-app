@@ -8,14 +8,15 @@ public class MemberController(
     ITokenService _tokenService) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams,
+        CancellationToken cancellationToken)
     {
         if (memberParams.MinAge > memberParams.MaxAge)
-            return BadRequest("Selected minAge cannot be greater than maxAge");
+            return BadRequest("Selected minAge cannot be greater than maxAge.");
 
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
-            return Unauthorized("User id is invalid. Login again.");
+            return Unauthorized("User id is invalid. Login again");
 
         string? gender = await _userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
 
@@ -27,24 +28,24 @@ public class MemberController(
 
         PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetPagedListAsync(memberParams, cancellationToken);
 
-        if (pagedAppUsers is null) return BadRequest("Returning members has failed. Try again or contact the customer support.");
+        if (pagedAppUsers is null)
+            return BadRequest("Returning members has failed. Try again or contact the customer support.");
 
-        /*  1- Response only exists in Contoller. So we have to set PaginationHeader here before converting AppUser to UserDto.
+        /*  1- Response only exists in Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
-        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
+        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize,
+            pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
 
-        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values. 
+        /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values.
                 After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
         List<MemberDto?> memberDtos = [];
 
         foreach (AppUser pagedAppUser in pagedAppUsers)
-        {
             if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
-                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, isFollowing: true));
+                memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, true));
             else
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
-        }
 
         return memberDtos;
     }
