@@ -1,121 +1,113 @@
-@if(isMobileSig()) {
-<app-member-detail-mobile />
-}
-@else {
-@if (member) {
-<main>
-    <mat-card>
+@if (isMobileSig()) {
+  <app-member-detail-mobile/>
+} @else {
+  @if (member) {
+    <main>
+      <mat-card>
         @for (photo of member.photos; track $index) {
-        @if (photo.isMain) {
-        <img mat-card-image ngSrc="{{photo.url_165}}" width="240" height="240" priority
-            alt="Photo of {{member.knownAs}}">
-        }
+          @if (photo.isMain) {
+            <img mat-card-image ngSrc="{{photo.url_165}}" width="240" height="240" priority
+                 alt="Photo of {{member.knownAs}}">
+          }
         }
         @if (member.photos.length === 0) {
-        <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="240" height="240"
-            alt="Photo of {{member.knownAs}}">
+          <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="240" height="240"
+               alt="Photo of {{member.knownAs}}">
         }
         <mat-card-content>
-            <div class="presence">
-                @if(member.isOnline)
-                {
-                <mat-icon class="is-online">person</mat-icon> Online now
-                }
-                @else {
-                <mat-icon>person</mat-icon> Offline
-                }
-            </div>
-            <div>
-                <p>Username</p>
-                <p>{{member.userName}}</p>
-            </div>
-            <div>
-                <p>Location</p>
-                <p>{{member.city}}, {{member.country}}</p>
-            </div>
-            <div>
-                <p class="title">Age</p>
-                <p>{{member.age}}</p>
-            </div>
-            <div>
-                <p class="title">Last Active</p>
-                <p>{{member.lastActive | intlRelativeTime}}</p>
-            </div>
-            <div>
-                <p class="title">Member Since</p>
-                <p>{{member.created | date}}</p>
-            </div>
+          <div class="presence">
+            @if (member.isOnline) {
+              <mat-icon class="is-online">person</mat-icon> Online now
+            } @else {
+              <mat-icon>person</mat-icon> Offline
+            }
+          </div>
+          <div>
+            <p>Username</p>
+            <p>{{ member.userName }}</p>
+          </div>
+          <div>
+            <p>Location</p>
+            <p>{{ member.city }}, {{ member.country }}</p>
+          </div>
+          <div>
+            <p class="title">Age</p>
+            <p>{{ member.age }}</p>
+          </div>
+          <div>
+            <p class="title">Last Active</p>
+            <p>{{ member.lastActive | intlRelativeTime }}</p>
+          </div>
+          <div>
+            <p class="title">Member Since</p>
+            <p>{{ member.created | date }}</p>
+          </div>
         </mat-card-content>
         <mat-card-actions>
-            @if (router.url === '/member/' + username) {
+          @if (router.url === '/member/' + username) {
             <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-stroked-button
-                color="primary">Edit Profile</button>
-            }
-            @else {
-            @if(member.isFollowing) {
-            <button (click)="removeFollow(member)" mat-raised-button color="primary">Unfollow</button>
-            }
-            @else {
-            <button (click)="addFollow(member)" mat-raised-button color="primary">Follow</button>
+                    color="primary">Edit Profile
+            </button>
+          } @else {
+            @if (member.isFollowing) {
+              <button (click)="removeFollow(member)" mat-raised-button color="primary">Unfollow</button>
+            } @else {
+              <button (click)="addFollow(member)" mat-raised-button color="primary">Follow</button>
             }
             <button (click)="setSelectTabIndex(messageTabIndex)" mat-raised-button color="accent">Messages</button>
-            }
+          }
         </mat-card-actions>
-    </mat-card>
-    <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="false"
-        mat-align-tabs="start">
+      </mat-card>
+      <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="false"
+                     mat-align-tabs="start">
         <mat-tab label="Photos">
-            <div class="tab-contents">
-                @if (images.length > 0) {
-                <div class="gallery">
-                    @for (image of images; track $index) {
-                    <div class="photo" [lightbox]="$index">
-                        <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
-                        <mat-icon color="primary">zoom_in</mat-icon>
-                    </div>
-                    }
-                </div>
+          <div class="tab-contents">
+            @if (images.length > 0) {
+              <div class="gallery">
+                @for (image of images; track $index) {
+                  <div class="photo" [lightbox]="$index">
+                    <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
+                    <mat-icon color="primary">zoom_in</mat-icon>
+                  </div>
                 }
-                @else {
-                <p>This member has not shared any photos!</p>
-                }
-            </div>
+              </div>
+            } @else {
+              <p>This member has not shared any photos!</p>
+            }
+          </div>
         </mat-tab>
         <mat-tab label="About {{member.knownAs}}">
-            <div class="tab-contents">
-                @if(
-                !(member.introduction || member.lookingFor || member.interests)) {
-                <p>There is no information provided.</p>
-                }
-                @else {
-                @if (member.introduction) {
+          <div class="tab-contents">
+            @if (!(member.introduction || member.lookingFor || member.interests)) {
+              <p>There is no information provided.</p>
+            } @else {
+              @if (member.introduction) {
                 <h6>Introduction</h6>
-                <p>{{member.introduction}}</p>
-                }
-                @if (member.lookingFor) {
+                <p>{{ member.introduction }}</p>
+              }
+              @if (member.lookingFor) {
                 <h6>Looking For</h6>
-                <p>{{member.lookingFor}}</p>
-                }
-                }
-            </div>
+                <p>{{ member.lookingFor }}</p>
+              }
+            }
+          </div>
         </mat-tab>
         <mat-tab label="Interests">
-            <div class="tab-contents">
-                @if(member.interests.length > 0) {
-                <h6>Interests</h6>
-                <p>{{member.interests}}</p>
-                }
-                @else {
-                <p>There is no information provided.</p>
-                }
-            </div>
+          <div class="tab-contents">
+            @if (member.interests.length > 0) {
+              <h6>Interests</h6>
+              <p>{{ member.interests }}</p>
+            } @else {
+              <p>There is no information provided.</p>
+            }
+          </div>
         </mat-tab>
         <mat-tab label="Messages">
-            <div class="tab-contents messages">
-                <app-member-messages #memberMessage [memberIn]="member" />
-            </div>
+          <div class="tab-contents messages">
+            <app-member-messages #memberMessage [memberIn]="member"/>
+          </div>
         </mat-tab>
-    </mat-tab-group>
-</main>
-}
+      </mat-tab-group>
+    </main>
+  }
 }

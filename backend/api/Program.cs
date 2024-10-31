@@ -1,13 +1,15 @@
 var builder = WebApplication.CreateBuilder(args);
 
 #region Add services to the container.
+
 builder.Services.AddControllers();
 
-// From customized ServiceExtensions (Extensions folder) for a claen maintained code //
+// From customized ServiceExtensions (Extensions folder) for a clean maintained code /
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddIdentityServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
 builder.Services.AddHubServices();
+
 #endregion
 
 if (builder.Environment.IsProduction())
@@ -21,6 +23,7 @@ if (builder.Environment.IsProduction())
 }
 
 #region Configure the HTTP request pipeline.
+
 var app = builder.Build();
 
 // created a customized ExceptionMiddleware
@@ -40,4 +43,5 @@ app.MapControllers();
 app.MapHubs();
 
 app.Run();
+
 #endregion

@@ -1,20 +1,20 @@
-import { Component, OnDestroy, inject } from '@angular/core';
-import { PageEvent, MatPaginatorModule } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
-import { Pagination } from '../../../models/helpers/pagination';
-import { PaginatedResult } from "../../../models/helpers/paginatedResult";
-import { Member } from '../../../models/member.model';
-import { MemberCardComponent } from '../member-card/member-card.component';
-import { MemberService } from '../../../services/member.service';
-import { MemberParams } from '../../../models/helpers/member-params';
-import { MatSelectModule } from '@angular/material/select';
-import { AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
-import { FollowService } from '../../../services/follow.service';
-import { MatSliderModule } from '@angular/material/slider';
+import {Component, inject, OnDestroy} from '@angular/core';
+import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {Subscription} from 'rxjs';
+import {Pagination} from '../../../models/helpers/pagination';
+import {PaginatedResult} from "../../../models/helpers/paginatedResult";
+import {Member} from '../../../models/member.model';
+import {MemberCardComponent} from '../member-card/member-card.component';
+import {MemberService} from '../../../services/member.service';
+import {MemberParams} from '../../../models/helpers/member-params';
+import {MatSelectModule} from '@angular/material/select';
+import {AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {FollowModifiedEmit} from '../../../models/helpers/follow-modified-emit';
+import {FollowService} from '../../../services/follow.service';
+import {MatSliderModule} from '@angular/material/slider';
 
 @Component({
   selector: 'app-member-list',
@@ -28,23 +28,14 @@ import { MatSliderModule } from '@angular/material/slider';
   styleUrls: ['./member-list.component.scss']
 })
 export class MemberListComponent implements OnDestroy {
-  //#region Variables
-  private memberService = inject(MemberService);
-  private followService = inject(FollowService);
-  private fb = inject(FormBuilder);
-
   subscribed: Subscription | undefined;
-
   pagination: Pagination | undefined;
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
-
   minAge: number = 18;
   maxAge: number = 99;
-
   orderOptions: string[] = ['lastActive', 'created', 'age'];
   orderOptionsView: string[] = ['Last Active', 'Created', 'Age'];
-
   // Material Pagination attrs
   pageSizeOptions = [5, 9, 25];
   hidePageSize = false;
@@ -52,7 +43,18 @@ export class MemberListComponent implements OnDestroy {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent | undefined;
+  //#region Variables
+  private memberService = inject(MemberService);
+  private followService = inject(FollowService);
+  private fb = inject(FormBuilder);
   //#endregion
+  //#region Reactive Form
+  filterFg = this.fb.group({
+    orderByCtrl: [],
+    genderCtrl: [],
+    minAgeCtrl: [],
+    maxAgeCtrl: []
+  });
 
   //#region auto-run methods
   constructor() {
@@ -61,31 +63,28 @@ export class MemberListComponent implements OnDestroy {
     this.initResetFilter();
   }
 
-  ngOnDestroy(): void {
-    this.subscribed?.unsubscribe();
-  }
   //#endregion auto-run methods
-
-  //#region Reactive Form 
-  filterFg = this.fb.group({
-    orderByCtrl: [],
-    genderCtrl: [],
-    minAgeCtrl: [],
-    maxAgeCtrl: []
-  });
 
   get OrderByCtrl(): AbstractControl {
     return this.filterFg.get('orderByCtrl') as FormControl;
   }
+
   get GenderCtrl(): AbstractControl {
     return this.filterFg.get('genderCtrl') as FormControl;
   }
+
   get MinAgeCtrl(): AbstractControl {
     return this.filterFg.get('minAgeCtrl') as FormControl;
   }
+
   get MaxAgeCtrl(): AbstractControl {
     return this.filterFg.get('maxAgeCtrl') as FormControl;
   }
+
+  ngOnDestroy(): void {
+    this.subscribed?.unsubscribe();
+  }
+
   //#endregion Reactive form
 
   initResetFilter(): void {

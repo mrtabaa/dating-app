@@ -1,28 +1,27 @@
-import { Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Message } from '../models/message.model';
-import { PaginatedResult } from '../models/helpers/paginatedResult';
-import { PaginationHandler } from '../extensions/paginationHandler';
-import { MessageParams } from '../models/helpers/message-params';
-import { MessageIn } from '../models/messageIn.model';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import {Injectable, signal} from '@angular/core';
+import {environment} from '../../environments/environment';
+import {HttpParams} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {Message} from '../models/message.model';
+import {PaginatedResult} from '../models/helpers/paginatedResult';
+import {PaginationHandler} from '../extensions/paginationHandler';
+import {MessageParams} from '../models/helpers/message-params';
+import {MessageIn} from '../models/messageIn.model';
+import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
-  private _baseUrl: string = environment.apiUrl + 'message/';
-  private _hubUrl: string = environment.hubUrl + 'message';
   hubConnection: HubConnection | undefined;
-  private _paginationHandler = new PaginationHandler();
   newMessageRes: Message | undefined;
   messagesSig = signal<Message[]>([]);
   viewport: CdkVirtualScrollViewport | undefined;
   targetUserName: string | undefined;
-
+  private _baseUrl: string = environment.apiUrl + 'message/';
+  private _hubUrl: string = environment.hubUrl + 'message';
+  private _paginationHandler = new PaginationHandler();
   private readonly _joinGroup = "JoinGroup";
   private readonly _create = "Create";
   private readonly _newMessageRes = "NewMessageRes";
@@ -43,7 +42,7 @@ export class MessageService {
    * Set targetUserName to join two parties to a group.
    * Set viewport so scrollToBottom() works properly.
    * @param targetUserName
-   * @param viewport 
+   * @param viewport
    */
   setTargetUserNameAndViewPort(targetUserName: string, viewport: CdkVirtualScrollViewport): void {
     this.targetUserName = targetUserName;
@@ -74,7 +73,7 @@ export class MessageService {
       if (messageRes) {
         console.log(messageRes);
         this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
-        this.messagesSig.update(msgs => [...msgs, messageRes]);
+        this.messagesSig.update(messages => [...messages, messageRes]);
 
         this.scrollToBottom();
       }
@@ -98,7 +97,7 @@ export class MessageService {
 
   /**
    * This moves scroll to the bottom on the first messages load and any time a new message is sent.
-   * Implemented in the service so it applies to the receiver of the message as well when this.hubConnection.on(this._sendMessage is triggered.
+   * Implemented in the service so it applies to the receiver of the message as well when this.hubConnection.on(this._sendMessage is triggered).
    */
   scrollToBottom() {
     try {
@@ -106,7 +105,9 @@ export class MessageService {
         if (this.viewport)
           this.viewport.scrollToIndex(this.messagesSig().length - 1, 'smooth');
       }, 0);
-    } catch (err) { console.error(err) }
+    } catch (err) {
+      console.error(err)
+    }
   }
 }
 
