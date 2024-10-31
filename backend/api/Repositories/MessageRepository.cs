@@ -44,23 +44,23 @@ public class MessageRepository : IMessageRepository
         {
             // Group all messages based on SenderId then Select the first one which is the latest message since they're OrderByDescending
             MessagePredicate.Inbox => query
-                .Where(doc => doc.RecieverId == userId)
+                .Where(doc => doc.ReceiverId == userId)
                 .GroupBy(doc => doc.SenderId)
                 .Select(group => group.First())
                 .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Unread => query
-                .Where(doc => doc.RecieverId == userId && doc.ReadOn == null)
+                .Where(doc => doc.ReceiverId == userId && doc.ReadOn == null)
                 .GroupBy(doc => doc.SenderId)
                 .Select(group => group.First())
                 .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Read => query
-                .Where(doc => doc.RecieverId == userId && doc.ReadOn != null)
+                .Where(doc => doc.ReceiverId == userId && doc.ReadOn != null)
                 .GroupBy(doc => doc.SenderId)
                 .Select(group => group.First())
                 .OrderByDescending(doc => doc.SentOn),
             MessagePredicate.Sent => query
                 .Where(doc => doc.SenderId == userId)
-                .GroupBy(doc => doc.RecieverId)
+                .GroupBy(doc => doc.ReceiverId)
                 .Select(group => group.First())
                 .OrderByDescending(doc => doc.SentOn),
             _ => query
@@ -78,8 +78,8 @@ public class MessageRepository : IMessageRepository
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
             .Where(doc =>
-                (doc.SenderId == userId && doc.RecieverId == targetUserId) ||
-                (doc.RecieverId == userId && doc.SenderId == targetUserId)
+                (doc.SenderId == userId && doc.ReceiverId == targetUserId) ||
+                (doc.ReceiverId == userId && doc.SenderId == targetUserId)
             ).OrderByDescending(doc => doc.SentOn);
 
         PagedList<Message> pagedMessages = await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
@@ -94,8 +94,8 @@ public class MessageRepository : IMessageRepository
     public async Task<DateTime?> UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
     {
         var filter = Builders<Message>.Filter.Where(doc =>
-                ((doc.SenderId == userId && doc.RecieverId == targetUserId) ||
-                 (doc.RecieverId == userId && doc.SenderId == targetUserId))
+                ((doc.SenderId == userId && doc.ReceiverId == targetUserId) ||
+                 (doc.ReceiverId == userId && doc.SenderId == targetUserId))
                 && doc.ReadOn == null
             );
 
@@ -110,8 +110,8 @@ public class MessageRepository : IMessageRepository
     private async Task<DateTime?> GetDateTimeAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
             .Where<Message>(doc =>
-                doc.SenderId == userId && doc.RecieverId == targetUserId ||
-                doc.RecieverId == userId && doc.SenderId == targetUserId)
+                doc.SenderId == userId && doc.ReceiverId == targetUserId ||
+                doc.ReceiverId == userId && doc.SenderId == targetUserId)
             .Select(doc => doc.ReadOn)
             .FirstOrDefaultAsync(cancellationToken);
 
