@@ -4,9 +4,11 @@ namespace api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class MessageController(
-        ITokenService _tokenService, IMessageRepository _messageRepository,
-        IMemberRepository _memberRepository, IPhotoService _photoService
-    ) : BaseApiController
+    ITokenService _tokenService,
+    IMessageRepository _messageRepository,
+    IMemberRepository _memberRepository,
+    IPhotoService _photoService
+) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult<MessageDto?>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
@@ -18,12 +20,13 @@ public class MessageController(
         MessageDto? messageDto = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
 
         return messageDto is null
-        ? BadRequest("Sending message faild. Try again or contact the support.")
-        : messageDto;
+            ? BadRequest("Sending message faild. Try again or contact the support.")
+            : messageDto;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MessageDto>>> Get([FromQuery] MessageParams messageParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MessageDto>>> Get([FromQuery] MessageParams messageParams,
+        CancellationToken cancellationToken)
     {
         List<MessageDto> messageDtos = [];
 
@@ -49,10 +52,10 @@ public class MessageController(
         IEnumerable<AppUser> userOrTargets = await GetAllMembers(pagedMessages, cancellationToken);
 
         AppUser? userOrTarget;
-        foreach (var message in pagedMessages)
+        foreach (Message message in pagedMessages)
         {
             if (messageParams.Predicate == MessagePredicate.Sent) // To set receiver photo instead of sender's photo
-                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.RecieverId);
+                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.ReceiverId);
             else // This already showes receiver photo
                 userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
 
@@ -74,7 +77,7 @@ public class MessageController(
     {
         // Get all Ids in the messages (sender & receiver)
         IEnumerable<ObjectId> allIds = pagedMessages.Select(message => message.SenderId) // Get senders' Ids
-            .Concat(pagedMessages.Select(message => message.RecieverId)) // Get receivers' Ids and merge with senders' Ids
+            .Concat(pagedMessages.Select(message => message.ReceiverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
         return await _memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
