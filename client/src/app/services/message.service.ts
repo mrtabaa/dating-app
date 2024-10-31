@@ -62,7 +62,9 @@ export class MessageService {
         console.log('MessageHub connection started.');
 
         if (this.targetUserName && this.viewport)
-          this.joinGroup();
+          this.joinGroup()
+            .then(r => console.log(this.targetUserName, 'joined the group with response:', r))
+            .catch(err => console.log(this.targetUserName, 'failed to join the group with error:', err));
       });
 
     this.getNewMessageResFromHub();
@@ -83,12 +85,12 @@ export class MessageService {
   // TODO If both parties are online, mark created messages as Read.
   // TODO Also implement delete message.
   async joinGroup(): Promise<void> {
-    this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
+    await this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
   }
 
   async create(messageIn: MessageIn): Promise<void> {
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
-    this.hubConnection?.invoke(this._create, messageIn);
+    await this.hubConnection?.invoke(this._create, messageIn);
   }
 
   stopHubConnection(): void {

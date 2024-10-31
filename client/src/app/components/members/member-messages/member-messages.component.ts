@@ -74,7 +74,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     this._messageService.stopHubConnection();
   }
 
-  create(): void {
+  async create(): Promise<void> {
     this.isCreatingMessageSig.set(true); // disable loading ngx-spinner
 
     if (this.memberIn?.userName && this.createMessageCtrl.value) {
@@ -87,7 +87,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       }
 
       //#region Create and add to messages for Optimistic approach
-      const message: Message = {
+      const unsavedMessage: Message = {
         tempId: tempId, // to find the message from messages after API response to update the list's message props
         userOrTargetUserName: this.loggedInUserSig()?.userName,
         userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
@@ -99,26 +99,23 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       //#endregion Create and add to messages for Optimistic approach
 
       // Send it to API
-      this._messageService.create(messageIn);
+      try {
+        // Send the message to the API
+        await this._messageService.create(messageIn); // do NOT forget await to prevent race-conditions of dependant tasks
 
-      setTimeout(() => {
-        const newMessage = this._messageService.newMessageRes;
-
-        if (newMessage) {
-          // Update message of the messages with API validated values
-
+        if (this._messageService.newMessageRes) { // Keep unsavedMessage in messagesSig since it's added to DB
           this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
 
-          // temprorarly increase the size to either of the length or the max size. 
+          // temporarily increase the size to either of the length or the max size.
           this.bufferSize = Math.min(this.messagesSig().length * this._defaultItemSize, this.MAX_BUFFER_SIZE);
+        } else { // delete message for API BadRequest response.
+          this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== unsavedMessage.tempId));
+          this._snackBar.open('Is your internet connected? Yes?! Refresh the page or login again.', 'Close',
+            {horizontalPosition: 'center', verticalPosition: 'top', duration: 10000});
         }
-        else {
-          // delete message for API BadRequest response. 
-          this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== message.tempId));
-          this._snackBar.open('Is sending a message failed? Sending too many messages too fast? Is your internet connected? No?! Refresh the page or login agian.', 'Close',
-            { horizontalPosition: 'center', verticalPosition: 'top', duration: 10000 });
-        }
-      }, 500);
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
