@@ -55,7 +55,8 @@ public class MessageService : IMessageService
         //     updateResult = await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updateDefinition, null, cancellationToken);
         // }
 
-        return updateResult.ModifiedCount > 0;
+        return updateResult.MatchedCount > 0;
+        // return updateResult.MatchedCount > 1; // TODO: Use this after RemoveGroupNameAsync is implemented
     }
 
     public async Task<HashSet<string>?> GetGroupNamesAsync(ObjectId userId, CancellationToken cancellationToken) =>
