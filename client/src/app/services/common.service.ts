@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +6,7 @@ import { Injectable, signal } from '@angular/core';
 export class CommonService {
   isPreventingLeavingPage: boolean = false;
   isMessageCompSig = signal<boolean>(false);
+  isMemberMessageCompSig = signal<boolean>(false);
   isCreatingMessageSig = signal<boolean>(false);
   isNavMobileBrandClickedSig = signal<boolean>(false);
 }
