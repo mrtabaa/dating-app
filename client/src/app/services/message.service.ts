@@ -1,4 +1,4 @@
-import {Injectable, signal} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
@@ -9,6 +9,7 @@ import {MessageParams} from '../models/helpers/message-params';
 import {MessageIn} from '../models/messageIn.model';
 import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import {AccountService} from "./account.service";
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class MessageService {
   messagesSig = signal<Message[]>([]);
   viewport: CdkVirtualScrollViewport | undefined;
   targetUserName: string | undefined;
+  private _loggedInUserSig = inject(AccountService).loggedInUserSig;
   private _baseUrl: string = environment.apiUrl + 'message/';
   private _hubUrl: string = environment.hubUrl + 'message';
   private _paginationHandler = new PaginationHandler();
@@ -49,7 +51,7 @@ export class MessageService {
     this.viewport = viewport;
   }
 
-  createHubConnection(token: string): void {
+  async createHubConnection(token: string): Promise<void> {
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
         accessTokenFactory: () => token
@@ -57,17 +59,16 @@ export class MessageService {
       .withAutomaticReconnect()
       .build();
 
-    this.hubConnection.start()
+    await this.hubConnection.start()
       .then(() => {
         console.log('MessageHub connection started.');
-
-        if (this.targetUserName && this.viewport)
-          this.joinGroup()
-            .then(r => console.log(this.targetUserName, 'joined the group with response:', r))
-            .catch(err => console.log(this.targetUserName, 'failed to join the group with error:', err));
       });
 
-    this.getNewMessageResFromHub();
+    await this.joinGroup()
+      .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))
+      .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to joined the chat with error:', err));
+
+    this.getNewMessageResFromHub(); // to start the hubConnection
   }
 
   getNewMessageResFromHub(): void {
@@ -93,8 +94,8 @@ export class MessageService {
     await this.hubConnection?.invoke(this._create, messageIn);
   }
 
-  stopHubConnection(): void {
-    this.hubConnection?.stop();
+  async stopHubConnection(): Promise<void | null> {
+    await this.hubConnection?.stop();
   }
 
   /**

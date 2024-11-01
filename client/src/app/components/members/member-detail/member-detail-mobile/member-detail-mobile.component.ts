@@ -37,7 +37,7 @@ import {CommonService} from "../../../../services/common.service";
 export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
   @ViewChild(MemberMessagesComponent) memberMessages: MemberMessagesComponent | undefined;
-  username = inject(AccountService).loggedInUserSig()?.userName;
+  loggedInUserSig = inject(AccountService).loggedInUserSig;
   router = inject(Router);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
@@ -138,20 +138,29 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  setSelectTabIndex(tabIndex: number): void {
+  async setSelectTabIndex(tabIndex: number): Promise<void> {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
-      this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
+      await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
 
       if (tabIndex === this.messagesTabIndex) {
+        await this.createMessageHubConnection();
         this._isMemberMessageCompSig.set(true);
         this.isChatActive = true;
         this.memberMessages?.initBufferSizeAndViewport();
         this._messageService.scrollToBottom();
       } else {
         this._isMemberMessageCompSig.set(false);
+        await this._messageService.stopHubConnection();
         this.isChatActive = false;
       }
+    }
+  }
+
+  async createMessageHubConnection(): Promise<void> {
+    const token = this.loggedInUserSig()?.token;
+    if (token) {
+      await this._messageService.createHubConnection(token);
     }
   }
 

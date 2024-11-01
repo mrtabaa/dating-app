@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, inject, Input, OnInit, Signal, ViewChild} from '@angular/core';
 import {Message} from '../../../models/message.model';
 import {MessageService} from '../../../services/message.service';
-import {Subscription, take} from 'rxjs';
+import {take} from 'rxjs';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MessageParams} from '../../../models/helpers/message-params';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
@@ -37,7 +37,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MemberMessagesComponent implements OnInit, AfterViewInit {
   @Input() memberIn: Member | undefined;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
@@ -51,7 +51,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _fb = inject(FormBuilder);
   createMessageCtrl = this._fb.control('', [Validators.maxLength(1000)]);
   private _snackBar = inject(MatSnackBar);
-  private _messagesSubs: Subscription | undefined;
   private _totalPages = 1;
   private _defaultItemSize = 50;
   private readonly MAX_BUFFER_SIZE = 1000 * this._defaultItemSize; // Assuming 1000 messages as an upper limit
@@ -66,12 +65,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngAfterViewInit(): void {
     this.setTargetUserNameAndViewport();
-    this.createHubConnection();
-  }
-
-  ngOnDestroy(): void {
-    this._messagesSubs?.unsubscribe();
-    this._messageService.stopHubConnection();
   }
 
   async create(): Promise<void> {
@@ -178,12 +171,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     this._messageParams.targetUserName = this.memberIn?.userName;
     this._messageParams.pageNumber = 1;
     this._messageParams.pageSize = 25;
-  }
-
-  private createHubConnection(): void {
-    const token = this.loggedInUserSig()?.token;
-    if (token)
-      this._messageService.createHubConnection(token);
   }
 
   private setTargetUserNameAndViewport(): void {
