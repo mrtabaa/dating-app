@@ -2,12 +2,12 @@ $navbar_h: 3rem;
 $tabGroup_h: 4.5rem;
 
 main {
-  height: calc(100dvh - $navbar_h - $tabGroup_h);
+  height: calc(100dvh - $tabGroup_h);
   overflow: hidden;
-
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 0 0.3rem;
 
   .warning-layout-helper {
     color: transparent;
