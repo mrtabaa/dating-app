@@ -23,7 +23,7 @@
             </div>
           </div>
           <div class="actions">
-            @if (router.url === '/member/' + username) {
+            @if (router.url === '/member/' + loggedInUserSig()?.userName) {
               <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-icon-button>
                 <mat-icon color="primary">edit</mat-icon>
               </button>
