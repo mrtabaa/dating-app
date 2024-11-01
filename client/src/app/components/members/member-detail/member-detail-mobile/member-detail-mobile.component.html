@@ -1,123 +1,118 @@
 @if (member) {
-<main>
-    @if(!isChatActive) {
-    <section class="details">
+  <main>
+    @if (!isChatActive) {
+      <section class="details">
         <section class="title">
-            <div class="photo-info">
-                <div class="photo">
-                    @if (member.photos.length === 0) {
-                    <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}"
-                        height="{{imageWH}}" priority alt="Loading...">
-                    }
-                    @else {
-                    @for (photo of member.photos; track $index) {
-                    @if (photo.isMain) {
+          <div class="photo-info">
+            <div class="photo">
+              @if (member.photos.length === 0) {
+                <img mat-card-image ngSrc="./assets/images/defaults/user.png" width="{{imageWH}}"
+                     height="{{imageWH}}" priority alt="Loading...">
+              } @else {
+                @for (photo of member.photos; track $index) {
+                  @if (photo.isMain) {
                     <img mat-card-image ngSrc="{{photo.url_165}}" width="{{imageWH}}" height="{{imageWH}}" priority
-                        alt="Loading...">
-                    }
-                    }
-                    }
-                </div>
-                <div class="info">
-                    <p>{{member.knownAs | titlecase | shortenString: 15}}, {{member.age}}</p>
-                    <p class="gray-text">{{member.userName | shortenString: 15}}</p>
-                </div>
-            </div>
-            <div class="actions">
-                @if (router.url === '/member/' + username) {
-                <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-icon-button>
-                    <mat-icon color="primary">edit</mat-icon>
-                </button>
+                         alt="Loading...">
+                  }
                 }
-                @else {
-                @if(member.isFollowing){
+              }
+            </div>
+            <div class="info">
+              <p>{{ member.knownAs | titlecase | shortenString: 15 }}, {{ member.age }}</p>
+              <p class="gray-text">{{ member.userName | shortenString: 15 }}</p>
+            </div>
+          </div>
+          <div class="actions">
+            @if (router.url === '/member/' + username) {
+              <button [routerLink]="['/user/edit']" routerLinkActive="router-link-active" mat-icon-button>
+                <mat-icon color="primary">edit</mat-icon>
+              </button>
+            } @else {
+              @if (member.isFollowing) {
                 <button (click)="removeFollow(member)" mat-mini-fab>
-                    <mat-icon color="primary">person_remove</mat-icon>
+                  <mat-icon color="primary">person_remove</mat-icon>
                 </button>
-                }
-                @else {
+              } @else {
                 <button (click)="addFollow(member)" mat-mini-fab>
-                    <mat-icon color="primary">person_add</mat-icon>
+                  <mat-icon color="primary">person_add</mat-icon>
                 </button>
-                }
-                }
-                <button routerLink="/main" mat-icon-button><mat-icon color="primary">reply</mat-icon></button>
-            </div>
+              }
+            }
+            <button routerLink="/main" mat-icon-button>
+              <mat-icon color="primary">reply</mat-icon>
+            </button>
+          </div>
         </section>
         <div class="extra-info">
-            <div class="presence">
-                @if(member.isOnline) {
-                <mat-icon class="is-online">person</mat-icon> Online now
-                }
-                @else {
-                <p>Active:<span class="gray-text"> {{member.lastActive | intlRelativeTime}}</span></p> | Offline
-                }
-            </div>
-            <p>Since:<span class="gray-text"> {{member.created | date}}</span></p>
-            <p class="location">{{member.city}}, {{member.state}}, {{member.country}}</p>
+          <div class="presence">
+            @if (member.isOnline) {
+              <mat-icon class="is-online">person</mat-icon> Online now
+            } @else {
+              <p>Active:<span class="gray-text"> {{ member.lastActive | intlRelativeTime }}</span></p> | Offline
+            }
+          </div>
+          <p>Since:<span class="gray-text"> {{ member.created | date }}</span></p>
+          <p class="location">{{ member.city }}, {{ member.state }}, {{ member.country }}</p>
         </div>
-    </section>
-    <mat-divider />
+      </section>
+      <mat-divider/>
     }
     <mat-tab-group #tabGroup (selectedTabChange)="(setSelectTabIndex($event.index))" mat-stretch-tabs="true"
-        disablePagination="true">
-        <mat-tab #photos>
-            <div class="tab-container">
-                <ng-template mat-tab-label>
-                    <mat-icon [color]="photos.isActive ? 'primary' : ''">photo_library</mat-icon>
-                </ng-template>
-                @if (images.length > 0) {
-                <div class="gallery">
-                    @for (image of images; track $index) {
-                    <div class="photo" [lightbox]="$index">
-                        <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
-                        <mat-icon color="primary">zoom_in</mat-icon>
-                    </div>
-                    }
+                   disablePagination="true">
+      <mat-tab #photos>
+        <div class="tab-container">
+          <ng-template mat-tab-label>
+            <mat-icon [color]="photos.isActive ? 'primary' : ''">photo_library</mat-icon>
+          </ng-template>
+          @if (images.length > 0) {
+            <div class="gallery">
+              @for (image of images; track $index) {
+                <div class="photo" [lightbox]="$index">
+                  <img gallerize [src]="image.data?.thumb" alt="{{member.knownAs + '\'s' + ' image'}}">
+                  <mat-icon color="primary">zoom_in</mat-icon>
                 </div>
-                }
-                @else {
-                <p>This member has not shared any photos!</p>
-                }
+              }
             </div>
-        </mat-tab>
-        <mat-tab #about>
-            <div class="tab-container">
-                <ng-template mat-tab-label>
-                    <mat-icon [color]="about.isActive ? 'primary' : ''">info</mat-icon>
-                </ng-template>
-                <div class="about">
-                    @if(
-                    !(member.introduction || member.lookingFor || member.interests)) {
-                    <p>There is no information provided.</p>
-                    }
-                    @else {
-                    @if (member.introduction) {
-                    <h6 class="title">Introduction:</h6>
-                    <p>{{member.introduction}}</p>
-                    }
-                    @if (member.lookingFor) {
-                    <h6 class="title">Looking For:</h6>
-                    <p>{{member.lookingFor}}</p>
-                    }
-                    @if(member.interests) {
-                    <h6 class="title">Interests:</h6>
-                    <p>{{member.interests}}</p>
-                    }
-                    }
-                </div>
-            </div>
-        </mat-tab>
-        <mat-tab #messages>
-            <div class="tab-container" style="padding: 0;">
-                <ng-template mat-tab-label>
-                    <mat-icon [color]="messages.isActive ? 'primary' : ''">chat</mat-icon>
-                </ng-template>
-                <div class="messages">
-                    <app-member-messages #memberMessages [memberIn]="member" />
-                </div>
-            </div>
-        </mat-tab>
+          } @else {
+            <p>This member has not shared any photos!</p>
+          }
+        </div>
+      </mat-tab>
+      <mat-tab #about>
+        <div class="tab-container">
+          <ng-template mat-tab-label>
+            <mat-icon [color]="about.isActive ? 'primary' : ''">info</mat-icon>
+          </ng-template>
+          <div class="about">
+            @if (!(member.introduction || member.lookingFor || member.interests)) {
+              <p>There is no information provided.</p>
+            } @else {
+              @if (member.introduction) {
+                <h6 class="title">Introduction:</h6>
+                <p>{{ member.introduction }}</p>
+              }
+              @if (member.lookingFor) {
+                <h6 class="title">Looking For:</h6>
+                <p>{{ member.lookingFor }}</p>
+              }
+              @if (member.interests) {
+                <h6 class="title">Interests:</h6>
+                <p>{{ member.interests }}</p>
+              }
+            }
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab #messages>
+        <div class="tab-container" style="padding: 0;">
+          <ng-template mat-tab-label>
+            <mat-icon [color]="messages.isActive ? 'primary' : ''">chat</mat-icon>
+          </ng-template>
+          <div class="messages">
+            <app-member-messages #memberMessages [memberIn]="member"/>
+          </div>
+        </div>
+      </mat-tab>
     </mat-tab-group>
-</main>
+  </main>
 }

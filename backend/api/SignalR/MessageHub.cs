@@ -64,14 +64,12 @@ public class MessageHub(
     private string GetUserName() =>
         Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
 
-    private async Task<DateTime?> UpdateReadOnAsync(ObjectId userId, string receiverUserName,
-        CancellationToken cancellationToken)
+    private async Task<DateTime?> UpdateReadOnAsync(ObjectId userId, string receiverUserName, CancellationToken cancellationToken)
     {
-        ObjectId? receiverUserId =
-            await _userRepository.GetIdByUserNameAsync(receiverUserName.ToUpper(), cancellationToken)
-            ?? throw new HubException("OtherUserId is invalid.");
+        ObjectId? receiverUserId = await _userRepository.GetIdByUserNameAsync(receiverUserName.ToUpper(), cancellationToken)
+                                   ?? throw new HubException("OtherUserId is invalid.");
 
-        return await _messageRepository.UpdateReadOn(userId, receiverUserId.Value, cancellationToken);
+        return await _messageRepository.UpdateReadOnAsync(userId, receiverUserId.Value, cancellationToken);
     }
 
     private async Task AddGroupNameToDb(ObjectId userId, string groupName, CancellationToken cancellationToken)

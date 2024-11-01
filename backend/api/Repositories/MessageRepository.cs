@@ -3,6 +3,7 @@ namespace api.Repositories;
 public class MessageRepository : IMessageRepository
 {
     #region Db and Token Settings
+
     private readonly IMongoCollection<Message> _collection;
     private readonly IUserRepository _userRepository;
 
@@ -10,15 +11,17 @@ public class MessageRepository : IMessageRepository
     public MessageRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
         IUserRepository userRepository
-        )
+    )
     {
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<Message>(AppVariablesExtensions.collectionMessages);
         _userRepository = userRepository;
     }
+
     #endregion Db and Token Settings
 
     #region CRUD
+
     public async Task<MessageDto?> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
     {
         AppUser? loggedInUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
@@ -86,18 +89,17 @@ public class MessageRepository : IMessageRepository
 
         // update ReadOn
         if (pagedMessages.Count > 0)
-            await UpdateReadOn(userId, targetUserId.Value, cancellationToken);
+            await UpdateReadOnAsync(userId, targetUserId.Value, cancellationToken);
 
         return pagedMessages;
     }
 
-    public async Task<DateTime?> UpdateReadOn(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    public async Task<DateTime?> UpdateReadOnAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
     {
-        var filter = Builders<Message>.Filter.Where(doc =>
-                ((doc.SenderId == userId && doc.ReceiverId == targetUserId) ||
-                 (doc.ReceiverId == userId && doc.SenderId == targetUserId))
-                && doc.ReadOn == null
-            );
+        FilterDefinition<Message>? filter = Builders<Message>.Filter.Where(doc =>
+            doc.ReceiverId == userId && doc.SenderId == targetUserId
+                                     && doc.ReadOn == null
+        );
 
         UpdateDefinition<Message> updateDefReadOn = Builders<Message>.Update
             .Set(message => message.ReadOn, DateTime.UtcNow);
@@ -109,8 +111,7 @@ public class MessageRepository : IMessageRepository
 
     private async Task<DateTime?> GetDateTimeAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
-            .Where<Message>(doc =>
-                doc.SenderId == userId && doc.ReceiverId == targetUserId ||
+            .Where(doc =>
                 doc.ReceiverId == userId && doc.SenderId == targetUserId)
             .Select(doc => doc.ReadOn)
             .FirstOrDefaultAsync(cancellationToken);
