@@ -1,26 +1,25 @@
-import { AfterViewChecked, Component, OnInit, ViewChild, effect, inject } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { NgOptimizedImage } from '@angular/common';
-import { take } from 'rxjs';
-import { Member } from '../../../models/member.model';
-import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
-import { MemberService } from '../../../services/member.service';
-import { MatButtonModule } from '@angular/material/button';
-import { Gallery, GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
-import { LightboxModule } from 'ng-gallery/lightbox';
-import { IntlModule } from "angular-ecmascript-intl";
-import { AccountService } from '../../../services/account.service';
-import { FollowService } from '../../../services/follow.service';
-import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatIconModule } from '@angular/material/icon';
-import { ResponsiveService } from '../../../services/responsive.service';
-import { MemberDetailMobileComponent } from './member-detail-mobile/member-detail-mobile.component';
-import { MemberMessagesComponent } from '../member-messages/member-messages.component';
-import { PresenceService } from '../../../services/hubs/presence.service';
-import { MessageService } from '../../../services/message.service';
+import {AfterViewChecked, Component, effect, inject, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {take} from 'rxjs';
+import {Member} from '../../../models/member.model';
+import {MatCardModule} from '@angular/material/card';
+import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
+import {MemberService} from '../../../services/member.service';
+import {MatButtonModule} from '@angular/material/button';
+import {Gallery, GalleryItem, GalleryModule, ImageItem} from 'ng-gallery';
+import {LightboxModule} from 'ng-gallery/lightbox';
+import {IntlModule} from "angular-ecmascript-intl";
+import {AccountService} from '../../../services/account.service';
+import {FollowService} from '../../../services/follow.service';
+import {ApiResponseMessage} from '../../../models/helpers/api-response-message';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {MatIconModule} from '@angular/material/icon';
+import {ResponsiveService} from '../../../services/responsive.service';
+import {MemberDetailMobileComponent} from './member-detail-mobile/member-detail-mobile.component';
+import {MemberMessagesComponent} from '../member-messages/member-messages.component';
+import {PresenceService} from '../../../services/hubs/presence.service';
+import {MessageService} from '../../../services/message.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -37,42 +36,26 @@ import { MessageService } from '../../../services/message.service';
 })
 export class MemberDetailComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
-  @ViewChild('memberMessage') memberMessage: MemberMessagesComponent | undefined;
-
-  private _memberService = inject(MemberService);
-  private _messageService = inject(MessageService);
-  private _followService = inject(FollowService);
+  @ViewChild('memberMessage') memberMessages: MemberMessagesComponent | undefined;
+  loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   username = inject(AccountService).loggedInUserSig()?.userName;
-  private snackBar = inject(MatSnackBar);
-  private gallery = inject(Gallery);
   router = inject(Router);
   private route = inject(ActivatedRoute);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
-  readonly messageTabIndex = 3;
-
+  readonly messagesTabIndex = 3;
   member: Member | undefined;
   images: GalleryItem[] = [];
+  private _memberService = inject(MemberService);
+  private _messageService = inject(MessageService);
+  private _followService = inject(FollowService);
+  private snackBar = inject(MatSnackBar);
+  private gallery = inject(Gallery);
+  private route = inject(ActivatedRoute);
 
   constructor() {
     this.updateOnlineUser();
-  }
-
-  private updateOnlineUser(): void {
-    effect(() => {
-      const onlineUser = this.onlineUsersSig().find(member => member.userName === this.member?.userName.toUpperCase());
-
-      if (this.member) {
-        if (onlineUser) {
-          this.member.isOnline = true;
-          this.member.lastActive = onlineUser.lastActive;
-        }
-        else {
-          this.member.isOnline = false;
-        }
-      }
-    });
   }
 
   ngOnInit(): void {
@@ -96,10 +79,10 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
         ?.pipe(
           take(1)
         ).subscribe((member: Member) => {
-          if (member) {
-            this.member = member;
-          }
-        });
+        if (member) {
+          this.member = member;
+        }
+      });
     }
   }
 
@@ -136,7 +119,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   setGalleryImages(): void {
     if (this.member)
       for (const photo of this.member.photos) {
-        this.images.push(new ImageItem({ src: photo.url_enlarged, thumb: photo.url_165 }));
+        this.images.push(new ImageItem({src: photo.url_enlarged, thumb: photo.url_165}));
       }
 
     // load ng-gallery and insert images
@@ -147,10 +130,10 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   setTabGroupParam(): void {
     this.route.queryParams.pipe(
       take(1)).subscribe(params => {
-        const tab = params['tab'];
-        if (tab)
-          this.setSelectTabIndex(tab);
-      });
+      const tab = params['tab'];
+      if (tab)
+        this.setSelectTabIndex(tab).finally();
+    });
   }
 
   setSelectTabIndex(tabIndex: number): void {
@@ -161,5 +144,21 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
       this.memberMessage?.initBufferSizeAndViewport();
       this._messageService.scrollToBottom();
     }
+  }
+}
+
+  private updateOnlineUser(): void {
+    effect(() => {
+      const onlineUser = this.onlineUsersSig().find(member => member.userName === this.member?.userName.toUpperCase());
+
+      if (this.member) {
+        if (onlineUser) {
+          this.member.isOnline = true;
+          this.member.lastActive = onlineUser.lastActive;
+        } else {
+          this.member.isOnline = false;
+        }
+      }
+    });
   }
 }

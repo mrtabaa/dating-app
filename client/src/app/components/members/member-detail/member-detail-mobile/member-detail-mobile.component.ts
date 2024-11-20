@@ -60,6 +60,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.getMember();
+    this.setGalleryImages();
   }
 
   ngAfterViewChecked(): void {
@@ -80,9 +81,6 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
           if (member)
             this.member = member;
         });
-
-      if (this.member !== null)
-        this.setGalleryImages();
     }
   }
 
@@ -134,7 +132,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
       take(1)).subscribe(params => {
       const tab = params['tab'];
       if (tab)
-        this.setSelectTabIndex(tab);
+        this.setSelectTabIndex(tab).finally();
     });
   }
 
