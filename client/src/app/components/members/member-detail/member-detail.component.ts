@@ -41,7 +41,6 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   username = inject(AccountService).loggedInUserSig()?.userName;
   router = inject(Router);
-  private route = inject(ActivatedRoute);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
   readonly messagesTabIndex = 3;
@@ -136,16 +135,27 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  setSelectTabIndex(tabIndex: number): void {
+  async setSelectTabIndex(tabIndex: number): Promise<void> {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
-      this.router.navigate([], { queryParams: { tab: tabIndex }, queryParamsHandling: 'merge' });
+      await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
 
-      this.memberMessage?.initBufferSizeAndViewport();
-      this._messageService.scrollToBottom();
+      if (tabIndex === this.messagesTabIndex) {
+        await this.createMessageHubConnection();
+        this.memberMessages?.initBufferSizeAndViewport();
+        this._messageService.scrollToBottom();
+      } else {
+        await this._messageService.stopHubConnection();
+      }
     }
   }
-}
+
+  async createMessageHubConnection(): Promise<void> {
+    const token = this.loggedInUserSig()?.token;
+    if (token) {
+      await this._messageService.createHubConnection(token);
+    }
+  }
 
   private updateOnlineUser(): void {
     effect(() => {
