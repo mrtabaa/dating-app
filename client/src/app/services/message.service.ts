@@ -60,15 +60,14 @@ export class MessageService {
       .build();
 
     await this.hubConnection.start()
-      .then(() => {
-        console.log('MessageHub connection started.');
-      });
+      .then(() => console.log('MessageHub connection started.'));
 
     await this.joinGroup()
       .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))
       .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to joined the chat with error:', err));
 
     this.getNewMessageResFromHub(); // to start the hubConnection
+    this.getNewMessageRes();
   }
 
   getNewMessageResFromHub(): void {
@@ -92,6 +91,19 @@ export class MessageService {
   async create(messageIn: MessageIn): Promise<void> {
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
     await this.hubConnection?.invoke(this._create, messageIn);
+  }
+
+  getNewMessageRes(): void {
+    this.hubConnection?.off(this._newMessageRes); // Remove existing listener to prevent memory leak
+    this.hubConnection?.on(this._newMessageRes, (messageRes: Message) => {
+      if (messageRes) {
+        // console.log(messageRes);
+        this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
+        this.messagesSig.update(messages => [...messages, messageRes]); // implicit return
+
+        this.scrollToBottom();
+      }
+    });
   }
 
   async stopHubConnection(): Promise<void | null> {
