@@ -25,6 +25,7 @@ export class MessageService {
   private _hubUrl: string = environment.hubUrl + 'message';
   private _paginationHandler = new PaginationHandler();
   private readonly _joinGroup = "JoinGroup";
+  private readonly _UpdatedReadOn = "UpdatedReadOn";
   private readonly _create = "Create";
   private readonly _newMessageRes = "NewMessageRes";
 
@@ -66,7 +67,7 @@ export class MessageService {
       .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))
       .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to joined the chat with error:', err));
 
-    this.getNewMessageResFromHub(); // to start the hubConnection
+    this.getUpdatedReadOn();
     this.getNewMessageRes();
   }
 
@@ -86,6 +87,20 @@ export class MessageService {
   // TODO Also implement delete message.
   async joinGroup(): Promise<void> {
     await this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
+  }
+
+  getUpdatedReadOn(): void {
+    this.hubConnection?.off(this._UpdatedReadOn); // Remove existing listener to prevent memory leak
+    this.hubConnection?.on(this._UpdatedReadOn, (updatedReadOn: Date): void => {
+      const readOnDate = new Date(updatedReadOn); // convert SignalR ISO string to Date object
+
+      this.messagesSig.update(messages => // implicit return
+        messages.map(message => ({
+          ...message,
+          readOn: readOnDate
+        }))
+      )
+    });
   }
 
   async create(messageIn: MessageIn): Promise<void> {

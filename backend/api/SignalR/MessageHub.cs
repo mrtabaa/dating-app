@@ -28,13 +28,22 @@ public class MessageHub(
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-            await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
+            await GetUpdatedReadOn(userId, targetUserName, groupName);
         }
         catch (Exception ex)
         {
             // Log the exception or handle it appropriately
             throw new HubException("An error occurred while joining the group.", ex);
         }
+    }
+
+    private async Task GetUpdatedReadOn(ObjectId userId, string targetUserName, string groupName)
+    {
+        const string updatedReadOn = "UpdatedReadOn";
+
+        DateTime? updatedOn = await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
+
+        await Clients.Group(groupName).SendAsync(updatedReadOn, updatedOn, GetCancellationToken());
     }
 
     public async Task Create(MessageInDto messageInDto)
@@ -69,7 +78,7 @@ public class MessageHub(
         ObjectId? receiverUserId = await _userRepository.GetIdByUserNameAsync(receiverUserName.ToUpper(), cancellationToken)
                                    ?? throw new HubException("OtherUserId is invalid.");
 
-        return await _messageRepository.UpdateReadOnAsync(userId, receiverUserId.Value, cancellationToken);
+        return await _messageRepository.UpdateReadOnAsync(userId, receiverUserId, cancellationToken);
     }
 
     private async Task AddGroupNameToDb(ObjectId userId, string groupName, CancellationToken cancellationToken)
