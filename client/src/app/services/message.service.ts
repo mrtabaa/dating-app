@@ -71,18 +71,6 @@ export class MessageService {
     this.getNewMessageRes();
   }
 
-  getNewMessageResFromHub(): void {
-    this.hubConnection?.on(this._newMessageRes, (messageRes: Message) => {
-      if (messageRes) {
-        console.log(messageRes);
-        this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
-        this.messagesSig.update(messages => [...messages, messageRes]);
-
-        this.scrollToBottom();
-      }
-    });
-  }
-
   // TODO If both parties are online, mark created messages as Read.
   // TODO Implement delete message.
   async joinGroup(): Promise<void> {
@@ -140,4 +128,3 @@ export class MessageService {
     }
   }
 }
-
