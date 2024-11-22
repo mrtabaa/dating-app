@@ -84,7 +84,7 @@ export class MessageService {
   }
 
   // TODO If both parties are online, mark created messages as Read.
-  // TODO Also implement delete message.
+  // TODO Implement delete message.
   async joinGroup(): Promise<void> {
     await this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
   }

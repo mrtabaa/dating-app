@@ -24,6 +24,7 @@ public class MessageHub(
 
         await AddGroupNameToDb(userId, groupName, GetCancellationToken());
 
+        // TODO Handle exceptions with middleware
         try
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
@@ -75,8 +76,8 @@ public class MessageHub(
 
     private async Task<DateTime?> UpdateReadOnAsync(ObjectId userId, string receiverUserName, CancellationToken cancellationToken)
     {
-        ObjectId? receiverUserId = await _userRepository.GetIdByUserNameAsync(receiverUserName.ToUpper(), cancellationToken)
-                                   ?? throw new HubException("OtherUserId is invalid.");
+        ObjectId receiverUserId = await _userRepository.GetIdByUserNameAsync(receiverUserName.ToUpper(), cancellationToken)
+                                  ?? throw new HubException("OtherUserId is invalid.");
 
         return await _messageRepository.UpdateReadOnAsync(userId, receiverUserId, cancellationToken);
     }
