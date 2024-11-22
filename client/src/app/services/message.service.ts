@@ -109,7 +109,14 @@ export class MessageService {
     });
   }
 
+  async leaveGroup(): Promise<void> {
+    await this.hubConnection?.invoke('LeaveGroup', this.targetUserName)
+      .then(() => console.log(this._loggedInUserSig()?.userName, 'left the group.'))
+      .catch(err => console.log(err));
+  }
+
   async stopHubConnection(): Promise<void | null> {
+    await this.leaveGroup();
     await this.hubConnection?.stop();
   }
 
