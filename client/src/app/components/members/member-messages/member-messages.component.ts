@@ -139,7 +139,10 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit {
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
             this._totalPages = response.pagination.totalPages;
-            this._messageService.messagesSig.update(messages => [...(response.result?.reverse() ?? []), ...messages]);
+            this._messageService.messagesSig.update(messages => {
+              messages = [];
+              return [...(response.result?.reverse() ?? []), ...messages];
+            });
 
             if (this._isFirstLoad && this.viewport) {
               this._messageService.scrollToBottom();
