@@ -130,7 +130,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit {
     this._messageService.viewport = this.viewport;
   }
 
-  private getMessages(): void {
+  getMessages(): void {
     if (this._messageParams.pageNumber <= this._totalPages) {
       this._messageService.getInbox(this._messageParams)
         .pipe(
