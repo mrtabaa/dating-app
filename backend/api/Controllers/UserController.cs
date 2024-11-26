@@ -5,6 +5,7 @@ namespace api.Controllers;
 public class UserController(IUserRepository _userRepository, ITokenService _tokenService) : BaseApiController
 {
     #region User Management
+
     [HttpPut]
     public async Task<ActionResult> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
@@ -17,18 +18,18 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
         return updateResult is null || updateResult.MatchedCount == 0
             ? BadRequest("Update failed. Try again later or if the issue persists contact the support.")
             : !userUpdateDto.IsProfileCompleted && updateResult.MatchedCount == 1 && updateResult.ModifiedCount == 0
-            ? BadRequest("This info is already saved.")
-            : Ok(new Response(Message: "Your information has been updated successfully."));
+                ? BadRequest("This info is already saved.")
+                : Ok(new Response("Your information has been updated successfully."));
     }
+
     #endregion User Management
 
     #region Photo Management
+
     // only jpeg, jpg, png. Between 100KB and 4MB(2000x2000)
     [HttpPost("add-photo")]
-    public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions, FileSize(100_000, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions] [FileSize(100_000, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
     {
-        if (file is null) return BadRequest("No file is selected with this request.");
-
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
@@ -56,7 +57,7 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
 
         return updateResult is null || updateResult.ModifiedCount == 0
             ? BadRequest("Set as main photo failed. Try again in a few moments. If the issue persists contact the admin.")
-            : Ok(new Response(Message: "Set this photo as main succeeded."));
+            : Ok(new Response("Set this photo as main succeeded."));
     }
 
     [HttpDelete("delete-one-photo")]
@@ -74,5 +75,6 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
         photoDeleteResponse.SuccessMessage = "Photo got deleted successfully.";
         return photoDeleteResponse;
     }
+
     #endregion Photo Management
 }

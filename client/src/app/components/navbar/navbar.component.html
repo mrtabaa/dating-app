@@ -1,120 +1,112 @@
 <mat-toolbar [ngStyle]="{
     'background-color': loggedInUserSig() ? '#ffd9e1' : 'transparent'
     }">
-    <!--#region LEFT -->
-    <section class="left">
-        <a [routerLink]="['/main']" class="brand" [ngStyle]="{
+  <!--#region LEFT -->
+  <section class="left">
+    <a [ngStyle]="{
             'color': !loggedInUserSig() ? 'white' : 'palevioletred',
-        }">
-            <mat-icon>eco</mat-icon>
-            Hallboard
-        </a>
+        }" [routerLink]="['/main']" class="brand">
+      <mat-icon>eco</mat-icon>
+      Hallboard
+    </a>
 
-        <!-- #region NavLinks -->
-        @if(loggedInUserSig()) {
-        <nav mat-tab-nav-bar backgroundColor="primary" color="accent" [tabPanel]="tabPanel">
-            @for (link of links; track $index) {
-            @if(loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
+    <!-- #region NavLinks -->
+    @if (loggedInUserSig()) {
+      <nav mat-tab-nav-bar backgroundColor="primary" color="accent" [tabPanel]="tabPanel">
+        @for (link of links; track $index) {
+          @if (loggedInUserSig()?.roles?.includes('admin') || loggedInUserSig()?.roles?.includes('moderator')) {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
-                [active]="rla.isActive">
-                @if(link === "main") {
+               [active]="rla.isActive">
+              @if (link === "main") {
                 Members
-                }
-                @else {
-                {{link | titlecase}}
-                }
+              } @else {
+                {{ link | titlecase }}
+              }
             </a>
-            }
-            @else if(link !== "admin")
-            {
+          } @else if (link !== "admin") {
             <a mat-tab-link [routerLink]="['/' + link]" routerLinkActive #rla="routerLinkActive"
-                [active]="rla.isActive">
-                @if(link === "main") {
+               [active]="rla.isActive">
+              @if (link === "main") {
                 Members
-                }
-                @else {
-                {{link | titlecase}}
-                }
+              } @else {
+                {{ link | titlecase }}
+              }
             </a>
-            }
-            }
-        </nav>
-        <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+          }
         }
-        <!-- #endregion -->
-    </section>
+      </nav>
+      <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+    }
     <!-- #endregion -->
+  </section>
+  <!-- #endregion -->
 
-    <!--#region RIGHT -->
-    <section class="right">
-        <!-- if logged-in: show appMenu
-            else: show signup/login -->
-        @if(loggedInUserSig(); as user) {
-        <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
-            @if(user.profilePhotoUrl) {
-            <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority
-                alt="{{user.knownAs[0]}}">
-            }
-            @else if (user.knownAs){
-            {{user.knownAs[0] | titlecase}}
-            }
-            @else {
-            {{user.userName[0] | titlecase}}
-            }
-        </button>
+  <!--#region RIGHT -->
+  <section class="right">
+    <!-- if logged-in: show appMenu
+        else: show signup/login -->
+    @if (loggedInUserSig(); as user) {
+      <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
+        @if (user.profilePhotoUrl) {
+          <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" priority width="45" height="45" alt="">
+        } @else if (user.knownAs) {
+          {{ user.knownAs[0] | titlecase }}
+        } @else {
+          {{ user.userName[0] | titlecase }}
         }
-        <!-- menu if logged-in -->
-        <mat-menu #appMenu [class]="'mat-menu'">
-            <!-- profile -->
-            @if(loggedInUserSig(); as user) {
-            <div class="user-info">
-                <div class="profile-image">
-                    @if(user.profilePhotoUrl) {
-                    <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority alt="{{user.knownAs[0]}}">
-                    }
-                    @else if (user.knownAs){
-                    {{user.knownAs[0] | titlecase}}
-                    }
-                    @else {
-                    {{user.userName[0] | titlecase}}
-                    }
-                </div>
-                <div>
-                    <p>{{user.knownAs | titlecase}}</p>
-                    <p class="username">{{user.userName}}</p>
-                </div>
+      </button>
+    }
+    <!-- menu if logged-in -->
+    <mat-menu #appMenu [class]="'mat-menu'">
+      <!-- profile -->
+      @if (loggedInUserSig(); as user) {
+        <div class="user-info">
+          <div class="profile-image">
+            @if (user.profilePhotoUrl) {
+              <img mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" fill priority alt="{{user.knownAs[0]}}">
+            } @else if (user.knownAs) {
+              {{ user.knownAs[0] | titlecase }}
+            } @else {
+              {{ user.userName[0] | titlecase }}
+            }
+          </div>
+          <div>
+            <p>{{ user.knownAs | titlecase }}</p>
+            <p class="username">{{ user.userName }}</p>
+          </div>
+        </div>
+      }
+      <!-- navigation -->
+      @if (loggedInUserSig()?.userName !== 'admin') {
+        <!-- Admin doesn't need these options -->
+        <mat-divider></mat-divider>
+        <mat-list>
+          <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active">
+            <div mat-button class="menu-items">
+              <mat-icon>account_circle</mat-icon>
+              Your Profile
             </div>
-            }
-            <!-- navigation -->
-            @if(loggedInUserSig()?.userName !== 'admin') { <!-- Admin doesn't need these options -->
-            <mat-divider></mat-divider>
-            <mat-list>
-                <mat-list-item (click)="goToEditProfile()" routerLinkActive="router-link-active">
-                    <div mat-button class="menu-items">
-                        <mat-icon>account_circle</mat-icon>
-                        Your Profile
-                    </div>
-                </mat-list-item>
-                <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active">
-                    <div class="menu-items">
-                        <mat-icon>edit</mat-icon>
-                        Edit Profile
-                    </div>
-                </mat-list-item>
-                <!-- <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active">
-                    <div class="menu-items">
-                        <mat-icon>assignment_returned</mat-icon>
-                        Manage Products
-                    </div>
-                </mat-list-item> -->
-            </mat-list>
-            }
+          </mat-list-item>
+          <mat-list-item [routerLink]="['/user/edit']" routerLinkActive="router-link-active">
+            <div class="menu-items">
+              <mat-icon>edit</mat-icon>
+              Edit Profile
+            </div>
+          </mat-list-item>
+          <!-- <mat-list-item [routerLink]="['/admin/manage-products']" routerLinkActive="router-link-active">
+              <div class="menu-items">
+                  <mat-icon>assignment_returned</mat-icon>
+                  Manage Products
+              </div>
+          </mat-list-item> -->
+        </mat-list>
+      }
 
-            <mat-divider></mat-divider>
-            <div class="logout">
-                <button mat-raised-button (click)="logout()">Logout</button>
-            </div>
-        </mat-menu>
-    </section>
-    <!-- #endregion -->
+      <mat-divider></mat-divider>
+      <div class="logout">
+        <button (click)="logout()" mat-raised-button>Logout</button>
+      </div>
+    </mat-menu>
+  </section>
+  <!-- #endregion -->
 </mat-toolbar>
