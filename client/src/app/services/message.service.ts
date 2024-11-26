@@ -24,10 +24,6 @@ export class MessageService {
   private _baseUrl: string = environment.apiUrl + 'message/';
   private _hubUrl: string = environment.hubUrl + 'message';
   private _paginationHandler = new PaginationHandler();
-  private readonly _joinGroup = "JoinGroup";
-  private readonly _UpdatedReadOn = "UpdatedReadOn";
-  private readonly _create = "Create";
-  private readonly _newMessageRes = "NewMessageRes";
 
   getInbox(messageParams: MessageParams): Observable<PaginatedResult<Message[]>> {
     let params = new HttpParams();
@@ -74,12 +70,12 @@ export class MessageService {
   // TODO If both parties are online, mark created messages as Read.
   // TODO Implement delete message.
   async joinGroup(): Promise<void> {
-    await this.hubConnection?.invoke(this._joinGroup, this.targetUserName);
+    await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName);
   }
 
   getUpdatedReadOn(): void {
-    this.hubConnection?.off(this._UpdatedReadOn); // Remove existing listener to prevent memory leak
-    this.hubConnection?.on(this._UpdatedReadOn, (updatedReadOn: Date): void => {
+    this.hubConnection?.off(SignalRMessages.UpdatedReadOn); // Remove existing listener to prevent memory leak
+    this.hubConnection?.on(SignalRMessages.UpdatedReadOn, (updatedReadOn: Date): void => {
       const readOnDate = new Date(updatedReadOn); // convert SignalR ISO string to Date object
 
       this.messagesSig.update(messages => // implicit return
@@ -93,12 +89,12 @@ export class MessageService {
 
   async create(messageIn: MessageIn): Promise<void> {
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
-    await this.hubConnection?.invoke(this._create, messageIn);
+    await this.hubConnection?.invoke(SignalRMessages.Create, messageIn);
   }
 
   getNewMessageRes(): void {
-    this.hubConnection?.off(this._newMessageRes); // Remove existing listener to prevent memory leak
-    this.hubConnection?.on(this._newMessageRes, (messageRes: Message) => {
+    this.hubConnection?.off(SignalRMessages.NewMessageRes); // Remove existing listener to prevent memory leak
+    this.hubConnection?.on(SignalRMessages.NewMessageRes, (messageRes: Message) => {
       if (messageRes) {
         // console.log(messageRes);
         this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
@@ -110,7 +106,7 @@ export class MessageService {
   }
 
   async leaveGroup(): Promise<void> {
-    await this.hubConnection?.invoke('LeaveGroup', this.targetUserName)
+    await this.hubConnection?.invoke(SignalRMessages.LeaveGroup, this.targetUserName)
       .then(() => console.log(this._loggedInUserSig()?.userName, 'left the group.'))
       .catch(err => console.log(err));
   }

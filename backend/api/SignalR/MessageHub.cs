@@ -31,18 +31,15 @@ public class MessageHub(
 
     private async Task GetUpdatedReadOn(ObjectId userId, string targetUserName, string groupName)
     {
-        const string updatedReadOn = "UpdatedReadOn";
-
         DateTime? updatedOn = await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
 
-        await Clients.Group(groupName).SendAsync(updatedReadOn, updatedOn, GetCancellationToken());
+        await Clients.Group(groupName).SendAsync(SignalRMessages.UpdatedReadOn, updatedOn, GetCancellationToken());
     }
 
     public async Task Create(MessageInDto messageInDto)
     {
         ObjectId userId = await GetUserId();
 
-        const string newMessageRes = "NewMessageRes";
         MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, GetCancellationToken())
                                 ?? throw new HubException("MessageDto is null. Message creation failed. Try again.");
 
@@ -51,12 +48,13 @@ public class MessageHub(
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName);
 
-        await Clients.Group(groupName).SendAsync(newMessageRes, messageDto, GetCancellationToken());
-        
+        await Clients.Group(groupName).SendAsync(SignalRMessages.NewMessageRes, messageDto, GetCancellationToken());
+
         ObjectId receiverUserId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
                                   ?? throw new HubException("OtherUserId is invalid.");
 
-        if (await _messageService.CheckIsMemberInGroupAsync(receiverUserId, groupName, GetCancellationToken())) await GetUpdatedReadOn(userId, messageDto.UserOrTargetUserName, groupName);
+        if (await _messageService.CheckIsMemberInGroupAsync(receiverUserId, groupName, GetCancellationToken()))
+            await GetUpdatedReadOn(userId, messageDto.UserOrTargetUserName, groupName);
     }
 
     public async Task LeaveGroup(string targetUserName)

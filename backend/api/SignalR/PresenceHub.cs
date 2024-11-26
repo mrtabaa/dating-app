@@ -3,10 +3,6 @@ namespace api.SignalR;
 [Authorize]
 public class PresenceHub(IPresenceTrackerService _presenceTrackerService, ITokenService _tokenService) : Hub
 {
-    // private const string _CheckUserIsOnline = "CheckUserIsOnline";
-    // private const string _CheckUserIsOffline = "CheckUserIsOffline";
-    private const string _GetOnlineUsers = "GetOnlineUsers";
-
     public override async Task OnConnectedAsync()
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
@@ -18,7 +14,7 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
 
         IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(GetCancellationToken());
 
-        await Clients.All.SendAsync(_GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
+        await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -32,7 +28,7 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
 
             IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(GetCancellationToken());
 
-            await Clients.All.SendAsync(_GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
+            await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
 
             await base.OnDisconnectedAsync(exception);
         }
