@@ -41,7 +41,8 @@ public class MessageHub(
     {
         DateTime? updatedOn = await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
 
-        await Clients.Group(groupName).SendAsync(SignalRMessages.UpdatedReadOn, updatedOn, GetCancellationToken());
+        if (updatedOn is not null)
+            await Clients.Group(groupName).SendAsync(SignalRMessages.UpdatedReadOn, updatedOn, GetCancellationToken());
     }
 
     public async Task Create(MessageInDto messageInDto)
