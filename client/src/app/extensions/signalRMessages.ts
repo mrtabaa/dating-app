@@ -1,4 +1,4 @@
-class SignalRMessages
+export class SignalRMessages
 {
   // PresenceHub
   static readonly GetOnlineUsers = 'GetOnlineUsers';

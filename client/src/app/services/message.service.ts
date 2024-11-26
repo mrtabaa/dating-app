@@ -10,6 +10,7 @@ import {MessageIn} from '../models/messageIn.model';
 import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {AccountService} from "./account.service";
+import {SignalRMessages} from "../extensions/signalRMessages";
 
 @Injectable({
   providedIn: 'root'
