@@ -1,115 +1,117 @@
 main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  .top {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1rem;
 
-    .top {
+    .header {
+      display: flex;
+      justify-content: center;
+    }
+
+    .gallery {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .photos {
+        width: 165px;
+
+        img {
+          border-radius: 5%;
+        }
+
+        .buttons {
+          display: flex;
+          justify-content: space-evenly;
+          align-items: center;
+        }
+      }
+
+      @mixin uploaderMixin {
+        min-width: 200px;
+
+        * {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        mat-card-content {
+          mat-icon {
+            width: 3rem;
+            height: 3rem;
+            font-size: 3rem;
+          }
+        }
+
+        input[type=file] {
+          display: none;
+        }
+      }
+
+      .nv-file-not-over {
+        border: rgb(206, 206, 206) solid 1px;
+
+        @include uploaderMixin();
+      }
+
+      .nv-file-over {
+        border: dotted 3px rgb(255, 114, 114);
+        background-color: rgb(253, 237, 240);
+
+        @include uploaderMixin();
+      }
+    }
+  }
+
+  .queue {
+    .title {
+      font-size: 1rem;
+      color: #673ab7;
+    }
+
+    .queue-length {
+      color: #673ab7;
+    }
+
+    .photos-queue {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1rem;
+
+      * {
+        display: flex;
+        flex: 1;
+      }
+    }
+
+    .process {
+      margin-top: 1rem;
+
+      .queue {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        color: #673ab7;
+
+        .progress-bar {
+          height: 1rem;
+          background-color: #673ab7;
+          border-radius: 0.5rem;
+        }
+      }
+
+      .buttons {
+        margin-top: 0.5rem;
+        display: flex;
         gap: 1rem;
-
-        .header {
-            display: flex;
-            justify-content: center;
-        }
-
-        .gallery {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            
-            .photos {
-                width: 165px;
-
-                img {
-                    border-radius: 5%;
-                }
-
-                .buttons {
-                    display: flex;
-                    justify-content: space-evenly;
-                    align-items: center;
-                }
-            }
-
-            @mixin uploaderMixin {
-                min-width: 200px;
-
-                * {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                }
-
-                mat-card-content {
-                    mat-icon {
-                        width: 3rem;
-                        height: 3rem;
-                        font-size: 3rem;
-                    }
-                }
-
-                input[type=file] {
-                    display: none;
-                }
-            }
-
-            .nv-file-not-over {
-                border: rgb(206, 206, 206) solid 1px;
-
-                @include uploaderMixin();
-            }
-
-            .nv-file-over {
-                border: dotted 3px rgb(255, 114, 114);
-                background-color: rgb(253, 237, 240);
-
-                @include uploaderMixin();
-            }
-        }
+      }
     }
-
-    .queue {
-        .title {
-            font-size: 1rem;
-            color: #673ab7;
-        }
-
-        .queue-length {
-            color: #673ab7;
-        }
-        .photos-queue {
-            display: flex;
-            flex-direction: column;
-            margin-top: 1rem;
-
-            * {
-                display: flex;
-                flex: 1;
-            }
-        }
-
-        .process {
-            margin-top: 1rem;
-
-            .queue {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: #673ab7;
-
-                .progress-bar {
-                    height: 1rem;
-                    background-color: #673ab7;
-                }
-            }
-
-            .buttons {
-                margin-top: 0.5rem;
-                display: flex;
-                gap: 1rem;
-            }
-        }
-    }
+  }
 }
