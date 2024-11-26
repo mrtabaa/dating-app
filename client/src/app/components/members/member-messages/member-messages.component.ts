@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, inject, Input, OnInit, Signal, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
 import {Message} from '../../../models/message.model';
 import {MessageService} from '../../../services/message.service';
 import {take} from 'rxjs';
@@ -37,7 +37,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit, AfterViewInit {
+export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() memberIn: Member | undefined;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
@@ -65,6 +65,10 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.setTargetUserNameAndViewport();
+  }
+
+  ngOnDestroy(): void {
+    this._messageService.stopHubConnection().finally();
   }
 
   async create(): Promise<void> {
