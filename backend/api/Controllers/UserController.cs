@@ -30,8 +30,6 @@ public class UserController(IUserRepository _userRepository, ITokenService _toke
     [HttpPost("add-photo")]
     public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions] [FileSize(100_000, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
     {
-        if (file is null) return BadRequest("No file is selected with this request.");
-
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
