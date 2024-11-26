@@ -6,7 +6,7 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
     public override async Task OnConnectedAsync()
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
-            ?? throw new ArgumentNullException("userId is null", nameof(userId));
+                           ?? throw new ArgumentNullException("userId is null", nameof(userId));
 
         await _presenceTrackerService.SaveConnectedUserAsync(userId.Value, Context.ConnectionId, GetCancellationToken());
 
@@ -36,5 +36,5 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
 
     private CancellationToken GetCancellationToken() =>
         Context.GetHttpContext()?.RequestAborted
-            ?? throw new HubException("CancellationToken is null which cannot be.");
+        ?? throw new HubException("CancellationToken is null which cannot be.");
 }
