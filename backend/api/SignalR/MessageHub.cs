@@ -21,12 +21,20 @@ public class MessageHub(
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
             await GetUpdatedReadOn(userId, targetUserName, groupName);
+
+            await NotifyMembersWhenJoined(groupName);
         }
         catch (Exception ex)
         {
             // Log the exception or handle it appropriately
             throw new HubException("An error occurred while joining the group.", ex);
         }
+    }
+
+    // Notify other member when joined back to group
+    private async Task NotifyMembersWhenJoined(string groupName)
+    {
+        await Clients.Group(groupName).SendAsync(SignalRMessages.NotifyMembersOnJoined, GetCancellationToken());
     }
 
     private async Task GetUpdatedReadOn(ObjectId userId, string targetUserName, string groupName)

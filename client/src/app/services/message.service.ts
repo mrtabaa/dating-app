@@ -71,6 +71,8 @@ export class MessageService {
   // TODO Implement delete message.
   async joinGroup(): Promise<void> {
     await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName);
+
+    await this.hubConnection?.invoke(SignalRMessages.NotifyMembersOnJoined);
   }
 
   getUpdatedReadOn(): void {
