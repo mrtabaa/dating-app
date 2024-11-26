@@ -48,7 +48,7 @@
     @if (loggedInUserSig(); as user) {
       <button class="menu-button" [mat-menu-trigger-for]="appMenu" mat-mini-fab>
         @if (user.profilePhotoUrl) {
-          <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" priority width="45" height="45">
+          <img class="top-avatar" mat-card-avatar ngSrc="{{user.profilePhotoUrl}}" priority width="45" height="45" alt="">
         } @else if (user.knownAs) {
           {{ user.knownAs[0] | titlecase }}
         } @else {
