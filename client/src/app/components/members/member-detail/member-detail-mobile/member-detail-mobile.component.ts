@@ -146,7 +146,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
         await this.createMessageHubConnection();
         this._isMemberMessageCompSig.set(true);
         this.isChatActive = true;
-        this.memberMessages?.getMessages(); // TODO Get new messages also when the user leaves chat room and returns
+        this.memberMessages?.getMessages();
         this.memberMessages?.initBufferSizeAndViewport();
         this._messageService.scrollToBottom();
       } else {
