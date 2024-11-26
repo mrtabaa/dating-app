@@ -138,7 +138,7 @@ export class PhotoEditorComponent implements OnInit {
 
             this.memberIn.photos.forEach(photo => {
               // unset previous main
-              if (photo.isMain === true)
+              if (photo.isMain)
                 photo.isMain = false;
 
               // set new selected main
