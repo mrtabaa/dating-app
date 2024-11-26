@@ -1,5 +1,4 @@
 var builder = WebApplication.CreateBuilder(args);
-// upgraded to 9.0
 
 #region Add services to the container.
 
