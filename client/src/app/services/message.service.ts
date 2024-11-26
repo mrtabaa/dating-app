@@ -7,7 +7,7 @@ import {PaginatedResult} from '../models/helpers/paginatedResult';
 import {PaginationHandler} from '../extensions/paginationHandler';
 import {MessageParams} from '../models/helpers/message-params';
 import {MessageIn} from '../models/messageIn.model';
-import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
+import {HubConnection, HubConnectionBuilder, HubConnectionState} from '@microsoft/signalr';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {AccountService} from "./account.service";
 import {SignalRMessages} from "../extensions/signalRMessages";
@@ -115,8 +115,10 @@ export class MessageService {
   }
 
   async stopHubConnection(): Promise<void | null> {
-    await this.leaveGroup();
-    await this.hubConnection?.stop();
+    if (this.hubConnection?.state === HubConnectionState.Connected) {
+      await this.leaveGroup();
+      await this.hubConnection?.stop();
+    }
   }
 
   /**
