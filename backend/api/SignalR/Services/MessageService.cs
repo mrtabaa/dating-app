@@ -27,8 +27,7 @@ public class MessageService : IMessageService
         await _collection.AsQueryable()
             .Where(appUser => appUser.Id == userId)
             .SelectMany(appUser => appUser.MessageGroups)
-            .Where(groupName => groupName == groupNameIn)
-            .AnyAsync(cancellationToken);
+            .AnyAsync(groupName => groupName == groupNameIn, cancellationToken);
 
     #region Fields and constructors
 
