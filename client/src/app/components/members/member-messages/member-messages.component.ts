@@ -6,7 +6,6 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MessageParams} from '../../../models/helpers/message-params';
 import {CommonModule, NgOptimizedImage} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {ShortenStringPipe} from '../../../pipes/shorten-string.pipe';
 import {MessagePredicate} from '../../../enums/MessagePredicate.enum';
 import {Member} from '../../../models/member.model';
 import {IntlModule} from 'angular-ecmascript-intl';
@@ -27,14 +26,14 @@ import {PaginatedResult} from '../../../models/helpers/paginatedResult';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
-    selector: 'app-member-messages',
-    imports: [
-        CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
-        ShortenStringPipe, IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
-        MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
-    ],
-    templateUrl: './member-messages.component.html',
-    styleUrl: './member-messages.component.scss'
+  selector: 'app-member-messages',
+  imports: [
+    CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
+    IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
+    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
+  ],
+  templateUrl: './member-messages.component.html',
+  styleUrl: './member-messages.component.scss'
 })
 export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() memberIn: Member | undefined;
@@ -89,6 +88,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
         userOrTargetKnownAs: this.loggedInUserSig()?.knownAs,
         userOrTargetProfilePhoto: this.loggedInUserSig()?.profilePhotoUrl,
         content: messageIn.content,
+        height: 0 // used in appCdkDynamicHeightDir to calculate a message height
       }
 
       this.createMessageCtrl.setValue(null);

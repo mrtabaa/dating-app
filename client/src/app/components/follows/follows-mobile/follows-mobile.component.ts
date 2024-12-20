@@ -1,51 +1,44 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, inject } from '@angular/core';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
-import { Subscription, take } from 'rxjs';
-import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit';
-import { FollowParams } from '../../../models/helpers/follow-params';
-import { FollowPredicate } from '../../../enums/follow-predicate.enum';
-import { PaginatedResult } from '../../../models/helpers/paginatedResult';
-import { Pagination } from '../../../models/helpers/pagination';
-import { Member } from '../../../models/member.model';
-import { FollowService } from '../../../services/follow.service';
-import { LoadingService } from '../../../services/loading.service';
-import { ResponsiveService } from '../../../services/responsive.service';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { MemberCardComponent } from '../../members/member-card/member-card.component';
-import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { ApiResponseMessage } from '../../../models/helpers/api-response-message';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {Component, EventEmitter, inject, OnDestroy, OnInit, Output} from '@angular/core';
+import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
+import {Subscription, take} from 'rxjs';
+import {FollowModifiedEmit} from '../../../models/helpers/follow-modified-emit';
+import {FollowParams} from '../../../models/helpers/follow-params';
+import {FollowPredicate} from '../../../enums/follow-predicate.enum';
+import {PaginatedResult} from '../../../models/helpers/paginatedResult';
+import {Pagination} from '../../../models/helpers/pagination';
+import {Member} from '../../../models/member.model';
+import {FollowService} from '../../../services/follow.service';
+import {LoadingService} from '../../../services/loading.service';
+import {ResponsiveService} from '../../../services/responsive.service';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {ShortenStringPipe} from '../../../pipes/shorten-string.pipe';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {ApiResponseMessage} from '../../../models/helpers/api-response-message';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
-    selector: 'app-follows-mobile',
-    imports: [
-        CommonModule, FormsModule, NgOptimizedImage,
-        MemberCardComponent, FollowsMobileComponent,
-        ShortenStringPipe,
-        MatTabsModule, MatPaginatorModule, MatIconModule, MatButtonModule
-    ],
-    templateUrl: './follows-mobile.component.html',
-    styleUrl: './follows-mobile.component.scss'
+  selector: 'app-follows-mobile',
+  imports: [
+    CommonModule, FormsModule, NgOptimizedImage,
+    ShortenStringPipe,
+    MatTabsModule, MatPaginatorModule, MatIconModule, MatButtonModule
+  ],
+  templateUrl: './follows-mobile.component.html',
+  styleUrl: './follows-mobile.component.scss'
 })
 export class FollowsMobileComponent implements OnInit, OnDestroy {
   @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();
-
-  private _followService = inject(FollowService);
   isLoadingSig = inject(LoadingService).isLoadingsig;
   snackBar = inject(MatSnackBar);
   isMobileSig = inject(ResponsiveService).isMobileSig;
-
   subscribed: Subscription | undefined;
   members: Member[] | undefined;
-
   followPredicate = FollowPredicate;
   followParams: FollowParams | undefined;
   imageWH = 50;
-
   pagination: Pagination | undefined;
   pageSizeOptions = [5, 9, 25];
   hidePageSize = false;
@@ -53,6 +46,7 @@ export class FollowsMobileComponent implements OnInit, OnDestroy {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent | undefined;
+  private _followService = inject(FollowService);
 
   ngOnInit(): void {
     this.followParams = new FollowParams();
@@ -70,13 +64,13 @@ export class FollowsMobileComponent implements OnInit, OnDestroy {
 
     if (this.followParams)
       this.subscribed = this._followService.getFollows(this.followParams).subscribe({
-        next: (response: PaginatedResult<Member[]>) => {
-          if (response.result && response.pagination) {
-            this.members = response.result;
-            this.pagination = response.pagination;
+          next: (response: PaginatedResult<Member[]>) => {
+            if (response.result && response.pagination) {
+              this.members = response.result;
+              this.pagination = response.pagination;
+            }
           }
         }
-      }
       );
   }
 
@@ -87,14 +81,13 @@ export class FollowsMobileComponent implements OnInit, OnDestroy {
 
   /**
    * Set predicate based on each tab then call getFollows()
-   * @param event 
+   * @param event
    */
   onTabChange(event: MatTabChangeEvent) { // called on tab change
     if (event.tab.textLabel === "Following") {
       if (this.followParams)
         this.followParams.predicate = FollowPredicate.followings;
-    }
-    else {
+    } else {
       if (this.followParams)
         this.followParams.predicate = FollowPredicate.followers;
     }

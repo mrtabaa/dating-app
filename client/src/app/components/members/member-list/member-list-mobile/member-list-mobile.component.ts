@@ -16,7 +16,7 @@ import { MemberCardMobileComponent } from '../../member-card/member-card-mobile/
 @Component({
     selector: 'app-member-list-mobile',
     imports: [
-        MemberCardMobileComponent, OrderBottomSheetComponent, FilterBottomSheetComponent,
+        MemberCardMobileComponent,
         MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
     ],
     templateUrl: './member-list-mobile.component.html',
