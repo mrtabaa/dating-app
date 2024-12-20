@@ -18,15 +18,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 @Component({
-  selector: 'app-register',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
-    InputCvaComponent, DatePickerCvaComponent,
-    MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatProgressSpinnerModule
-  ],
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
+    selector: 'app-register',
+    imports: [
+        CommonModule, FormsModule, ReactiveFormsModule,
+        InputCvaComponent, DatePickerCvaComponent,
+        MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatProgressSpinnerModule
+    ],
+    templateUrl: './register.component.html',
+    styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   private accountService = inject(AccountService);

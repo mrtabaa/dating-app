@@ -3,11 +3,10 @@ import { Component, inject } from '@angular/core';
 import { take } from 'rxjs';
 
 @Component({
-  standalone: true,
-  imports: [],
-  selector: 'app-test-error',
-  templateUrl: './test-error.component.html',
-  styleUrls: ['./test-error.component.scss']
+    imports: [],
+    selector: 'app-test-error',
+    templateUrl: './test-error.component.html',
+    styleUrls: ['./test-error.component.scss']
 })
 export class TestErrorComponent {
   private http = inject(HttpClient);

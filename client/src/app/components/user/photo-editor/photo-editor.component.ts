@@ -19,16 +19,15 @@ import {ResponsiveService} from '../../../services/responsive.service';
 import {PhotoEditorMobileComponent} from './photo-editor-mobile/photo-editor-mobile.component';
 
 @Component({
-  selector: 'app-photo-editor',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage,
-    PhotoEditorMobileComponent,
-    MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
-    FileUploadModule
-  ],
-  templateUrl: './photo-editor.component.html',
-  styleUrls: ['./photo-editor.component.scss']
+    selector: 'app-photo-editor',
+    imports: [
+        CommonModule, NgOptimizedImage,
+        PhotoEditorMobileComponent,
+        MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
+        FileUploadModule
+    ],
+    templateUrl: './photo-editor.component.html',
+    styleUrls: ['./photo-editor.component.scss']
 })
 export class PhotoEditorComponent implements OnInit {
   @Input() memberIn: Member | undefined;

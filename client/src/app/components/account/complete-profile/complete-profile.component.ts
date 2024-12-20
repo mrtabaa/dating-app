@@ -27,19 +27,18 @@ import { ResponsiveService } from '../../../services/responsive.service';
 import { PhotoEditorMobileComponent } from '../../user/photo-editor/photo-editor-mobile/photo-editor-mobile.component';
 
 @Component({
-  selector: 'app-complete-profile',
-  standalone: true,
-  imports: [
-    FormsModule, ReactiveFormsModule, CommonModule, NgOptimizedImage,
-    PhotoEditorComponent, PhotoEditorMobileComponent, GooglePlacesComponent,
-    MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule,
-    MatExpansionModule, MatIconModule, MatCardModule, MatDividerModule
-  ],
-  templateUrl: './complete-profile.component.html',
-  styleUrl: './complete-profile.component.scss',
-  providers: [{
-    provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
-  }]
+    selector: 'app-complete-profile',
+    imports: [
+        FormsModule, ReactiveFormsModule, CommonModule, NgOptimizedImage,
+        PhotoEditorComponent, PhotoEditorMobileComponent, GooglePlacesComponent,
+        MatStepperModule, InputCvaComponent, RouterLink, MatButtonModule, MatInputModule,
+        MatExpansionModule, MatIconModule, MatCardModule, MatDividerModule
+    ],
+    templateUrl: './complete-profile.component.html',
+    styleUrl: './complete-profile.component.scss',
+    providers: [{
+            provide: STEPPER_GLOBAL_OPTIONS, useValue: { displayDefaultIndicatorType: false }
+        }]
 })
 export class CompleteProfileComponent implements OnInit {
   @ViewChild(GooglePlacesComponent) private googlePlacesComponent: GooglePlacesComponent | undefined;

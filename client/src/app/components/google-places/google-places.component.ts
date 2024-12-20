@@ -9,15 +9,14 @@ import { GooglePlacesService } from '../../services/google-places.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-google-places',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    NgOptimizedImage, MatButtonModule, MatInputModule, MatCardModule, MatDividerModule,
-    MatIconModule
-  ],
-  templateUrl: './google-places.component.html',
-  styleUrl: './google-places.component.scss'
+    selector: 'app-google-places',
+    imports: [
+        ReactiveFormsModule,
+        NgOptimizedImage, MatButtonModule, MatInputModule, MatCardModule, MatDividerModule,
+        MatIconModule
+    ],
+    templateUrl: './google-places.component.html',
+    styleUrl: './google-places.component.scss'
 })
 export class GooglePlacesComponent {
   private googlePlacesService = inject(GooglePlacesService);

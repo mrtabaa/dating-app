@@ -18,16 +18,15 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [
-    InputCvaComponent, RouterLink,
-    FormsModule, ReactiveFormsModule,
-    RecaptchaV3Module,
-    MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule, MatProgressSpinnerModule
-  ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+    selector: 'app-login',
+    imports: [
+        InputCvaComponent, RouterLink,
+        FormsModule, ReactiveFormsModule,
+        RecaptchaV3Module,
+        MatButtonModule, MatInputModule, MatCheckboxModule, MatDivider, MatSlideToggleModule, MatProgressSpinnerModule
+    ],
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnDestroy {
   private accountService = inject(AccountService);

@@ -20,16 +20,15 @@ import { MessagesMobileComponent } from './messages-mobile/messages-mobile.compo
 import { MemberDetailTabs } from '../../enums/member-detail-tabs.enum';
 
 @Component({
-  selector: 'app-messages',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, RouterModule,
-    MessagesMobileComponent,
-    ShortenStringPipe,
-    MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
-  ],
-  templateUrl: './messages.component.html',
-  styleUrls: ['./messages.component.scss']
+    selector: 'app-messages',
+    imports: [
+        CommonModule, NgOptimizedImage, RouterModule,
+        MessagesMobileComponent,
+        ShortenStringPipe,
+        MatListModule, MatIconModule, MatPaginatorModule, MatTableModule
+    ],
+    templateUrl: './messages.component.html',
+    styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit, OnDestroy {
   private _isMessageCompSig = inject(CommonService).isMessageCompSig;

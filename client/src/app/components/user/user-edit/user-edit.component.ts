@@ -28,17 +28,16 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ShortenStringPipe } from '../../../pipes/shorten-string.pipe';
 
 @Component({
-  selector: 'app-user-edit',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
-    PhotoEditorComponent, DatePickerCvaComponent, GooglePlacesComponent,
-    RecaptchaV3Module,
-    MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSlideToggleModule,
-    IntlModule, ShortenStringPipe
-  ],
-  templateUrl: './user-edit.component.html',
-  styleUrls: ['./user-edit.component.scss']
+    selector: 'app-user-edit',
+    imports: [
+        CommonModule, NgOptimizedImage, FormsModule, ReactiveFormsModule,
+        PhotoEditorComponent, DatePickerCvaComponent, GooglePlacesComponent,
+        RecaptchaV3Module,
+        MatCardModule, MatTabsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatSlideToggleModule,
+        IntlModule, ShortenStringPipe
+    ],
+    templateUrl: './user-edit.component.html',
+    styleUrls: ['./user-edit.component.scss']
 })
 export class UserEditComponent implements OnInit, OnDestroy {
   private _userService = inject(UserService);

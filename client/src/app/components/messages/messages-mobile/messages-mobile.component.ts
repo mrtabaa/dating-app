@@ -13,14 +13,13 @@ import { CdkVirtualScrollerComponent } from '../helpers/cdk-virtual-scroller/cdk
 import { PaginatedResult } from '../../../models/helpers/paginatedResult';
 
 @Component({
-  selector: 'app-messages-mobile',
-  standalone: true,
-  imports: [
-    CdkVirtualScrollerComponent,
-    MatTabsModule, MatIconModule
-  ],
-  templateUrl: './messages-mobile.component.html',
-  styleUrl: './messages-mobile.component.scss'
+    selector: 'app-messages-mobile',
+    imports: [
+        CdkVirtualScrollerComponent,
+        MatTabsModule, MatIconModule
+    ],
+    templateUrl: './messages-mobile.component.html',
+    styleUrl: './messages-mobile.component.scss'
 })
 export class MessagesMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;

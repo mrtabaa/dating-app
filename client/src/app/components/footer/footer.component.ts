@@ -6,14 +6,13 @@ import { AccountService } from '../../services/account.service';
 import { CommonService } from '../../services/common.service';
 
 @Component({
-  selector: 'app-footer',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatToolbarModule
-  ],
-  templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss'
+    selector: 'app-footer',
+    imports: [
+        CommonModule,
+        MatToolbarModule
+    ],
+    templateUrl: './footer.component.html',
+    styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
   loggedInUserSig = inject(AccountService).loggedInUserSig;

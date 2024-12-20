@@ -22,17 +22,16 @@ import {PresenceService} from '../../../services/hubs/presence.service';
 import {MessageService} from '../../../services/message.service';
 
 @Component({
-  selector: 'app-user-detail',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, RouterModule,
-    MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
-    MemberDetailMobileComponent, MemberMessagesComponent,
-    MatCardModule, MatTabsModule, MatButtonModule,
-    GalleryModule, LightboxModule, IntlModule
-  ],
-  templateUrl: './member-detail.component.html',
-  styleUrls: ['./member-detail.component.scss']
+    selector: 'app-user-detail',
+    imports: [
+        CommonModule, NgOptimizedImage, RouterModule,
+        MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
+        MemberDetailMobileComponent, MemberMessagesComponent,
+        MatCardModule, MatTabsModule, MatButtonModule,
+        GalleryModule, LightboxModule, IntlModule
+    ],
+    templateUrl: './member-detail.component.html',
+    styleUrls: ['./member-detail.component.scss']
 })
 export class MemberDetailComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;

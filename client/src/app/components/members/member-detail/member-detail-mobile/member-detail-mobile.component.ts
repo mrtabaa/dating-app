@@ -23,16 +23,15 @@ import {MessageService} from '../../../../services/message.service';
 import {CommonService} from "../../../../services/common.service";
 
 @Component({
-  selector: 'app-member-detail-mobile',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, RouterModule, ShortenStringPipe,
-    MemberMessagesComponent,
-    MatCardModule, MatTabsModule, MatButtonModule, MatDividerModule, MatIconModule,
-    GalleryModule, LightboxModule, IntlModule
-  ],
-  templateUrl: './member-detail-mobile.component.html',
-  styleUrl: './member-detail-mobile.component.scss'
+    selector: 'app-member-detail-mobile',
+    imports: [
+        CommonModule, NgOptimizedImage, RouterModule, ShortenStringPipe,
+        MemberMessagesComponent,
+        MatCardModule, MatTabsModule, MatButtonModule, MatDividerModule, MatIconModule,
+        GalleryModule, LightboxModule, IntlModule
+    ],
+    templateUrl: './member-detail-mobile.component.html',
+    styleUrl: './member-detail-mobile.component.scss'
 })
 export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;

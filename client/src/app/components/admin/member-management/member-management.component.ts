@@ -18,14 +18,13 @@ import { MatInputModule } from '@angular/material/input';
 import { AdminParams } from '../../../models/helpers/AdminParams';
 
 @Component({
-  selector: 'app-member-management',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
-    MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatPaginatorModule
-  ],
-  templateUrl: './member-management.component.html',
-  styleUrl: './member-management.component.scss'
+    selector: 'app-member-management',
+    imports: [
+        CommonModule, FormsModule, ReactiveFormsModule,
+        MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule, MatPaginatorModule
+    ],
+    templateUrl: './member-management.component.html',
+    styleUrl: './member-management.component.scss'
 })
 export class MemberManagementComponent implements OnInit {
   private adminService = inject(AdminService);

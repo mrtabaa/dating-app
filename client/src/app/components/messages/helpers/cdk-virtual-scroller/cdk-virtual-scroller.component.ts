@@ -9,14 +9,13 @@ import { MemberDetailTabs } from '../../../../enums/member-detail-tabs.enum';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-cdk-virtual-scroller',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, RouterModule,
-    ScrollingModule, ShortenStringPipe
-  ],
-  templateUrl: './cdk-virtual-scroller.component.html',
-  styleUrl: './cdk-virtual-scroller.component.scss'
+    selector: 'app-cdk-virtual-scroller',
+    imports: [
+        CommonModule, NgOptimizedImage, RouterModule,
+        ScrollingModule, ShortenStringPipe
+    ],
+    templateUrl: './cdk-virtual-scroller.component.html',
+    styleUrl: './cdk-virtual-scroller.component.scss'
 })
 export class CdkVirtualScrollerComponent implements OnInit {
   @ViewChild(CdkVirtualScrollViewport) private viewport: CdkVirtualScrollViewport | undefined;

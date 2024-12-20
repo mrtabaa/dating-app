@@ -21,16 +21,15 @@ import { ApiResponseMessage } from '../../../models/helpers/api-response-message
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-follows-mobile',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule, NgOptimizedImage,
-    MemberCardComponent, FollowsMobileComponent,
-    ShortenStringPipe,
-    MatTabsModule, MatPaginatorModule, MatIconModule, MatButtonModule
-  ],
-  templateUrl: './follows-mobile.component.html',
-  styleUrl: './follows-mobile.component.scss'
+    selector: 'app-follows-mobile',
+    imports: [
+        CommonModule, FormsModule, NgOptimizedImage,
+        MemberCardComponent, FollowsMobileComponent,
+        ShortenStringPipe,
+        MatTabsModule, MatPaginatorModule, MatIconModule, MatButtonModule
+    ],
+    templateUrl: './follows-mobile.component.html',
+    styleUrl: './follows-mobile.component.scss'
 })
 export class FollowsMobileComponent implements OnInit, OnDestroy {
   @Output() FollowModifiedOut = new EventEmitter<FollowModifiedEmit>();

@@ -12,15 +12,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import { CommonService } from '../../../services/common.service';
 
 @Component({
-  selector: 'app-nav-mobile',
-  standalone: true,
-  imports: [
-    RouterModule, CommonModule, NgOptimizedImage,
-    MatSidenavModule, MatToolbarModule, MatIconModule, MatButtonModule,
-    MatListModule, MatDividerModule
-  ],
-  templateUrl: './nav-mobile.component.html',
-  styleUrl: './nav-mobile.component.scss'
+    selector: 'app-nav-mobile',
+    imports: [
+        RouterModule, CommonModule, NgOptimizedImage,
+        MatSidenavModule, MatToolbarModule, MatIconModule, MatButtonModule,
+        MatListModule, MatDividerModule
+    ],
+    templateUrl: './nav-mobile.component.html',
+    styleUrl: './nav-mobile.component.scss'
 })
 export class NavMobileComponent {
   @ViewChild('drawer') drawer: MatDrawer | undefined;

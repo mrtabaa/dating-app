@@ -10,16 +10,15 @@ import { FooterComponent } from '../footer/footer.component';
 import { ResponsiveService } from '../../services/responsive.service';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [
-    CommonModule,
-    LoginRegisterComponent, WelcomeComponent, FooterComponent,
-    NgOptimizedImage, MatIconModule,
-    MatButtonModule, MatTabsModule, RouterLink, RouterLinkActive
-  ],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+    selector: 'app-home',
+    imports: [
+        CommonModule,
+        LoginRegisterComponent, WelcomeComponent, FooterComponent,
+        NgOptimizedImage, MatIconModule,
+        MatButtonModule, MatTabsModule, RouterLink, RouterLinkActive
+    ],
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
   isMobileSig = inject(ResponsiveService).isMobileSig;

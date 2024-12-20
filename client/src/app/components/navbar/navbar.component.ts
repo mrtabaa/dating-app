@@ -11,15 +11,14 @@ import { MatListModule } from '@angular/material/list';
 import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [
-    CommonModule, RouterLink, RouterLinkActive, NgOptimizedImage,
-    MatIconModule, MatToolbarModule, MatTabsModule, MatMenuModule,
-    MatButtonModule, MatListModule, MatDividerModule
-  ],
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+    selector: 'app-navbar',
+    imports: [
+        CommonModule, RouterLink, RouterLinkActive, NgOptimizedImage,
+        MatIconModule, MatToolbarModule, MatTabsModule, MatMenuModule,
+        MatButtonModule, MatListModule, MatDividerModule
+    ],
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
   private router = inject(Router);

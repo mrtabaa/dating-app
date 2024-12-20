@@ -14,14 +14,13 @@ import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-
 import { MemberCardMobileComponent } from '../../member-card/member-card-mobile/member-card-mobile.component';
 
 @Component({
-  selector: 'app-member-list-mobile',
-  standalone: true,
-  imports: [
-    MemberCardMobileComponent, OrderBottomSheetComponent, FilterBottomSheetComponent,
-    MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
-  ],
-  templateUrl: './member-list-mobile.component.html',
-  styleUrl: './member-list-mobile.component.scss'
+    selector: 'app-member-list-mobile',
+    imports: [
+        MemberCardMobileComponent, OrderBottomSheetComponent, FilterBottomSheetComponent,
+        MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
+    ],
+    templateUrl: './member-list-mobile.component.html',
+    styleUrl: './member-list-mobile.component.scss'
 })
 export class MemberListMobileComponent implements OnInit, OnDestroy {
   private _memberService = inject(MemberService);

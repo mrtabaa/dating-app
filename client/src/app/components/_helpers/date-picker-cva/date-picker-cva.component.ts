@@ -5,15 +5,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-date-picker-cva',
-  standalone: true,
-  imports: [
-    FormsModule, ReactiveFormsModule, MatInputModule,
-    MatDatepickerModule, 
-    MatNativeDateModule
-  ],
-  templateUrl: './date-picker-cva.component.html',
-  styleUrls: ['./date-picker-cva.component.scss']
+    selector: 'app-date-picker-cva',
+    imports: [
+        FormsModule, ReactiveFormsModule, MatInputModule,
+        MatDatepickerModule,
+        MatNativeDateModule
+    ],
+    templateUrl: './date-picker-cva.component.html',
+    styleUrls: ['./date-picker-cva.component.scss']
 })
 export class DatePickerCvaComponent implements ControlValueAccessor {
   @Input({ required: true }) label = '';

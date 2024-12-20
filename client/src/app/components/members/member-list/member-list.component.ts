@@ -17,15 +17,14 @@ import {FollowService} from '../../../services/follow.service';
 import {MatSliderModule} from '@angular/material/slider';
 
 @Component({
-  selector: 'app-member-list',
-  standalone: true,
-  imports: [
-    MemberCardComponent, FormsModule, ReactiveFormsModule,
-    MatPaginatorModule, MatSelectModule, MatButtonModule,
-    MatIconModule, MatDividerModule, MatSliderModule
-  ],
-  templateUrl: './member-list.component.html',
-  styleUrls: ['./member-list.component.scss']
+    selector: 'app-member-list',
+    imports: [
+        MemberCardComponent, FormsModule, ReactiveFormsModule,
+        MatPaginatorModule, MatSelectModule, MatButtonModule,
+        MatIconModule, MatDividerModule, MatSliderModule
+    ],
+    templateUrl: './member-list.component.html',
+    styleUrls: ['./member-list.component.scss']
 })
 export class MemberListComponent implements OnDestroy {
   subscribed: Subscription | undefined;

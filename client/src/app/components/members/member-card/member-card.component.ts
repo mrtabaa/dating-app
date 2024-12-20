@@ -13,15 +13,14 @@ import { FollowModifiedEmit } from '../../../models/helpers/follow-modified-emit
 import { PresenceService } from '../../../services/hubs/presence.service';
 
 @Component({
-  selector: 'app-member-card',
-  standalone: true,
-  imports: [
-    CommonModule,
-    NgOptimizedImage, RouterLink, ShortenStringPipe,
-    MatCardModule, MatIconModule
-  ],
-  templateUrl: './member-card.component.html',
-  styleUrls: ['./member-card.component.scss']
+    selector: 'app-member-card',
+    imports: [
+        CommonModule,
+        NgOptimizedImage, RouterLink, ShortenStringPipe,
+        MatCardModule, MatIconModule
+    ],
+    templateUrl: './member-card.component.html',
+    styleUrls: ['./member-card.component.scss']
 })
 export class MemberCardComponent {
   @Input() memberIn: Member | undefined;

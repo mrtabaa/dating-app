@@ -27,15 +27,14 @@ import {PaginatedResult} from '../../../models/helpers/paginatedResult';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-member-messages',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
-    ShortenStringPipe, IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
-    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
-  ],
-  templateUrl: './member-messages.component.html',
-  styleUrl: './member-messages.component.scss'
+    selector: 'app-member-messages',
+    imports: [
+        CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
+        ShortenStringPipe, IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
+        MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
+    ],
+    templateUrl: './member-messages.component.html',
+    styleUrl: './member-messages.component.scss'
 })
 export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() memberIn: Member | undefined;

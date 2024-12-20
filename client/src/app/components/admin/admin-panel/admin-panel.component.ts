@@ -6,15 +6,14 @@ import { PhotoManagementComponent } from '../photo-management/photo-management.c
 import { ResponsiveService } from '../../../services/responsive.service';
 
 @Component({
-  selector: 'app-admin-panel',
-  standalone: true,
-  imports: [
-    HasRoleDirective,
-    MatTabsModule,
-    MemberManagementComponent, PhotoManagementComponent
-  ],
-  templateUrl: './admin-panel.component.html',
-  styleUrl: './admin-panel.component.scss'
+    selector: 'app-admin-panel',
+    imports: [
+        HasRoleDirective,
+        MatTabsModule,
+        MemberManagementComponent, PhotoManagementComponent
+    ],
+    templateUrl: './admin-panel.component.html',
+    styleUrl: './admin-panel.component.scss'
 })
 export class AdminPanelComponent {
 isMobileSig = inject(ResponsiveService).isMobileSig;

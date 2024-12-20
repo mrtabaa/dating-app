@@ -17,15 +17,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-photo-editor-mobile',
-  standalone: true,
-  imports: [
-    CommonModule, NgOptimizedImage,
-    MatIconModule, MatButtonModule, MatFormFieldModule, MatCardModule,
-    FileUploadModule
-  ],
-  templateUrl: './photo-editor-mobile.component.html',
-  styleUrl: './photo-editor-mobile.component.scss'
+    selector: 'app-photo-editor-mobile',
+    imports: [
+        CommonModule, NgOptimizedImage,
+        MatIconModule, MatButtonModule, MatFormFieldModule, MatCardModule,
+        FileUploadModule
+    ],
+    templateUrl: './photo-editor-mobile.component.html',
+    styleUrl: './photo-editor-mobile.component.scss'
 })
 export class PhotoEditorMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;

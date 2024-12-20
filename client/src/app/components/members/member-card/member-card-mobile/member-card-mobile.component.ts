@@ -10,15 +10,14 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { PresenceService } from '../../../../services/hubs/presence.service';
 
 @Component({
-  selector: 'app-member-card-mobile',
-  standalone: true,
-  imports: [
-    CommonModule, RouterLink, NgOptimizedImage,
-    ShortenStringPipe,
-    MatCardModule, MatIconModule
-  ],
-  templateUrl: './member-card-mobile.component.html',
-  styleUrl: './member-card-mobile.component.scss'
+    selector: 'app-member-card-mobile',
+    imports: [
+        CommonModule, RouterLink, NgOptimizedImage,
+        ShortenStringPipe,
+        MatCardModule, MatIconModule
+    ],
+    templateUrl: './member-card-mobile.component.html',
+    styleUrl: './member-card-mobile.component.scss'
 })
 export class MemberCardMobileComponent {
   @Input() memberIn: Member | undefined;

@@ -7,15 +7,14 @@ import { MatInputModule } from '@angular/material/input';
 import { AutofocusDirective } from '../../../directives/autofocus.directive';
 
 @Component({
-  selector: 'app-input-cva',
-  standalone: true,
-  imports: [
-    AutofocusDirective,
-    FormsModule, ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
-  ],
-  templateUrl: './input-cva.component.html',
-  styleUrls: ['./input-cva.component.scss']
+    selector: 'app-input-cva',
+    imports: [
+        AutofocusDirective,
+        FormsModule, ReactiveFormsModule,
+        MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule
+    ],
+    templateUrl: './input-cva.component.html',
+    styleUrls: ['./input-cva.component.scss']
 })
 export class InputCvaComponent implements ControlValueAccessor {
   @Input({ required: true }) label = '';

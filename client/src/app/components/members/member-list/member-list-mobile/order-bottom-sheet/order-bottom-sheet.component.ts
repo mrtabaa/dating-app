@@ -7,14 +7,13 @@ import { MemberParams } from '../../../../../models/helpers/member-params';
 import { Subscription, tap } from 'rxjs';
 
 @Component({
-  selector: 'app-order-bottom-sheet',
-  standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    MatFormFieldModule, MatSelectModule
-  ],
-  templateUrl: './order-bottom-sheet.component.html',
-  styleUrl: './order-bottom-sheet.component.scss'
+    selector: 'app-order-bottom-sheet',
+    imports: [
+        ReactiveFormsModule,
+        MatFormFieldModule, MatSelectModule
+    ],
+    templateUrl: './order-bottom-sheet.component.html',
+    styleUrl: './order-bottom-sheet.component.scss'
 })
 export class OrderBottomSheetComponent implements OnInit, OnDestroy {
   private _memberService = inject(MemberService);

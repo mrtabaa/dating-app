@@ -14,15 +14,14 @@ import { CommonService } from '../../services/common.service';
 import { take } from 'rxjs';
 
 @Component({
-  selector: 'app-main',
-  standalone: true,
-  imports: [
-    RouterModule, CommonModule,
-    MemberListComponent, MemberListMobileComponent, FollowsComponent, MessagesComponent, AdminPanelComponent,
-    MatTabsModule, MatIconModule
-  ],
-  templateUrl: './main.component.html',
-  styleUrl: './main.component.scss'
+    selector: 'app-main',
+    imports: [
+        RouterModule, CommonModule,
+        MemberListComponent, MemberListMobileComponent, FollowsComponent, MessagesComponent, AdminPanelComponent,
+        MatTabsModule, MatIconModule
+    ],
+    templateUrl: './main.component.html',
+    styleUrl: './main.component.scss'
 })
 export class MainComponent implements AfterViewChecked {
   @ViewChild(MatTabGroup) tabGroup: MatTabGroup | undefined;

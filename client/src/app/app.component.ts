@@ -13,14 +13,13 @@ import {NavMobileComponent} from './components/navbar/nav-mobile/nav-mobile.comp
 import {CommonService} from './services/common.service';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    CommonModule, RouterOutlet, NgxSpinnerModule,
-    NavbarComponent, NavMobileComponent, FooterComponent, WelcomeComponent
-  ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    imports: [
+        CommonModule, RouterOutlet, NgxSpinnerModule,
+        NavbarComponent, NavMobileComponent, FooterComponent, WelcomeComponent
+    ],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
   accountService = inject(AccountService);

@@ -17,15 +17,14 @@ import { ResponsiveService } from '../../services/responsive.service';
 import { FollowsMobileComponent } from './follows-mobile/follows-mobile.component';
 
 @Component({
-  selector: 'app-follows',
-  standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    MemberCardComponent, FollowsMobileComponent,
-    MatTabsModule, MatPaginatorModule
-  ],
-  templateUrl: './follows.component.html',
-  styleUrl: './follows.component.scss'
+    selector: 'app-follows',
+    imports: [
+        CommonModule, FormsModule,
+        MemberCardComponent, FollowsMobileComponent,
+        MatTabsModule, MatPaginatorModule
+    ],
+    templateUrl: './follows.component.html',
+    styleUrl: './follows.component.scss'
 })
 export class FollowsComponent implements OnInit, OnDestroy {
   private followService = inject(FollowService);

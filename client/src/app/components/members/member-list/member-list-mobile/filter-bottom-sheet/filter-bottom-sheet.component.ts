@@ -7,14 +7,13 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MemberService } from '../../../../../services/member.service';
 
 @Component({
-  selector: 'app-filter-bottom-sheet',
-  standalone: true,
-  imports: [
-    FormsModule, ReactiveFormsModule, MatDividerModule,
-    MatSliderModule, MatSelectModule, MatButtonModule,
-  ],
-  templateUrl: './filter-bottom-sheet.component.html',
-  styleUrl: './filter-bottom-sheet.component.scss'
+    selector: 'app-filter-bottom-sheet',
+    imports: [
+        FormsModule, ReactiveFormsModule, MatDividerModule,
+        MatSliderModule, MatSelectModule, MatButtonModule,
+    ],
+    templateUrl: './filter-bottom-sheet.component.html',
+    styleUrl: './filter-bottom-sheet.component.scss'
 })
 export class FilterBottomSheetComponent {
   private _fb = inject(FormBuilder);
