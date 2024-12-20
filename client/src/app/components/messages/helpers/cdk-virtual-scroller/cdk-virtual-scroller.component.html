@@ -1,18 +1,23 @@
-@if(messagesIn) {
-<cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
-    [maxBufferPx]="bufferSize" itemSize="{{defaultItemSize}}" class="messages-container">
+@if (messagesIn) {
+  <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
+                               [maxBufferPx]="bufferSize" itemSize="{{defaultItemSize}}" class="messages-container">
     <div *cdkVirtualFor="let message of messagesIn" class="item"
-        [routerLink]="['/member/' + message.userOrTargetUserName]" [queryParams]="{tab: MemberDetailTabs.MESSAGES}">
-        <img ngSrc="{{message.userOrTargetProfilePhoto? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
-            priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName[0]}}">
-        <div class="details">
-            <div class="row1">
-                <p>{{message.userOrTargetUserName | shortenString: 15}}</p>
-                <p class="date">{{message.sentOn | date}}</p>
-            </div>
-            <p [ngStyle]="{'font-weight': message.readOn ? 'normal' : 'bold'}" class="row2">{{message.content|
-                shortenString: isMobileSig() ? 22 : 50}}</p>
+         [routerLink]="['/member/' + message.userOrTargetUserName]" [queryParams]="{tab: MemberDetailTabs.MESSAGES}">
+      @if (message.userOrTargetUserName) {
+        <img
+          ngSrc="{{message.userOrTargetProfilePhoto? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
+          priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName[0]}}">
+      }
+      <div class="details">
+        <div class="row1">
+          <p>{{ message.userOrTargetUserName | shortenString: 15 }}</p>
+          <p class="date">{{ message.sentOn | date }}</p>
         </div>
+        <p [ngStyle]="{'font-weight': message.readOn ? 'normal' : 'bold'}" class="row2">{{
+            message.content|
+              shortenString: isMobileSig() ? 22 : 50
+          }}</p>
+      </div>
     </div>
-</cdk-virtual-scroll-viewport>
+  </cdk-virtual-scroll-viewport>
 }
