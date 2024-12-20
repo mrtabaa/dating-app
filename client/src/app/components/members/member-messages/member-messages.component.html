@@ -29,8 +29,10 @@
         </cdk-virtual-scroll-viewport>
     }
     <form (ngSubmit)="create()" class="create">
+      <div class="content">
         <app-input-cva [formControl]="createMessageCtrl" [label]="'Your message'" [placeHolder]="'Enter your message'"
             [isFocused]="!isMobileSig()" [hint]="'Up to 500 characters.'" [isButtonSuffix]="true">
         </app-input-cva>
+      </div>
     </form>
 </main>

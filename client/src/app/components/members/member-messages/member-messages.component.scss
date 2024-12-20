@@ -1,12 +1,9 @@
-$navbar_h: 3rem;
-$tabGroup_h: 4.5rem;
+$tabGroup_h: 4rem;
+$create_h: 75px;
 
 main {
   height: calc(100dvh - $tabGroup_h);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   padding: 0 0.3rem;
 
   .warning-layout-helper {
@@ -23,8 +20,7 @@ main {
   }
 
   .messages-container {
-    height: inherit;
-    padding: 1rem 0;
+    height: calc(100dvh - $tabGroup_h - $create_h);
 
     .item {
       border-bottom: rgb(194, 194, 194) dotted 1px;
@@ -33,7 +29,6 @@ main {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-right: 1rem;
       min-height: 50px;
 
       * {
@@ -77,7 +72,14 @@ main {
   }
 
   .create {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
+
+    .content {
+      padding: 0 0.3rem;
+    }
   }
 }
 
@@ -87,5 +89,25 @@ main {
 
   main {
     height: calc(100dvh - $navbar-footer_h - $tabGroup_h);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .messages-container {
+      height: inherit;
+      padding: 1rem 0;
+
+      .item {
+        padding-right: 1rem;
+      }
+    }
+
+    .create {
+      position: static; // default
+
+      .content {
+        padding: 0;
+      }
+    }
   }
 }
