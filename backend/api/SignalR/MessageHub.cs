@@ -20,9 +20,7 @@ public class MessageHub(
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
-            await GetUpdatedReadOn(userId, targetUserName, groupName);
-
-            await NotifyMembersWhenJoined(groupName);
+            await UpdateAndGetReadOn(userId, targetUserName, groupName);
         }
         catch (Exception ex)
         {
@@ -31,18 +29,14 @@ public class MessageHub(
         }
     }
 
-    // Notify other member when joined back to group
-    private async Task NotifyMembersWhenJoined(string groupName)
+    private async Task<DateTime?> UpdateAndGetReadOn(ObjectId userId, string targetUserName, string groupName)
     {
-        await Clients.Group(groupName).SendAsync(SignalRMessages.NotifyMembersOnJoined, GetCancellationToken());
-    }
+        DateTime? updatedReadOn = await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
 
-    private async Task GetUpdatedReadOn(ObjectId userId, string targetUserName, string groupName)
-    {
-        DateTime? updatedOn = await UpdateReadOnAsync(userId, targetUserName, GetCancellationToken());
+        if (updatedReadOn is null) return null;
+        await Clients.Group(groupName).SendAsync(SignalRMessages.UpdatedReadOn, updatedReadOn, GetCancellationToken());
 
-        if (updatedOn is not null)
-            await Clients.Group(groupName).SendAsync(SignalRMessages.UpdatedReadOn, updatedOn, GetCancellationToken());
+        return updatedReadOn;
     }
 
     public async Task Create(MessageInDto messageInDto)
@@ -57,14 +51,21 @@ public class MessageHub(
 
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName);
 
+        ObjectId receiverUserId =
+            await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
+            ?? throw new HubException("OtherUserId is invalid.");
+
+        // Update and get ReadOn if target member is in group. Also update messageDto.ReadOn 
+        if (await _messageService.CheckIsMemberIsInGroupAsync(receiverUserId, groupName, GetCancellationToken()))
+            messageDto.ReadOn = await UpdateReadOnIfTargetIsInGroup(userId, groupName, messageInDto.ReceiverUserName, GetCancellationToken());
+
         await Clients.Group(groupName).SendAsync(SignalRMessages.NewMessageRes, messageDto, GetCancellationToken());
-
-        ObjectId receiverUserId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
-                                  ?? throw new HubException("OtherUserId is invalid.");
-
-        if (await _messageService.CheckIsMemberInGroupAsync(receiverUserId, groupName, GetCancellationToken()))
-            await GetUpdatedReadOn(userId, messageDto.UserOrTargetUserName, groupName);
     }
+
+    private async Task<DateTime> UpdateReadOnIfTargetIsInGroup(
+        ObjectId userId, string groupName, string targetUserName, CancellationToken cancellationToken) =>
+        await UpdateAndGetReadOn(userId, targetUserName, groupName)
+        ?? throw new HubException("DateTime cannot be null here.");
 
     public async Task LeaveGroup(string targetUserName)
     {
