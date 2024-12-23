@@ -1,7 +1,8 @@
 namespace api.DTOs;
 
-public record MessageInDto(
-    string TempId,
-    [Length(1, 500)] string Content,
-    string ReceiverUserName
-);
+public record MessageInDto
+{
+    public required string TempId { get; init; }
+    public required string Content { get; set; }
+    public required string ReceiverUserName { get; init; }
+}

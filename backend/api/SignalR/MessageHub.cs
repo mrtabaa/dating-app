@@ -41,6 +41,11 @@ public class MessageHub(
 
     public async Task Create(MessageInDto messageInDto)
     {
+        messageInDto.Content = messageInDto.Content.Trim();
+
+        if (ValidateContent(messageInDto.Content))
+            return;
+
         ObjectId userId = await GetUserId();
 
         MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, GetCancellationToken())
@@ -60,6 +65,12 @@ public class MessageHub(
             messageDto.ReadOn = await UpdateReadOnIfTargetIsInGroup(userId, groupName, messageInDto.ReceiverUserName, GetCancellationToken());
 
         await Clients.Group(groupName).SendAsync(SignalRMessages.NewMessageRes, messageDto, GetCancellationToken());
+    }
+
+    private static bool ValidateContent(string content)
+    {
+        string trimmedContent = content.Trim(); // Remove space/enter
+        return string.IsNullOrEmpty(trimmedContent) || trimmedContent.Length > 500;
     }
 
     private async Task<DateTime> UpdateReadOnIfTargetIsInGroup(

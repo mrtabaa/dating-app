@@ -47,7 +47,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _messageService = inject(MessageService);
   messagesSig: Signal<Message[]> = this._messageService.messagesSig;
   private _fb = inject(FormBuilder);
-  createMessageCtrl = this._fb.control('', [Validators.maxLength(1000)]);
+  createMessageCtrl = this._fb.control('',
+    [Validators.required, Validators.maxLength(500)]); // nonEnter pattern
   private _snackBar = inject(MatSnackBar);
   private _totalPages = 1;
   private _defaultItemSize = 50;
@@ -77,7 +78,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
       const messageIn: MessageIn = {
         tempId: tempId,
-        content: this.createMessageCtrl.value,
+        content: this.createMessageCtrl.value.trim(),
         receiverUserName: this.memberIn?.userName
       }
 
@@ -112,6 +113,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       } catch (error) {
         console.log(error);
       }
+
+      this.createMessageCtrl.setValue(null); // Reset textarea and remove enter '\n' after being hit
     }
   }
 
