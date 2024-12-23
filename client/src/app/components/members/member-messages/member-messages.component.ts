@@ -30,8 +30,8 @@ import {MatInput} from "@angular/material/input";
   selector: 'app-member-messages',
   imports: [
     CommonModule, NgOptimizedImage, ReactiveFormsModule, FormsModule,
-    IntlModule, InputCvaComponent, CdkDynamicHeightDirective,
-    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule
+    IntlModule, CdkDynamicHeightDirective,
+    MatIconModule, MatPaginatorModule, MatDividerModule, MatFormFieldModule, MatButtonModule, ScrollingModule, CdkTextareaAutosize, MatInput
   ],
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
