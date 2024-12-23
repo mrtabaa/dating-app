@@ -30,6 +30,7 @@ main {
       justify-content: space-between;
       align-items: center;
       min-height: 50px;
+      max-width: calc(95% - 0.3rem);
 
       * {
         padding: 0;
@@ -37,8 +38,6 @@ main {
       }
 
       .details {
-        max-width: 100%;
-
         .title {
           display: flex;
           align-items: center;
@@ -61,7 +60,7 @@ main {
         }
 
         .content {
-          word-wrap: normal;
+          word-wrap: anywhere;
         }
       }
 
@@ -79,16 +78,24 @@ main {
 
     .content {
       padding: 0 0.3rem;
+
+      mat-form-field {
+        width: 100%;
+      }
     }
   }
 }
 
 @media only screen and (min-width: 51rem) {
-  $navbar-footer_h: 64px * 2;
+  $navbar_h: 64px;
+  $footer_h: 64px;
   $tabGroup_h: 9rem;
+  $tabGroupPadding_height: 2rem;
 
   main {
-    height: calc(100dvh - $navbar-footer_h - $tabGroup_h);
+    //background-color: red;
+    width: 90%;
+    height: calc(100dvh - $navbar_h - $footer_h - $tabGroup_h - $tabGroupPadding_height);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -103,10 +110,16 @@ main {
     }
 
     .create {
-      position: static; // default
+      bottom: calc($footer_h + 1rem);
+      left: calc(15rem + 4% + 2rem); // left-side + parent's padding + left-side and right-side gap
 
       .content {
         padding: 0;
+
+        mat-form-field {
+          width: 50%;
+          min-width: 25rem;
+        }
       }
     }
   }

@@ -14,7 +14,6 @@ import {MessageIn} from '../../../models/messageIn.model';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatButtonModule} from '@angular/material/button';
-import {InputCvaComponent} from '../../_helpers/input-cva/input-cva.component';
 import {ResponsiveService} from '../../../services/responsive.service';
 import {AccountService} from '../../../services/account.service';
 import {CdkVirtualScrollViewport, ScrollingModule} from '@angular/cdk/scrolling';
@@ -24,6 +23,8 @@ import {v4 as uuidv4} from 'uuid';
 import {CommonService} from '../../../services/common.service';
 import {PaginatedResult} from '../../../models/helpers/paginatedResult';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {CdkTextareaAutosize} from "@angular/cdk/text-field";
+import {MatInput} from "@angular/material/input";
 
 @Component({
   selector: 'app-member-messages',
@@ -91,8 +92,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
         content: messageIn.content,
         height: 0 // used in appCdkDynamicHeightDir to calculate a message height
       }
-
-      this.createMessageCtrl.setValue(null);
       //#endregion Create and add to messages for Optimistic approach
 
       // Send it to API
