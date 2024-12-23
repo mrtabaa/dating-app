@@ -23,7 +23,7 @@ public class MessageService : IMessageService
         return updateResult.ModifiedCount > 0;
     }
 
-    public async Task<bool> CheckIsMemberInGroupAsync(ObjectId userId, string groupNameIn, CancellationToken cancellationToken) =>
+    public async Task<bool> CheckIsMemberIsInGroupAsync(ObjectId userId, string groupNameIn, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
             .Where(appUser => appUser.Id == userId)
             .SelectMany(appUser => appUser.MessageGroups)
