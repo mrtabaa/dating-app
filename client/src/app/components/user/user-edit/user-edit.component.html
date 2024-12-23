@@ -1,167 +1,165 @@
 <div class="container">
-    @if (isAnyValueChanged() && !isLoadingSig() && !isMobileSig()) {
+  @if (isAnyValueChanged() && !isLoadingSig() && !isMobileSig()) {
     <mat-card class="warning">
-        <mat-card-content>
-            <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
-        </mat-card-content>
+      <mat-card-content>
+        <p><strong>Warning: </strong>You have made changes. Any unsaved changes will be lost!</p>
+      </mat-card-content>
     </mat-card>
-    }
-    @if(member) {
+  }
+  @if (member) {
     <div class="content">
-        @if(!isMobileSig()) {
+      @if (!isMobileSig()) {
         <section class="user-card">
-            <mat-card>
-                @for (photo of member.photos; track $index) {
-                @if (photo.isMain) {
+          <mat-card>
+            @for (photo of member.photos; track $index) {
+              @if (photo.isMain) {
                 <img mat-card-image ngSrc="{{photo.url_165}}" width="240" height="240" priority
-                    alt="Photo of {{member.knownAs}}">
+                     alt="Photo of {{member.knownAs}}">
+              }
+            }
+            @if (member.photos.length === 0) {
+              <img mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}" width="240" height="240" priority
+                   alt="Photo of {{member.knownAs}}">
+            }
+            <mat-card-content>
+              <div>
+                <strong>Location</strong>
+                <p>{{ member.city }}, {{ member.country }}</p>
+              </div>
+              <div>
+                <strong>Age</strong>
+                <p>{{ member.age }}</p>
+              </div>
+              <div>
+                <strong>Last Active</strong>
+                <p>{{ member.lastActive | intlRelativeTime }}</p>
+              </div>
+              <div>
+                <strong>User Since</strong>
+                <p>{{ member.created | date }}</p>
+              </div>
+            </mat-card-content>
+            <mat-card-actions>
+              <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+                @if (!recaptchaCtrl.value) {
+                  <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                } @else {
+                  <span style="color: #ba005c;">Validated</span>
                 }
-                }
-                @if (member.photos.length === 0) {
-                <img mat-card-image ngSrc="{{'./assets/images/defaults/user.png'}}" width="240" height="240" priority
-                    alt="Photo of {{member.knownAs}}">
-                }
-                <mat-card-content>
-                    <div>
-                        <strong>Location</strong>
-                        <p>{{member.city}}, {{member.country}}</p>
-                    </div>
-                    <div>
-                        <strong>Age</strong>
-                        <p>{{member.age}}</p>
-                    </div>
-                    <div>
-                        <strong>Last Active</strong>
-                        <p>{{member.lastActive | intlRelativeTime}}</p>
-                    </div>
-                    <div>
-                        <strong>User Since</strong>
-                        <p>{{member.created | date}}</p>
-                    </div>
-                </mat-card-content>
-                <mat-card-actions>
-                    <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
-                        @if(!recaptchaCtrl.value) {
-                        <span style="color: palevioletred;">Not a robot? Slide me!</span>
-                        }
-                        @else {
-                        <span style="color: #ba005c;">Validated</span>
-                        }
-                    </mat-slide-toggle>
-                    <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
+              </mat-slide-toggle>
+              <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid
                         || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button color="primary">
-                        Save Changes
-                    </button>
-                    <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
-                        mat-stroked-button color="warn">
-                        Reset
-                    </button>
-                </mat-card-actions>
-            </mat-card>
+                Save Changes
+              </button>
+              <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
+                      mat-stroked-button color="warn">
+                Reset
+              </button>
+            </mat-card-actions>
+          </mat-card>
         </section>
-        }
-        <mat-tab-group
-            [ngStyle]="{'padding-bottom': editAbout.isActive && isMobileSig() && isAnyValueChanged() ? '2rem' : '0'}"
-            mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
-            <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value | shortenString: isMobileSig() ? 4 : 20}}">
-                <div class="tab-contents">
-                    <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
-                        <mat-form-field appearaance="outline">
-                            <mat-label>Nickname/Name</mat-label>
-                            <input formControlName="knownAsCtrl" [value]="member.knownAs"
-                                placeholder="Your Nickname or Name" matInput>
-                            <mat-hint>Nickname between 1 to 50 characters</mat-hint>
-                            @if (KnownAsCtrl.hasError('minlength')) {
-                            <mat-error>
-                                Minimum of 1 character is required.
-                            </mat-error>
-                            }
-                            @if (KnownAsCtrl.hasError('maxlength')) {
-                            <mat-error>
-                                Maximum of 50 characters is reached.
-                            </mat-error>
-                            }
-                        </mat-form-field>
-                        <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'"
-                            [minDate]="minDate" [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
-                        </app-date-picker-cva>
-                        <mat-form-field appearaance="outline">
-                            <mat-label>Introduction</mat-label>
-                            <textarea cdkTextareaAutosize formControlName="introductionCtrl"
-                                [value]="member.introduction" placeholder="Say something about yourself" matInput>
+      }
+      <mat-tab-group
+        [ngStyle]="{'padding-bottom': editAbout.isActive && isMobileSig() && isAnyValueChanged() ? '2rem' : '0'}"
+        mat-stretch-tabs="false" mat-align-tabs="start" class="user-info">
+        <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value | shortenString: isMobileSig() ? 4 : 20}}">
+          <div class="tab-contents">
+            <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
+              <mat-form-field appearaance="outline">
+                <mat-label>Nickname/Name</mat-label>
+                <input formControlName="knownAsCtrl" [value]="member.knownAs"
+                       placeholder="Your Nickname or Name" matInput>
+                <mat-hint>Nickname between 1 to 50 characters</mat-hint>
+                @if (KnownAsCtrl.hasError('minlength')) {
+                  <mat-error>
+                    Minimum of 1 character is required.
+                  </mat-error>
+                }
+                @if (KnownAsCtrl.hasError('maxlength')) {
+                  <mat-error>
+                    Maximum of 50 characters is reached.
+                  </mat-error>
+                }
+              </mat-form-field>
+              <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'"
+                                   [minDate]="minDate" [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
+              </app-date-picker-cva>
+              <mat-form-field appearaance="outline">
+                <mat-label>Introduction</mat-label>
+                <textarea cdkTextareaAutosize formControlName="introductionCtrl"
+                          [value]="member.introduction" placeholder="Say something about yourself" matInput>
                             {{IntroductionCtrl.value}}
                             </textarea>
-                            <mat-hint>{{IntroductionCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                            @if (IntroductionCtrl.hasError('maxlength')) {
-                            <mat-error>
-                                Maximum of {{maxTextAreaChars}} characters is reached.
-                            </mat-error>
-                            }
-                        </mat-form-field>
-                        <mat-form-field appearaance="outline">
-                            <mat-label>Looking For</mat-label>
-                            <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
-                                placeholder="Enter what you're looking for" matInput>
+                <mat-hint>{{ IntroductionCtrl.value?.length }} of {{ maxTextAreaChars }}</mat-hint>
+                @if (IntroductionCtrl.hasError('maxlength')) {
+                  <mat-error>
+                    Maximum of {{ maxTextAreaChars }} characters is reached.
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field appearaance="outline">
+                <mat-label>Looking For</mat-label>
+                <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
+                          placeholder="Enter what you're looking for" matInput>
                             {{member.lookingFor}}
                             </textarea>
-                            <mat-hint>{{LookingForCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                            @if(IntroductionCtrl.hasError('maxlength')) {
-                            <mat-error>
-                                Maximum of {{maxTextAreaChars}} characters is reached.
-                            </mat-error>
-                            }
-                        </mat-form-field>
-                        <mat-form-field appearaance="outline">
-                            <mat-label>Interests</mat-label>
-                            <textarea cdkTextareaAutosize formControlName="interestsCtrl"
-                                placeholder="Enter your interests" matInput>
+                <mat-hint>{{ LookingForCtrl.value?.length }} of {{ maxTextAreaChars }}</mat-hint>
+                @if (IntroductionCtrl.hasError('maxlength')) {
+                  <mat-error>
+                    Maximum of {{ maxTextAreaChars }} characters is reached.
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field appearaance="outline">
+                <mat-label>Interests</mat-label>
+                <textarea cdkTextareaAutosize formControlName="interestsCtrl"
+                          placeholder="Enter your interests" matInput>
                         {{member.interests}}
                             </textarea>
-                            <mat-hint>{{InterestsCtrl.value?.length}} of {{maxTextAreaChars}}</mat-hint>
-                            @if(IntroductionCtrl.hasError('maxlength')) {
-                            <mat-error>
-                                Maximum of {{maxTextAreaChars}} characters is reached.
-                            </mat-error>
-                            }
-                        </mat-form-field>
-                        <mat-card>
-                        </mat-card>
-                        <app-google-places />
+                <mat-hint>{{ InterestsCtrl.value?.length }} of {{ maxTextAreaChars }}</mat-hint>
+                @if (IntroductionCtrl.hasError('maxlength')) {
+                  <mat-error>
+                    Maximum of {{ maxTextAreaChars }} characters is reached.
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-card>
+              </mat-card>
+              <app-google-places/>
 
-                        @if(isMobileSig() && isAnyValueChanged()) {
-                        <div class="mobile-submit">
-                            <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()"
-                                color="primary">
-                                @if(!recaptchaCtrl.value) {
-                                <span style="color: palevioletred;">Not a robot? Slide me!</span>
-                                }
-                                @else {
-                                <span style="color: #ba005c;">Validated</span>
-                                }
-                            </mat-slide-toggle>
-                            <div class="mobile-buttons">
-                                <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid 
-                                                || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button
+              @if (isMobileSig() && isAnyValueChanged()) {
+                <div class="mobile-submit">
+                  <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()"
                                     color="primary">
-                                    Save Changes
-                                </button>
-                                <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
-                                    mat-stroked-button color="warn">
-                                    Reset
-                                </button>
-                            </div>
-                        </div>
-                        }
-                    </form>
+                    @if (!recaptchaCtrl.value) {
+                      <span style="color: palevioletred;">Not a robot? Slide me!</span>
+                    } @else {
+                      <span style="color: #ba005c;">Validated</span>
+                    }
+                  </mat-slide-toggle>
+                  <div class="mobile-buttons">
+                    <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid
+                                                || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button
+                            color="primary">
+                      Save Changes
+                    </button>
+                    <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
+                            mat-stroked-button color="warn">
+                      Reset
+                    </button>
+                  </div>
                 </div>
-            </mat-tab>
-            <mat-tab label="Edit Photos">
-                <div class="tab-contents">
-                    <app-photo-editor [memberIn]="member" />
-                </div>
-            </mat-tab>
-        </mat-tab-group>
+              }
+            </form>
+          </div>
+        </mat-tab>
+        <mat-tab label="Edit Photos">
+          <div class="tab-contents">
+            <app-photo-editor [memberIn]="member"/>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
-    }
+  }
 </div>
 <!-- <p>{{ userEditFg.value | json }}</p> -->
