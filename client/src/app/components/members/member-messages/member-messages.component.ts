@@ -58,6 +58,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _messageParams = new MessageParams();
 
   ngOnInit(): void {
+    this.createMessageHubConnection().finally();
     this.initMessageParams();
     this.initBufferSizeAndViewport();
     this.getMessages();
@@ -69,6 +70,13 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnDestroy(): void {
     this._messageService.stopHubConnection().finally();
+  }
+
+  async createMessageHubConnection(): Promise<void> { // TODO: Rename all async methods to methodAsync
+    const token = this.loggedInUserSig()?.token;
+    if (token) {
+      await this._messageService.createHubConnection(token);
+    }
   }
 
   async create(): Promise<void> {

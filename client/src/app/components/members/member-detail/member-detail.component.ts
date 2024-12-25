@@ -138,21 +138,6 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
       await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
-
-      if (tabIndex === this.messagesTabIndex) {
-        await this.createMessageHubConnection();
-        this.memberMessages?.initBufferSizeAndViewport();
-        this._messageService.scrollToBottom();
-      } else {
-        await this._messageService.stopHubConnection();
-      }
-    }
-  }
-
-  async createMessageHubConnection(): Promise<void> {
-    const token = this.loggedInUserSig()?.token;
-    if (token) {
-      await this._messageService.createHubConnection(token);
     }
   }
 

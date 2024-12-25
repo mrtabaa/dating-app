@@ -142,24 +142,12 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
       await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
 
       if (tabIndex === this.messagesTabIndex) {
-        await this.createMessageHubConnection();
-        this._isMemberMessageCompSig.set(true);
+        this._isMemberMessageCompSig.set(true); // TODO: Remove these
         this.isChatActive = true;
-        this.memberMessages?.getMessages();
-        this.memberMessages?.initBufferSizeAndViewport();
-        this._messageService.scrollToBottom();
       } else {
         this._isMemberMessageCompSig.set(false);
-        await this._messageService.stopHubConnection();
         this.isChatActive = false;
       }
-    }
-  }
-
-  async createMessageHubConnection(): Promise<void> {
-    const token = this.loggedInUserSig()?.token;
-    if (token) {
-      await this._messageService.createHubConnection(token);
     }
   }
 
