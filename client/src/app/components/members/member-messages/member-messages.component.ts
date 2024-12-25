@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, effect, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
 import {Message} from '../../../models/message.model';
 import {MessageService} from '../../../services/message.service';
 import {take} from 'rxjs';
@@ -53,9 +53,16 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _snackBar = inject(MatSnackBar);
   private _totalPages = 1;
   private _defaultItemSize = 50;
-  private readonly MAX_BUFFER_SIZE = 1000 * this._defaultItemSize; // Assuming 1000 messages as an upper limit
   private _isFirstLoad = true;
   private _messageParams = new MessageParams();
+
+  constructor() {
+    effect(() => {
+      // Call scrollToEnd() every time targetMember receives a new message in the messagesSig
+      this.messagesSig();
+      this.scrollToEnd();
+    });
+  }
 
   ngOnInit(): void {
     this.createMessageHubConnectionAsync().finally();
@@ -78,6 +85,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       await this._messageService.createHubConnectionAsync(token, this.memberIn?.userName);
     }
   }
+
 
   async create(): Promise<void> {
     this.isCreatingMessageSig.set(true); // disable loading ngx-spinner
@@ -169,7 +177,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  private scrollToEnd() {
+  public scrollToEnd() {
     try {
       setTimeout(() => {
         if (this.viewport) {
