@@ -109,7 +109,7 @@ public class MessageRepository : IMessageRepository
 
         UpdateResult updateResult = await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
 
-        if (updateResult.ModifiedCount == 0)
+        if (!updateResult.IsAcknowledged)
             throw new InvalidOperationException("Update ReadOn failed. No records were modified.");
 
         return readOnTimestamp;
