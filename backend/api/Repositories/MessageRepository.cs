@@ -94,20 +94,23 @@ public class MessageRepository : IMessageRepository
         return pagedMessages;
     }
 
-    public async Task<DateTime> UpdateReadOnAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    public async Task<DateTime> UpdateReadOnAsync(ObjectId partyOneId, ObjectId partyTwoId, CancellationToken cancellationToken)
     {
         DateTime readOnTimestamp = DateTime.UtcNow;
-        
+
         FilterDefinition<Message>? filter = Builders<Message>.Filter
             .Where(doc =>
-                doc.ReceiverId == userId && doc.SenderId == targetUserId
-                                         && doc.ReadOn == null
+                doc.SenderId == partyOneId && doc.ReceiverId == partyTwoId
+                                           && doc.ReadOn == null
             );
 
         UpdateDefinition<Message> updateDefReadOn = Builders<Message>.Update
             .Set(message => message.ReadOn, readOnTimestamp);
 
-        await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
+
+        if (updateResult.ModifiedCount == 0)
+            throw new InvalidOperationException("Update ReadOn failed. No records were modified.");
 
         return readOnTimestamp;
     }

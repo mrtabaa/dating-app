@@ -1,6 +1,6 @@
 namespace api.DTOs;
 
-public record MessageInDto
+public class MessageInDto
 {
     public required string TempId { get; init; }
     public required string Content { get; set; }
