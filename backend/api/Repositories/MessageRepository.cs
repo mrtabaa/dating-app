@@ -94,27 +94,23 @@ public class MessageRepository : IMessageRepository
         return pagedMessages;
     }
 
-    public async Task<DateTime?> UpdateReadOnAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
+    public async Task<DateTime> UpdateReadOnAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken)
     {
-        FilterDefinition<Message>? filter = Builders<Message>.Filter.Where(doc =>
-            doc.ReceiverId == userId && doc.SenderId == targetUserId
-                                     && doc.ReadOn == null
-        );
+        DateTime readOnTimestamp = DateTime.UtcNow;
+        
+        FilterDefinition<Message>? filter = Builders<Message>.Filter
+            .Where(doc =>
+                doc.ReceiverId == userId && doc.SenderId == targetUserId
+                                         && doc.ReadOn == null
+            );
 
         UpdateDefinition<Message> updateDefReadOn = Builders<Message>.Update
-            .Set(message => message.ReadOn, DateTime.UtcNow);
+            .Set(message => message.ReadOn, readOnTimestamp);
 
         await _collection.UpdateManyAsync(filter, updateDefReadOn, null, cancellationToken);
 
-        return await GetDateTimeAsync(userId, targetUserId, cancellationToken);
+        return readOnTimestamp;
     }
-
-    private async Task<DateTime?> GetDateTimeAsync(ObjectId userId, ObjectId targetUserId, CancellationToken cancellationToken) =>
-        await _collection.AsQueryable()
-            .Where(doc =>
-                doc.ReceiverId == userId && doc.SenderId == targetUserId)
-            .Select(doc => doc.ReadOn)
-            .FirstOrDefaultAsync(cancellationToken);
 
     #endregion CRUD
 }
