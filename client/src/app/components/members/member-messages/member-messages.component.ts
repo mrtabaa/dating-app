@@ -106,7 +106,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
           this.bufferSize = Math.min(this.messagesSig().length * this._defaultItemSize, this.MAX_BUFFER_SIZE);
         } else { // delete message for API BadRequest response.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== unsavedMessage.tempId));
-          this._snackBar.open('Is your internet connected? Yes?! Refresh the page or login again.', 'Close',
+          this._snackBar.open('Sending failed. Try again, refresh the page or login again.', 'Close',
             {horizontalPosition: 'center', verticalPosition: 'top', duration: 10000});
         }
       } catch (error) {
@@ -145,7 +145,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
           if (response.result && response.pagination) {
             this._totalPages = response.pagination.totalPages;
             this._messageService.messagesSig.update(messages => {
-              messages = [];
               return [...(response.result?.reverse() ?? []), ...messages];
             });
 
@@ -161,6 +160,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
+  // TODO: Use this to fix scroll when messages exceed the height on fresh chat room
   private scrollToReloaded() {
     try {
       setTimeout(() => {
