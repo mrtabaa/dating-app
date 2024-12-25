@@ -1,6 +1,6 @@
 @if (member) {
   <main>
-    @if (!isChatActive) {
+    @if (!isOnMessageTab) {
       <section class="details">
         <section class="title">
           <div class="photo-info">
@@ -109,7 +109,7 @@
             <mat-icon [color]="messages.isActive ? 'primary' : ''">chat</mat-icon>
           </ng-template>
           <div class="messages">
-            @if (tabGroup.selectedIndex === messagesTabIndex) {
+            @if (isOnMessageTab) {
               <app-member-messages [memberIn]="member"/>
             }
           </div>

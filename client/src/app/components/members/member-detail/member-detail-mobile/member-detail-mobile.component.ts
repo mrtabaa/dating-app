@@ -39,7 +39,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   router = inject(Router);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
-  isChatActive = false;
+  isOnMessageTab = false;
   readonly messagesTabIndex = 2;
   member: Member | undefined;
   images: GalleryItem[] = [];
@@ -142,10 +142,10 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
 
       if (tabIndex === this.messagesTabIndex) {
         this._isMemberMessageCompSig.set(true); // To remove Header/Footer in AppComp while in chat
-        this.isChatActive = true;
+        this.isOnMessageTab = true;
       } else {
         this._isMemberMessageCompSig.set(false);
-        this.isChatActive = false;
+        this.isOnMessageTab = false;
       }
     }
   }
