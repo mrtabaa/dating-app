@@ -7,8 +7,11 @@ public class MessageHub(
     IUserRepository _userRepository,
     ITokenService _tokenService) : Hub
 {
-    public async Task JoinGroup(string targetUserName)
+    public async Task JoinGroup(string? targetUserName)
     {
+        if (string.IsNullOrEmpty(targetUserName))
+            throw new HubException("targetUserName cannot be null or empty.");
+
         ObjectId userId = await GetUserId();
 
         string groupName = GetGroupName(GetUserName(), targetUserName);
@@ -26,6 +29,27 @@ public class MessageHub(
         {
             // Log the exception or handle it appropriately
             throw new HubException("An error occurred while joining the group.", ex);
+        }
+    }
+
+    public async Task LeaveGroup(string? targetUserName)
+    {
+        if (string.IsNullOrEmpty(targetUserName))
+            throw new HubException("targetUserName cannot be null or empty.");
+
+        string groupName = GetGroupName(GetUserName(), targetUserName);
+
+        await RemoveGroupNameFromDb(await GetUserId(), groupName);
+
+        // TODO: Handle exceptions with middleware
+        try
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it appropriately
+            throw new HubException("An error occurred while leaving the group.", ex);
         }
     }
 
@@ -77,24 +101,6 @@ public class MessageHub(
         ObjectId userId, string groupName, string targetUserName, CancellationToken cancellationToken) =>
         await UpdateAndGetReadOn(userId, targetUserName, groupName)
         ?? throw new HubException("DateTime cannot be null here.");
-
-    public async Task LeaveGroup(string targetUserName)
-    {
-        string groupName = GetGroupName(GetUserName(), targetUserName);
-
-        await RemoveGroupNameFromDb(await GetUserId(), groupName);
-
-        // TODO Handle exceptions with middleware
-        try
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception or handle it appropriately
-            throw new HubException("An error occurred while leaving the group.", ex);
-        }
-    }
 
     private async Task<ObjectId> GetUserId() =>
         await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
