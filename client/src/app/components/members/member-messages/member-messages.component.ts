@@ -58,7 +58,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _messageParams = new MessageParams();
 
   ngOnInit(): void {
-    this.createMessageHubConnection().finally();
+    this.createMessageHubConnectionAsync().finally();
     this.initMessageParams();
     this.initBufferSizeAndViewport();
     this.getMessages();
@@ -69,13 +69,13 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnDestroy(): void {
-    this._messageService.stopHubConnection().finally();
+    this._messageService.stopHubConnectionAsync().finally();
   }
 
-  async createMessageHubConnection(): Promise<void> { // TODO: Rename all async methods to methodAsync
+  async createMessageHubConnectionAsync(): Promise<void> {
     const token = this.loggedInUserSig()?.token;
     if (token) {
-      await this._messageService.createHubConnection(token);
+      await this._messageService.createHubConnectionAsync(token);
     }
   }
 
@@ -105,7 +105,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       // Send it to API
       try {
         // Send the message to the API
-        await this._messageService.create(messageIn); // do NOT forget await to prevent race-conditions of dependant tasks
+        await this._messageService.createAsync(messageIn); // do NOT forget await to prevent race-conditions of dependant tasks
 
         if (this._messageService.newMessageRes) { // Keep unsavedMessage in messagesSig since it's added to DB
           this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
