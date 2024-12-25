@@ -11,8 +11,7 @@ public class MessageService : IMessageService
             null,
             cancellationToken);
 
-        return updateResult.MatchedCount > 0;
-        // return updateResult.MatchedCount > 1; // TODO: Use this after RemoveGroupNameFromDbAsync is implemented
+        return updateResult.MatchedCount == 1;
     }
 
     public async Task<bool> RemoveGroupNameFromDbAsync(ObjectId userId, string groupName, CancellationToken cancellationToken)
