@@ -22,20 +22,19 @@ import {PresenceService} from '../../../services/hubs/presence.service';
 import {MessageService} from '../../../services/message.service';
 
 @Component({
-    selector: 'app-user-detail',
-    imports: [
-        CommonModule, NgOptimizedImage, RouterModule,
-        MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
-        MemberDetailMobileComponent, MemberMessagesComponent,
-        MatCardModule, MatTabsModule, MatButtonModule,
-        GalleryModule, LightboxModule, IntlModule
-    ],
-    templateUrl: './member-detail.component.html',
-    styleUrls: ['./member-detail.component.scss']
+  selector: 'app-user-detail',
+  imports: [
+    CommonModule, NgOptimizedImage, RouterModule,
+    MatCardModule, MatTabsModule, MatButtonModule, MatIconModule,
+    MemberDetailMobileComponent, MemberMessagesComponent,
+    MatCardModule, MatTabsModule, MatButtonModule,
+    GalleryModule, LightboxModule, IntlModule
+  ],
+  templateUrl: './member-detail.component.html',
+  styleUrls: ['./member-detail.component.scss']
 })
 export class MemberDetailComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
-  @ViewChild('memberMessage') memberMessages: MemberMessagesComponent | undefined;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   username = inject(AccountService).loggedInUserSig()?.userName;

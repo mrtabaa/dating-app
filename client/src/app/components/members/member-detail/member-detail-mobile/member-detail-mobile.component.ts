@@ -35,7 +35,6 @@ import {CommonService} from "../../../../services/common.service";
 })
 export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
   @ViewChild('tabGroup') tabGroup: MatTabGroup | undefined;
-  @ViewChild(MemberMessagesComponent) memberMessages: MemberMessagesComponent | undefined;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
   router = inject(Router);
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
