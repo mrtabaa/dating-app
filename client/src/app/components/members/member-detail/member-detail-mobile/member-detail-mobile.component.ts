@@ -141,7 +141,7 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
       await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
 
       if (tabIndex === this.messagesTabIndex) {
-        this._isMemberMessageCompSig.set(true); // TODO: Remove these
+        this._isMemberMessageCompSig.set(true); // To remove Header/Footer in AppComp while in chat
         this.isChatActive = true;
       } else {
         this._isMemberMessageCompSig.set(false);
