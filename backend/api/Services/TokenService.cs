@@ -1,4 +1,5 @@
 namespace api.Services;
+
 public class TokenService : ITokenService
 {
     private readonly IMongoCollection<AppUser> _collection;
@@ -10,7 +11,7 @@ public class TokenService : ITokenService
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
 
-        string? tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
+        var tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 
         // throw exception if tokenValue is null
         _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
@@ -22,16 +23,17 @@ public class TokenService : ITokenService
 
     public async Task<string?> CreateToken(AppUser user, CancellationToken cancellationToken)
     {
-        string jtiValue = Guid.NewGuid().ToString();
+        var jtiValue = Guid.NewGuid().ToString();
 
         string? identifierHash = await InsertEncryptedUserId(user.Id, jtiValue, cancellationToken); // this securedId is stored in users collection to associate with the AppUser.
 
         if (!string.IsNullOrEmpty(identifierHash) && !string.IsNullOrEmpty(user.NormalizedUserName))
         {
-            var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
-            new(JwtRegisteredClaimNames.UniqueName, user.NormalizedUserName),
-            new(JwtRegisteredClaimNames.Jti, jtiValue), // TODO store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
+            var claims = new List<Claim>
+            {
+                new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
+                new(JwtRegisteredClaimNames.UniqueName, user.NormalizedUserName),
+                new(JwtRegisteredClaimNames.Jti, jtiValue) // TODO: store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 
             // Get user's roles and add them all into claims
@@ -44,12 +46,12 @@ public class TokenService : ITokenService
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddDays(7), // Set expiration days
-                SigningCredentials = creds,
+                SigningCredentials = creds
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            SecurityToken? token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
         }
@@ -57,27 +59,9 @@ public class TokenService : ITokenService
         return null;
     }
 
-    private async Task<string?> InsertEncryptedUserId(ObjectId userId, string jtiValue, CancellationToken cancellationToken)
-    {
-        string newObjectId = ObjectId.GenerateNewId().ToString();
-
-        string identifierHash = BCrypt.Net.BCrypt.HashPassword(newObjectId);
-
-        UpdateDefinition<AppUser> updatedSecuredToken = Builders<AppUser>.Update
-            .Set(appUser => appUser.IdentifierHash, identifierHash)
-            .Set(appUser => appUser.JtiValue, jtiValue);
-
-        UpdateResult updateResult = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken);
-
-        if (updateResult.ModifiedCount == 1)
-            return identifierHash;
-
-        return null;
-    }
-
     /// <summary>
-    /// Gets a the userIdHashed of the AppUser and returns the user's actual ObjectId from DB. 
-    /// It returns null if ObjectId or userIdHashed is invalid, Empty or null. 
+    ///     Gets a the userIdHashed of the AppUser and returns the user's actual ObjectId from DB.
+    ///     It returns null if ObjectId or userIdHashed is invalid, Empty or null.
     /// </summary>
     /// <param name="userIdHashed"></param>
     /// <param name="cancellationToken"></param>
@@ -92,5 +76,23 @@ public class TokenService : ITokenService
             .SingleOrDefaultAsync(cancellationToken);
 
         return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
+    }
+
+    private async Task<string?> InsertEncryptedUserId(ObjectId userId, string jtiValue, CancellationToken cancellationToken)
+    {
+        var newObjectId = ObjectId.GenerateNewId().ToString();
+
+        string identifierHash = BCrypt.Net.BCrypt.HashPassword(newObjectId);
+
+        UpdateDefinition<AppUser> updatedSecuredToken = Builders<AppUser>.Update
+            .Set(appUser => appUser.IdentifierHash, identifierHash)
+            .Set(appUser => appUser.JtiValue, jtiValue);
+
+        UpdateResult updateResult = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken);
+
+        if (updateResult.ModifiedCount == 1)
+            return identifierHash;
+
+        return null;
     }
 }
