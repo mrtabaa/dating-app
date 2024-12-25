@@ -61,9 +61,7 @@ export class MessageService {
     await this.hubConnection.start()
       .then(() => console.log('MessageHub connection started.'));
 
-    await this.joinGroupAsync()
-      .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))
-      .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to joined the chat with error:', err));
+    await this.joinGroupAsync();
 
     this.getUpdatedReadOn();
     this.getNewMessageRes();
@@ -72,7 +70,15 @@ export class MessageService {
   // TODO: If both parties are online, mark created messages as Read.
   // TODO: Implement delete message.
   async joinGroupAsync(): Promise<void> {
-    await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName);
+    await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName)
+      .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))
+      .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to join the chat with error:', err));
+  }
+
+  async leaveGroupAsync(): Promise<void> {
+    await this.hubConnection?.invoke(SignalRMessages.LeaveGroup, this.targetUserName)
+      .then(() => console.log(this._loggedInUserSig()?.userName, 'left the group.'))
+      .catch(err => console.log(this._loggedInUserSig()?.userName, 'failed to leave the chat with error:', err));
   }
 
   getUpdatedReadOn(): void {
@@ -105,12 +111,6 @@ export class MessageService {
         this.scrollToBottom();
       }
     });
-  }
-
-  async leaveGroupAsync(): Promise<void> {
-    await this.hubConnection?.invoke(SignalRMessages.LeaveGroup, this.targetUserName)
-      .then(() => console.log(this._loggedInUserSig()?.userName, 'left the group.'))
-      .catch(err => console.log(err));
   }
 
   async stopHubConnectionAsync(): Promise<void | null> {
