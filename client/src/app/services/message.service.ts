@@ -68,8 +68,8 @@ export class MessageService {
     this.getNewMessageRes();
   }
 
-  // TODO If both parties are online, mark created messages as Read.
-  // TODO Implement delete message.
+  // TODO: If both parties are online, mark created messages as Read.
+  // TODO: Implement delete message.
   async joinGroupAsync(): Promise<void> {
     await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName);
   }

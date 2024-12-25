@@ -15,7 +15,7 @@ public class MessageHub(
 
         await AddGroupNameToDb(userId, groupName);
 
-        // TODO Handle exceptions with middleware
+        // TODO: Handle exceptions with middleware
         try
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
