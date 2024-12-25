@@ -65,7 +65,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngAfterViewInit(): void {
-    this.setTargetUserNameAndViewport();
+    this.setViewPort();
   }
 
   ngOnDestroy(): void {
@@ -74,8 +74,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
   async createMessageHubConnectionAsync(): Promise<void> {
     const token = this.loggedInUserSig()?.token;
-    if (token) {
-      await this._messageService.createHubConnectionAsync(token);
+    if (token && this.memberIn?.userName) {
+      await this._messageService.createHubConnectionAsync(token, this.memberIn?.userName);
     }
   }
 
@@ -189,8 +189,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     this._messageParams.pageSize = 25;
   }
 
-  private setTargetUserNameAndViewport(): void {
-    if (this.memberIn && this.viewport)
-      this._messageService.setTargetUserNameAndViewPort(this.memberIn.userName, this.viewport);
+  private setViewPort(): void {
+    if (this.viewport)
+      this._messageService.setViewPort(this.viewport);
   }
 }

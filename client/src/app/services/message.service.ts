@@ -44,12 +44,13 @@ export class MessageService {
    * @param targetUserName
    * @param viewport
    */
-  setTargetUserNameAndViewPort(targetUserName: string, viewport: CdkVirtualScrollViewport): void {
-    this.targetUserName = targetUserName;
+  setViewPort(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
   }
 
-  async createHubConnectionAsync(token: string): Promise<void> {
+  async createHubConnectionAsync(token: string, targetUsername: string): Promise<void> {
+    this.targetUserName = targetUsername;
+
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
         accessTokenFactory: () => token
