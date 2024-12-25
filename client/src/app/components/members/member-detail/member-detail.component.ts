@@ -19,7 +19,6 @@ import {ResponsiveService} from '../../../services/responsive.service';
 import {MemberDetailMobileComponent} from './member-detail-mobile/member-detail-mobile.component';
 import {MemberMessagesComponent} from '../member-messages/member-messages.component';
 import {PresenceService} from '../../../services/hubs/presence.service';
-import {MessageService} from '../../../services/message.service';
 
 @Component({
   selector: 'app-user-detail',
@@ -46,7 +45,6 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   member: Member | undefined;
   images: GalleryItem[] = [];
   private _memberService = inject(MemberService);
-  private _messageService = inject(MessageService);
   private _followService = inject(FollowService);
   private snackBar = inject(MatSnackBar);
   private gallery = inject(Gallery);
