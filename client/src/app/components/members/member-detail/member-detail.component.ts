@@ -42,6 +42,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   onlineUsersSig = inject(PresenceService).onlineUsersSig;
   initLoad = true;
   readonly messagesTabIndex = 3;
+  isOnMessageTab = false;
   member: Member | undefined;
   images: GalleryItem[] = [];
   private _memberService = inject(MemberService);
@@ -137,6 +138,9 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
     if (this.tabGroup) {
       this.tabGroup.selectedIndex = tabIndex;
       await this.router.navigate([], {queryParams: {tab: tabIndex}, queryParamsHandling: 'merge'});
+
+      // Load/Destroy MessageComponent based on being on message tab or not
+      this.isOnMessageTab = tabIndex == this.messagesTabIndex;
     }
   }
 

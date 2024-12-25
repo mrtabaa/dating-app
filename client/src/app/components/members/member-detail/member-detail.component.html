@@ -103,7 +103,7 @@
           </div>
         </mat-tab>
         <mat-tab label="Messages">
-          @if (tabGroup.selectedIndex === messagesTabIndex) {
+          @if (isOnMessageTab) {
             <div class="tab-contents messages">
               <app-member-messages [memberIn]="member"/>
             </div>
