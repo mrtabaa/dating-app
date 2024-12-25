@@ -103,12 +103,13 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
           this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
 
           // temporarily increase the size to either of the length or the max size.
-          this.bufferSize = Math.min(this.messagesSig().length * this._defaultItemSize, this.MAX_BUFFER_SIZE);
+          this.scrollToEnd();
         } else { // delete message for API BadRequest response.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== unsavedMessage.tempId));
           this._snackBar.open('Sending failed. Try again, refresh the page or login again.', 'Close',
             {horizontalPosition: 'center', verticalPosition: 'top', duration: 10000});
         }
+
       } catch (error) {
         console.log(error);
       }
@@ -124,7 +125,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       if (event === range.start) {
         this._messageParams.pageNumber++;
         this.getMessages();
-        this.scrollToReloaded();
+        this.scrollToEnd();
       }
     }
   }
@@ -153,19 +154,18 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
               this.initBufferSizeAndViewport();
               this._isFirstLoad = false;
             } else
-              this.scrollToReloaded();
+              this.scrollToEnd();
           }
         }
       });
     }
   }
 
-  // TODO: Use this to fix scroll when messages exceed the height on fresh chat room
-  private scrollToReloaded() {
+  private scrollToEnd() {
     try {
       setTimeout(() => {
         if (this.viewport) {
-          this.viewport.scrollToIndex((this.messagesSig().length) - this._messageParams.pageSize * (this._messageParams.pageNumber - 1), 'instant');
+          this.viewport.scrollToIndex((this.messagesSig().length) - this._messageParams.pageSize * (this._messageParams.pageNumber - 1), 'smooth');
         }
       }, 0);
     } catch (err) {
