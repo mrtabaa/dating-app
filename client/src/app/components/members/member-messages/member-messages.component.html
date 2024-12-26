@@ -38,8 +38,8 @@
                     cdkTextareaAutosize matInput placeholder="Enter your message">
         </textarea>
           <mat-hint>{{ createMessageCtrl.value?.length }} of 500 characters.</mat-hint>
-          <button [disabled]="createMessageCtrl.invalid" mat-icon-button matSuffix
-                  type="submit">
+          <button (click)="create()" [disabled]="createMessageCtrl.invalid" mat-icon-button matSuffix
+                  type="button">
             <mat-icon>send</mat-icon>
           </button>
         </mat-form-field>
