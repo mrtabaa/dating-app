@@ -22,16 +22,17 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
         string? userName = Context.User?.GetUserName();
         if (!string.IsNullOrEmpty(userName))
         {
-            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId, GetCancellationToken());
+            // Do NOT use CancellationToken for this request or the ConnectionId does NOT get removed from DB on browser closed.
+            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
 
             // await Clients.Others.SendAsync(_CheckUserIsOffline, userName, cancellationToken);
 
-            IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(GetCancellationToken());
+            IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync();
 
-            await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
-
-            await base.OnDisconnectedAsync(exception);
+            await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos);
         }
+
+        await base.OnDisconnectedAsync(exception);
     }
 
     private CancellationToken GetCancellationToken() =>

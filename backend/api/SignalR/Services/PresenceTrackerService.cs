@@ -18,7 +18,7 @@ public class PresenceTrackerService : IPresenceTrackerService
             .Where(appUser => appUser.Id == userId)
             .Select(appUser => appUser.IsProfileCompleted)
             .FirstAsync(cancellationToken);
-            
+
         if (!isProfileCompleted) return;
 
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
@@ -41,11 +41,11 @@ public class PresenceTrackerService : IPresenceTrackerService
         return onlineUsersDtos;
     }
 
-    public async Task RemoveDisconnectedUserAsync(string userName, string connectionId, CancellationToken cancellationToken)
+    public async Task RemoveDisconnectedUserAsync(string userName, string connectionId)
     {
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .Pull(appUser => appUser.ConnectionsPresence, connectionId);
 
-        await _collection.UpdateOneAsync(appUser => appUser.NormalizedUserName == userName, updateDefinition, null, cancellationToken);
+        await _collection.UpdateOneAsync(appUser => appUser.NormalizedUserName == userName, updateDefinition);
     }
 }
