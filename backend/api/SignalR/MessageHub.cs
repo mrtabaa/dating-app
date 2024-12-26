@@ -32,26 +32,6 @@ public class MessageHub(
         }
     }
 
-    public async Task LeaveGroup(string? targetUserName)
-    {
-        if (string.IsNullOrEmpty(targetUserName))
-            throw new HubException("targetUserName cannot be null or empty.");
-
-        string groupName = GetGroupName(GetUserName(), targetUserName);
-
-        await RemoveGroupNameFromDb(await GetUserId(), groupName);
-
-        try
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-        }
-        catch (Exception ex)
-        {
-            // Log the exception or handle it appropriately
-            throw new HubException("An error occurred while leaving the group.", ex);
-        }
-    }
-
     private async Task<DateTime> UpdateReadOnAsync(ObjectId userId, string targetUserName, string groupName, MessageOperation operation)
     {
         ObjectId receiverUserId = await _userRepository.GetIdByUserNameAsync(targetUserName.ToUpper(), GetCancellationToken())
@@ -97,15 +77,42 @@ public class MessageHub(
         await Clients.Group(groupName).SendAsync(SignalRMessages.NewMessageRes, messageDto, GetCancellationToken());
     }
 
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        ObjectId userId = await GetUserId();
+
+        MessageGroup messageGroup = await _messageService.GetMessageGroupAsync(userId, Context.ConnectionId, GetCancellationToken())
+                                    ?? throw new HubException("MessageGroup is not found. DB MessageGroup removal will fail.");
+
+        if (!await _messageService.RemoveMessageGroupAsync(userId, messageGroup))
+            throw new HubException("Removing MessageGroup from DB failed.");
+
+        await base.OnDisconnectedAsync(exception);
+    }
+
+    private async Task AddGroupNameToDb(ObjectId userId, string groupName)
+    {
+        MessageGroup messageGroup = new(
+            Context.ConnectionId,
+            groupName
+        );
+
+        if (!await _messageService.AddMessageGroupAsync(userId, messageGroup, GetCancellationToken()))
+            throw new HubException("Add messageGroup to DB failed.");
+    }
+
+    private string GetUserName() =>
+        Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
+
+    private async Task<ObjectId> GetUserId() =>
+        await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
+        ?? throw new HubException("UserId is invalid. Login again.");
+
     private static bool ValidateContent(string content)
     {
         string trimmedContent = content.Trim(); // Remove space/enter
         return string.IsNullOrEmpty(trimmedContent) || trimmedContent.Length > 500;
     }
-
-    private async Task<ObjectId> GetUserId() =>
-        await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
-        ?? throw new HubException("UserId is invalid. Login again.");
 
     private static string GetGroupName(string caller, string other)
     {
@@ -113,21 +120,6 @@ public class MessageHub(
         bool stringCompare = string.CompareOrdinal(caller, otherUpper) < 0;
 
         return stringCompare ? $"{caller}-{otherUpper}" : $"{otherUpper}-{caller}";
-    }
-
-    private string GetUserName() =>
-        Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
-
-    private async Task AddGroupNameToDb(ObjectId userId, string groupName)
-    {
-        if (!await _messageService.AddGroupNameAsync(userId, groupName, GetCancellationToken()))
-            throw new HubException("Add groupName to DB failed.");
-    }
-
-    private async Task RemoveGroupNameFromDb(ObjectId userId, string groupName)
-    {
-        if (!await _messageService.RemoveGroupNameFromDbAsync(userId, groupName, GetCancellationToken()))
-            throw new HubException("Removing groupName from DB failed.");
     }
 
     private CancellationToken GetCancellationToken() =>
