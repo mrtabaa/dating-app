@@ -8,7 +8,6 @@ import {PaginationHandler} from '../extensions/paginationHandler';
 import {MessageParams} from '../models/helpers/message-params';
 import {MessageIn} from '../models/messageIn.model';
 import {HubConnection, HubConnectionBuilder, HubConnectionState} from '@microsoft/signalr';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {AccountService} from "./account.service";
 import {SignalRMessages} from "../extensions/signalRMessages";
 
@@ -19,7 +18,6 @@ export class MessageService {
   hubConnection: HubConnection | undefined;
   newMessageRes: Message | undefined;
   messagesSig = signal<Message[]>([]);
-  viewport: CdkVirtualScrollViewport | undefined;
   targetUserName: string | undefined;
   private _loggedInUserSig = inject(AccountService).loggedInUserSig;
   private _baseUrl: string = environment.apiUrl + 'message/';
@@ -36,16 +34,6 @@ export class MessageService {
       params = params.append('targetUserName', messageParams.targetUserName); // Set for THREAD
 
     return this._paginationHandler.getPaginatedResult<Message[]>(this._baseUrl, params);
-  }
-
-  /**
-   * Set targetUserName to join two parties to a group.
-   * Set viewport so scrollToBottom() works properly.
-   * @param targetUserName
-   * @param viewport
-   */
-  setViewPort(viewport: CdkVirtualScrollViewport): void {
-    this.viewport = viewport;
   }
 
   async createHubConnectionAsync(token: string, targetUsername: string): Promise<void> {
@@ -117,21 +105,6 @@ export class MessageService {
     if (this.hubConnection?.state === HubConnectionState.Connected) {
       await this.leaveGroupAsync();
       await this.hubConnection?.stop();
-    }
-  }
-
-  /**
-   * This moves scroll to the bottom on the first messages load and any time a new message is sent.
-   * Implemented in the service so it applies to the receiver of the message as well when this.hubConnection.on(this._sendMessage is triggered).
-   */
-  scrollToBottom(): void {
-    try {
-      setTimeout((): void => {
-        if (this.viewport)
-          this.viewport.scrollToIndex(this.messagesSig().length - 1, 'smooth');
-      }, 0);
-    } catch (err) {
-      console.error(err)
     }
   }
 }

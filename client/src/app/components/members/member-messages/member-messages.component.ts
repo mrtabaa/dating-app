@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, effect, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
+import {Component, effect, inject, Input, OnDestroy, OnInit, Signal, ViewChild} from '@angular/core';
 import {Message} from '../../../models/message.model';
 import {MessageService} from '../../../services/message.service';
 import {take} from 'rxjs';
@@ -36,7 +36,7 @@ import {MatInput} from "@angular/material/input";
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.scss'
 })
-export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MemberMessagesComponent implements OnInit, OnDestroy {
   @Input() memberIn: Member | undefined;
   isMobileSig = inject(ResponsiveService).isMobileSig;
   loggedInUserSig = inject(AccountService).loggedInUserSig;
@@ -53,12 +53,14 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   private _snackBar = inject(MatSnackBar);
   private _totalPages = 1;
   private _defaultItemSize = 50;
-  private _isFirstLoad = true;
+  private _canLoadOlderMessages = false;
+  private _canScrollInstantly = false;
+  private _isNewMessageAdded = false;
   private _messageParams = new MessageParams();
 
   constructor() {
     effect(() => {
-      // Call scrollToEnd() every time targetMember receives a new message in the messagesSig
+      // Call scrollToEnd() every time targetMember receives new message/s in the messagesSig
       this.messagesSig();
       this.scrollToEnd();
     });
@@ -67,12 +69,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnInit(): void {
     this.createMessageHubConnectionAsync().finally();
     this.initMessageParams();
-    this.initBufferSizeAndViewport();
+    this.initBufferSize();
     this.getMessages();
-  }
-
-  ngAfterViewInit(): void {
-    this.setViewPort();
   }
 
   ngOnDestroy(): void {
@@ -85,7 +83,6 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
       await this._messageService.createHubConnectionAsync(token, this.memberIn?.userName);
     }
   }
-
 
   async create(): Promise<void> {
     this.isCreatingMessageSig.set(true); // disable loading ngx-spinner
@@ -117,9 +114,8 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
 
         if (this._messageService.newMessageRes) { // Keep unsavedMessage in messagesSig since it's added to DB
           this.isCreatingMessageSig.set(false); // enable loading ngx-spinner
-
-          // temporarily increase the size to either of the length or the max size.
-          this.scrollToEnd();
+          this._isNewMessageAdded = true; // Use in scrollToEnd() to modify its index
+          this._canScrollInstantly = false; // scroll smoothly
         } else { // delete message for API BadRequest response.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== unsavedMessage.tempId));
           this._snackBar.open('Sending failed. Try again, refresh the page or login again.', 'Close',
@@ -135,21 +131,17 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   loadOlderMessages(event: number): void {
-    if (this.viewport && !this._isFirstLoad) {
+    if (this.viewport && this._canLoadOlderMessages) {
       const range = this.viewport.getRenderedRange();
 
       if (event === range.start) {
         this._messageParams.pageNumber++;
         this.getMessages();
-        this.scrollToEnd();
+        this._canLoadOlderMessages = false;
+        this._canScrollInstantly = true;
+        this._isNewMessageAdded = false;
       }
     }
-  }
-
-  initBufferSizeAndViewport(): void {
-    // Set/Reset bufferSize for performance.
-    this.bufferSize = this._messageParams.pageSize * this._defaultItemSize;
-    this._messageService.viewport = this.viewport;
   }
 
   getMessages(): void {
@@ -161,27 +153,28 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
         next: (response: PaginatedResult<Message[]>) => {
           if (response.result && response.pagination) {
             this._totalPages = response.pagination.totalPages;
+            this._canLoadOlderMessages = false;
+
             this._messageService.messagesSig.update(messages => {
               return [...(response.result?.reverse() ?? []), ...messages];
             });
-
-            if (this._isFirstLoad && this.viewport) {
-              this._messageService.scrollToBottom();
-              this.initBufferSizeAndViewport();
-              this._isFirstLoad = false;
-            } else
-              this.scrollToEnd();
           }
         }
       });
     }
   }
 
-  public scrollToEnd() {
+  private scrollToEnd() {
     try {
       setTimeout(() => {
         if (this.viewport) {
-          this.viewport.scrollToIndex((this.messagesSig().length) - this._messageParams.pageSize * (this._messageParams.pageNumber - 1), 'smooth');
+          const index = this._isNewMessageAdded
+            ? this.messagesSig().length
+            : this.messagesSig().length - this._messageParams.pageSize * (this._messageParams.pageNumber - 1);
+
+          this.viewport.scrollToIndex(index, this._canScrollInstantly ? 'instant' : 'smooth');
+
+          this._canLoadOlderMessages = true;
         }
       }, 0);
     } catch (err) {
@@ -197,8 +190,7 @@ export class MemberMessagesComponent implements OnInit, AfterViewInit, OnDestroy
     this._messageParams.pageSize = 25;
   }
 
-  private setViewPort(): void {
-    if (this.viewport)
-      this._messageService.setViewPort(this.viewport);
+  private initBufferSize(): void {
+    this.bufferSize = this._messageParams.pageSize * this._defaultItemSize;
   }
 }
