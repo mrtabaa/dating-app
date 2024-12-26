@@ -2,16 +2,6 @@ namespace api.SignalR.Services;
 
 public class PresenceTrackerService : IPresenceTrackerService
 {
-    #region Fields and constructors
-    private readonly IMongoCollection<AppUser> _collection;
-
-    public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings)
-    {
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
-    }
-    #endregion Fields and constructors
-
     public async Task SaveConnectedUserAsync(ObjectId userId, string connectionId, CancellationToken cancellationToken)
     {
         bool isProfileCompleted = await _collection.AsQueryable<AppUser>()
@@ -33,10 +23,7 @@ public class PresenceTrackerService : IPresenceTrackerService
 
         List<OnlineUsersDto> onlineUsersDtos = [];
 
-        foreach (AppUser appUser in appUsers)
-        {
-            onlineUsersDtos.Add(Mappers.ConvertAppUserToOnlineStatusDto(appUser));
-        }
+        foreach (AppUser appUser in appUsers) onlineUsersDtos.Add(Mappers.ConvertAppUserToOnlineStatusDto(appUser));
 
         return onlineUsersDtos;
     }
@@ -48,4 +35,16 @@ public class PresenceTrackerService : IPresenceTrackerService
 
         await _collection.UpdateOneAsync(appUser => appUser.NormalizedUserName == userName, updateDefinition);
     }
+
+    #region Fields and constructors
+
+    private readonly IMongoCollection<AppUser> _collection;
+
+    public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings)
+    {
+        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+    }
+
+    #endregion Fields and constructors
 }
