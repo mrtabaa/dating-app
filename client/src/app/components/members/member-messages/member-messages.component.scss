@@ -3,8 +3,14 @@ $form-field_h: 75px;
 
 main {
   background-color: blue;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  //margin-top: $tabGroup_h;
   overflow: hidden;
+  width: 100%;
   padding: 0 0.3rem;
+  //height: calc(100dvh - $tabGroup_h - $form-field_h);
 
   .warning-layout-helper {
     color: transparent;
@@ -74,9 +80,9 @@ main {
 
   .create {
     background-color: red;
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    //position: fixed;
+    //bottom: 0;
+    //left: 0;
     width: 100%;
 
     .content {
