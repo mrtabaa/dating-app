@@ -1,52 +1,97 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { AbstractControlOptions, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { RegisterValidators } from '../../_helpers/validators/register.validator';
-import { UserRegister } from '../../../models/account/user-register.model';
-import { AccountService } from '../../../services/account.service';
-import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatRadioModule } from '@angular/material/radio';
-import { InputCvaComponent } from '../../_helpers/input-cva/input-cva.component';
-import { DatePickerCvaComponent } from '../../_helpers/date-picker-cva/date-picker-cva.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ResponsiveService } from '../../../services/responsive.service';
-import { ReCaptchaV3Service } from 'ng-recaptcha';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {
+  AbstractControlOptions,
+  FormBuilder,
+  FormControl,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import {Router} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {RegisterValidators} from '../../_helpers/validators/register.validator';
+import {UserRegister} from '../../../models/account/user-register.model';
+import {AccountService} from '../../../services/account.service';
+import {CommonModule} from '@angular/common';
+import {MatButtonModule} from '@angular/material/button';
+import {MatInputModule} from '@angular/material/input';
+import {MatRadioModule} from '@angular/material/radio';
+import {InputCvaComponent} from '../../_helpers/input-cva/input-cva.component';
+import {DatePickerCvaComponent} from '../../_helpers/date-picker-cva/date-picker-cva.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {ResponsiveService} from '../../../services/responsive.service';
+import {ReCaptchaV3Service} from 'ng-recaptcha';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 @Component({
-    selector: 'app-register',
-    imports: [
-        CommonModule, FormsModule, ReactiveFormsModule,
-        InputCvaComponent, DatePickerCvaComponent,
-        MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatProgressSpinnerModule
-    ],
-    templateUrl: './register.component.html',
-    styleUrls: ['./register.component.scss']
+  selector: 'app-register',
+  imports: [
+    CommonModule, FormsModule, ReactiveFormsModule,
+    InputCvaComponent, DatePickerCvaComponent,
+    MatButtonModule, MatInputModule, MatRadioModule, MatSlideToggleModule, MatProgressSpinnerModule
+  ],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  isMobileSig = inject(ResponsiveService).isMobileSig;
+  recaptchaToken: string | undefined;
+  isRecaptchaValidating = false;
+  minDate = new Date();
+  maxDate = new Date();
+  subscribedRegisterUser!: Subscription;
+  subscribedRecaptcha: Subscription | undefined;
   private accountService = inject(AccountService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  //#region Forms Group/controler
+  registerFg = this.fb.group({
+    emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
+    usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
+    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
+    dateOfBirthCtrl: ['', [Validators.required]],
+    genderCtrl: ['female', [Validators.required]],
+    recaptchaCtrl: [false, [Validators.required]],
+  }, {validators: [RegisterValidators.confirmPassword]} as AbstractControlOptions);
   private snackBar = inject(MatSnackBar);
-  isMobileSig = inject(ResponsiveService).isMobileSig;
   private _recaptchaService = inject(ReCaptchaV3Service);
-  recaptchaToken: string | undefined;
-  isRecaptchaValidating = false;
 
-  minDate = new Date();
-  maxDate = new Date();
+  //#region Forms Properties
+  get EmailCtrl(): FormControl {
+    return this.registerFg.get('emailCtrl') as FormControl;
+  }
 
-  subscribedRegisterUser!: Subscription;
-  subscribedRecaptcha: Subscription | undefined;
+  //#endregion
+
+  get UsernameCtrl(): FormControl {
+    return this.registerFg.get('usernameCtrl') as FormControl;
+  }
+  //#endregion
+
+  get PasswordCtrl(): FormControl {
+    return this.registerFg.get('passwordCtrl') as FormControl;
+  }
+
+  get ConfirmPasswordCtrl(): FormControl {
+    return this.registerFg.get('confirmPasswordCtrl') as FormControl;
+  }
+
+  get DateOfBirthCtrl(): FormControl {
+    return this.registerFg.get('dateOfBirthCtrl') as FormControl;
+  }
+
+  get GenderCtrl(): FormControl {
+    return this.registerFg.get('genderCtrl') as FormControl;
+  }
+
+  get RecaptchaCtrl(): FormControl {
+    return this.registerFg.get('recaptchaCtrl') as FormControl;
+  }
 
   //#region Base
   ngOnInit() {
-    this.registerFg;
-
     // set datePicker year limitations
     const currentYear = new Date().getFullYear();
     this.minDate = new Date(currentYear - 99, 0, 1); // not older than 99 years
@@ -57,43 +102,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (this.subscribedRegisterUser)
       this.subscribedRegisterUser.unsubscribe();
   }
-  //#endregion
 
-  //#region Forms Group/controler
-  registerFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
-    usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-    passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
-    confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
-    dateOfBirthCtrl: ['', [Validators.required]],
-    genderCtrl: ['female', [Validators.required]],
-    recaptchaCtrl: [false, [Validators.required]],
-  }, { validators: [RegisterValidators.confirmPassword] } as AbstractControlOptions);
-  //#endregion
-
-  //#region Forms Properties
-  // Lab's Info
-  get EmailCtrl(): FormControl {
-    return this.registerFg.get('emailCtrl') as FormControl;
-  }
-  get UsernameCtrl(): FormControl {
-    return this.registerFg.get('usernameCtrl') as FormControl;
-  }
-  get PasswordCtrl(): FormControl {
-    return this.registerFg.get('passwordCtrl') as FormControl;
-  }
-  get ConfirmPasswordCtrl(): FormControl {
-    return this.registerFg.get('confirmPasswordCtrl') as FormControl;
-  }
-  get DateOfBirthCtrl(): FormControl {
-    return this.registerFg.get('dateOfBirthCtrl') as FormControl;
-  }
-  get GenderCtrl(): FormControl {
-    return this.registerFg.get('genderCtrl') as FormControl;
-  }
-  get RecaptchaCtrl(): FormControl {
-    return this.registerFg.get('recaptchaCtrl') as FormControl;
-  }
   //#endregion
 
   //#region Methods
@@ -129,7 +138,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
         .subscribe({
           next: res => {
             this.router.navigate(['/main']);
-            this.snackBar.open("You are logged in as: " + res?.userName, "Close", { verticalPosition: 'bottom', horizontalPosition: 'center', duration: 7000 })
+            this.snackBar.open("You are logged in as: " + res?.userName, "Close", {
+              verticalPosition: 'bottom',
+              horizontalPosition: 'center',
+              duration: 7000
+            })
           },
           complete: () => console.log('Register successful.')
         });
@@ -139,6 +152,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
   }
 
+  // other methods
+  checkStatus(): void {
+    console.log(this.registerFg.value);
+  }
+
   private getDateOnly(dob: string | null): string | undefined {
     if (!dob) return undefined;
 
@@ -146,9 +164,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return new Date(theDob.setMinutes(theDob.getMinutes() - theDob.getTimezoneOffset())).toISOString().slice(0, 10);
   }
 
-  // other methods
-  checkStatus(): void {
-    console.log(this.registerFg.value);
-  }
   //#endregion
 }
