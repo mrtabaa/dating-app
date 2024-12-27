@@ -48,6 +48,7 @@ export class LoginComponent implements OnDestroy {
   private _subscribedLogin: Subscription | undefined;
   private _subscribedRecaptcha: Subscription | undefined;
 
+  //#region Forms Properties
   get EmailUsernameCtrl(): FormControl {
     return this.loginFg.get('emailUsernameCtrl') as FormControl;
   }
@@ -63,6 +64,8 @@ export class LoginComponent implements OnDestroy {
   get RememberMeCtrl(): FormControl {
     return this.loginFg.get('rememberMeCtrl') as FormControl;
   }
+
+  //#endregion
 
   ngOnDestroy(): void {
     this._subscribedLogin?.unsubscribe();
