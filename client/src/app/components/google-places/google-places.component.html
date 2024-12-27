@@ -5,9 +5,13 @@
         <mat-label>Search your City</mat-label>
         <input [formControl]="searchedLocationCtrl" #location (input)="searchLocation(location)" type="text"
                placeholder="City name" aria-label="Location" matInput>
-        <ng-container matSuffix>
+        <ng-container matSuffix class="test">
           @if (!countrySig()) {
-            <mat-icon matSuffix color="primary">radio_button_unchecked</mat-icon>
+            @if (searchedLocationCtrl.value && searchedLocationCtrl.value.length > 0) {
+              <mat-spinner></mat-spinner>
+            } @else {
+              <mat-icon matSuffix color="primary">radio_button_unchecked</mat-icon>
+            }
           } @else {
             <mat-icon matSuffix color="primary">check_circle</mat-icon>
           }

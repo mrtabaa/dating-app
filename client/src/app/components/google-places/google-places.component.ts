@@ -6,13 +6,14 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatInputModule} from '@angular/material/input';
 import {GooglePlacesService} from '../../services/google-places.service';
 import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinner} from "@angular/material/progress-spinner";
 
 @Component({
   selector: 'app-google-places',
   imports: [
     ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatCardModule, MatDividerModule,
-    MatIconModule
+    MatIconModule, MatProgressSpinner
   ],
   templateUrl: './google-places.component.html',
   styleUrl: './google-places.component.scss'
@@ -26,7 +27,7 @@ export class GooglePlacesComponent {
   citySig: Signal<string | undefined> = this.googlePlacesService.citySig;
   isCountrySelectedSig: Signal<boolean> = this.googlePlacesService.isCountrySelectedSig;
   private fb = inject(FormBuilder);
-  searchedLocationCtrl = this.fb.control(null, Validators.required);
+  searchedLocationCtrl = this.fb.control('', Validators.required);
 
   searchLocation(location: HTMLInputElement): void {
     this.googlePlacesService.isCountrySelectedSig.set(false);
