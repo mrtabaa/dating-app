@@ -31,10 +31,11 @@ public class TokenService : ITokenService
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for identification.
-                new(JwtRegisteredClaimNames.UniqueName, user.NormalizedUserName),
-                new(JwtRegisteredClaimNames.Jti, jtiValue) // TODO: store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
+                new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for internal identification.
+                new(JwtRegisteredClaimNames.Sub, user.NormalizedUserName), // unique identifier (e.g., UserName or user ID)
+                new(JwtRegisteredClaimNames.Jti, jtiValue) // session identifier or token ID, // TODO: store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
+
 
             // Get user's roles and add them all into claims
             IList<string>? roles = await _userManager.GetRolesAsync(user);
@@ -88,7 +89,7 @@ public class TokenService : ITokenService
             .Set(appUser => appUser.IdentifierHash, identifierHash)
             .Set(appUser => appUser.JtiValue, jtiValue);
 
-        UpdateResult updateResult = await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken);
 
         if (updateResult.ModifiedCount == 1)
             return identifierHash;
