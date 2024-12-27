@@ -19,8 +19,8 @@ main {
   }
 
   .messages-container {
+    position: relative;
     height: calc(100dvh - $tabGroup_h - $form-field_h);
-    margin-bottom: $tabGroup_h;
     overflow-y: auto;
 
     .item {
@@ -72,7 +72,7 @@ main {
   }
 
   .create {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
