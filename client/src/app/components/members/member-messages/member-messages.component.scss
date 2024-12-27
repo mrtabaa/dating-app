@@ -2,6 +2,7 @@ $tabGroup_h: 4rem;
 $form-field_h: 75px;
 
 main {
+  background-color: blue;
   overflow: hidden;
   padding: 0 0.3rem;
 
@@ -19,7 +20,7 @@ main {
   }
 
   .messages-container {
-    position: relative;
+    background-color: yellow;
     height: calc(100dvh - $tabGroup_h - $form-field_h);
     overflow-y: auto;
 
@@ -72,7 +73,8 @@ main {
   }
 
   .create {
-    position: absolute;
+    background-color: red;
+    position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
