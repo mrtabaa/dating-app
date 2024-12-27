@@ -1,70 +1,70 @@
-<form [formGroup]="registerFg" (ngSubmit)="registerFg.valid && registerUser()">
-    <div class="container">
-        <div class="inputs">
-            <div class="gender">
-                <strong>I am a</strong>
-                <mat-radio-group formControlName="genderCtrl" aria-label="Select your gender" color="primary">
-                    <mat-radio-button value="female">Female</mat-radio-button>
-                    <mat-radio-button value="male">Male</mat-radio-button>
-                    <mat-radio-button value="other">Other</mat-radio-button>
-                </mat-radio-group>
-            </div>
-            <app-input-cva [formControl]="EmailCtrl" [label]="'Email'" [placeHolder]="'Your email'"
-                [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
-                [error]="'Enter a valid email address.'" [isFocused]="!isMobileSig()">
-            </app-input-cva>
-            <app-input-cva [formControl]="UsernameCtrl" [label]="'Username'" [placeHolder]="'Your Username'"
-                [hint]="'Will be shown to other members.'">
-            </app-input-cva>
-            <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [minDate]="minDate"
-                [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
-            </app-date-picker-cva>
-            <app-input-cva [formControl]="PasswordCtrl" [label]="'Password'" [type]="'password'"
-                [placeHolder]="'Enter a password'"
-                [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
-                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'" [ngStyle]="{
+<form (ngSubmit)="registerUser()" [formGroup]="registerFg">
+  <div class="container">
+    <div class="inputs">
+      <div class="gender">
+        <strong>I am a</strong>
+        <mat-radio-group aria-label="Select your gender" color="primary" formControlName="genderCtrl">
+          <mat-radio-button value="female">Female</mat-radio-button>
+          <mat-radio-button value="male">Male</mat-radio-button>
+          <mat-radio-button value="other">Other</mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <app-input-cva [error]="'Enter a valid email address.'" [formControl]="EmailCtrl" [hint]="'Privately used for account management. (e.g. Reset password, Login)'"
+                     [isFocused]="!isMobileSig()"
+                     [label]="'Email'" [placeHolder]="'Your email'">
+      </app-input-cva>
+      <app-input-cva [formControl]="UsernameCtrl" [hint]="'Will be shown to other members.'" [label]="'Username'"
+                     [placeHolder]="'Your Username'">
+      </app-input-cva>
+      <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'" [maxDate]="maxDate"
+                           [minDate]="minDate" [placeHolder]="'MM/DD/YYYY'">
+      </app-date-picker-cva>
+      <app-input-cva [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'" [formControl]="PasswordCtrl" [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
+                     [label]="'Password'"
+                     [ngStyle]="{
                     'margin-bottom': PasswordCtrl.invalid ? '1rem' : '0'
-                }">
-            </app-input-cva>
-            <div>
-                <app-input-cva [formControl]=" ConfirmPasswordCtrl" [label]="'Confirm Password'" [type]="'password'"
-                    [placeHolder]="'Confirm your password'" [hint]="'Confirm above password'">
-                </app-input-cva>
-                @if(PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
-                <mat-error>Password entries don't match.</mat-error>
-                }
-            </div>
-            <!-- show api errors
-            @if(errorMessages && errorMessages.length > 1) {
-            <ul>
-                @for (error of errorMessages; track $index) {
-                <li>
-                    <mat-error>{{error}}</mat-error>
-                </li>
-                }
-            </ul>
-            }
-            @else {
-            <mat-error>{{errorMessage}}</mat-error>
-            } -->
-            <mat-slide-toggle class="recaptcha" formControlName="recaptchaCtrl" (change)="validateRecaptcha()"
-                color="primary">
-                @if(!RecaptchaCtrl.value) {
-                <p>Not a robot? Slide me!</p>
-                }
-                @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
-                <div class="validating-recaptcha">
-                    <p>Validating</p>
-                    <mat-spinner></mat-spinner>
-                </div>
-                }
-                @else {
-                <span style="color: #ba005c;">Validated</span>
-                }
-            </mat-slide-toggle>
-            <button type="submit" [disabled]="registerFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)" mat-raised-button color="primary"
-                class="submitBtn">Register</button>
-            <!-- <p>{{registerFg.errors | json}}</p> -->
-        </div>
+                }"
+                     [placeHolder]="'Enter a password'" [type]="'password'">
+      </app-input-cva>
+      <div>
+        <app-input-cva [formControl]=" ConfirmPasswordCtrl" [hint]="'Confirm above password'" [label]="'Confirm Password'"
+                       [placeHolder]="'Confirm your password'" [type]="'password'">
+        </app-input-cva>
+        @if (PasswordCtrl.valid && ConfirmPasswordCtrl.valid && registerFg.hasError('invalidPasswordsMatch')) {
+          <mat-error>Password entries don't match.</mat-error>
+        }
+      </div>
+      <!-- show api errors
+      @if(errorMessages && errorMessages.length > 1) {
+      <ul>
+          @for (error of errorMessages; track $index) {
+          <li>
+              <mat-error>{{error}}</mat-error>
+          </li>
+          }
+      </ul>
+      }
+      @else {
+      <mat-error>{{errorMessage}}</mat-error>
+      } -->
+      <mat-slide-toggle (change)="validateRecaptcha()" class="recaptcha" color="primary"
+                        formControlName="recaptchaCtrl">
+        @if (!RecaptchaCtrl.value) {
+          <p>Not a robot? Slide me!</p>
+        } @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
+          <div class="validating-recaptcha">
+            <p>Validating</p>
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <span style="color: #ba005c;">Validated</span>
+        }
+      </mat-slide-toggle>
+      <button [disabled]="registerFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)" class="submitBtn"
+              color="primary" mat-raised-button
+              type="submit">Register
+      </button>
+      <!-- <p>{{registerFg.errors | json}}</p> -->
     </div>
+  </div>
 </form>
