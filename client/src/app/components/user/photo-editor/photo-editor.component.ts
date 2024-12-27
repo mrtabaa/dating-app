@@ -107,8 +107,9 @@ export class PhotoEditorComponent implements OnInit {
           this.memberIn?.photos.push(photo);
 
           // set navbar profile photo when first photo is uploaded
-          if (this.memberIn?.photos.length === 1)
-            this.setNavbarProfilePhoto(photo.url_165)
+          if (this.memberIn?.photos.length === 1) {
+            this.setNavbarProfilePhoto(photo.url_165);
+          }
         }
 
         this.isUploading = false;

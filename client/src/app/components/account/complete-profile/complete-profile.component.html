@@ -1,8 +1,8 @@
 <section>
   <h6 class="title">Please complete your profile to attract more people.</h6>
   <mat-stepper #stepper [linear]="true" [orientation]="isMobileSig() ? 'vertical' : 'horizontal'">
+    <!-- Name and Location -->
     <mat-step [stepControl]="starterFg">
-      <!-- Name and Location -->
       <div class="container">
         <form [formGroup]="starterFg">
           <ng-template matStepLabel>{{ starterLable }}</ng-template>
