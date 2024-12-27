@@ -2,91 +2,82 @@ $tabGroup_h: 4rem;
 $form-field_h: 75px;
 
 main {
-  background-color: blue;
   position: fixed;
   bottom: 0;
   left: 0;
-  //margin-top: $tabGroup_h;
   overflow: hidden;
   width: 100%;
-  padding: 0 0.3rem;
-  //height: calc(100dvh - $tabGroup_h - $form-field_h);
 
-  .warning-layout-helper {
-    color: transparent;
-  }
+  .container {
+    padding: 0 0.3rem;
 
-  .warning {
-    color: rgb(121, 121, 121);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+    .warning-layout-helper {
+      color: transparent;
+    }
 
-  .messages-container {
-    background-color: yellow;
-    height: calc(100dvh - $tabGroup_h - $form-field_h);
-    overflow-y: auto;
-
-    .item {
-      border-bottom: rgb(194, 194, 194) dotted 1px;
-      list-style: none;
-      margin: 0;
+    .warning {
+      color: rgb(121, 121, 121);
+      text-align: center;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      min-height: 50px;
-      max-width: calc(95% - 0.3rem);
+    }
 
-      * {
-        padding: 0;
+    .messages-container {
+      height: calc(100dvh - $tabGroup_h - $form-field_h - 3rem);
+      margin-bottom: 0.5rem;
+
+      .item {
+        border-bottom: rgb(194, 194, 194) dotted 1px;
+        list-style: none;
         margin: 0;
-      }
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 50px;
+        max-width: calc(95% - 0.3rem);
 
-      .details {
-        .title {
-          display: flex;
-          align-items: center;
-          color: rgb(116, 116, 116);
+        * {
+          padding: 0;
+          margin: 0;
+        }
 
-          * {
-            font-size: 1rem;
-          }
-
-          p {
-            font-size: 0.8rem;
-          }
-
-
-          mat-icon {
+        .details {
+          .title {
             display: flex;
-            justify-content: center;
             align-items: center;
+            color: rgb(116, 116, 116);
+
+            * {
+              font-size: 1rem;
+            }
+
+            p {
+              font-size: 0.8rem;
+            }
+
+
+            mat-icon {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+          }
+
+          .content {
+            word-wrap: anywhere;
           }
         }
 
-        .content {
-          word-wrap: anywhere;
+        img {
+          border-radius: 50%;
         }
-      }
-
-      img {
-        border-radius: 50%;
       }
     }
-  }
 
-  .create {
-    background-color: red;
-    //position: fixed;
-    //bottom: 0;
-    //left: 0;
-    width: 100%;
-
-    .content {
-      padding: 0 0.3rem;
+    .create {
+      width: 100%;
 
       mat-form-field {
         width: 100%;
@@ -99,36 +90,28 @@ main {
   $navbar_h: 64px;
   $footer_h: 64px;
   $tabGroup_h: 9rem;
+  $input_h: 4rem;
   $tabGroupPadding_height: 2rem;
 
   main {
-    //background-color: red;
+    position: relative;
     width: 90%;
-    height: calc(100dvh - $navbar_h - $footer_h - $tabGroup_h - $tabGroupPadding_height);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 
     .messages-container {
-      height: inherit;
-      padding: 1rem 0;
+      max-height: calc(100dvh - $navbar_h - $footer_h - $tabGroup_h - $input_h);
 
       .item {
-        padding-right: 1rem;
+        padding: 0 0.5rem;
       }
     }
 
     .create {
+      position: fixed;
       bottom: calc($footer_h + 1rem);
-      left: calc(15rem + 4% + 2rem); // left-side + parent's padding + left-side and right-side gap
 
-      .content {
-        padding: 0;
-
-        mat-form-field {
-          width: 50%;
-          min-width: 25rem;
-        }
+      mat-form-field {
+        max-width: 50%;
+        min-width: 25rem;
       }
     }
   }

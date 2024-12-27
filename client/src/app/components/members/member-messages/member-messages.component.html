@@ -1,37 +1,37 @@
 @if (!isLoadingSig()) {
   <main>
-    @if (messagesSig().length < 1) {
-      <div class="warning">
-        <div class="warning-layout-helper">.</div>
-        <h5>Empty box</h5>
-        <p>
-          Chatting can increase your chance of finding a right match. Start now by sending your first message!
-        </p>
-      </div>
-    } @else {
-      <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
-                                   [maxBufferPx]="bufferSize" itemSize="50" class="messages-container">
-        <div *cdkVirtualFor="let message of messagesSig()" [appCdkDynamicHeightDir]="message" class="item">
-          <div class="details">
-            <div class="title">
-              <mat-icon>schedule</mat-icon>
-              <p>{{ message.sentOn | intlRelativeTime }}</p>
-              @if (message.userOrTargetUserName !== memberIn?.userName) {
-                <mat-icon [ngStyle]="{'color': message.readOn ? 'green' : 'red'}">
-                  {{ message.readOn ? 'done_all' : 'check' }}
-                </mat-icon>
-              }
-            </div>
-            <div class="content">{{ message.content }}</div>
-          </div>
-          <img
-            ngSrc="{{message.userOrTargetProfilePhoto ? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
-            priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName}}">
+    <div class="container">
+      @if (messagesSig().length < 1) {
+        <div class="warning">
+          <div class="warning-layout-helper">.</div>
+          <h5>Empty box</h5>
+          <p>
+            Chatting can increase your chance of finding a right match. Start now by sending your first message!
+          </p>
         </div>
-      </cdk-virtual-scroll-viewport>
-    }
-    <form (keydown.enter)="$event.preventDefault()" class="create">
-      <div class="content">
+      } @else {
+        <cdk-virtual-scroll-viewport (scrolledIndexChange)="loadOlderMessages($event)" [minBufferPx]="bufferSize"
+                                     [maxBufferPx]="bufferSize" itemSize="50" class="messages-container">
+          <div *cdkVirtualFor="let message of messagesSig()" [appCdkDynamicHeightDir]="message" class="item">
+            <div class="details">
+              <div class="title">
+                <mat-icon>schedule</mat-icon>
+                <p>{{ message.sentOn | intlRelativeTime }}</p>
+                @if (message.userOrTargetUserName !== memberIn?.userName) {
+                  <mat-icon [ngStyle]="{'color': message.readOn ? 'green' : 'red'}">
+                    {{ message.readOn ? 'done_all' : 'check' }}
+                  </mat-icon>
+                }
+              </div>
+              <div class="content">{{ message.content }}</div>
+            </div>
+            <img
+              ngSrc="{{message.userOrTargetProfilePhoto ? message.userOrTargetProfilePhoto : '/assets/images/defaults/user.png'}}"
+              priority width="{{photo_WH}}" height="{{photo_WH}}" alt="{{message.userOrTargetUserName}}">
+          </div>
+        </cdk-virtual-scroll-viewport>
+      }
+      <form (keydown.enter)="$event.preventDefault()" class="create">
         <mat-form-field appearaance="outline">
           <mat-label>Your message</mat-label>
           <textarea (keydown.enter)="create()" [autofocus]="!isMobileSig()" [formControl]="createMessageCtrl"
@@ -43,7 +43,7 @@
             <mat-icon>send</mat-icon>
           </button>
         </mat-form-field>
-      </div>
-    </form>
+      </form>
+    </div>
   </main>
 }
