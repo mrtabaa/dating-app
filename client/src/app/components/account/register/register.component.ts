@@ -112,8 +112,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   registerUser(): void {
-    this.validateRecaptcha();
-
     if (this.recaptchaToken) {
       const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
