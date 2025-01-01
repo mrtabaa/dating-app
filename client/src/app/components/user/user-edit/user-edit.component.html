@@ -58,7 +58,7 @@
         <mat-tab #editAbout label="Edit About {{KnownAsCtrl.value | shortenString: isMobileSig() ? 4 : 20}}">
           <div class="tab-contents">
             <form [formGroup]="userEditFg" (ngSubmit)="userEditFg.value" class="about-contents">
-              <mat-form-field appearaance="outline">
+              <mat-form-field appearance="outline">
                 <mat-label>Nickname/Name</mat-label>
                 <input formControlName="knownAsCtrl" [value]="member.knownAs"
                        placeholder="Your Nickname or Name" matInput>
@@ -77,7 +77,7 @@
               <app-date-picker-cva [formControl]="DateOfBirthCtrl" [label]="'Date of Birth'"
                                    [minDate]="minDate" [maxDate]="maxDate" [placeHolder]="'MM/DD/YYYY'">
               </app-date-picker-cva>
-              <mat-form-field appearaance="outline">
+              <mat-form-field appearance="outline">
                 <mat-label>Introduction</mat-label>
                 <textarea cdkTextareaAutosize formControlName="introductionCtrl"
                           [value]="member.introduction" placeholder="Say something about yourself" matInput>
@@ -90,7 +90,7 @@
                   </mat-error>
                 }
               </mat-form-field>
-              <mat-form-field appearaance="outline">
+              <mat-form-field appearance="outline">
                 <mat-label>Looking For</mat-label>
                 <textarea cdkTextareaAutosize formControlName="lookingForCtrl"
                           placeholder="Enter what you're looking for" matInput>
@@ -103,7 +103,7 @@
                   </mat-error>
                 }
               </mat-form-field>
-              <mat-form-field appearaance="outline">
+              <mat-form-field appearance="outline">
                 <mat-label>Interests</mat-label>
                 <textarea cdkTextareaAutosize formControlName="interestsCtrl"
                           placeholder="Enter your interests" matInput>

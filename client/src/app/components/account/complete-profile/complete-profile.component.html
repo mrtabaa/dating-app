@@ -6,7 +6,7 @@
       <div class="container">
         <form [formGroup]="starterFg">
           <ng-template matStepLabel>{{ starterLabel }}</ng-template>
-          <mat-form-field appearaance="outline">
+          <mat-form-field appearance="outline">
             <mat-label>Name or Nickname</mat-label>
             <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
             @if (KnownAsCtrl.hasError('required')) {
@@ -56,7 +56,7 @@
       <div class="container">
         <form>
           <ng-template matStepLabel>{{ introductionLabel }}</ng-template>
-          <mat-form-field appearaance="outline">
+          <mat-form-field appearance="outline">
             @if (isMobileSig()) {
               <mat-label>Describe yourself</mat-label>
             } @else {
@@ -87,7 +87,7 @@
       <div class="container">
         <form>
           <ng-template matStepLabel>{{ interestsLabel }}</ng-template>
-          <mat-form-field appearaance="outline">
+          <mat-form-field appearance="outline">
             @if (isMobileSig()) {
               <mat-label>Share your interests</mat-label>
             } @else {
@@ -118,7 +118,7 @@
       <div class="container">
         <form>
           <ng-template matStepLabel>{{ lookingForLabel }}</ng-template>
-          <mat-form-field appearaance="outline">
+          <mat-form-field appearance="outline">
             <mat-label>What are you looking for?</mat-label>
             <textarea [formControl]="lookingForCtrl" [value]="LookingForCtrl.value" cdkTextareaAutosize
                       matInput placeholder="Anything you are looking for?">

@@ -32,7 +32,7 @@
         </cdk-virtual-scroll-viewport>
       }
       <form (keydown.enter)="$event.preventDefault()" class="create">
-        <mat-form-field appearaance="outline">
+        <mat-form-field appearance="outline">
           <mat-label>Your message</mat-label>
           <textarea (keydown.enter)="create()" [autofocus]="!isMobileSig()" [formControl]="createMessageCtrl"
                     cdkTextareaAutosize matInput placeholder="Enter your message">
