@@ -133,7 +133,7 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.countrySig() && this.stateSig() && this.citySig()) {
+    if (this.countrySig() && this.countryAcrSig() && this.stateSig() && this.citySig()) {
       const updatedUser: UserUpdate = this.createUpdatedUser();
       updatedUser.isProfileCompleted = true;
 
@@ -183,8 +183,8 @@ export class CompleteProfileComponent implements OnInit {
   private createUpdatedUser(): UserUpdate {
     return {
       knownAs: this.KnownAsCtrl.value,
-      countryAcr: this.countryAcrSig() as string,
-      country: this.countrySig() as string, // Type assertion since countrySig() is never null here
+      countryAcr: this.countryAcrSig() as string, // Type assertion since countrySig() is never null here
+      country: this.countrySig() as string,
       state: this.stateSig() as string,
       city: this.citySig() as string,
       introduction: this.IntroductionCtrl.value,
