@@ -54,6 +54,12 @@ public class UserRepository : IUserRepository
         return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
     }
 
+    public async Task<string?> GetUserNameByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken) =>
+        await _collection.AsQueryable()
+            .Where(appUser => appUser.IdentifierHash == identifierHash)
+            .Select(appUser => appUser.NormalizedUserName)
+            .SingleOrDefaultAsync(cancellationToken);
+
     public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
             .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())

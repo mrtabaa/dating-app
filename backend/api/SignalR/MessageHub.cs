@@ -14,7 +14,7 @@ public class MessageHub(
 
         ObjectId userId = await GetUserId();
 
-        string groupName = GetGroupName(GetUserName(), targetUserName);
+        string groupName = GetGroupName(await GetUserName(), targetUserName);
 
         await AddGroupNameToDb(userId, groupName);
 
@@ -64,7 +64,7 @@ public class MessageHub(
         _ = messageDto.UserOrTargetUserName
             ?? throw new HubException("UserOrTargetUserName is null. Message creation failed. Try again.");
 
-        string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName);
+        string groupName = GetGroupName(await GetUserName(), messageInDto.ReceiverUserName);
 
         ObjectId receiverUserId =
             await userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
@@ -101,8 +101,14 @@ public class MessageHub(
             throw new HubException("Add messageGroup to DB failed.");
     }
 
-    private string GetUserName() =>
-        Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
+    private async Task<string> GetUserName()
+    {
+        string userIdHashed = Context.User?.GetUserIdHashed()
+                              ?? throw new HubException("The token is invalid/expired. Login again.");
+
+        return await userRepository.GetUserNameByIdentifierHashAsync(userIdHashed, GetCancellationToken())
+               ?? throw new HubException("UserName is invalid. Login again.");
+    }
 
     private async Task<ObjectId> GetUserId() =>
         await tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())

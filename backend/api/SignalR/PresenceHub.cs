@@ -1,7 +1,7 @@
 namespace api.SignalR;
 
 [Authorize]
-public class PresenceHub(IPresenceTrackerService presenceTrackerService, ITokenService tokenService) : Hub
+public class PresenceHub(IPresenceTrackerService presenceTrackerService, ITokenService tokenService, IUserRepository userRepository) : Hub
 {
     public override async Task OnConnectedAsync()
     {
@@ -19,20 +19,25 @@ public class PresenceHub(IPresenceTrackerService presenceTrackerService, ITokenS
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        string? userName = Context.User?.GetUserName();
-        if (!string.IsNullOrEmpty(userName))
-        {
             // Do NOT use CancellationToken for this request or the ConnectionId does NOT get removed from DB on browser closed.
-            await presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
+            await presenceTrackerService.RemoveDisconnectedUserAsync(await GetUserName(), Context.ConnectionId);
 
             // await Clients.Others.SendAsync(_CheckUserIsOffline, userName, cancellationToken);
 
             IEnumerable<OnlineUsersDto> onlineUsersDtos = await presenceTrackerService.GetOnlineUsersDtosAsync();
 
             await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos);
-        }
 
         await base.OnDisconnectedAsync(exception);
+    }
+    
+    private async Task<string> GetUserName()
+    {
+        string userIdHashed = Context.User?.GetUserIdHashed()
+                              ?? throw new HubException("The token is invalid/expired. Login again.");
+
+        return await userRepository.GetUserNameByIdentifierHashAsync(userIdHashed, GetCancellationToken())
+               ?? throw new HubException("UserName is invalid. Login again.");
     }
 
     private CancellationToken GetCancellationToken() =>

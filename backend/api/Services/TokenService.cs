@@ -31,8 +31,7 @@ public class TokenService : ITokenService
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.NameId, identifierHash), // unique user Id for internal identification.
-                new(JwtRegisteredClaimNames.Sub, user.NormalizedUserName), // unique identifier (e.g., UserName or user ID)
+                new(JwtRegisteredClaimNames.Sub, identifierHash),
                 new(JwtRegisteredClaimNames.Jti, jtiValue) // session identifier or token ID, // TODO: store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 

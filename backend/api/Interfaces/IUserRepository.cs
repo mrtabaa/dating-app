@@ -1,9 +1,11 @@
 namespace api.Interfaces;
+
 public interface IUserRepository
 {
     public Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken);
     public Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken);
     public Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken);
+    public Task<string?> GetUserNameByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken);
     public Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken);
     public Task<string?> GetGenderByIdAsync(ObjectId userId, CancellationToken cancellationToken);
 
