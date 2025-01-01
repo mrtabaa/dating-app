@@ -31,7 +31,7 @@ main {
             position: absolute;
             right: 10%;
 
-            h3 {
+            .h3 {
                 font-weight: bold;
                 letter-spacing: 2px;
             }
@@ -46,7 +46,7 @@ main {
             text-align: center;
             gap: 5dvh;
 
-            h5 {
+            .banner {
                 align-self: center;
                 background-color: rgba(124, 125, 117, 0.8);
                 border-radius: 8px;
