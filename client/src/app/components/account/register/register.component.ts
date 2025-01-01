@@ -68,6 +68,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   get UsernameCtrl(): FormControl {
     return this.registerFg.get('usernameCtrl') as FormControl;
   }
+
   //#endregion
 
   get PasswordCtrl(): FormControl {
@@ -99,8 +100,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.subscribedRegisterUser)
-      this.subscribedRegisterUser.unsubscribe();
+    this.subscribedRegisterUser?.unsubscribe();
+    this.subscribedRecaptcha?.unsubscribe();
   }
 
   //#endregion
