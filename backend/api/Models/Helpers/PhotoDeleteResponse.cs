@@ -1,4 +1,4 @@
-namespace api.Models.Errors;
+namespace api.Models.Helpers;
 
 public class PhotoDeleteResponse
 {

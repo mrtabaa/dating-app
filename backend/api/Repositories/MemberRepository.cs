@@ -12,7 +12,7 @@ public class MemberRepository : IMemberRepository
     public MemberRepository(IMongoClient client, IMyMongoDbSettings dbSettings, IPhotoService photoService, IFollowRepository followRepository)
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
         _photoService = photoService;
         _followRepository = followRepository;
     }
@@ -47,7 +47,7 @@ public class MemberRepository : IMemberRepository
         DateOnly minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
         DateOnly maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
-        // set query to AsQuerable to use it again MongoDB later
+        // set query to AsQueryable to use it again MongoDB later
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
         query = query.Where(appUser => appUser.Id != memberParams.UserId); // don't request/show the currentUser in the list
@@ -71,16 +71,13 @@ public class MemberRepository : IMemberRepository
 
         for (var i = 0; i < appUsers.Count; i++)
         {
-            AppUser? appUser = null;
+            if (appUsers[i].Photos.Count <= 0) continue; // continue only if appUser has a photo
 
-            if (appUsers[i].Photos.Count > 0) // skip if appUser has no photos
-            {
-                appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
+            AppUser? appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
 
-                if (appUser is null) return null;
+            if (appUser is null) return null;
 
-                appUsers[i] = appUser;
-            }
+            appUsers[i] = appUser;
         }
 
         #endregion Convert all members' appUser.Photos to BlobLinkFormat

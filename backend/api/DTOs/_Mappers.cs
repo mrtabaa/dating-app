@@ -1,3 +1,5 @@
+using api.DTOs.helpers;
+
 namespace api.DTOs;
 
 public static class Mappers
@@ -67,21 +69,20 @@ public static class Mappers
             UserName = appUser.UserName,
             Gender = appUser.Gender,
             ProfilePhotoUrl = blobPhotoUrl,
-            IsProfileCompleted = appUser.IsProfileCompleted,
-            RecaptchaToken = turnstileToken
+            IsProfileCompleted = appUser.IsProfileCompleted
         };
 
     public static Photo ConvertPhotoUrlsToPhoto(string[] photoUrls, bool isMain) =>
         new()
         {
             Schema = AppVariablesExtensions.AppVersions.Last(),
-            Url_165 = photoUrls[0],
-            Url_256 = photoUrls[1],
-            Url_enlarged = photoUrls[2],
+            Url165 = photoUrls[0],
+            Url256 = photoUrls[1],
+            UrlEnlarged = photoUrls[2],
             IsMain = isMain
         };
 
-    public static Follow ConvertAppUsertoFollow(ObjectId followerId, ObjectId followedMemberId) =>
+    public static Follow ConvertAppUserToFollow(ObjectId followerId, ObjectId followedMemberId) =>
         new(
             AppVariablesExtensions.AppVersions.Last(),
             FollowerId: followerId,
@@ -106,7 +107,7 @@ public static class Mappers
         {
             Id = message.Id.ToString(), // To delete/update
             UserOrTargetUserName = userOrTarget.UserName,
-            UserOrTargetKnownAs = userOrTarget?.KnownAs,
+            UserOrTargetKnownAs = userOrTarget.KnownAs,
             UserOrTargetProfilePhoto = profilePhotoSasUrl,
             Content = message.Content,
             ReadOn = message.ReadOn,
@@ -116,8 +117,7 @@ public static class Mappers
     public static OnlineUsersDto ConvertAppUserToOnlineStatusDto(AppUser appUser) =>
         new(
             appUser.NormalizedUserName
-            ?? throw new ArgumentNullException("UserName cannot be null but it is.",
-                nameof(appUser.NormalizedUserName)),
+            ?? throw new ArgumentNullException(nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null but it is."),
             appUser.LastActive
         );
 

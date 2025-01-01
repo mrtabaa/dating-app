@@ -1,15 +1,15 @@
-namespace api.Middleware;
+namespace api.SignalR.Helpers;
 
 public class SignalRExceptionHandler : IHubFilter
 {
-    private readonly ILogger<SignalRExceptionHandler> _logger;
     private readonly IMongoCollection<ApiException> _collection;
+    private readonly ILogger<SignalRExceptionHandler> _logger;
 
     public SignalRExceptionHandler(ILogger<SignalRExceptionHandler> logger, IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         _logger = logger;
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
+        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.CollectionExceptionLogs);
     }
 
     public async ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
@@ -21,12 +21,12 @@ public class SignalRExceptionHandler : IHubFilter
         catch (Exception ex)
         {
             // Log to MongoDB
-            ApiException apiException = new ApiException
+            var apiException = new ApiException
             {
                 Id = ObjectId.Empty,
                 StatusCode = StatusCodes.Status500InternalServerError,
                 Message = ex.Message,
-                Details = ex.StackTrace?.ToString(),
+                Details = ex.StackTrace,
                 Time = DateTime.Now
             };
             await _collection.InsertOneAsync(apiException);
@@ -38,4 +38,3 @@ public class SignalRExceptionHandler : IHubFilter
         }
     }
 }
-

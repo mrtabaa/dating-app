@@ -3,19 +3,20 @@ namespace api.Extensions;
 public static class AppVariablesExtensions
 {
     public const string TokenKey = "TokenKey";
-    public const string recaptchaSecretKey = "RecaptchaSecretKey";
+    public const string RecaptchaSecretKey = "RecaptchaSecretKey";
 
-    public const string collectionUsers = "users";
-    public const string collectionFollows = "follows";
-    public const string collectionMessages = "messages";
-    public const string collectionOnlineTrackers = "online-trackers";
-    public const string collectionExceptionLogs = "exception-logs";
+    public const string CollectionUsers = "users";
+    public const string CollectionFollows = "follows";
+    public const string CollectionMessages = "messages";
+    public const string CollectionOnlineTrackers = "online-trackers";
+    public const string CollectionExceptionLogs = "exception-logs";
 
-    public readonly static string[] AppVersions = ["1", "1.0.2"];
+    public static readonly string[] AppVersions = ["1", "1.0.2"];
 
-    public readonly static AppRole[] roles = [
-            new() {Name = Roles.admin.ToString()},
-            new() {Name = Roles.moderator.ToString()},
-            new() {Name = Roles.member.ToString()}
-        ];
+    public static readonly AppRole[] Roles =
+    [
+        new() { Name = enums.Roles.Admin.ToString() },
+        new() { Name = enums.Roles.Moderator.ToString() },
+        new() { Name = enums.Roles.Member.ToString() }
+    ];
 }

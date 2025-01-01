@@ -45,7 +45,7 @@ public class MessageService : IMessageService
     {
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ??
                                  throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
     }
 
     #endregion Fields and constructors

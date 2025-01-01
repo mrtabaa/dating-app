@@ -2,7 +2,7 @@ namespace api.enums;
 
 public enum Roles
 {
-    admin,
-    moderator,
-    member
+    Admin,
+    Moderator,
+    Member
 }

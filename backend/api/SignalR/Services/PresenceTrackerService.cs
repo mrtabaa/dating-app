@@ -43,7 +43,7 @@ public class PresenceTrackerService : IPresenceTrackerService
     public PresenceTrackerService(IMongoClient client, IMyMongoDbSettings dbSettings)
     {
         IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
     }
 
     #endregion Fields and constructors

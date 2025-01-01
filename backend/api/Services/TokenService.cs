@@ -8,15 +8,15 @@ public class TokenService : ITokenService
 
     public TokenService(IConfiguration config, IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager)
     {
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
 
         var tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
 
         // throw exception if tokenValue is null
-        _ = tokenValue ?? throw new ArgumentNullException("tokenValue cannot be null", nameof(tokenValue));
+        _ = tokenValue ?? throw new ArgumentNullException(nameof(tokenValue), "tokenValue cannot be null");
 
-        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue!));
+        _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue));
 
         _userManager = userManager;
     }
@@ -38,7 +38,7 @@ public class TokenService : ITokenService
 
 
             // Get user's roles and add them all into claims
-            IList<string>? roles = await _userManager.GetRolesAsync(user);
+            IList<string> roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
@@ -61,12 +61,12 @@ public class TokenService : ITokenService
     }
 
     /// <summary>
-    ///     Gets a the userIdHashed of the AppUser and returns the user's actual ObjectId from DB.
+    ///     Gets a userIdHashed of the AppUser and returns the user's actual ObjectId from DB.
     ///     It returns null if ObjectId or userIdHashed is invalid, Empty or null.
     /// </summary>
     /// <param name="userIdHashed"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Decrypted AppUser ObjedId OR null</returns>
+    /// <returns>Decrypted AppUser ObjectId OR null</returns>
     public async Task<ObjectId?> GetActualUserIdAsync(string? userIdHashed, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(userIdHashed)) return null;

@@ -1,61 +1,35 @@
-namespace api.Extensions.Validations;
+namespace api.Validations;
 
 public class AllowedFileExtensions : ValidationAttribute
 {
-    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    private static readonly Dictionary<string, List<byte[]>> FileSignatures = new()
     {
-        var file = value as IFormFile;
-        if (file is not null)
         {
-            if (!IsFileValid(file))
-            {
-
-                // get only allowed extensions to show
-                string? keys = null;
-                foreach (var key in _fileSignatures.Keys)
-                {
-                    keys += key + ", ";
-                }
-
-                return new ValidationResult($"File type is not allowed. These extensions are allowed only: {keys}");
-            }
-        }
-
-        return ValidationResult.Success;
-    }
-
-
-    public static bool IsFileValid(IFormFile file)
-    {
-        using var reader = new BinaryReader(file.OpenReadStream());
-        var signatures = _fileSignatures.Values.SelectMany(x => x).ToList();  // flatten all signatures to single list
-        var headerBytes = reader.ReadBytes(_fileSignatures.Max(m => m.Value.Max(n => n.Length)));
-        bool result = signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
-        return result;
-    }
-
-    public static Dictionary<string, List<byte[]>> _fileSignatures = new()
-    {
-        { ".jpeg", new List<byte[]>
-            {
+            ".webp", [
+                new byte[] { 0x52, 0x49, 0x46, 0x46 },
+                new byte[] { 0x57, 0x45, 0x42, 0x50 }
+            ]
+        },
+        {
+            ".jpeg", [
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE2 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE3 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xEE },
-                new byte[] { 0xFF, 0xD8, 0xFF, 0xDB },
-            }
+                new byte[] { 0xFF, 0xD8, 0xFF, 0xDB }
+            ]
         },
-        { ".jpg", new List<byte[]>
-            {
+        {
+            ".jpg", [
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE1 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xE8 },
                 new byte[] { 0xFF, 0xD8, 0xFF, 0xEE },
-                new byte[] { 0xFF, 0xD8, 0xFF, 0xDB },
-            }
+                new byte[] { 0xFF, 0xD8, 0xFF, 0xDB }
+            ]
         },
         // { ".jpeg2000", new List<byte[]> { new byte[] { 0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20, 0x0D, 0x0A, 0x87, 0x0A } } },
-        { ".png", new List<byte[]> { new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A } } },
+        { ".png", [new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }] }
         // { ".gif", new List<byte[]> { new byte[] { 0x47, 0x49, 0x46, 0x38 } } },
         // { ".zip", new List<byte[]> //also docx, xlsx, pptx, ...
         //     {
@@ -127,4 +101,27 @@ public class AllowedFileExtensions : ValidationAttribute
         //     }
         // },
     };
+
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        if (value is not IFormFile file) return ValidationResult.Success; // check if value is IFormFile
+
+        if (IsFileValid(file)) return ValidationResult.Success;
+
+        // get only allowed extensions to show
+        string? keys = null;
+        foreach (string key in FileSignatures.Keys)
+            keys += key + ", ";
+
+        return new ValidationResult($"File type is not allowed. These extensions are allowed only: {keys}");
+    }
+
+    private static bool IsFileValid(IFormFile file)
+    {
+        using var reader = new BinaryReader(file.OpenReadStream());
+        List<byte[]> signatures = FileSignatures.Values.SelectMany(x => x).ToList(); // flatten all signatures to single list
+        byte[] headerBytes = reader.ReadBytes(FileSignatures.Max(m => m.Value.Max(n => n.Length)));
+        bool result = signatures.Any(signature => headerBytes.Take(signature.Length).SequenceEqual(signature));
+        return result;
+    }
 }

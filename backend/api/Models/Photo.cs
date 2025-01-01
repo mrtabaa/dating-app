@@ -2,9 +2,9 @@ namespace api.Models;
 
 public class Photo
 {
-    public string Schema { get; set; } = string.Empty;
-    required public string Url_165 { get; set; } = string.Empty; // navbar & thumbnail
-    required public string Url_256 { get; set; } = string.Empty; // card
-    required public string Url_enlarged { get; set; } = string.Empty; // enlarged photo up to ~300kb
-    public bool IsMain { get; set; }
+    public string Schema { get; init; } = string.Empty;
+    public required string Url165 { get; init; } = string.Empty; // navbar & thumbnail
+    public required string Url256 { get; init; } = string.Empty; // card
+    public required string UrlEnlarged { get; init; } = string.Empty; // enlarged photo up to ~300kb
+    public bool IsMain { get; init; }
 }

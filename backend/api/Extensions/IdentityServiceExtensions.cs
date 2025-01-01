@@ -79,8 +79,8 @@ public static class IdentityServiceExtensions
         #region Policy
 
         services.AddAuthorizationBuilder()
-            .AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.admin.ToString()))
-            .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.admin.ToString(), Roles.moderator.ToString()));
+            .AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.Admin.ToString()))
+            .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.Admin.ToString(), Roles.Moderator.ToString()));
 
         #endregion
 
@@ -97,13 +97,13 @@ public static class IdentityServiceExtensions
     /// <returns></returns>
     private static Task HandleOnMessageReceived(MessageReceivedContext context)
     {
-        const string AccessTokenQueryParameter = "access_token";
-        const string HubsPathSegment = "/hubs";
+        const string accessTokenQueryParameter = "access_token";
+        const string hubsPathSegment = "/hubs";
 
-        StringValues accessToken = context.Request.Query[AccessTokenQueryParameter];
+        StringValues accessToken = context.Request.Query[accessTokenQueryParameter];
         PathString path = context.HttpContext.Request.Path;
 
-        if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments(HubsPathSegment))
+        if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments(hubsPathSegment))
             context.Token = accessToken;
 
         return Task.CompletedTask;

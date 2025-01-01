@@ -5,7 +5,6 @@ global using System.Text;
 global using api.DTOs;
 global using api.Helpers;
 global using api.Extensions;
-global using api.Extensions.Validations;
 global using api.Interfaces;
 global using api.Models;
 global using api.Models.Helpers;

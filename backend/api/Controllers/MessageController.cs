@@ -4,23 +4,23 @@ namespace api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public class MessageController(
-    ITokenService _tokenService,
-    IMessageRepository _messageRepository,
-    IMemberRepository _memberRepository,
-    IPhotoService _photoService
+    ITokenService tokenService,
+    IMessageRepository messageRepository,
+    IMemberRepository memberRepository,
+    IPhotoService photoService
 ) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult<MessageDto?>> Create(MessageInDto messageInDto, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        MessageDto? messageDto = await _messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
+        MessageDto? messageDto = await messageRepository.CreateAsync(userId.Value, messageInDto, cancellationToken);
 
         return messageDto is null
-            ? BadRequest("Sending message faild. Try again or contact the support.")
+            ? BadRequest("Sending message failed. Try again or contact the support.")
             : messageDto;
     }
 
@@ -30,7 +30,7 @@ public class MessageController(
     {
         List<MessageDto> messageDtos = [];
 
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
@@ -38,11 +38,11 @@ public class MessageController(
 
         if (messageParams.Predicate == MessagePredicate.Thread)
         {
-            pagedMessages = await _messageRepository.GetThreadAsync(userId.Value, messageParams, cancellationToken);
+            pagedMessages = await messageRepository.GetThreadAsync(userId.Value, messageParams, cancellationToken);
             if (pagedMessages is null) return NotFound("Target user was not found.");
         }
         else
-            pagedMessages = await _messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
+            pagedMessages = await messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
 
         Response.AddPaginationHeader(new PaginationHeader(
             pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));
@@ -51,23 +51,20 @@ public class MessageController(
 
         IEnumerable<AppUser> userOrTargets = await GetAllMembers(pagedMessages, cancellationToken);
 
-        AppUser? userOrTarget;
         foreach (Message message in pagedMessages)
         {
-            if (messageParams.Predicate == MessagePredicate.Sent) // To set receiver photo instead of sender's photo
-                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.ReceiverId);
-            else // This already showes receiver photo
-                userOrTarget = userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
+            AppUser? userOrTarget = messageParams.Predicate == MessagePredicate.Sent
+                ? userOrTargets.FirstOrDefault(member => member.Id == message.ReceiverId) // To set receiver photo instead of sender's photo 
+                : userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
 
-            if (userOrTarget is not null)
-            {
-                // Convert all targetMember profile photo to blob Sas format
-                string? profilePhotoUrl = userOrTarget.Photos.FirstOrDefault(photo => photo.IsMain)?.Url_165;
+            if (userOrTarget is null) continue;
 
-                string? profilePhotoSasUrl = _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
+            // Convert all targetMember profile photo to blob Sas format
+            string? profilePhotoUrl = userOrTarget.Photos.FirstOrDefault(photo => photo.IsMain)?.Url165;
 
-                messageDtos.Add(Mappers.ConvertMessageToMessageDto(message, userOrTarget, profilePhotoSasUrl));
-            }
+            string? profilePhotoSasUrl = photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
+
+            messageDtos.Add(Mappers.ConvertMessageToMessageDto(message, userOrTarget, profilePhotoSasUrl));
         }
 
         return messageDtos;
@@ -80,6 +77,6 @@ public class MessageController(
             .Concat(pagedMessages.Select(message => message.ReceiverId)) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
-        return await _memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
+        return await memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
     }
 }

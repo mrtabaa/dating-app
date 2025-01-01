@@ -11,7 +11,7 @@
               } @else {
                 @for (photo of member.photos; track $index) {
                   @if (photo.isMain) {
-                    <img mat-card-image ngSrc="{{photo.url_165}}" width="{{imageWH}}" height="{{imageWH}}" priority
+                    <img mat-card-image ngSrc="{{photo.url165}}" width="{{imageWH}}" height="{{imageWH}}" priority
                          alt="Loading...">
                   }
                 }

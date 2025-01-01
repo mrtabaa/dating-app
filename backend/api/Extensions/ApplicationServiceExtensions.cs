@@ -2,19 +2,19 @@ namespace api.Extensions;
 
 public static class ApplicationServiceExtensions
 {
-
     public static IServiceCollection AddApplicationServices(
         this IServiceCollection services, IConfiguration config, IWebHostEnvironment env
     )
     {
         #region MongoDbSettings
+
         ///// get values from this file: appsettings.Development.json /////
         // get section
         services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
 
         // get values
         services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
-        serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value);
+            serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value);
 
         // get connectionString to the db
         services.AddSingleton<IMongoClient>(serviceProvider =>
@@ -27,7 +27,8 @@ public static class ApplicationServiceExtensions
         #endregion MongoDbSettings
 
         #region Azure storage
-        string? storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
+
+        var storageConnectionString = config.GetValue<string>("StorageConnectionString"); // Azure blob
 
         if (!string.IsNullOrEmpty(storageConnectionString))
         {
@@ -35,10 +36,12 @@ public static class ApplicationServiceExtensions
 
             // Add the BlobServiceClient to the services collection
             services.AddSingleton<BlobServiceClient>(blobServiceClient);
-        };
+        }
+
         #endregion Azure storage
 
         #region CORS
+
         services.AddCors(options =>
         {
             if (env.IsDevelopment())
@@ -53,10 +56,10 @@ public static class ApplicationServiceExtensions
             else if (env.IsProduction())
             {
                 options.AddDefaultPolicy(policy => policy
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                    .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com", "https://www.hallboard.com") // Nginx, Azure
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials()
+                        .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com", "https://www.hallboard.com") // Nginx, Azure
                 );
             }
         });
@@ -64,14 +67,12 @@ public static class ApplicationServiceExtensions
         #endregion CORS
 
         #region Others
+
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
 
         services.AddHttpClient();
 
-        services.AddSignalR(options =>
-        {
-            options.AddFilter<SignalRExceptionHandler>();
-        });
+        services.AddSignalR(options => { options.AddFilter<SignalRExceptionHandler>(); });
 
         #endregion Others
 

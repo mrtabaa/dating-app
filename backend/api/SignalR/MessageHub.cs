@@ -2,10 +2,10 @@ namespace api.SignalR;
 
 [Authorize]
 public class MessageHub(
-    IMessageRepository _messageRepository,
-    IMessageService _messageService,
-    IUserRepository _userRepository,
-    ITokenService _tokenService) : Hub
+    IMessageRepository messageRepository,
+    IMessageService messageService,
+    IUserRepository userRepository,
+    ITokenService tokenService) : Hub
 {
     public async Task JoinGroup(string? targetUserName)
     {
@@ -34,13 +34,13 @@ public class MessageHub(
 
     private async Task<DateTime> UpdateReadOnAsync(ObjectId userId, string targetUserName, string groupName, MessageOperation operation)
     {
-        ObjectId receiverUserId = await _userRepository.GetIdByUserNameAsync(targetUserName.ToUpper(), GetCancellationToken())
+        ObjectId receiverUserId = await userRepository.GetIdByUserNameAsync(targetUserName.ToUpper(), GetCancellationToken())
                                   ?? throw new HubException("OtherUserId is invalid.");
 
         DateTime updatedReadOn = operation switch
         {
-            MessageOperation.Join => await _messageRepository.UpdateReadOnAsync(receiverUserId, userId, GetCancellationToken()),
-            MessageOperation.Create => await _messageRepository.UpdateReadOnAsync(userId, receiverUserId, GetCancellationToken()),
+            MessageOperation.Join => await messageRepository.UpdateReadOnAsync(receiverUserId, userId, GetCancellationToken()),
+            MessageOperation.Create => await messageRepository.UpdateReadOnAsync(userId, receiverUserId, GetCancellationToken()),
             _ => throw new InvalidOperationException($"Invalid operation: {operation}") // Throw an exception for any invalid operation
         };
 
@@ -58,7 +58,7 @@ public class MessageHub(
 
         ObjectId userId = await GetUserId();
 
-        MessageDto messageDto = await _messageRepository.CreateAsync(userId, messageInDto, GetCancellationToken())
+        MessageDto messageDto = await messageRepository.CreateAsync(userId, messageInDto, GetCancellationToken())
                                 ?? throw new HubException("MessageDto is null. Message creation failed. Try again.");
 
         _ = messageDto.UserOrTargetUserName
@@ -67,11 +67,11 @@ public class MessageHub(
         string groupName = GetGroupName(GetUserName(), messageInDto.ReceiverUserName);
 
         ObjectId receiverUserId =
-            await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
+            await userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, GetCancellationToken())
             ?? throw new HubException("OtherUserId is invalid.");
 
         // Update and get ReadOn if target member is in group. Also update messageDto.ReadOn 
-        if (await _messageService.CheckIsMemberIsInGroupAsync(receiverUserId, groupName, GetCancellationToken()))
+        if (await messageService.CheckIsMemberIsInGroupAsync(receiverUserId, groupName, GetCancellationToken()))
             messageDto.ReadOn = await UpdateReadOnAsync(userId, messageInDto.ReceiverUserName, groupName, MessageOperation.Create);
 
         await Clients.Group(groupName).SendAsync(SignalRMessages.NewMessageRes, messageDto, GetCancellationToken());
@@ -81,10 +81,10 @@ public class MessageHub(
     {
         ObjectId userId = await GetUserId();
 
-        MessageGroup messageGroup = await _messageService.GetMessageGroupAsync(userId, Context.ConnectionId, GetCancellationToken())
+        MessageGroup messageGroup = await messageService.GetMessageGroupAsync(userId, Context.ConnectionId, GetCancellationToken())
                                     ?? throw new HubException("MessageGroup is not found. DB MessageGroup removal will fail.");
 
-        if (!await _messageService.RemoveMessageGroupAsync(userId, messageGroup))
+        if (!await messageService.RemoveMessageGroupAsync(userId, messageGroup))
             throw new HubException("Removing MessageGroup from DB failed.");
 
         await base.OnDisconnectedAsync(exception);
@@ -97,7 +97,7 @@ public class MessageHub(
             groupName
         );
 
-        if (!await _messageService.AddMessageGroupAsync(userId, messageGroup, GetCancellationToken()))
+        if (!await messageService.AddMessageGroupAsync(userId, messageGroup, GetCancellationToken()))
             throw new HubException("Add messageGroup to DB failed.");
     }
 
@@ -105,7 +105,7 @@ public class MessageHub(
         Context.User?.GetUserName() ?? throw new HubException("UserName is invalid. Login again.");
 
     private async Task<ObjectId> GetUserId() =>
-        await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
+        await tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
         ?? throw new HubException("UserId is invalid. Login again.");
 
     private static bool ValidateContent(string content)

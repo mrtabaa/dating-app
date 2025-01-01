@@ -2,10 +2,10 @@ namespace api.Middleware;
 
 public class ExceptionMiddleware
 {
-    private readonly RequestDelegate _next;
-    private readonly IHostEnvironment _env;
     private readonly IMongoCollection<ApiException> _collection;
+    private readonly IHostEnvironment _env;
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly RequestDelegate _next;
 
     public ExceptionMiddleware(
         RequestDelegate next, IHostEnvironment env,
@@ -15,8 +15,8 @@ public class ExceptionMiddleware
         _logger = logger;
         _env = env;
 
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.collectionExceptionLogs);
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.CollectionExceptionLogs);
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -37,7 +37,7 @@ public class ExceptionMiddleware
                 Id = ObjectId.Empty,
                 StatusCode = context.Response.StatusCode,
                 Message = ex.Message,
-                Details = ex.StackTrace?.ToString(),
+                Details = ex.StackTrace,
                 Time = DateTime.Now
             };
 
@@ -48,7 +48,7 @@ public class ExceptionMiddleware
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
-            var json = JsonSerializer.Serialize(response, options);
+            string json = JsonSerializer.Serialize(response, options);
 
             await context.Response.WriteAsync(json);
         }

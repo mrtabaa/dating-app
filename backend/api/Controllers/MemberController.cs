@@ -2,10 +2,10 @@ namespace api.Controllers;
 
 [Authorize]
 public class MemberController(
-    IMemberRepository _memberRepository,
-    IUserRepository _userRepository,
-    IFollowRepository _followRepository,
-    ITokenService _tokenService) : BaseApiController
+    IMemberRepository memberRepository,
+    IUserRepository userRepository,
+    IFollowRepository followRepository,
+    ITokenService tokenService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> GetAll([FromQuery] MemberParams memberParams,
@@ -14,11 +14,11 @@ public class MemberController(
         if (memberParams.MinAge > memberParams.MaxAge)
             return BadRequest("Selected minAge cannot be greater than maxAge.");
 
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again");
 
-        string? gender = await _userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
+        string? gender = await userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
 
         if (gender is not null && string.IsNullOrEmpty(memberParams.Gender))
         {
@@ -26,7 +26,7 @@ public class MemberController(
             memberParams.Gender = gender == "male" ? "female" : "male"; // value is gender here
         }
 
-        PagedList<AppUser>? pagedAppUsers = await _memberRepository.GetPagedListAsync(memberParams, cancellationToken);
+        PagedList<AppUser>? pagedAppUsers = await memberRepository.GetPagedListAsync(memberParams, cancellationToken);
 
         if (pagedAppUsers is null)
             return BadRequest("Returning members has failed. Try again or contact the customer support.");
@@ -42,7 +42,7 @@ public class MemberController(
         List<MemberDto?> memberDtos = [];
 
         foreach (AppUser pagedAppUser in pagedAppUsers)
-            if (await _followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
+            if (await followRepository.CheckIsFollowing(userId.Value, pagedAppUser, cancellationToken))
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser, true));
             else
                 memberDtos.Add(Mappers.ConvertAppUserToMemberDto(pagedAppUser));
@@ -53,7 +53,7 @@ public class MemberController(
     [HttpGet("id/{memberId}")]
     public async Task<ActionResult<MemberDto>> GetById(string memberId, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
@@ -62,7 +62,7 @@ public class MemberController(
         if (!isValid)
             return BadRequest("Invalid memberId. Contact the admin.");
 
-        MemberDto? memberDto = await _memberRepository.GetByIdAsync(userId.Value, memberObjectId, cancellationToken);
+        MemberDto? memberDto = await memberRepository.GetByIdAsync(userId.Value, memberObjectId, cancellationToken);
 
         return memberDto is null ? BadRequest("No member found by this ID.") : memberDto;
     }
@@ -70,11 +70,11 @@ public class MemberController(
     [HttpGet("username/{userName}")]
     public async Task<ActionResult<MemberDto>> GetByUserName(string userName, CancellationToken cancellationToken)
     {
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        MemberDto? memberDto = await _memberRepository.GetByUserNameAsync(userId.Value, userName, cancellationToken);
+        MemberDto? memberDto = await memberRepository.GetByUserNameAsync(userId.Value, userName, cancellationToken);
 
         return memberDto is null ? BadRequest("No user found by this username.") : memberDto;
     }

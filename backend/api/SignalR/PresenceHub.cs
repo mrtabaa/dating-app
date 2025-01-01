@@ -1,18 +1,18 @@
 namespace api.SignalR;
 
 [Authorize]
-public class PresenceHub(IPresenceTrackerService _presenceTrackerService, ITokenService _tokenService) : Hub
+public class PresenceHub(IPresenceTrackerService presenceTrackerService, ITokenService tokenService) : Hub
 {
     public override async Task OnConnectedAsync()
     {
-        ObjectId? userId = await _tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
-                           ?? throw new ArgumentNullException("userId is null", nameof(userId));
+        ObjectId? userId = await tokenService.GetActualUserIdAsync(Context.User?.GetUserIdHashed(), GetCancellationToken())
+                           ?? throw new ArgumentNullException(nameof(userId), "userId is null");
 
-        await _presenceTrackerService.SaveConnectedUserAsync(userId.Value, Context.ConnectionId, GetCancellationToken());
+        await presenceTrackerService.SaveConnectedUserAsync(userId.Value, Context.ConnectionId, GetCancellationToken());
 
         // await Clients.Others.SendAsync(_CheckUserIsOnline, userName, cancellationToken);
 
-        IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync(GetCancellationToken());
+        IEnumerable<OnlineUsersDto> onlineUsersDtos = await presenceTrackerService.GetOnlineUsersDtosAsync(GetCancellationToken());
 
         await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos, GetCancellationToken());
     }
@@ -23,11 +23,11 @@ public class PresenceHub(IPresenceTrackerService _presenceTrackerService, IToken
         if (!string.IsNullOrEmpty(userName))
         {
             // Do NOT use CancellationToken for this request or the ConnectionId does NOT get removed from DB on browser closed.
-            await _presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
+            await presenceTrackerService.RemoveDisconnectedUserAsync(userName, Context.ConnectionId);
 
             // await Clients.Others.SendAsync(_CheckUserIsOffline, userName, cancellationToken);
 
-            IEnumerable<OnlineUsersDto> onlineUsersDtos = await _presenceTrackerService.GetOnlineUsersDtosAsync();
+            IEnumerable<OnlineUsersDto> onlineUsersDtos = await presenceTrackerService.GetOnlineUsersDtosAsync();
 
             await Clients.All.SendAsync(SignalRMessages.GetOnlineUsers, onlineUsersDtos);
         }

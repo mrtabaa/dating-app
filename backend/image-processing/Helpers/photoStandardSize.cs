@@ -2,6 +2,33 @@ namespace image_processing.Helpers;
 
 public class PhotoStandardSize
 {
+    private protected static readonly StandardSize[] Dimensions =
+    [
+        // 4:3
+        new(640, 480),
+        new(800, 600),
+        new(960, 720),
+        new(1024, 768),
+        new(1280, 960),
+        new(1400, 1050),
+        new(1600, 1200),
+        new(1856, 1392),
+        new(1920, 1440),
+        new(2048, 1536),
+
+        // 4:9
+        new(1080, 566),
+        new(960, 540),
+        new(828, 464),
+        new(750, 422),
+        new(640, 360),
+        new(576, 324),
+        new(500, 283),
+        new(480, 270),
+        new(400, 234),
+        new(320, 180)
+    ];
+
     private protected record StandardSize(
         int Side1,
         int Side2
@@ -31,32 +58,6 @@ public class PhotoStandardSize
         _4_9_500x283,
         _4_9_480x270,
         _4_9_400x234,
-        _4_9_320x180,
+        _4_9_320x180
     }
-
-    private protected static readonly StandardSize[] dimensions = [
-        // 4:3
-        new StandardSize( 640, 480),
-        new StandardSize( 800, 600),
-        new StandardSize( 960, 720),
-        new StandardSize( 1024, 768),
-        new StandardSize( 1280, 960),
-        new StandardSize( 1400, 1050),
-        new StandardSize( 1600, 1200),
-        new StandardSize( 1856, 1392),
-        new StandardSize( 1920, 1440),
-        new StandardSize( 2048, 1536),
-
-        // 4:9
-        new StandardSize( 1080, 566),
-        new StandardSize( 960, 540),
-        new StandardSize( 828, 464),
-        new StandardSize( 750, 422),
-        new StandardSize( 640, 360),
-        new StandardSize( 576, 324),
-        new StandardSize( 500, 283),
-        new StandardSize( 480, 270),
-        new StandardSize( 400, 234),
-        new StandardSize( 320, 180)
-    ];
 }

@@ -4,7 +4,25 @@ namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
+    /// <summary>
+    ///     This function gets appUser's main photo's Url_165 and convert it to blobUriWithSas
+    /// </summary>
+    /// <param name="appUser"></param>
+    /// <returns>string blobUriWithSas</returns>
+    private string? GetMainPhoto(AppUser appUser) =>
+        _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url165;
+
+    private async Task<LoggedInDto> ValidateRecaptcha(string recaptchaToken, LoggedInDto loggedInDto, CancellationToken cancellationToken)
+    {
+        bool isValid = await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
+
+        loggedInDto.IsRecaptchaTokenInvalid = !isValid;
+
+        return loggedInDto;
+    }
+
     #region Db and Token Settings
+
     private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
@@ -19,16 +37,19 @@ public class AccountRepository : IAccountRepository
         IPhotoService photoService
     )
     {
-        IMongoDatabase? dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.collectionUsers);
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
+                                ?? throw new ArgumentNullException(nameof(dbName), "The database name cannot be null.");
+        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
         _recaptchaService = turnstileValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;
         _photoService = photoService;
     }
+
     #endregion
 
     #region CRUD
+
     public async Task<LoggedInDto> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
@@ -41,11 +62,11 @@ public class AccountRepository : IAccountRepository
 
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
 
-        IdentityResult? userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
+        IdentityResult userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
 
         if (userCreatedResult.Succeeded)
         {
-            IdentityResult? roleResult = await _userManager.AddToRoleAsync(appUser, Roles.member.ToString());
+            IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
 
             if (!roleResult.Succeeded) // failed
                 return loggedInDto;
@@ -58,10 +79,9 @@ public class AccountRepository : IAccountRepository
         else // Store and return userCreatedResult errors if failed. 
         {
             foreach (IdentityError error in userCreatedResult.Errors)
-            {
                 loggedInDto.Errors.Add(error.Description);
-            }
         }
+
         #endregion Create user, token and role
 
         return loggedInDto; // failed
@@ -72,8 +92,8 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
-        if (loggedInDto.IsRecaptchaTokenInvalid)
-            return loggedInDto;
+        // if (loggedInDto.IsRecaptchaTokenInvalid)
+        //     return loggedInDto;
 
         AppUser? appUser;
 
@@ -97,10 +117,9 @@ public class AccountRepository : IAccountRepository
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        if (!string.IsNullOrEmpty(token))
-            return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.RecaptchaToken); // Return loggedInDto
-
-        return loggedInDto;
+        return !string.IsNullOrEmpty(token)
+            ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.RecaptchaToken)
+            : loggedInDto;
     }
 
     public async Task<LoggedInDto?> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
@@ -129,23 +148,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
-       await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
+        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
+
     #endregion CRUD
-
-    /// <summary>
-    /// This function gets appUser's main photo's Url_165 and convert it to blobUriWithSas
-    /// </summary>
-    /// <param name="appUser"></param>
-    /// <returns>string blobUriWithSas</returns>
-    private string? GetMainPhoto(AppUser appUser) =>
-     _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url_165;
-
-    private async Task<LoggedInDto> ValidateRecaptcha(string recaptchaToken, LoggedInDto loggedInDto, CancellationToken cancellationToken)
-    {
-        bool isValid = await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
-
-        loggedInDto.IsRecaptchaTokenInvalid = !isValid;
-
-        return loggedInDto;
-    }
 }

@@ -115,7 +115,7 @@ export class MemberDetailComponent implements OnInit, AfterViewChecked {
   setGalleryImages(): void {
     if (this.member)
       for (const photo of this.member.photos) {
-        this.images.push(new ImageItem({src: photo.url_enlarged, thumb: photo.url_165}));
+        this.images.push(new ImageItem({src: photo.urlEnlarged, thumb: photo.url165}));
       }
 
     // load ng-gallery and insert images

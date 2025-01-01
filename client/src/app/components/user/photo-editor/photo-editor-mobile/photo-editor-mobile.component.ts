@@ -100,7 +100,7 @@ export class PhotoEditorMobileComponent implements OnInit {
 
           // set navbar profile photo when first photo is uploaded
           if (this.memberIn?.photos.length === 1)
-            this.setNavbarProfilePhoto(photo.url_165)
+            this.setNavbarProfilePhoto(photo.url165)
         }
 
         this.isUploading = false;
@@ -117,7 +117,7 @@ export class PhotoEditorMobileComponent implements OnInit {
 
   /**
    * Set main photo for card and album
-   * @param url_165In 
+   * @param url_165In
    */
   setMainPhoto(url_165In: string): void {
     this.userService.setMainPhoto(url_165In)
@@ -132,7 +132,7 @@ export class PhotoEditorMobileComponent implements OnInit {
                 photo.isMain = false;
 
               // set new selected main
-              if (photo.url_165 === url_165In && this.loggedInUser) {
+              if (photo.url165 === url_165In && this.loggedInUser) {
                 photo.isMain = true;
 
                 // update navbar photo
@@ -173,7 +173,7 @@ export class PhotoEditorMobileComponent implements OnInit {
 
   /**
    * Set navbar profile photo ONLY when FIRST photo is uploaded.
-   * @param url_165 
+   * @param url_165
    */
   private setNavbarProfilePhoto(url_165: string): void {
     if (this.loggedInUser) {
@@ -197,7 +197,7 @@ export class PhotoEditorMobileComponent implements OnInit {
 
       for (const photo of this.memberIn.photos) {
         // If the deleted photo was main => Update the next photo as main.
-        if (photo.url_165.includes(imageUrlFirstPart[0]))
+        if (photo.url165.includes(imageUrlFirstPart[0]))
           photo.isMain = true;
       }
     }

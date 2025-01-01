@@ -108,7 +108,7 @@ export class PhotoEditorComponent implements OnInit {
 
           // set navbar profile photo when first photo is uploaded
           if (this.memberIn?.photos.length === 1) {
-            this.setNavbarProfilePhoto(photo.url_165);
+            this.setNavbarProfilePhoto(photo.url165);
           }
         }
 
@@ -142,7 +142,7 @@ export class PhotoEditorComponent implements OnInit {
                 photo.isMain = false;
 
               // set new selected main
-              if (photo.url_165 === url_165In && this.loggedInUser) {
+              if (photo.url165 === url_165In && this.loggedInUser) {
                 photo.isMain = true;
 
                 // update navbar photo
@@ -215,7 +215,7 @@ export class PhotoEditorComponent implements OnInit {
 
       for (const photo of this.memberIn.photos) {
         // If the deleted photo was main => Update the next photo as main.
-        if (photo.url_165.includes(imageUrlFirstPart[0]))
+        if (photo.url165.includes(imageUrlFirstPart[0]))
           photo.isMain = true;
       }
     }

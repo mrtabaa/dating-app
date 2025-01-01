@@ -1,28 +1,23 @@
-namespace api.Controllers;
+using api.DTOs.helpers;
 
-public class SeedUsersController : BaseApiController
+namespace api.Controllers.Helpers;
+
+public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+    : BaseApiController
 {
     #region Db Settings
-    private readonly IMongoDatabase _database;
-    private readonly IMongoClient _client;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly RoleManager<AppRole> _roleManager;
 
-    public SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
-    {
-        _database = client.GetDatabase(dbSettings.DatabaseName);
-        _client = client;
+    private readonly IMongoDatabase _database = client.GetDatabase(dbSettings.DatabaseName);
 
-        _userManager = userManager;
-        _roleManager = roleManager;
-    }
     #endregion
 
     #region Add Dummy users to DB
+
     [HttpPost]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(IEnumerable<DummyRegisterDto> inputUsersDummy)
     {
         #region If databaseExists
+
         // check if database already exists using its status
         // https://stackoverflow.com/a/53803908/3944285
         var command = "{ dbStats: 1, scale: 1 }";
@@ -31,40 +26,40 @@ public class SeedUsersController : BaseApiController
 
         if (dbStats["collections"].BsonType == BsonType.Int64)
         {
-            var collectionsCount = dbStats["collections"].AsInt64;
+            long collectionsCount = dbStats["collections"].AsInt64;
             databaseExists = collectionsCount > 0 || dbStats["indexes"].AsInt64 > 0;
         }
         else
         {
-            var collectionsCount = dbStats["collections"].AsInt32;
+            int collectionsCount = dbStats["collections"].AsInt32;
             databaseExists = collectionsCount > 0 || dbStats["indexes"].AsInt32 > 0;
         }
 
-        if (databaseExists == true)
+        if (databaseExists)
             // return BadRequest("Database already exists");
             // await _database.DropCollectionAsync(_collectionName);
-            await _client.DropDatabaseAsync("dating-app");
+            await client.DropDatabaseAsync("dating-app");
+
         #endregion
 
         #region Import db seed
+
         // add each user to DB
-        List < AppUser > appUsers = [];
+        List<AppUser> appUsers = [];
 
         #region Roles Management
-        AppRole[] roles = AppVariablesExtensions.roles;
 
-        foreach (AppRole role in roles)
-        {
-            await _roleManager.CreateAsync(role);
-        }
+        AppRole[] roles = AppVariablesExtensions.Roles;
 
-        foreach (var userInput in inputUsersDummy)
+        foreach (AppRole role in roles) await roleManager.CreateAsync(role);
+
+        foreach (DummyRegisterDto userInput in inputUsersDummy)
         {
             AppUser appUser = Mappers.ConvertDummyRegisterDtoToAppUser(userInput);
 
-            await _userManager.CreateAsync(appUser, userInput.Password);
+            await userManager.CreateAsync(appUser, userInput.Password);
 
-            await _userManager.AddToRoleAsync(appUser, Roles.member.ToString());
+            await userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
 
             appUsers.Add(appUser);
         }
@@ -76,8 +71,8 @@ public class SeedUsersController : BaseApiController
             IsProfileCompleted = true
         };
 
-        await _userManager.CreateAsync(admin, "Aaaaaaa/1");
-        await _userManager.AddToRolesAsync(admin, [Roles.admin.ToString(), Roles.moderator.ToString()]);
+        await userManager.CreateAsync(admin, "Aaaaaaa/1");
+        await userManager.AddToRolesAsync(admin, [Roles.Admin.ToString(), Roles.Moderator.ToString()]);
 
         AppUser moderator = new()
         {
@@ -86,20 +81,19 @@ public class SeedUsersController : BaseApiController
             IsProfileCompleted = true
         };
 
-        await _userManager.CreateAsync(moderator, "Aaaaaaa/1");
-        await _userManager.AddToRolesAsync(moderator, [Roles.moderator.ToString()]);
+        await userManager.CreateAsync(moderator, "Aaaaaaa/1");
+        await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString()]);
 
         #endregion Roles Management
 
         // convert AppUser to MemberDto
         List<MemberDto?> memberDtos = [];
-        foreach (AppUser appuser in appUsers)
-        {
-            memberDtos.Add(Mappers.ConvertAppUserToMemberDto(appuser));
-        }
+        foreach (AppUser appuser in appUsers) memberDtos.Add(Mappers.ConvertAppUserToMemberDto(appuser));
 
         return memberDtos;
+
         #endregion
     }
+
     #endregion
 }
