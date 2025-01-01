@@ -89,6 +89,13 @@ export class PhotoEditorMobileComponent implements OnInit {
       }
 
       this.uploader.onWhenAddingFileFailed = (file) => {
+        if (!file.type?.startsWith('image'))
+          this.snackBar.open('Upload an image only.', 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 7000
+          });
+
         if (file.size > this.maxFileSize)
           this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', {
             horizontalPosition: 'center',
