@@ -25,7 +25,7 @@ main {
     }
 
     .messages-container {
-      height: calc(100dvh - $tabGroup_h - $form-field_h - 3rem);
+      height: calc(100dvh - $tabGroup_h - $form-field_h);
       margin-bottom: 0.5rem;
 
       .item {
