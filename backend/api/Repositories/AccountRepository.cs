@@ -92,8 +92,8 @@ public class AccountRepository : IAccountRepository
         LoggedInDto loggedInDto = new();
 
         loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
-        // if (loggedInDto.IsRecaptchaTokenInvalid)
-        //     return loggedInDto;
+        if (loggedInDto.IsRecaptchaTokenInvalid)
+            return loggedInDto;
 
         AppUser? appUser;
 
