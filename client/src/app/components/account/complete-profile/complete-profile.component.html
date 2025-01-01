@@ -5,7 +5,7 @@
     <mat-step [stepControl]="starterFg">
       <div class="container">
         <form [formGroup]="starterFg">
-          <ng-template matStepLabel>{{ starterLable }}</ng-template>
+          <ng-template matStepLabel>{{ starterLabel }}</ng-template>
           <mat-form-field appearaance="outline">
             <mat-label>Name or Nickname</mat-label>
             <input formControlName="knownAsCtrl" matInput placeholder="Nickname" required>
@@ -150,7 +150,7 @@
             <mat-expansion-panel [expanded]="true">
               <mat-expansion-panel-header>
                 <mat-panel-title>
-                  {{ starterLable }}
+                  {{ starterLabel }}
                 </mat-panel-title>
                 @if (!isMobileSig()) {
                   <mat-panel-description>

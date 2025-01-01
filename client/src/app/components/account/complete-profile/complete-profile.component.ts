@@ -44,7 +44,7 @@ export class CompleteProfileComponent implements OnInit {
   readonly maxTextAreaChars: number = 1000;
   readonly minInputChars: number = 3;
   readonly maxInputChars: number = 50;
-  readonly starterLable = 'Starter';
+  readonly starterLabel = 'Starter';
   readonly starterSummary = 'Your basic information';
   readonly photosLabel = 'Photos';
   readonly introductionLabel = 'Introduction';
