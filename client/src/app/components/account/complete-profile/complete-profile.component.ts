@@ -82,12 +82,16 @@ export class CompleteProfileComponent implements OnInit {
       this.googlePlacesService.isCountrySelectedSig(); // trigger
 
       // validate locationCtrl on isCountrySelectedSig update
-      this.starterFg.get('locationCtrl')?.updateValueAndValidity({emitEvent: true});
+      this.LocationCtrl.updateValueAndValidity();
     });
   }
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
+  }
+
+  get LocationCtrl(): AbstractControl {
+    return this.starterFg.get('locationCtrl') as FormControl;
   }
 
   get IntroductionCtrl(): AbstractControl {
