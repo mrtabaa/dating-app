@@ -64,13 +64,13 @@ public class UserRepository : IUserRepository
         await _collection.AsQueryable()
             .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
             .Select(appUser => appUser.KnownAs)
-            .FirstOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<string?> GetGenderByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
         await _collection.AsQueryable()
             .Where(appUser => appUser.Id == userId)
             .Select(appUser => appUser.Gender)
-            .FirstOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(cancellationToken);
 
     public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, ObjectId userId, CancellationToken cancellationToken)
     {
