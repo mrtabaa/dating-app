@@ -40,18 +40,11 @@
               </div>
             </mat-card-content>
             <mat-card-actions>
-              <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
-                @if (!recaptchaCtrl.value) {
-                  <span style="color: palevioletred;">Not a robot? Slide me!</span>
-                } @else {
-                  <span style="color: #ba005c;">Validated</span>
-                }
-              </mat-slide-toggle>
               <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid
-                        || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button color="primary">
+                        || !isAnyValueChanged()" mat-raised-button color="primary">
                 Save Changes
               </button>
-              <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
+              <button (click)="(initControllersValues(member))" [disabled]="!isAnyValueChanged()"
                       mat-stroked-button color="warn">
                 Reset
               </button>
@@ -129,21 +122,13 @@
 
               @if (isMobileSig() && isAnyValueChanged()) {
                 <div class="mobile-submit">
-                  <mat-slide-toggle [formControl]="recaptchaCtrl" (change)="validateRecaptcha()"
-                                    color="primary">
-                    @if (!recaptchaCtrl.value) {
-                      <span style="color: palevioletred;">Not a robot? Slide me!</span>
-                    } @else {
-                      <span style="color: #ba005c;">Validated</span>
-                    }
-                  </mat-slide-toggle>
                   <div class="mobile-buttons">
                     <button type="submit" (click)="updateUser(member)" [disabled]="userEditFg.invalid
-                                                || !isAnyValueChanged() || !recaptchaCtrl.value" mat-raised-button
+                                                || !isAnyValueChanged()" mat-raised-button
                             color="primary">
                       Save Changes
                     </button>
-                    <button (click)="(initContollersValues(member))" [disabled]="!isAnyValueChanged()"
+                    <button (click)="(initControllersValues(member))" [disabled]="!isAnyValueChanged()"
                             mat-stroked-button color="warn">
                       Reset
                     </button>
