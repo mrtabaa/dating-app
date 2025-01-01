@@ -28,9 +28,9 @@ public class UserController(IUserRepository userRepository, ITokenService tokenS
 
     #region Photo Management
 
-    // only jpeg, jpg, png. Between 100KB and 4MB(2000x2000)
+    // only jpeg, jpg, png, webp. Between 50KB and 4MB(2000x2000)
     [HttpPost("add-photo")]
-    public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions] [FileSize(100_000, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<Photo>> AddPhoto([AllowedFileExtensions] [FileSize(50_000, 2000 * 2000)] IFormFile file, CancellationToken cancellationToken)
     {
         ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)

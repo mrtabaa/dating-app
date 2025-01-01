@@ -1,48 +1,44 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { FileUploadModule, FileUploader } from 'ng2-file-upload';
-import { take } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
-import { ApiResponseMessage } from '../../../../models/helpers/api-response-message';
-import { PhotoDeleteResponse } from '../../../../models/helpers/photo-delete-response';
-import { LoggedInUser } from '../../../../models/logged-in-user.model';
-import { Member } from '../../../../models/member.model';
-import { Photo } from '../../../../models/photo.model';
-import { AccountService } from '../../../../services/account.service';
-import { UserService } from '../../../../services/user.service';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
+import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {FileUploader, FileUploadModule} from 'ng2-file-upload';
+import {take} from 'rxjs';
+import {environment} from '../../../../../environments/environment';
+import {ApiResponseMessage} from '../../../../models/helpers/api-response-message';
+import {PhotoDeleteResponse} from '../../../../models/helpers/photo-delete-response';
+import {LoggedInUser} from '../../../../models/logged-in-user.model';
+import {Member} from '../../../../models/member.model';
+import {Photo} from '../../../../models/photo.model';
+import {AccountService} from '../../../../services/account.service';
+import {UserService} from '../../../../services/user.service';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatCardModule} from '@angular/material/card';
 
 @Component({
-    selector: 'app-photo-editor-mobile',
-    imports: [
-        CommonModule, NgOptimizedImage,
-        MatIconModule, MatButtonModule, MatFormFieldModule, MatCardModule,
-        FileUploadModule
-    ],
-    templateUrl: './photo-editor-mobile.component.html',
-    styleUrl: './photo-editor-mobile.component.scss'
+  selector: 'app-photo-editor-mobile',
+  imports: [
+    CommonModule, NgOptimizedImage,
+    MatIconModule, MatButtonModule, MatFormFieldModule, MatCardModule,
+    FileUploadModule
+  ],
+  templateUrl: './photo-editor-mobile.component.html',
+  styleUrl: './photo-editor-mobile.component.scss'
 })
 export class PhotoEditorMobileComponent implements OnInit {
   @Input() memberIn: Member | undefined;
   @Output() isUploadingOut = new EventEmitter<boolean>(false);
   isUploading = false;
-
+  loggedInUser: LoggedInUser | null | undefined;
+  baseApiUrl: string = environment.apiUrl;
+  uploader: FileUploader | undefined;
+  hasBaseDropZoneOver = false;
   private accountService = inject(AccountService);
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
-
   private readonly maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
-  private readonly minFileSize = 100_000; // 100KB in bytes
-
-  loggedInUser: LoggedInUser | null | undefined;
-  baseApiUrl: string = environment.apiUrl;
-
-  uploader: FileUploader | undefined;
-  hasBaseDropZoneOver = false;
+  private readonly minFileSize = 50_000; // 50KB in bytes
 
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
@@ -73,7 +69,11 @@ export class PhotoEditorMobileComponent implements OnInit {
         file.withCredentials = false;
 
         if (file.file.size < this.minFileSize) {
-          this.snackBar.open('Photo has to be Larger than ' + Math.floor(this.minFileSize / 1000) + 'KB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+          this.snackBar.open('Photo has to be Larger than ' + Math.floor(this.minFileSize / 1000) + 'KB', 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 7000
+          });
           this.uploader?.clearQueue();
         }
       }
@@ -90,7 +90,11 @@ export class PhotoEditorMobileComponent implements OnInit {
 
       this.uploader.onWhenAddingFileFailed = (file) => {
         if (file.size > this.maxFileSize)
-          this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+          this.snackBar.open('Photo has to be Smaller than ' + Math.floor(this.maxFileSize / 1_000_000) + 'MB', 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 7000
+          });
       }
 
       this.uploader.onSuccessItem = (item, response) => {
@@ -108,11 +112,19 @@ export class PhotoEditorMobileComponent implements OnInit {
       }
 
       this.uploader.onErrorItem = (item, error) => {
-        if (error)
-          this.snackBar.open(error, 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 });
+        if (error) {
+          this.isUploading = false;
+          const errorJson = JSON.parse(error);
+          this.snackBar.open(errorJson.errors.file[0], 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 7000
+          });
+        }
       }
     }
   }
+
   //#endregion Photo Upload using `ng2-file-upload`
 
   /**
@@ -128,7 +140,7 @@ export class PhotoEditorMobileComponent implements OnInit {
 
             this.memberIn.photos.forEach(photo => {
               // unset previous main
-              if (photo.isMain === true)
+              if (photo.isMain)
                 photo.isMain = false;
 
               // set new selected main
@@ -141,7 +153,11 @@ export class PhotoEditorMobileComponent implements OnInit {
               }
             })
 
-            this.snackBar.open(response.message, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+            this.snackBar.open(response.message, 'Close', {
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+              duration: 7000
+            });
           }
         }
       });
@@ -165,7 +181,11 @@ export class PhotoEditorMobileComponent implements OnInit {
             if (pDR.newMainUrl)
               this.setNextMainWhenMainDeleted(pDR);
 
-            this.snackBar.open(pDR.successMessage, 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+            this.snackBar.open(pDR.successMessage, 'Close', {
+              horizontalPosition: 'center',
+              verticalPosition: 'bottom',
+              duration: 7000
+            });
           }
         }
       })

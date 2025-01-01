@@ -19,15 +19,15 @@ import {ResponsiveService} from '../../../services/responsive.service';
 import {PhotoEditorMobileComponent} from './photo-editor-mobile/photo-editor-mobile.component';
 
 @Component({
-    selector: 'app-photo-editor',
-    imports: [
-        CommonModule, NgOptimizedImage,
-        PhotoEditorMobileComponent,
-        MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
-        FileUploadModule
-    ],
-    templateUrl: './photo-editor.component.html',
-    styleUrls: ['./photo-editor.component.scss']
+  selector: 'app-photo-editor',
+  imports: [
+    CommonModule, NgOptimizedImage,
+    PhotoEditorMobileComponent,
+    MatIconModule, MatFormFieldModule, MatCardModule, MatButtonModule,
+    FileUploadModule
+  ],
+  templateUrl: './photo-editor.component.html',
+  styleUrls: ['./photo-editor.component.scss']
 })
 export class PhotoEditorComponent implements OnInit {
   @Input() memberIn: Member | undefined;
@@ -42,7 +42,7 @@ export class PhotoEditorComponent implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
   private readonly maxFileSize = 4 * 1024 * 1024; // 4MB in bytes
-  private readonly minFileSize = 100_000; // 100KB in bytes
+  private readonly minFileSize = 50_000; // 50KB in bytes
 
   constructor() {
     this.loggedInUser = this.accountService.loggedInUserSig();
@@ -117,8 +117,15 @@ export class PhotoEditorComponent implements OnInit {
       }
 
       this.uploader.onErrorItem = (item, error) => {
-        if (error)
-          this.snackBar.open(error, 'Close', {horizontalPosition: 'center', verticalPosition: 'top', duration: 7000});
+        if (error) {
+          this.isUploading = false;
+          const errorJson = JSON.parse(error);
+          this.snackBar.open(errorJson.errors.file[0], 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 7000
+          });
+        }
       }
     }
   }
