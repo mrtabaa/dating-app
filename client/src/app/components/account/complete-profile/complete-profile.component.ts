@@ -1,4 +1,4 @@
-import {Component, inject, OnInit, Signal, ViewChild} from '@angular/core';
+import {Component, effect, inject, OnInit, Signal, ViewChild} from '@angular/core';
 import {AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
@@ -24,6 +24,7 @@ import {MatDividerModule} from '@angular/material/divider';
 import {GooglePlacesComponent} from '../../google-places/google-places.component';
 import {ResponsiveService} from '../../../services/responsive.service';
 import {PhotoEditorMobileComponent} from '../../user/photo-editor/photo-editor-mobile/photo-editor-mobile.component';
+import {locationValidator} from "../../../validators/location.validator";
 
 @Component({
   selector: 'app-complete-profile',
@@ -57,8 +58,9 @@ export class CompleteProfileComponent implements OnInit {
   @ViewChild(GooglePlacesComponent) private googlePlacesComponent: GooglePlacesComponent | undefined;
   private fb = inject(FormBuilder);
   starterFg = this.fb.group({
-    knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]]
-  })
+    knownAsCtrl: [null, [Validators.required, Validators.maxLength(this.maxInputChars)]],
+    locationCtrl: [null, [locationValidator()]]
+  });
   introductionCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   interestsCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
   lookingForCtrl = this.fb.control('', [Validators.maxLength(this.maxTextAreaChars)]);
@@ -74,6 +76,15 @@ export class CompleteProfileComponent implements OnInit {
   isCountrySelectedSig: Signal<boolean> = this.googlePlacesService.isCountrySelectedSig;
   private router = inject(Router);
   private matSnack = inject(MatSnackBar);
+
+  constructor() {
+    effect(() => {
+      this.googlePlacesService.isCountrySelectedSig(); // trigger
+
+      // validate locationCtrl on isCountrySelectedSig update
+      this.starterFg.get('locationCtrl')?.updateValueAndValidity({emitEvent: true});
+    });
+  }
 
   get KnownAsCtrl(): AbstractControl {
     return this.starterFg.get('knownAsCtrl') as FormControl;
