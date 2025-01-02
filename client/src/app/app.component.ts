@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, effect, ElementRef, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Router, RouterOutlet} from '@angular/router';
 import {AccountService} from './services/account.service';
@@ -25,12 +25,22 @@ export class AppComponent implements OnInit {
   router = inject(Router);
   isMobileSig = inject(ResponsiveService).isMobileSig;
   commonService = inject(CommonService);
-  isMobileView$: Observable<boolean>;
+  isMobileView$: Observable<boolean> | undefined;
   title = 'Hallboard';
   isLoading: boolean = false;
+  private elementRef = inject(ElementRef);
   private breakpointObserver = inject(BreakpointObserver);
 
   constructor() {
+    this.setBreakpointObserver();
+    this.applyEffect();
+  }
+
+  ngOnInit(): void {
+    this.accountService.reloadLoggedInUser();
+  }
+
+  private setBreakpointObserver(): void {
     this.isMobileView$ = this.breakpointObserver.observe('(min-width: 51rem)') // include iPad/tablet
       .pipe(map(({matches}) => {
         matches = !matches
@@ -41,7 +51,15 @@ export class AppComponent implements OnInit {
       }));
   }
 
-  ngOnInit(): void {
-    this.accountService.reloadLoggedInUser();
+  private applyEffect(): void {
+    effect(() => {
+      if (this.accountService.loggedInUserSig()) {
+        const badge = this.elementRef.nativeElement.ownerDocument.querySelector('.grecaptcha-badge');
+        if (badge) {
+          console.log(this.accountService.loggedInUserSig());
+          (badge as HTMLElement).style.display = 'none';
+        }
+      }
+    });
   }
 }
