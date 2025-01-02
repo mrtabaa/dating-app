@@ -1,0 +1,40 @@
+$navbar-footer_h: 56px * 2;
+$mainNav_h: 3.3rem;
+$title_h: 5rem;
+
+.messages-container {
+  height: calc(100dvh - $navbar-footer_h - $mainNav_h - $title_h);
+
+  .item {
+    border-bottom: rgb(194, 194, 194) dotted 1px;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    min-height: 50px;
+
+    img {
+      border-radius: 50%;
+    }
+
+    .details {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      * {
+        margin: 0;
+      }
+
+      .row1 {
+        display: flex;
+        justify-content: space-between;
+        color: rgb(116, 116, 116);
+      }
+
+      .row2 {
+        //background-color: lightgray;
+
+      }
+    }
+  }
+}

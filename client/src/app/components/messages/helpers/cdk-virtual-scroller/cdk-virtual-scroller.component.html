@@ -11,6 +11,7 @@
       <div class="details">
         <div class="row1">
           <p>{{ message.userOrTargetUserName | shortenString: 15 }}</p>
+          <p>{{ message.userOrTargetKnownAs | shortenString: 15 }}</p>
           <p class="date">{{ message.sentOn | date }}</p>
         </div>
         <p [ngStyle]="{'font-weight': message.readOn ? 'normal' : 'bold'}" class="row2">{{
