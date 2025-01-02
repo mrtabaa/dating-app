@@ -56,7 +56,6 @@ export class AppComponent implements OnInit {
       if (this.accountService.loggedInUserSig()) {
         const badge = this.elementRef.nativeElement.ownerDocument.querySelector('.grecaptcha-badge');
         if (badge) {
-          console.log(this.accountService.loggedInUserSig());
           (badge as HTMLElement).style.display = 'none';
         }
       }
