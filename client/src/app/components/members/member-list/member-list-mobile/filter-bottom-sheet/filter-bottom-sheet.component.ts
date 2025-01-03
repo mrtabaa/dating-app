@@ -1,44 +1,45 @@
-import { Component, inject } from '@angular/core';
-import { FormBuilder, AbstractControl, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSliderModule } from '@angular/material/slider';
-import { MemberService } from '../../../../../services/member.service';
+import {Component, inject} from '@angular/core';
+import {AbstractControl, FormBuilder, FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatSelectModule} from '@angular/material/select';
+import {MatSliderModule} from '@angular/material/slider';
+import {MemberService} from '../../../../../services/member.service';
 
 @Component({
-    selector: 'app-filter-bottom-sheet',
-    imports: [
-        FormsModule, ReactiveFormsModule, MatDividerModule,
-        MatSliderModule, MatSelectModule, MatButtonModule,
-    ],
-    templateUrl: './filter-bottom-sheet.component.html',
-    styleUrl: './filter-bottom-sheet.component.scss'
+  selector: 'app-filter-bottom-sheet',
+  imports: [
+    FormsModule, ReactiveFormsModule, MatDividerModule,
+    MatSliderModule, MatSelectModule, MatButtonModule,
+  ],
+  templateUrl: './filter-bottom-sheet.component.html',
+  styleUrl: './filter-bottom-sheet.component.scss'
 })
 export class FilterBottomSheetComponent {
-  private _fb = inject(FormBuilder);
-  private _memberService = inject(MemberService);
-  private _memberParams = inject(MemberService).memberParams;
-
   minAge = 18;
   maxAge = 99;
-
-  //#region Reactive Form 
+  private _fb = inject(FormBuilder);
+  private _memberService = inject(MemberService);
+  //#region Reactive Form
   filterFg = this._fb.group({
     genderCtrl: [this._memberService.selectedGenderSig()],
     minAgeCtrl: [this._memberService.selectedMinAgeSig()],
     maxAgeCtrl: [this._memberService.selectedMaxAgeSig()]
   });
+  private _memberParams = inject(MemberService).memberParams;
 
   get GenderCtrl(): AbstractControl {
     return this.filterFg.get('genderCtrl') as FormControl;
   }
+
   get MinAgeCtrl(): AbstractControl {
     return this.filterFg.get('minAgeCtrl') as FormControl;
   }
+
   get MaxAgeCtrl(): AbstractControl {
     return this.filterFg.get('maxAgeCtrl') as FormControl;
   }
+
   //#endregion Reactive form
 
   updateMemberParams(): void {
@@ -51,8 +52,6 @@ export class FilterBottomSheetComponent {
       this._memberService.selectedGenderSig.set(this.GenderCtrl.value)
       this._memberService.selectedMinAgeSig.set(this.MinAgeCtrl.value)
       this._memberService.selectedMaxAgeSig.set(this.MaxAgeCtrl.value)
-
-      this._memberService.setMemberParams(this._memberParams);
 
       this._memberService.eventEmitOrderFilterBottomSheet.emit();
     }

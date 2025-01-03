@@ -1,21 +1,21 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { Member } from '../models/member.model';
-import { PaginatedResult } from '../models/helpers/paginatedResult';
-import { PaginationHandler } from '../extensions/paginationHandler';
-import { ApiResponseMessage } from '../models/helpers/api-response-message';
-import { FollowModifiedEmit } from '../models/helpers/follow-modified-emit';
-import { FollowParams } from '../models/helpers/follow-params';
-import { MemberService } from './member.service';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {environment} from '../../environments/environment';
+import {Member} from '../models/member.model';
+import {PaginatedResult} from '../models/helpers/paginatedResult';
+import {PaginationHandler} from '../extensions/paginationHandler';
+import {ApiResponseMessage} from '../models/helpers/api-response-message';
+import {FollowModifiedEmit} from '../models/helpers/follow-modified-emit';
+import {FollowParams} from '../models/helpers/follow-params';
+import {MemberService} from './member.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FollowService {
   private http = inject(HttpClient);
-  private memberServie = inject(MemberService);
+  private _memberService = inject(MemberService);
 
   private baseUrl = environment.apiUrl + 'follow/';
   private paginationHandler = new PaginationHandler();
@@ -27,13 +27,13 @@ export class FollowService {
   }
 
   addFollow(username: string): Observable<ApiResponseMessage> {
-    this.memberServie.resetMembersAfterFollowModified(username, true); // Reasign MemberService's cached members.
+    this._memberService.resetMembersAfterFollowModified(username, true); // Reassign MemberService's cached members.
 
     return this.http.post<ApiResponseMessage>(this.baseUrl + username, {});
   }
 
   removeFollow(username: string): Observable<ApiResponseMessage> {
-    this.memberServie.resetMembersAfterFollowModified(username, false); // Reasign MemberService's cached members.
+    this._memberService.resetMembersAfterFollowModified(username, false); // Reassign MemberService's cached members.
 
     return this.http.delete<ApiResponseMessage>(this.baseUrl + username);
   }
@@ -60,5 +60,6 @@ export class FollowService {
 
     return params;
   }
+
   //#endregion
 }
