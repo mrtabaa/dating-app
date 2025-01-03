@@ -29,6 +29,11 @@ $title_h: 5rem;
         display: flex;
         justify-content: space-between;
         color: rgb(116, 116, 116);
+
+        .member-info {
+          display: flex;
+          gap: 2px;
+        }
       }
 
       .row2 {

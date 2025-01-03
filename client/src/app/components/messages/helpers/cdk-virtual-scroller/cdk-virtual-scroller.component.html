@@ -10,8 +10,10 @@
       }
       <div class="details">
         <div class="row1">
-          <p>{{ message.userOrTargetUserName | shortenString: 15 }}</p>
-          <p>{{ message.userOrTargetKnownAs | shortenString: 15 }}</p>
+          <div class="member-info">
+            <p>{{ message.userOrTargetKnownAs | shortenString: 10 }}</p>
+            <p>({{ message.userOrTargetUserName | shortenString: 15 }})</p>
+          </div>
           <p class="date">{{ message.sentOn | date }}</p>
         </div>
         <p [ngStyle]="{'font-weight': message.readOn ? 'normal' : 'bold'}" class="row2">{{
