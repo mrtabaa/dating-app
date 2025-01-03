@@ -150,6 +150,11 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  goHome(): void {
+    this._isMemberMessageCompSig.set(false);
+    this.router.navigate(['/main']);
+  }
+
   private updateOnlineUser(): void {
     effect(() => {
       const onlineUser = this.onlineUsersSig().find(member => member.userName === this.member?.userName.toUpperCase());

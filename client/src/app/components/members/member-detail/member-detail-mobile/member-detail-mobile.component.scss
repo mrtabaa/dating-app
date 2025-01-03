@@ -3,6 +3,14 @@ main {
     flex-direction: column;
     gap: 0.5rem;
 
+  .home {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    color: #db7093;
+  }
+
     img {
         border-radius: 1rem;
     }

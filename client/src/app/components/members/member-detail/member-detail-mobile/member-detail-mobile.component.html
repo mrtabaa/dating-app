@@ -1,6 +1,9 @@
 @if (member) {
   <main>
-    @if (!isOnMessageTab) {
+    @if (isOnMessageTab) {
+      <mat-icon (click)="goHome()" class="home">home</mat-icon>
+    }
+    @else {
       <section class="details">
         <section class="title">
           <div class="photo-info">
