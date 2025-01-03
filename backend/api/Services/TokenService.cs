@@ -35,7 +35,6 @@ public class TokenService : ITokenService
                 new(JwtRegisteredClaimNames.Jti, jtiValue) // session identifier or token ID, // TODO: store in db/cache to prevent multiple login sessions with one token. If already exists, reject new login.
             };
 
-
             // Get user's roles and add them all into claims
             IList<string> roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
