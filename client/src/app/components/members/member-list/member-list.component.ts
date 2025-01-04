@@ -145,9 +145,6 @@ export class MemberListComponent implements OnDestroy {
   }
 
   isAnyFilterApplied(): boolean {
-    console.log('PARAMS', this.memberParams);
-    console.log('FILTER', this.filterFg.value);
-
     return this.OrderByCtrl.value === this.memberParams?.orderBy &&
       (this.UserNameOrKnownAs.pristine || this.UserNameOrKnownAs.value?.length < 1) &&
       (this.GenderCtrl.pristine || this.GenderCtrl.value === this.memberParams?.gender) &&
