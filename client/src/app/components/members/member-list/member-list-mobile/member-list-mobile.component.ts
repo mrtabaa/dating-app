@@ -1,41 +1,35 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { Subscription } from 'rxjs';
-import { MemberParams } from '../../../../models/helpers/member-params';
-import { PaginatedResult } from '../../../../models/helpers/paginatedResult';
-import { Pagination } from '../../../../models/helpers/pagination';
-import { Member } from '../../../../models/member.model';
-import { MemberService } from '../../../../services/member.service';
-import { MatBottomSheet, MatBottomSheetModule } from '@angular/material/bottom-sheet';
-import { OrderBottomSheetComponent } from './order-bottom-sheet/order-bottom-sheet.component';
-import { FilterBottomSheetComponent } from './filter-bottom-sheet/filter-bottom-sheet.component';
-import { MemberCardMobileComponent } from '../../member-card/member-card-mobile/member-card-mobile.component';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
+import {Subscription} from 'rxjs';
+import {MemberParams} from '../../../../models/helpers/member-params';
+import {PaginatedResult} from '../../../../models/helpers/paginatedResult';
+import {Pagination} from '../../../../models/helpers/pagination';
+import {Member} from '../../../../models/member.model';
+import {MemberService} from '../../../../services/member.service';
+import {MatBottomSheet, MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {OrderBottomSheetComponent} from './order-bottom-sheet/order-bottom-sheet.component';
+import {FilterBottomSheetComponent} from './filter-bottom-sheet/filter-bottom-sheet.component';
+import {MemberCardMobileComponent} from '../../member-card/member-card-mobile/member-card-mobile.component';
+import {AccountService} from "../../../../services/account.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
-    selector: 'app-member-list-mobile',
-    imports: [
-        MemberCardMobileComponent,
-        MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
-    ],
-    templateUrl: './member-list-mobile.component.html',
-    styleUrl: './member-list-mobile.component.scss'
+  selector: 'app-member-list-mobile',
+  imports: [
+    MemberCardMobileComponent,
+    MatPaginatorModule, MatButtonModule, MatIconModule, MatBottomSheetModule
+  ],
+  templateUrl: './member-list-mobile.component.html',
+  styleUrl: './member-list-mobile.component.scss'
 })
 export class MemberListMobileComponent implements OnInit, OnDestroy {
-  private _memberService = inject(MemberService);
-  private _matBottomSheet = inject(MatBottomSheet);
-
   subsGetMembers: Subscription | undefined;
   subsOrderBottomSheet: Subscription | undefined;
-
   pagination: Pagination | undefined;
   members: Member[] | undefined;
   memberParams: MemberParams | undefined;
-
-  private orderSheet = new OrderBottomSheetComponent();
-  selectedOrder = this.orderSheet.orderByCtrl.value;
-
   // Material Pagination attrs
   pageSizeOptions = [9, 15, 21];
   hidePageSize = false;
@@ -43,11 +37,15 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
   showFirstLastButtons = false;
   disabled = false;
   pageEvent: PageEvent | undefined;
+  private _accountService = inject(AccountService);
+  private _memberService = inject(MemberService);
+  private _matBottomSheet = inject(MatBottomSheet);
+  private _matSnackBar = inject(MatSnackBar);
   //#endregion
 
   //#region auto-run methods
   constructor() {
-    this.memberParams = this._memberService.getFreshMemberParams();
+    this.initResetMemberParams();
 
     this.applyOrderFilter();
   }
@@ -60,6 +58,7 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
     this.subsGetMembers?.unsubscribe();
     this.subsOrderBottomSheet?.unsubscribe();
   }
+
   //#endregion auto-run methods
 
   //#region BottomSheets
@@ -79,23 +78,37 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
       this.getMembers();
     });
   }
+
   //#endregion BottomSheets
 
   getMembers(): void {
-    this.subsGetMembers = this._memberService.getMembers().subscribe({
-      next: (response: PaginatedResult<Member[]>) => {
-        if (response.result && response.pagination) {
-          this.members = response.result;
-          this.pagination = response.pagination;
+    if (this.memberParams)
+      this.subsGetMembers = this._memberService.getMembers(this.memberParams).subscribe({
+        next: (response: PaginatedResult<Member[]>) => {
+          if (response.result && response.pagination) {
+            this.members = response.result;
+            this.pagination = response.pagination;
+          }
         }
-      }
-    });
+      });
   }
 
-  initResetFilter(): void {
-    this._memberService.resetMemberParamsAndSignals();
+  initResetMemberParams(): void {
+    // retrieve gender from localStorage since accountService.loggedInUserSig is ran after this service and gender will be undefined.
+    const loggedInUserStr: string | null = localStorage.getItem('loggedInUser');
 
-    this.getMembers();
+    if (loggedInUserStr) {
+      const gender: string = JSON.parse(loggedInUserStr).gender;
+
+      this.memberParams = new MemberParams(gender ? gender : 'male'); // 'male' for the admin who doesn't have a gender
+    } else {
+      this._matSnackBar.open('Your login has expired. Please login again!', 'Close', {
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 7000
+      });
+      this._accountService.logout();
+    }
   }
 
   handlePageEvent(e: PageEvent) {
@@ -104,7 +117,6 @@ export class MemberListMobileComponent implements OnInit, OnDestroy {
       this.memberParams.pageSize = e.pageSize;
       this.memberParams.pageNumber = e.pageIndex + 1;
 
-      this._memberService.setMemberParams(this.memberParams);
       this.getMembers();
     }
   }

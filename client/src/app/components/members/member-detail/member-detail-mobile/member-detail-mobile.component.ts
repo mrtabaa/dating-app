@@ -125,7 +125,6 @@ export class MemberDetailMobileComponent implements OnInit, AfterViewChecked {
     galleryRef.load(this.images);
   }
 
-  // TODO: Add counter badge to show the unread messages on the messages tab icon
   setTabGroupParam(): void {
     this._route.queryParams.pipe(
       take(1)).subscribe(params => {

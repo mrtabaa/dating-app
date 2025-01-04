@@ -55,7 +55,6 @@ export class MessageService {
     this.getNewMessageRes();
   }
 
-  // TODO: Implement delete message.
   async joinGroupAsync(): Promise<void> {
     await this.hubConnection?.invoke(SignalRMessages.JoinGroup, this.targetUserName)
       .then(() => console.log(this._loggedInUserSig()?.userName, 'joined the chat.'))

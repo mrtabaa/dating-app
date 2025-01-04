@@ -18,27 +18,21 @@ public class MemberController(
         if (userId is null)
             return Unauthorized("User id is invalid. Login again");
 
-        string? gender = await userRepository.GetGenderByIdAsync(userId.Value, cancellationToken);
-
-        if (gender is not null && string.IsNullOrEmpty(memberParams.Gender))
-        {
-            memberParams.UserId = userId;
-            memberParams.Gender = gender == "male" ? "female" : "male"; // value is gender here
-        }
+        memberParams.UserId = userId;
 
         PagedList<AppUser>? pagedAppUsers = await memberRepository.GetPagedListAsync(memberParams, cancellationToken);
 
         if (pagedAppUsers is null)
             return BadRequest("Returning members has failed. Try again or contact the customer support.");
 
-        /*  1- Response only exists in Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
+        /*  1- Response only exists in the controller, so we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
         Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize,
             pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values.
-                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+                After that step, we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
         List<MemberDto?> memberDtos = [];
 
         foreach (AppUser pagedAppUser in pagedAppUsers)

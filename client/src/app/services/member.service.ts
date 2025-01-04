@@ -1,85 +1,49 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { EventEmitter, Injectable, inject, signal } from '@angular/core';
-import { Observable, map, of } from 'rxjs';
-import { PaginatedResult } from "../models/helpers/paginatedResult";
-import { Member } from '../models/member.model';
-import { environment } from '../../environments/environment';
-import { MemberParams } from '../models/helpers/member-params';
-import { PaginationHandler } from '../extensions/paginationHandler';
-import { AccountService } from './account.service';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {EventEmitter, inject, Injectable} from '@angular/core';
+import {map, Observable, of} from 'rxjs';
+import {PaginatedResult} from "../models/helpers/paginatedResult";
+import {Member} from '../models/member.model';
+import {environment} from '../../environments/environment';
+import {MemberParams} from '../models/helpers/member-params';
+import {PaginationHandler} from '../extensions/paginationHandler';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
-  private http = inject(HttpClient);
-  private gender = inject(AccountService).loggedInUserSig()?.gender;
-
-  minAge = 18;
-  maxAge = 99;
-
   //#region Mobile
-  eventEmitOrderFilterBottomSheet = new EventEmitter<void>();
-  selectedOrderSig = signal<string | null>('lastActive');
-  selectedMinAgeSig = signal<number | null>(this.minAge);
-  selectedMaxAgeSig = signal<number | null>(this.maxAge);
-  selectedGenderSig = signal<string | undefined>(this.gender);
-  //#endregion
-
-  private paginationHandler = new PaginationHandler();
   baseUrl: string = environment.apiUrl + 'member/';
   memberCache = new Map<string, PaginatedResult<Member[]>>();
+  eventEmitOrderFilterBottomSheet = new EventEmitter<void>();
   memberParams: MemberParams | undefined;
+  //#endregion
   paginatedResultMembers: PaginatedResult<Member[]> | undefined;
 
-  constructor() {
-    this.getFreshMemberParams();
-  }
+  //#region OrderBottomSheetComponent and FilterBottomSheetComponent signal/vars values
+  private http = inject(HttpClient);
+  //#endregion OrderBottomSheetComponent and FilterBottomSheetComponent signal/vars values
 
-  setMemberParams(memberParamsInput: MemberParams | undefined): void {
-    if (memberParamsInput)
-      this.memberParams = memberParamsInput;
-  }
+  private paginationHandler = new PaginationHandler();
 
-  getFreshMemberParams(): MemberParams | undefined {
-    // retrieve gender from localStorage since accountService.loggedInUserSig is ran after this service and gender will be undefined.
-    const loggedInUserStr: string | null = localStorage.getItem('loggedInUser');
-
-    if (loggedInUserStr) {
-      const gender: string = JSON.parse(loggedInUserStr).gender;
-
-      if (gender) {
-        this.memberParams = new MemberParams(gender);
-
-        this.getMembers();
-      }
-      else { // for admin who doesn't have a gender
-        this.memberParams = new MemberParams('male');
-
-        this.getMembers();
-      }
-    }
-
-    return this.memberParams;
-  }
-
-  getMembers(): Observable<PaginatedResult<Member[]>> {
+  getMembers(memberParams: MemberParams): Observable<PaginatedResult<Member[]>> {
     let response: PaginatedResult<Member[]> | undefined;
 
-    if (this.memberParams)
-      response = this.memberCache.get(Object.values(this.memberParams).join('-'));
+    if (memberParams)
+      response = this.memberCache.get(Object.values(memberParams).join('-'));
 
     if (response) return of(response);
 
-    const params = this.getHttpParams();
+    const params = this.getHttpParams(memberParams);
 
     return this.paginationHandler.getPaginatedResult<Member[]>(this.baseUrl, params)
       .pipe(
         map(response => {
           this.paginatedResultMembers = response;
 
-          if (this.memberParams)
-            this.memberCache.set(Object.values(this.memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+          if (memberParams) {
+            this.memberParams = memberParams; // to use in resetMembersAfterFollowModified()
+            this.memberCache.set(Object.values(memberParams).join('-'), response); // set Value: response in the Key: Object.values(memberParams).join('-')
+          }
 
           return response;
         })
@@ -98,8 +62,8 @@ export class MemberService {
   }
 
   /**
-   * If member is already loaded in memberCache in getMembers(), loop through it and return the member. Otherwise call the api to get the member. 
-   * @param usernameIn 
+   * If member is already loaded in memberCache in getMembers(), loop through it and return the member. Otherwise, call the api to get the member.
+   * @param usernameIn
    * @returns Observable<Member> | undefined
    */
   getMemberByUsername(usernameIn: string | undefined): Observable<Member> | undefined {
@@ -109,10 +73,10 @@ export class MemberService {
 
     this.memberCache.forEach((value: PaginatedResult<Member[]>) =>
       value.result?.forEach((result: Member) => {
-        if (result && result.userName === usernameIn) {
-          member = result;
+          if (result && result.userName === usernameIn) {
+            member = result;
+          }
         }
-      }
       ));
 
     if (member) return of(member);
@@ -123,30 +87,24 @@ export class MemberService {
   }
 
   //#region Helpers
-  private getHttpParams(): HttpParams {
-    if (!this.memberParams)
-      this.getFreshMemberParams();
-
+  private getHttpParams(memberParams: MemberParams): HttpParams {
     let params = new HttpParams();
 
-    if (this.memberParams) {
-      params = params.append('pageNumber', this.memberParams.pageNumber);
-      params = params.append('pageSize', this.memberParams.pageSize);
-      params = params.append('gender', this.memberParams.gender);
-      params = params.append('minAge', this.memberParams.minAge);
-      params = params.append('maxAge', this.memberParams.maxAge);
-      params = params.append('orderBy', this.memberParams.orderBy);
+    if (memberParams) {
+      if (memberParams.userNameOrKnownAs)
+        params = params.append('userNameOrKnownAs', memberParams.userNameOrKnownAs);
+      if (memberParams.gender)
+        params = params.append('gender', memberParams.gender);
+
+      params = params.append('pageNumber', memberParams.pageNumber);
+      params = params.append('pageSize', memberParams.pageSize);
+      params = params.append('minAge', memberParams.minAge);
+      params = params.append('maxAge', memberParams.maxAge);
+      params = params.append('orderBy', memberParams.orderBy);
     }
 
     return params;
   }
 
-  resetMemberParamsAndSignals(): void {
-    this.getFreshMemberParams();
-
-    this.selectedGenderSig.set(undefined);
-    this.selectedMinAgeSig.set(this.minAge);
-    this.selectedMaxAgeSig.set(this.maxAge);
-  }
   //#endregion
 }

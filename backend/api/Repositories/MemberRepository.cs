@@ -34,27 +34,34 @@ public class MemberRepository : IMemberRepository
 
     #endregion
 
-    #region CRUD
+    #region Helpers
 
-    public async Task<PagedList<AppUser>?> GetPagedListAsync(MemberParams memberParams, CancellationToken cancellationToken)
+    private IMongoQueryable<AppUser> CreateQuery(MemberParams memberParams)
     {
-        // For small lists
-        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
-
-        #region Filters
-
         // calculate DOB based on user's selected Age
         DateOnly minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
         DateOnly maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
-        // set query to AsQueryable to use it again MongoDB later
+        // set the query to AsQueryable to use it against MongoDB later
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
-        query = query.Where(appUser => appUser.Id != memberParams.UserId); // don't request/show the currentUser in the list
-        query = query.Where(appUser => !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // don't show admin/moderator
+        query = query.Where(appUser => appUser.Id != memberParams.UserId); // Don't request/show the currentUser in the list
+        query = query.Where(appUser => !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // Don't show admin/moderator
         query = query.Where(appUser => !(string.IsNullOrEmpty(appUser.NormalizedUserName) || appUser.NormalizedUserName.StartsWith("DEMO"))); // don't show demo users
-        query = query.Where(appUser => appUser.Gender == memberParams.Gender); // get the opposite gender by default. It's set in MemberController
-        query = query.Where(appUser => appUser.DateOfBirth >= minDob && appUser.DateOfBirth <= maxDob); // get ages between 2 age inputs
+        if (!string.IsNullOrEmpty(memberParams.UserNameOrKnownAs))
+        {
+            // Contains either UserName or KnowAs exists
+            query = query.Where(appUser =>
+                (!string.IsNullOrEmpty(appUser.NormalizedUserName)
+                 && appUser.NormalizedUserName.Contains(memberParams.UserNameOrKnownAs.ToUpper())
+                )
+                || appUser.KnownAs.ToUpper().Contains(memberParams.UserNameOrKnownAs.ToUpper()));
+        }
+
+        if (!string.IsNullOrEmpty(memberParams.Gender))
+            query = query.Where(appUser => appUser.Gender == memberParams.Gender);
+
+        query = query.Where(appUser => appUser.DateOfBirth >= minDob && appUser.DateOfBirth <= maxDob); // Get ages between 2 age inputs
         query = memberParams.OrderBy switch
         {
             // sort users based on Age, Created or LastActive
@@ -63,9 +70,20 @@ public class MemberRepository : IMemberRepository
             _ => query.OrderByDescending(appUser => appUser.LastActive).ThenBy(appUser => appUser.Id)
         };
 
-        #endregion Filters
+        return query;
+    }
 
-        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, memberParams.PageNumber, memberParams.PageSize, cancellationToken);
+    #endregion Helpers
+
+    #region CRUD
+
+    public async Task<PagedList<AppUser>?> GetPagedListAsync(MemberParams memberParams, CancellationToken cancellationToken)
+    {
+        // For small lists
+        // var appUsers = await _collection.Find<AppUser>(new BsonDocument()).ToListAsync(cancellationToken);
+
+        PagedList<AppUser> appUsers = await PagedList<AppUser>.CreatePagedListAsync(
+            CreateQuery(memberParams), memberParams.PageNumber, memberParams.PageSize, cancellationToken);
 
         #region Convert all members' appUser.Photos to BlobLinkFormat
 

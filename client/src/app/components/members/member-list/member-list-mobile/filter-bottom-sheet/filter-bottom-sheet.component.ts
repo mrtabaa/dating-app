@@ -5,28 +5,40 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSliderModule} from '@angular/material/slider';
 import {MemberService} from '../../../../../services/member.service';
+import {InputCvaComponent} from "../../../../_helpers/input-cva/input-cva.component";
+import {MemberParams} from "../../../../../models/helpers/member-params";
 
 @Component({
   selector: 'app-filter-bottom-sheet',
   imports: [
     FormsModule, ReactiveFormsModule, MatDividerModule,
-    MatSliderModule, MatSelectModule, MatButtonModule,
+    MatSliderModule, MatSelectModule, MatButtonModule, InputCvaComponent,
   ],
   templateUrl: './filter-bottom-sheet.component.html',
   styleUrl: './filter-bottom-sheet.component.scss'
 })
 export class FilterBottomSheetComponent {
+  memberParams: MemberParams | undefined;
   minAge = 18;
   maxAge = 99;
   private _fb = inject(FormBuilder);
-  private _memberService = inject(MemberService);
   //#region Reactive Form
   filterFg = this._fb.group({
-    genderCtrl: [this._memberService.selectedGenderSig()],
-    minAgeCtrl: [this._memberService.selectedMinAgeSig()],
-    maxAgeCtrl: [this._memberService.selectedMaxAgeSig()]
+    userNameOrKnownAs: ['', []],
+    genderCtrl: [],
+    minAgeCtrl: [this.minAge],
+    maxAgeCtrl: [this.maxAge],
   });
-  private _memberParams = inject(MemberService).memberParams;
+  private _memberService = inject(MemberService);
+
+  constructor() {
+    this.memberParams = this._memberService.memberParams;
+    console.log(this.memberParams);
+  }
+
+  get UserNameOrKnownAs(): FormControl {
+    return this.filterFg.get('userNameOrKnownAs') as FormControl;
+  }
 
   get GenderCtrl(): AbstractControl {
     return this.filterFg.get('genderCtrl') as FormControl;
@@ -43,23 +55,20 @@ export class FilterBottomSheetComponent {
   //#endregion Reactive form
 
   updateMemberParams(): void {
-    if (this._memberParams) {
-      if (this.GenderCtrl.value) // skip setting gender if not selected
-        this._memberParams.gender = this.GenderCtrl.value;
-      this._memberParams.minAge = this.MinAgeCtrl.value;
-      this._memberParams.maxAge = this.MaxAgeCtrl.value;
-
-      this._memberService.selectedGenderSig.set(this.GenderCtrl.value)
-      this._memberService.selectedMinAgeSig.set(this.MinAgeCtrl.value)
-      this._memberService.selectedMaxAgeSig.set(this.MaxAgeCtrl.value)
-
-      this._memberService.eventEmitOrderFilterBottomSheet.emit();
+    if (this.memberParams) {
+      this.memberParams.userNameOrKnownAs = this.UserNameOrKnownAs.value;
+      this.memberParams.gender = this.GenderCtrl.value;
+      this.memberParams.minAge = this.MinAgeCtrl.value;
+      this.memberParams.maxAge = this.MaxAgeCtrl.value;
     }
+
+    this._memberService.eventEmitOrderFilterBottomSheet.emit();
   }
 
   disableButton(): boolean {
-    return this.MinAgeCtrl.value === this._memberService.selectedMinAgeSig() &&
-      this.MaxAgeCtrl.value === this._memberService.selectedMaxAgeSig() &&
-      this.GenderCtrl.value === this._memberService.selectedGenderSig()
+    return (this.UserNameOrKnownAs.value.length < 1 || this.UserNameOrKnownAs.pristine) &&
+      (this.GenderCtrl.value === this.memberParams?.gender || this.GenderCtrl.pristine) &&
+      this.MinAgeCtrl.value === this.memberParams?.minAge &&
+      this.MaxAgeCtrl.value === this.memberParams?.maxAge
   }
 }

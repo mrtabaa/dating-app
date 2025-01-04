@@ -17,10 +17,16 @@
     <div class="filter">
       <p class="title">Filter members</p>
       <section class="filters">
+        <!-- Search -->
+        <app-input-cva [formControl]="UserNameOrKnownAs" [hint]="'By email or username'"
+                       [label]="'Email / Username'"
+                       [placeHolder]="'Enter email or username'">
+        </app-input-cva>
         <!-- Gender -->
         <mat-form-field>
           <mat-label>By gender</mat-label>
-          <mat-select (selectionChange)="updateMemberParams()" formControlName="genderCtrl">
+          <mat-select formControlName="genderCtrl">
+            <mat-option>-- none --</mat-option>
             <mat-option [value]="'female'">Female</mat-option>
             <mat-option [value]="'male'">Male</mat-option>
             <mat-option [value]="'other'">Other</mat-option>
@@ -39,10 +45,12 @@
       </section>
       <!-- Buttons -->
       <div class="buttons">
-        <button (click)="initResetFilter()" color="warn" mat-stroked-button>
+        <button (click)="initResetMemberParamsAndFilterControllers(); getMembers();" color="warn" mat-stroked-button
+                type="button">
           Reset
         </button>
-        <button (click)="getMembers()" color="primary" mat-stroked-button>
+        <button (click)="updateMemberParams(); getMembers();" [disabled]="isAnyFilterApplied()" color="primary"
+                mat-stroked-button type="button">
           Apply Filters
         </button>
       </div>
