@@ -54,6 +54,10 @@ public static class IdentityServiceExtensions
                 {
                     // Unique email
                     options.User.RequireUniqueEmail = true;
+                    
+                    // Verify confirmed email. No account confirmation
+                    options.SignIn.RequireConfirmedEmail = true;
+                    options.SignIn.RequireConfirmedAccount = false;
 
                     // Password requirements
                     options.Password.RequireDigit = true;
