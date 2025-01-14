@@ -3,7 +3,6 @@ namespace api.Controllers;
 [Authorize]
 public class MemberController(
     IMemberRepository memberRepository,
-    IUserRepository userRepository,
     IFollowRepository followRepository,
     ITokenService tokenService) : BaseApiController
 {
