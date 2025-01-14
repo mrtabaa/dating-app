@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using api.DTOs.helpers;
 
 namespace api.Repositories;
 
@@ -21,12 +22,32 @@ public class AccountRepository : IAccountRepository
         return loggedInDto;
     }
 
+    private async Task<bool> VerifyAccount(string recipientEmail, CancellationToken cancellationToken)
+    {
+        const string verificationLink = "https://hallboard.com/account/verify";
+
+        var request = new EmailRequest(
+            "mrtabaa@gmail.com",
+            "Account Verification",
+            $"""
+             		<html>
+             			<body>
+             				<h1>Verify your email using this link {verificationLink}.</h1>
+             			</body>
+             		</html>
+             """
+        );
+
+        return await _emailService.SendEmailAsync(request, cancellationToken);
+    }
+
     #region Db and Token Settings
 
     private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
+    private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
 
     // constructor - dependency injection
@@ -34,7 +55,7 @@ public class AccountRepository : IAccountRepository
         IMongoClient client, IMyMongoDbSettings dbSettings,
         IRecaptchaService turnstileValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
-        IPhotoService photoService
+        IEmailService emailService, IPhotoService photoService
     )
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
@@ -43,6 +64,7 @@ public class AccountRepository : IAccountRepository
         _recaptchaService = turnstileValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;
+        _emailService = emailService;
         _photoService = photoService;
     }
 
@@ -91,10 +113,10 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
-        if (loggedInDto.IsRecaptchaTokenInvalid)
-            return loggedInDto;
-
+        // loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
+        // if (loggedInDto.IsRecaptchaTokenInvalid)
+        //     return loggedInDto;
+        
         AppUser? appUser;
 
         // Find appUser by Email or UserName
@@ -114,6 +136,8 @@ public class AccountRepository : IAccountRepository
             loggedInDto.IsWrongCreds = true;
             return loggedInDto;
         }
+        
+        bool isEmailSent = await VerifyAccount(userInput.EmailUsername, cancellationToken);
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
@@ -128,7 +152,7 @@ public class AccountRepository : IAccountRepository
 
         if (userId is null) return null;
 
-        AppUser appUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
             ? null
@@ -144,11 +168,11 @@ public class AccountRepository : IAccountRepository
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
+        return await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
     }
 
     public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
-        await _collection.DeleteOneAsync<AppUser>(appUser => appUser.Email == userEmail, cancellationToken);
+        await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken);
 
     #endregion CRUD
 }
