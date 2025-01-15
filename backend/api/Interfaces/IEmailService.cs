@@ -1,8 +1,7 @@
-using api.DTOs.helpers;
-
 namespace api.Interfaces;
 
 public interface IEmailService
 {
-    public Task<bool> SendEmailAsync(EmailRequest request, CancellationToken cancellationToken);
+    public Task<bool> SendVerificationCode(AppUser appUser, string verificationCode, CancellationToken cancellationToken);
+    public Task<bool> SendRecoveryCode(AppUser appUser, string verificationCode, CancellationToken cancellationToken);
 }

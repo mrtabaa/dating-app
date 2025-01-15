@@ -54,10 +54,11 @@ public static class IdentityServiceExtensions
                 {
                     // Unique email
                     options.User.RequireUniqueEmail = true;
-                    
+
                     // Verify confirmed email. No account confirmation
                     options.SignIn.RequireConfirmedEmail = true;
                     options.SignIn.RequireConfirmedAccount = false;
+                    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider; // shorten code to 6 digits
 
                     // Password requirements
                     options.Password.RequireDigit = true;

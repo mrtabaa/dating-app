@@ -6,16 +6,44 @@ namespace api.Services;
 
 public class EmailService(IConfiguration config) : IEmailService
 {
-    private readonly string? _connectionString = config.GetValue<string>(AppVariablesExtensions.AzureCommEmailConnectionStr)
+    private readonly string? _connectionString = config.GetValue<string>(EmailExtensions.AzureCommEmailConnectionStr)
                                                  ?? throw new NullReferenceException(nameof(_connectionString));
 
-    public async Task<bool> SendEmailAsync(EmailRequest request, CancellationToken cancellationToken)
+    public async Task<bool> SendVerificationCode(AppUser appUser, string verificationCode, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(appUser.Email))
+            throw new ArgumentNullException(nameof(appUser.Email));
+
+        var request = new EmailRequest(
+            appUser.Email.ToLower(),
+            EmailExtensions.VerifySubject,
+            EmailExtensions.GetVerificationTemplate(verificationCode)
+        );
+
+        return await SendEmailAsync(request, cancellationToken);
+    }
+
+    public async Task<bool> SendRecoveryCode(AppUser appUser, string verificationCode, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(appUser.Email))
+            throw new ArgumentNullException(nameof(appUser.Email));
+
+        var request = new EmailRequest(
+            appUser.Email.ToLower(),
+            EmailExtensions.RecoverySubject,
+            EmailExtensions.GetRecoveryTemplate(verificationCode)
+        );
+
+        return await SendEmailAsync(request, cancellationToken);
+    }
+
+    private async Task<bool> SendEmailAsync(EmailRequest request, CancellationToken cancellationToken)
     {
         // Create an EmailClient using the connection string
         var emailClient = new EmailClient(_connectionString);
 
         var emailMessage = new EmailMessage(
-            AppVariablesExtensions.SenderEmail,
+            EmailExtensions.SenderEmail,
             content: new EmailContent(request.Subject)
             {
                 Html = request.Body

@@ -18,9 +18,22 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             ? Ok(loggedInDto)
             : loggedInDto.IsRecaptchaTokenInvalid
                 ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-                : loggedInDto.Errors.Count != 0
-                    ? BadRequest(loggedInDto.Errors)
-                    : BadRequest("Registration has failed. Try again or contact the support.");
+                : loggedInDto.IsEmailSendFailed
+                    ? BadRequest("Failed to send the verification link. Try again.")
+                    : loggedInDto.Errors.Count != 0
+                        ? BadRequest(loggedInDto.Errors)
+                        : BadRequest("Registration has failed. Try again or contact the support.");
+    }
+
+    [AllowAnonymous]
+    [HttpPost("verify-account")]
+    public async Task<ActionResult<LoggedInDto>> VerifyAccount(VerifyDto verifyDto, CancellationToken cancellationToken)
+    {
+        LoggedInDto loggedInDto = await accountRepository.VerifyAccountAsync(verifyDto, cancellationToken);
+
+        return !string.IsNullOrEmpty(loggedInDto.Token) // success
+            ? Ok(loggedInDto)
+            : Unauthorized("Failed to verify your account. Try again.");
     }
 
     [AllowAnonymous]
@@ -35,9 +48,13 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
                 ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
                 : loggedInDto.IsWrongCreds
                     ? Unauthorized("Wrong username or password.")
-                    : loggedInDto.Errors.Count != 0
-                        ? BadRequest(loggedInDto.Errors)
-                        : Unauthorized("Login has failed. Try again or contact the support.");
+                    : loggedInDto.IsEmailSendFailed
+                        ? BadRequest("Failed to send the verification link. Try again.")
+                        : loggedInDto.IsEmailNotConfirmed
+                            ? Unauthorized("Your account is not verified. Verify your account using the code sent to your email and try again.")
+                            : loggedInDto.Errors.Count != 0
+                                ? BadRequest(loggedInDto.Errors)
+                                : Unauthorized("Login has failed. Try again or contact the support.");
     }
 
     [HttpGet]

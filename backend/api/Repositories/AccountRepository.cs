@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using api.DTOs.helpers;
+using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace api.Repositories;
 
@@ -22,23 +22,11 @@ public class AccountRepository : IAccountRepository
         return loggedInDto;
     }
 
-    private async Task<bool> VerifyAccount(string recipientEmail, CancellationToken cancellationToken)
+    private async Task<bool> SendVerificationCode(AppUser appUser, CancellationToken cancellationToken)
     {
-        const string verificationLink = "https://hallboard.com/account/verify";
+        string verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
-        var request = new EmailRequest(
-            "mrtabaa@gmail.com",
-            "Account Verification",
-            $"""
-             		<html>
-             			<body>
-             				<h1>Verify your email using this link {verificationLink}.</h1>
-             			</body>
-             		</html>
-             """
-        );
-
-        return await _emailService.SendEmailAsync(request, cancellationToken);
+        return await _emailService.SendVerificationCode(appUser, verificationCode, cancellationToken);
     }
 
     #region Db and Token Settings
@@ -93,30 +81,53 @@ public class AccountRepository : IAccountRepository
             if (!roleResult.Succeeded) // failed
                 return loggedInDto;
 
-            string? token = await _tokenService.CreateToken(appUser, cancellationToken);
+            if (await SendVerificationCode(appUser, cancellationToken)) return loggedInDto; // success
+            loggedInDto.IsEmailSendFailed = true;
+            return loggedInDto;
+        }
 
-            if (!string.IsNullOrEmpty(token))
-                return Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)); // Return loggedInDto
-        }
-        else // Store and return userCreatedResult errors if failed. 
-        {
-            foreach (IdentityError error in userCreatedResult.Errors)
-                loggedInDto.Errors.Add(error.Description);
-        }
+        // Store and return userCreatedResult errors if failed. 
+        foreach (IdentityError error in userCreatedResult.Errors)
+            loggedInDto.Errors.Add(error.Description);
 
         #endregion Create user, token and role
 
         return loggedInDto; // failed
     }
 
+    public async Task<LoggedInDto> VerifyAccountAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
+    {
+        LoggedInDto loggedInDto = new();
+
+        AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
+        if (appUser is null)
+        {
+            loggedInDto.IsEmailNotConfirmed = true;
+            return loggedInDto;
+        }
+
+        IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verifyDto.Code);
+        if (!result.Succeeded)
+        {
+            loggedInDto.IsEmailNotConfirmed = true;
+            return loggedInDto;
+        }
+
+        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
+
+        return !string.IsNullOrEmpty(token)
+            ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser))
+            : loggedInDto;
+    }
+
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
 
-        // loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
-        // if (loggedInDto.IsRecaptchaTokenInvalid)
-        //     return loggedInDto;
-        
+        loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
+        if (loggedInDto.IsRecaptchaTokenInvalid)
+            return loggedInDto;
+
         AppUser? appUser;
 
         // Find appUser by Email or UserName
@@ -136,8 +147,18 @@ public class AccountRepository : IAccountRepository
             loggedInDto.IsWrongCreds = true;
             return loggedInDto;
         }
-        
-        bool isEmailSent = await VerifyAccount(userInput.EmailUsername, cancellationToken);
+
+        if (!await _userManager.IsEmailConfirmedAsync(appUser))
+        {
+            if (!await SendVerificationCode(appUser, cancellationToken))
+            {
+                loggedInDto.IsEmailSendFailed = true;
+                return loggedInDto;
+            }
+
+            loggedInDto.IsEmailNotConfirmed = true;
+            return loggedInDto;
+        }
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
