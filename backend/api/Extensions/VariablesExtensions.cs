@@ -5,7 +5,7 @@ public static class AppVariablesExtensions
     public const string TokenKey = "TokenKey";
     public const string RecaptchaSecretKey = "RecaptchaSecretKey";
     public const string AzureCommEmailConnectionStr = "AzureCommEmailConnectionStr";
-    public const string SenderEmail = "DoNotReply@e7c11576-5ad4-40aa-a1ad-d6a973c43868.azurecomm.net";
+    public const string SenderEmail = "DoNotReply@hallboard.com";
 
     public const string CollectionUsers = "users";
     public const string CollectionFollows = "follows";
