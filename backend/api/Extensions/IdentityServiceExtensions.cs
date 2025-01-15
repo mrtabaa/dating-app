@@ -19,6 +19,7 @@ public static class IdentityServiceExtensions
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
+                        RoleClaimType = ClaimTypes.Role, // Ensure it matches how roles are stored in the token
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue)),
                         ValidateIssuer = false,
@@ -85,8 +86,10 @@ public static class IdentityServiceExtensions
         #region Policy
 
         services.AddAuthorizationBuilder()
-            .AddPolicy("RequiredAdminRole", policy => policy.RequireRole(Roles.Admin.ToString()))
-            .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole(Roles.Admin.ToString(), Roles.Moderator.ToString()));
+            .AddPolicy(AppVariablesExtensions.RequiredAdminRole, policy =>
+                policy.RequireRole(Roles.Admin.ToString().ToLower()))
+            .AddPolicy(AppVariablesExtensions.RequiredModeratorRole, policy =>
+                policy.RequireRole(Roles.Admin.ToString().ToLower(), Roles.Moderator.ToString().ToLower()));
 
         #endregion
 
@@ -95,8 +98,7 @@ public static class IdentityServiceExtensions
 
     /// <summary>
     ///     Enable/Customize the JwtBearer authentication middleware to extract the JWT token from the query string for
-    ///     requests
-    ///     made to SignalR hubs. This is particularly useful in scenarios where the token cannot be sent in the
+    ///     requests made to SignalR hubs. This is particularly useful in scenarios where the token cannot be sent in the
     ///     Authorization header (which is the standard way of sending tokens) due to WebSocket or other constraints.
     /// </summary>
     /// <param name="context"></param>

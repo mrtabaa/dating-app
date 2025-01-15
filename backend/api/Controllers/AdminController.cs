@@ -1,6 +1,6 @@
 namespace api.Controllers;
 
-[Authorize(Policy = "RequiredAdminRole")]
+[Authorize(Policy = AppVariablesExtensions.RequiredAdminRole)]
 public class AdminController(IAdminRepository adminRepository, UserManager<AppUser> userManager) : BaseApiController
 {
     [HttpGet("users-with-roles")]
@@ -10,7 +10,7 @@ public class AdminController(IAdminRepository adminRepository, UserManager<AppUs
 
         if (pagedAppUsers.Count == 0) return NoContent();
 
-        /*  1- Response only exists in Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
+        /*  1- Response only exists in the Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                 If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
         */
         Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
