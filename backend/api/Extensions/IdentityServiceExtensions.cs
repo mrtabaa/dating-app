@@ -67,6 +67,7 @@ public static class IdentityServiceExtensions
                     options.Password.RequireLowercase = false;
 
                     // Lockout
+                    options.Lockout.AllowedForNewUsers = true;
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
                     options.Lockout.MaxFailedAccessAttempts = 5;
                 }
