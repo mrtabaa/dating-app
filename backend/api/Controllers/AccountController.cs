@@ -87,7 +87,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         return loggedInDto is null ? Unauthorized("User is logged out or unauthorized. Login again.") : loggedInDto;
     }
 
-    [HttpDelete("delete-user")]
+    [HttpDelete("delete-account")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
         DeleteResult? result = await accountRepository.DeleteUserAsync(User.GetUserIdHashed(), cancellationToken);

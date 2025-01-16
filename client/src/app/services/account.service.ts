@@ -1,28 +1,31 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { map, Observable, take } from 'rxjs';
-import { UserLogin } from '../models/account/user-login.model';
-import { UserRegister } from '../models/account/user-register.model';
-import { environment } from '../../environments/environment';
-import { LoggedInUser } from '../models/logged-in-user.model';
-import { GooglePlacesService } from './google-places.service';
-import { ResponsiveService } from './responsive.service';
-import { PresenceService } from './hubs/presence.service';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable, signal} from '@angular/core';
+import {Router} from '@angular/router';
+import {map, Observable, take} from 'rxjs';
+import {UserLogin} from '../models/account/user-login.model';
+import {UserRegister} from '../models/account/user-register.model';
+import {environment} from '../../environments/environment';
+import {LoggedInUser} from '../models/logged-in-user.model';
+import {GooglePlacesService} from './google-places.service';
+import {ResponsiveService} from './responsive.service';
+import {PresenceService} from './hubs/presence.service';
+import {Verify} from "../models/account/verify.model";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {ResendCodeRequest} from "../models/account/ResendCodeRequest";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
+  loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
   private _googlePlacesService = inject(GooglePlacesService);
   private _responsiveService = inject(ResponsiveService);
   private _http = inject(HttpClient);
   private _router = inject(Router);
   private _presenceService = inject(PresenceService);
-
   private baseUrl = environment.apiUrl + "account/";
+  private _snackBar = inject(MatSnackBar);
 
-  loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
 
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<string>(this.baseUrl + 'register', userInput)
@@ -93,12 +96,14 @@ export class AccountService {
   registerDemo(userInput: UserRegister): Observable<LoggedInUser | null> {
     return this._http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
       .pipe(
-        map((user: LoggedInUser) => { return user ? user : null })
+        map((user: LoggedInUser) => {
+          return user ? user : null
+        })
       );
   }
 
   /**
-   * Check if user's token is still valid or log them out. 
+   * Check if user's token is still valid or log them out.
    * Called in app.component.ts
    * @returns Observable<LoggedInUser | null>
    */
@@ -106,9 +111,9 @@ export class AccountService {
     if (localStorage.getItem("loggedInUser"))
       this._http.get<LoggedInUser>(this.baseUrl)
         .pipe(take(1)).subscribe({
-          next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
-          error: () => this.logout()
-        });
+        next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
+        error: () => this.logout()
+      });
   }
 
   logout(): void {
@@ -122,7 +127,7 @@ export class AccountService {
   /**
    * Used in app-component to set currentUserSig
    * Now user can refresh the page or relaunch the browser without losing authentication or returnUrl
-   * @param loggedInUser 
+   * @param loggedInUser
    */
   setCurrentUser(loggedInUser: LoggedInUser): void {
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
