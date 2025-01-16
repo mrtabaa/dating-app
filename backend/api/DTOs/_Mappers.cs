@@ -10,8 +10,8 @@ public static class Mappers
         new()
         {
             Schema = AppVariablesExtensions.AppVersions.Last(),
-            Email = userInput.Email, // required by AspNet Identity
-            UserName = userInput.UserName, // required by AspNet Identity
+            Email = userInput.Email.ToLower(), // required by AspNet Identity
+            UserName = userInput.UserName.ToLower(), // required by AspNet Identity
             DateOfBirth = userInput.DateOfBirth,
             KnownAs = userInput.KnownAs,
             LastActive = DateTime.UtcNow,
@@ -30,8 +30,8 @@ public static class Mappers
         new()
         {
             Schema = AppVariablesExtensions.AppVersions.Last(),
-            Email = userInput.Email, // required by AspNet Identity
-            UserName = userInput.UserName, // required by AspNet Identity
+            Email = userInput.Email.ToLower(), // required by AspNet Identity
+            UserName = userInput.UserName.ToLower(), // required by AspNet Identity
             DateOfBirth = userInput.DateOfBirth,
             LastActive = DateTime.UtcNow,
             Gender = userInput.Gender.ToLower(),
