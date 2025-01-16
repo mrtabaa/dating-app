@@ -95,16 +95,7 @@ export class LoginComponent implements OnDestroy {
       };
 
       this._subscribedLogin = this.accountService.login(userLoginInput)
-        .subscribe({
-          next: res => {
-            this.snackBar.open('You logged in as: ' + res?.userName, 'Close', {
-              verticalPosition: 'bottom',
-              horizontalPosition: 'center',
-              duration: 7000
-            })
-          }
-          // complete: () => console.log('Login successful.')
-        });
+        .subscribe();
 
       this.loginFg.markAllAsTouched();
     }
