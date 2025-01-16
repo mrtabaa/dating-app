@@ -76,13 +76,14 @@ export class LoginComponent implements OnDestroy {
     this.recaptchaToken = undefined; // reset
     this.isRecaptchaValidating = true;
 
-    this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
-      (token: string) => {
-        if (token) {
-          this.recaptchaToken = token;
-          this.isRecaptchaValidating = false;
-        }
-      });
+    if (this.RecaptchaCtrl.value)
+      this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
+        (token: string) => {
+          if (token) {
+            this.recaptchaToken = token;
+            this.isRecaptchaValidating = false;
+          }
+        });
   }
 
   loginEmailUsername(): void {

@@ -112,13 +112,14 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.recaptchaToken = undefined; // reset
     this.isRecaptchaValidating = true;
 
-    this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
-      (token: string) => {
-        if (token) {
-          this.recaptchaToken = token;
-          this.isRecaptchaValidating = false;
-        }
-      });
+    if (this.RecaptchaCtrl.value)
+      this.subscribedRecaptcha = this._recaptchaService.execute('register').subscribe(
+        (token: string) => {
+          if (token) {
+            this.recaptchaToken = token;
+            this.isRecaptchaValidating = false;
+          }
+        });
   }
 
   registerUser(): void {
@@ -137,15 +138,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
       this.subscribedRegisterUser = this.accountService.register(userRegisterInput)
         .subscribe({
-          next: res => {
-            this.router.navigate(['/main']);
-            this.snackBar.open("You are logged in as: " + res?.userName, "Close", {
+          next: () => {
+            this.snackBar.open("Your account is created successfully.", "Close", {
               verticalPosition: 'bottom',
               horizontalPosition: 'center',
               duration: 7000
             })
-          },
-          complete: () => console.log('Register successful.')
+          }
         });
 
       // to show validation mat-error on submit button (also added to DOM mat-error)
