@@ -13,14 +13,8 @@ public class AccountRepository : IAccountRepository
     private string? GetMainPhoto(AppUser appUser) =>
         _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url165;
 
-    private async Task<LoggedInDto> ValidateRecaptcha(string recaptchaToken, LoggedInDto loggedInDto, CancellationToken cancellationToken)
-    {
-        bool isValid = await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
-
-        loggedInDto.IsRecaptchaTokenInvalid = !isValid;
-
-        return loggedInDto;
-    }
+    private async Task<bool> ValidateRecaptcha(string recaptchaToken, CancellationToken cancellationToken) =>
+        await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
 
     private async Task<bool> SendVerificationCode(AppUser appUser, CancellationToken cancellationToken)
     {
@@ -34,6 +28,7 @@ public class AccountRepository : IAccountRepository
     private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
+    private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
@@ -41,16 +36,18 @@ public class AccountRepository : IAccountRepository
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        IRecaptchaService turnstileValidatorService,
-        UserManager<AppUser> userManager, ITokenService tokenService,
+        IRecaptchaService recaptchaValidatorService,
+        UserManager<AppUser> userManager, IUserRepository userRepository,
+        ITokenService tokenService,
         IEmailService emailService, IPhotoService photoService
     )
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
                                 ?? throw new ArgumentNullException(nameof(dbName), "The database name cannot be null.");
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
-        _recaptchaService = turnstileValidatorService;
+        _recaptchaService = recaptchaValidatorService;
         _userManager = userManager;
+        _userRepository = userRepository;
         _tokenService = tokenService;
         _emailService = emailService;
         _photoService = photoService;
@@ -60,46 +57,41 @@ public class AccountRepository : IAccountRepository
 
     #region CRUD
 
-    public async Task<LoggedInDto> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
+    public async Task<RegisteredDto> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = new();
-
-        loggedInDto = await ValidateRecaptcha(registerDto.RecaptchaToken, loggedInDto, cancellationToken);
-        if (loggedInDto.IsRecaptchaTokenInvalid)
-            return loggedInDto;
-
-        #region Create user, token and add role
+        if (!await ValidateRecaptcha(registerDto.RecaptchaToken, cancellationToken))
+            return new RegisteredDto(IsRecaptchaTokenInvalid: true);
 
         AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
 
         IdentityResult userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
-
-        if (userCreatedResult.Succeeded)
+        if (!userCreatedResult.Succeeded)
         {
-            IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
-
-            if (!roleResult.Succeeded) // failed
-                return loggedInDto;
-
-            if (await SendVerificationCode(appUser, cancellationToken)) return loggedInDto; // success
-            loggedInDto.IsEmailSendFailed = true;
-            return loggedInDto;
+            return new RegisteredDto(
+                ErrorMessage: userCreatedResult.Errors.ToArray()[0].Description
+            ); // failed to create the user
         }
 
-        // Store and return userCreatedResult errors if failed. 
-        foreach (IdentityError error in userCreatedResult.Errors)
-            loggedInDto.Errors.Add(error.Description);
+        IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
+        if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
+        {
+            await _userManager.DeleteAsync(appUser);
+            return new RegisteredDto();
+        }
 
-        #endregion Create user, token and role
+        if (!await SendVerificationCode(appUser, cancellationToken))
+            throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
-        return loggedInDto; // failed
+        return new RegisteredDto(
+            appUser.UserName ?? throw new ArgumentNullException(nameof(appUser.UserName), "Cannot be null in DB")
+        ); // Account created successfully.
     }
 
-    public async Task<LoggedInDto> VerifyAccountAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
+    public async Task<LoggedInDto> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
 
-        AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
+        AppUser? appUser = await _userRepository.GetByUserNameAsync(verifyDto.UserName, cancellationToken);
         if (appUser is null)
         {
             loggedInDto.IsEmailNotConfirmed = true;
@@ -120,13 +112,27 @@ public class AccountRepository : IAccountRepository
             : loggedInDto;
     }
 
+    public async Task<ResendCodeResult> ResendVerifyCodeAsync(ResendCodeRequest resendCRequest, CancellationToken cancellationToken)
+    {
+        if (!await ValidateRecaptcha(resendCRequest.RecaptchaToken, cancellationToken))
+            return new ResendCodeResult(true);
+
+        AppUser? appUser = await _userRepository.GetByUserNameAsync(resendCRequest.UserName, cancellationToken);
+
+        return appUser is null
+            ? new ResendCodeResult()
+            : new ResendCodeResult(IsSuccessful: await SendVerificationCode(appUser, cancellationToken));
+    }
+
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         LoggedInDto loggedInDto = new();
 
-        loggedInDto = await ValidateRecaptcha(userInput.RecaptchaToken, loggedInDto, cancellationToken);
-        if (loggedInDto.IsRecaptchaTokenInvalid)
+        if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
+        {
+            loggedInDto.IsRecaptchaTokenInvalid = true;
             return loggedInDto;
+        }
 
         AppUser? appUser;
 
@@ -151,11 +157,9 @@ public class AccountRepository : IAccountRepository
         if (!await _userManager.IsEmailConfirmedAsync(appUser))
         {
             if (!await SendVerificationCode(appUser, cancellationToken))
-            {
-                loggedInDto.IsEmailSendFailed = true;
-                return loggedInDto;
-            }
+                throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
+            loggedInDto.UserName = appUser.UserName;
             loggedInDto.IsEmailNotConfirmed = true;
             return loggedInDto;
         }

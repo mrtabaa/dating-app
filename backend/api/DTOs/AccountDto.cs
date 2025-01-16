@@ -18,6 +18,31 @@ public record RegisterDto(
     string RecaptchaToken
 );
 
+public record RegisteredDto(
+    [Optional] string UserName,
+    [Optional] bool IsRecaptchaTokenInvalid,
+    [Optional] string ErrorMessage
+);
+
+public record VerifyDto(
+    [Length(PropLength.UserNameMinLength, PropLength.UserNameMaxLength)]
+    string UserName,
+    [Length(6, 6)]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Only digits accepted.")]
+    string Code
+);
+
+public record ResendCodeRequest(
+    [Length(PropLength.UserNameMinLength, PropLength.UserNameMaxLength)]
+    string UserName,
+    string RecaptchaToken
+);
+
+public record ResendCodeResult(
+    [Optional] bool IsRecaptchaTokenInvalid,
+    [Optional] bool IsSuccessful
+);
+
 public record LoginDto(
     [MaxLength(50)] string EmailUsername,
     [DataType(DataType.Password)]
@@ -39,7 +64,7 @@ public class LoggedInDto
     public string? RecaptchaToken { get; set; }
     public string? Token { get; init; }
     public string? KnownAs { get; init; }
-    public string? UserName { get; init; }
+    public string? UserName { get; set; }
     public string? Gender { get; init; }
     public string? ProfilePhotoUrl { get; init; }
     public bool IsWrongCreds { get; set; }

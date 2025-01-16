@@ -1,0 +1,55 @@
+<main>
+  <h1>Account Verification</h1>
+
+  @if (!isRequestingAnotherCode) {
+    <p>Please verify your account using the 6-digit code sent to your email.</p>
+
+    <form class="verify" (ngSubmit)="verifyAccount()">
+      <div class="input">
+        <mat-form-field appearance="outline">
+          <mat-label>Verification Code</mat-label>
+          <input [appAutofocusDir]="!isMobileSig()"
+                 [formControl]="verificationCodeCtrl"
+                 matInput placeholder="Enter the code here">
+          <mat-hint>e.g. 123456</mat-hint>
+          @if (verificationCodeCtrl.hasError('required')) {
+            <mat-error>This field is required.</mat-error>
+          } @else if (verificationCodeCtrl.hasError('minlength') || verificationCodeCtrl.hasError('maxlength')) {
+            <mat-error>6 digits only.</mat-error>
+          }
+        </mat-form-field>
+        <button [disabled]="verificationCodeCtrl.invalid || !(recaptchaCtrl.value && recaptchaToken)"
+                mat-raised-button
+                type="submit" color="primary">
+          Verify
+        </button>
+      </div>
+      <a (click)="requestAnotherCode()">Need another code?</a>
+    </form>
+  } @else {
+    <form class="resend-code">
+      <div class="buttons">
+        <button (click)="cancelRequestAnotherCode()" type="button" mat-icon-button>
+          <mat-icon>reply</mat-icon>
+        </button>
+        <button (click)="resendVerifyCode()" type="button"
+                [disabled]="!(recaptchaCtrl.value && recaptchaToken)"
+                mat-raised-button color="accent">Resend Code
+        </button>
+      </div>
+      <mat-slide-toggle (change)="validateRecaptcha()" class="recaptcha" color="primary"
+                        [formControl]="recaptchaCtrl">
+        @if (!recaptchaCtrl.value) {
+          <p>Not a robot? Slide me!</p>
+        } @else if (recaptchaCtrl.value && isRecaptchaValidating) {
+          <div class="validating-recaptcha">
+            <p>Validating</p>
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <span style="color: #ba005c;">Validated</span>
+        }
+      </mat-slide-toggle>
+    </form>
+  }
+</main>

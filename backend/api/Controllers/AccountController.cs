@@ -8,32 +8,43 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
 {
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<LoggedInDto>> Register(RegisterDto userIn, CancellationToken cancellationToken)
+    public async Task<ActionResult<string>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        LoggedInDto loggedInDto = await accountRepository.CreateAsync(userIn, cancellationToken);
+        RegisteredDto registeredDto = await accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return !string.IsNullOrEmpty(loggedInDto.Token) // success
-            ? Ok(loggedInDto)
-            : loggedInDto.IsRecaptchaTokenInvalid
+        return !string.IsNullOrEmpty(registeredDto.UserName) // success
+            ? registeredDto.UserName
+            : registeredDto.IsRecaptchaTokenInvalid
                 ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-                : loggedInDto.IsEmailSendFailed
-                    ? BadRequest("Failed to send the verification link. Try again.")
-                    : loggedInDto.Errors.Count != 0
-                        ? BadRequest(loggedInDto.Errors)
-                        : BadRequest("Registration has failed. Try again or contact the support.");
+                : !string.IsNullOrEmpty(registeredDto.ErrorMessage)
+                    ? BadRequest(registeredDto.ErrorMessage)
+                    : BadRequest("Registration has failed. Try again or contact the support.");
     }
 
     [AllowAnonymous]
-    [HttpPost("verify-account")]
-    public async Task<ActionResult<LoggedInDto>> VerifyAccount(VerifyDto verifyDto, CancellationToken cancellationToken)
+    [HttpPost("verify")]
+    public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = await accountRepository.VerifyAccountAsync(verifyDto, cancellationToken);
+        LoggedInDto loggedInDto = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
 
         return !string.IsNullOrEmpty(loggedInDto.Token) // success
             ? Ok(loggedInDto)
-            : Unauthorized("Failed to verify your account. Try again.");
+            : BadRequest("Failed to verify your account. Check the code and try again.");
+    }
+
+    [AllowAnonymous]
+    [HttpPost("resend-verify-code")]
+    public async Task<ActionResult<bool>> ResendVerifyCode(ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken)
+    {
+        ResendCodeResult result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
+
+        return result.IsSuccessful
+            ? true
+            : result.IsRecaptchaTokenInvalid
+                ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
+                : BadRequest("Failed to resend code. Try again or contact the support.");
     }
 
     [AllowAnonymous]
@@ -48,13 +59,11 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
                 ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
                 : loggedInDto.IsWrongCreds
                     ? Unauthorized("Wrong username or password.")
-                    : loggedInDto.IsEmailSendFailed
-                        ? BadRequest("Failed to send the verification link. Try again.")
-                        : loggedInDto.IsEmailNotConfirmed
-                            ? Unauthorized("Your account is not verified. Verify your account using the code sent to your email and try again.")
-                            : loggedInDto.Errors.Count != 0
-                                ? BadRequest(loggedInDto.Errors)
-                                : Unauthorized("Login has failed. Try again or contact the support.");
+                    : loggedInDto.IsEmailNotConfirmed
+                        ? loggedInDto
+                        : loggedInDto.Errors.Count != 0
+                            ? BadRequest(loggedInDto.Errors)
+                            : Unauthorized("Login has failed. Try again or contact the support.");
     }
 
     [HttpGet]

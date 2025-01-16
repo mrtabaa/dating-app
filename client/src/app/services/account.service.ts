@@ -24,17 +24,45 @@ export class AccountService {
 
   loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
 
-  register(userInput: UserRegister): Observable<LoggedInUser | null> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
+  register(userInput: UserRegister): Observable<void> {
+    return this._http.post<string>(this.baseUrl + 'register', userInput)
+      .pipe(
+        map((res: string) => {
+          if (res) {
+            localStorage.setItem('userName', res);
+            this._router.navigate(['/account/verify']);
+          }
+        })
+      );
+  }
+
+  verify(verify: Verify): Observable<void> {
+    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify)
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
-            return user;
+            localStorage.removeItem('userName');
+            this._router.navigate(['/main']);
+            this._snackBar.open("You are logged in as: " + user?.userName, "Close", {
+              verticalPosition: 'bottom',
+              horizontalPosition: 'center',
+              duration: 7000
+            })
           }
-          return null;
         })
       );
+  }
+
+  resendVerifyCode(resendRequest: ResendCodeRequest): Observable<void> {
+    return this._http.post<boolean>(this.baseUrl + 'resend-verify-code', resendRequest)
+      .pipe(
+        map((res: boolean) => {
+          if (res) {
+            console.log(res);
+          }
+        })
+      )
   }
 
   login(userInput: UserLogin): Observable<LoggedInUser | null> {
@@ -42,11 +70,20 @@ export class AccountService {
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
-            this.setCurrentUser(user);
-
-            this.setGetReturnUrl(); // Never put it setCurrentUser() or all pages refreshes land on members only. 
-
-            return user;
+            if (user.isEmailNotConfirmed) {
+              localStorage.setItem('userName', user.userName);
+              this._router.navigate(['/account/verify']);
+              console.log(user);
+            } else {
+              this._snackBar.open('You logged in as: ' + user?.userName, 'Close', {
+                verticalPosition: 'bottom',
+                horizontalPosition: 'center',
+                duration: 7000
+              })
+              this.setCurrentUser(user);
+              this.setGetReturnUrl(); // Never put it setCurrentUser() or all pages refreshes land on members only.
+              return user;
+            }
           }
           return null;
         })
