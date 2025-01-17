@@ -17,7 +17,9 @@ public class EmailService(IConfiguration config) : IEmailService
         var request = new EmailRequest(
             appUser.Email.ToLower(),
             EmailExtensions.VerifySubject,
-            EmailExtensions.GetVerificationTemplate(verificationCode)
+            EmailExtensions.GetVerificationTemplate(verificationCode, appUser.UserName
+                                                                      ?? throw new ArgumentNullException(
+                                                                          nameof(appUser.UserName), "cannot be null."))
         );
 
         return await SendEmailAsync(request, cancellationToken);
@@ -31,7 +33,9 @@ public class EmailService(IConfiguration config) : IEmailService
         var request = new EmailRequest(
             appUser.Email.ToLower(),
             EmailExtensions.RecoverySubject,
-            EmailExtensions.GetRecoveryTemplate(verificationCode)
+            EmailExtensions.GetRecoveryTemplate(verificationCode, appUser.UserName
+                                                                  ?? throw new ArgumentNullException(
+                                                                      nameof(appUser.UserName), "cannot be null."))
         );
 
         return await SendEmailAsync(request, cancellationToken);

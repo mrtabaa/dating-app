@@ -29,22 +29,24 @@ public record RegisterDto(
 );
 
 public record RegisteredDto(
-    [Optional] string UserName,
+    [Optional] bool IsSuccess,
     [Optional] bool IsRecaptchaTokenInvalid,
     [Optional] string ErrorMessage
 );
 
 public record VerifyDto(
-    [Length(PropLength.UserNameMinLength, PropLength.UserNameMaxLength)]
-    string UserName,
+    [MaxLength(PropLength.EmailManLength)]
+    [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format.")]
+    string Email,
     [Length(6, 6)]
     [RegularExpression(@"^\d+$", ErrorMessage = "Only digits accepted.")]
     string Code
 );
 
 public record ResendCodeRequest(
-    [Length(PropLength.UserNameMinLength, PropLength.UserNameMaxLength)]
-    string UserName,
+    [MaxLength(PropLength.EmailManLength)]
+    [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format.")]
+    string Email,
     string RecaptchaToken
 );
 
@@ -66,6 +68,7 @@ public class LoggedInDto
 {
     public bool IsRecaptchaTokenInvalid { get; set; }
     public string? RecaptchaToken { get; set; }
+    public string? Email { get; set; } // Used only to verify account. Will always return null if account is verified.
     public string? Token { get; init; }
     public string? KnownAs { get; init; }
     public string? UserName { get; set; }

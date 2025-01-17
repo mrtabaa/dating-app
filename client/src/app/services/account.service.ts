@@ -12,6 +12,7 @@ import {PresenceService} from './hubs/presence.service';
 import {Verify} from "../models/account/verify.model";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ResendCodeRequest} from "../models/account/ResendCodeRequest";
+import {CommonService} from "./common.service";
 
 @Injectable({
   providedIn: 'root'
@@ -25,15 +26,16 @@ export class AccountService {
   private _presenceService = inject(PresenceService);
   private baseUrl = environment.apiUrl + "account/";
   private _snackBar = inject(MatSnackBar);
+  private _isVerifyingAccount = inject(CommonService).isVerifyingAccount;
 
 
   register(userInput: UserRegister): Observable<void> {
-    return this._http.post<string>(this.baseUrl + 'register', userInput)
+    return this._http.post<boolean>(this.baseUrl + 'register', userInput)
       .pipe(
-        map((res: string) => {
-          if (res) {
-            localStorage.setItem('userName', res);
-            this._router.navigate(['/account/verify']);
+        map((isRegistered: boolean) => {
+          if (isRegistered) {
+            localStorage.setItem('email', userInput.email);
+            this._isVerifyingAccount.set(true);
           }
         })
       );
@@ -45,8 +47,9 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
-            localStorage.removeItem('userName');
+            localStorage.removeItem('email');
             this._router.navigate(['/main']);
+            this._isVerifyingAccount.set(false);
             this._snackBar.open("You are logged in as: " + user?.userName, "Close", {
               verticalPosition: 'bottom',
               horizontalPosition: 'center',
@@ -74,10 +77,10 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             if (user.isEmailNotConfirmed) {
-              localStorage.setItem('userName', user.userName);
-              this._router.navigate(['/account/verify']);
-              console.log(user);
+              localStorage.setItem('email', user.email);
+              this._isVerifyingAccount.set(true);
             } else {
+              this._isVerifyingAccount.set(false);
               this._snackBar.open('You logged in as: ' + user?.userName, 'Close', {
                 verticalPosition: 'bottom',
                 horizontalPosition: 'center',

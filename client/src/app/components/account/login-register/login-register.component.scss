@@ -1,22 +1,15 @@
-mat-tab-group {
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 2rem;
-    max-width: 30rem;
-    margin: 0 auto;
-}
-
 ::ng-deep .grecaptcha-badge {
-    visibility: visible !important;
-    scale: (0.9);
-    z-index: 2;
+  visibility: visible !important;
+  scale: (0.9);
+  z-index: 2;
 }
 
 @media only screen and (min-width: 51rem) {
-    mat-tab-group {
-        width: 35rem;
-    }
+  //mat-tab-group {
+  //    width: 35rem;
+  //}
 
-    ::ng-deep .grecaptcha-badge {
-        scale: (1);
-    }    
+  ::ng-deep .grecaptcha-badge {
+    scale: (1);
+  }
 }

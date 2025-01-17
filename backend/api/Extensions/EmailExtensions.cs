@@ -8,22 +8,24 @@ internal static class EmailExtensions
     internal const string RecoverySubject = "Recover Your Hallboard Account";
 
     //TODO: Improve layout
-    internal static string GetVerificationTemplate(string verificationCode) =>
+    internal static string GetVerificationTemplate(string verificationCode, string userName) =>
         $"""
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
-                        <h5>Verify your account using this verification code</h5>
+                        <h5>Dear {userName},</h5>
+                        <h5>Please verify your account using this verification code:</h5>
                         <h2>{verificationCode}</h2>
                     </body>
                 </html>
          """;
 
     //TODO: Improve layout
-    internal static string GetRecoveryTemplate(string verificationCode) =>
+    internal static string GetRecoveryTemplate(string verificationCode, string userName) =>
         $"""
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
-                        <h5>Reset your password using this verification code</h5>
+                        <h5>Dear {userName},</h5>
+                        <h5>You can reset your password using this verification code:</h5>
                         <h2>{verificationCode}</h2>
                     </body>
                 </html>

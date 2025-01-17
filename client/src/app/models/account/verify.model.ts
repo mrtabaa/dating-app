@@ -1,4 +1,4 @@
 export interface Verify {
-  userName: string;
+  email: string;
   code: string;
 }

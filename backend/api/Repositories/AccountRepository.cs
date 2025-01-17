@@ -28,7 +28,6 @@ public class AccountRepository : IAccountRepository
     private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
-    private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
@@ -37,8 +36,7 @@ public class AccountRepository : IAccountRepository
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
         IRecaptchaService recaptchaValidatorService,
-        UserManager<AppUser> userManager, IUserRepository userRepository,
-        ITokenService tokenService,
+        UserManager<AppUser> userManager, ITokenService tokenService,
         IEmailService emailService, IPhotoService photoService
     )
     {
@@ -47,7 +45,6 @@ public class AccountRepository : IAccountRepository
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
         _recaptchaService = recaptchaValidatorService;
         _userManager = userManager;
-        _userRepository = userRepository;
         _tokenService = tokenService;
         _emailService = emailService;
         _photoService = photoService;
@@ -80,10 +77,10 @@ public class AccountRepository : IAccountRepository
         }
 
         if (!await SendVerificationCode(appUser, cancellationToken))
-            throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
+            throw new ArgumentException(nameof(appUser.Email) + ": Failed to email verification code.");
 
         return new RegisteredDto(
-            appUser.UserName ?? throw new ArgumentNullException(nameof(appUser.UserName), "Cannot be null in DB")
+            true
         ); // Account created successfully.
     }
 
@@ -91,7 +88,7 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        AppUser? appUser = await _userRepository.GetByUserNameAsync(verifyDto.UserName, cancellationToken);
+        AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
         {
             loggedInDto.IsEmailNotConfirmed = true;
@@ -117,7 +114,7 @@ public class AccountRepository : IAccountRepository
         if (!await ValidateRecaptcha(resendCRequest.RecaptchaToken, cancellationToken))
             return new ResendCodeResult(true);
 
-        AppUser? appUser = await _userRepository.GetByUserNameAsync(resendCRequest.UserName, cancellationToken);
+        AppUser? appUser = await _userManager.FindByEmailAsync(resendCRequest.Email);
 
         return appUser is null
             ? new ResendCodeResult()
@@ -159,7 +156,7 @@ public class AccountRepository : IAccountRepository
             if (!await SendVerificationCode(appUser, cancellationToken))
                 throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
-            loggedInDto.UserName = appUser.UserName;
+            loggedInDto.Email = appUser.Email;
             loggedInDto.IsEmailNotConfirmed = true;
             return loggedInDto;
         }

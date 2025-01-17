@@ -1,4 +1,4 @@
 export interface ResendCodeRequest {
-  userName: string;
+  email: string;
   recaptchaToken: string;
 }

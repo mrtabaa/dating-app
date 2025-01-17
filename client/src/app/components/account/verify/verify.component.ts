@@ -13,6 +13,7 @@ import {ResendCodeRequest} from "../../../models/account/ResendCodeRequest";
 import {RecaptchaV3Module, ReCaptchaV3Service} from "ng-recaptcha";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {MatProgressSpinner} from "@angular/material/progress-spinner";
+import {CommonService} from "../../../services/common.service";
 
 @Component({
   selector: 'app-verify',
@@ -28,7 +29,7 @@ import {MatProgressSpinner} from "@angular/material/progress-spinner";
 export class VerifyComponent implements OnDestroy {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isRequestingAnotherCode: boolean = false;
-  userName: string | undefined;
+  email: string | undefined;
   recaptchaToken: string | undefined;
   isRecaptchaValidating = false;
   private _accountService = inject(AccountService);
@@ -38,9 +39,10 @@ export class VerifyComponent implements OnDestroy {
     [Validators.required, Validators.minLength(6), Validators.maxLength(6), Validators.pattern(/^\d+$/)]);
   recaptchaCtrl = this._fb.control(false, [Validators.required]);
   private _subscribedRecaptcha: Subscription | undefined;
+  private _isVerifyingAccount = inject(CommonService).isVerifyingAccount;
 
   constructor() {
-    this.setUserName();
+    this.setEmail();
   }
 
   ngOnDestroy(): void {
@@ -61,17 +63,17 @@ export class VerifyComponent implements OnDestroy {
         });
   }
 
-  setUserName() {
-    const userName = localStorage.getItem('userName');
+  setEmail() {
+    const email = localStorage.getItem('email');
 
-    if (userName)
-      this.userName = userName;
+    if (email)
+      this.email = email;
   }
 
   verifyAccount(): void {
-    if (this.userName && this.verificationCodeCtrl.value) {
+    if (this.email && this.verificationCodeCtrl.value) {
       const verify: Verify = {
-        userName: this.userName,
+        email: this.email,
         code: this.verificationCodeCtrl.value
       }
 
@@ -89,10 +91,14 @@ export class VerifyComponent implements OnDestroy {
     this.isRequestingAnotherCode = false;
   }
 
+  cancelVerification(): void {
+    this._isVerifyingAccount.set(false);
+  }
+
   resendVerifyCode(): void {
-    if (this.userName && this.recaptchaToken) {
+    if (this.email && this.recaptchaToken) {
       const resendRequest: ResendCodeRequest = {
-        userName: this.userName,
+        email: this.email,
         recaptchaToken: this.recaptchaToken
       }
 

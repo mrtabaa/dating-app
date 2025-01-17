@@ -1,4 +1,5 @@
 export interface LoggedInUser {
+  email: string; // Used only to verify account. Will always be null if account is verified.
   userName: string;
   knownAs: string;
   token: string;

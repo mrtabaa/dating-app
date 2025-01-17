@@ -19,7 +19,6 @@ import {completeProfileGuard} from './guards/complete-profile.guard';
 import {profileIsCompletedGuard} from './guards/profile-is-completed.guard';
 import {MainComponent} from './components/main/main.component';
 import {mobileGuard} from './guards/mobile.guard';
-import {VerifyComponent} from "./components/account/verify/verify.component";
 
 export const routes: Routes = [
   {
@@ -30,7 +29,6 @@ export const routes: Routes = [
       {path: '', component: HomeComponent},
       {path: 'account/register', component: HomeComponent},
       {path: 'account/login', component: HomeComponent},
-      {path: 'account/verify', component: VerifyComponent},
       {path: 'account/recover', component: RecoverComponent},
       {path: 'demo', component: HomeComponent}, // DEMO
     ]

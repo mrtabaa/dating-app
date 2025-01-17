@@ -6,12 +6,14 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {LoginRegisterComponent} from '../account/login-register/login-register.component';
 import {WelcomeComponent} from './welcome/welcome.component';
 import {ResponsiveService} from '../../services/responsive.service';
+import {CommonService} from "../../services/common.service";
+import {VerifyComponent} from "../account/verify/verify.component";
 
 @Component({
   selector: 'app-home',
   imports: [
     CommonModule,
-    LoginRegisterComponent, WelcomeComponent,
+    LoginRegisterComponent, WelcomeComponent, VerifyComponent,
     NgOptimizedImage, MatIconModule,
     MatButtonModule, MatTabsModule
   ],
@@ -21,4 +23,5 @@ import {ResponsiveService} from '../../services/responsive.service';
 export class HomeComponent {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
+  isVerifyingAccount = inject(CommonService).isVerifyingAccount;
 }

@@ -1,8 +1,12 @@
 <main>
   <h1>Account Verification</h1>
+  <div class="account-info">
+    <strong>{{ email }}</strong>
+    <button (click)="cancelVerification()" mat-button type="button">change</button>
+  </div>
 
   @if (!isRequestingAnotherCode) {
-    <p>Please verify your account using the 6-digit code sent to your email.</p>
+    <p class="message">Please verify your account using the 6-digit code sent to your email.</p>
 
     <form class="verify" (ngSubmit)="verifyAccount()">
       <div class="input">
@@ -11,32 +15,25 @@
           <input [appAutofocusDir]="!isMobileSig()"
                  [formControl]="verificationCodeCtrl"
                  matInput placeholder="Enter the code here">
-          <mat-hint>e.g. 123456</mat-hint>
+          @if (verificationCodeCtrl.invalid) {
+            <mat-hint>e.g. 123456</mat-hint>
+          }
           @if (verificationCodeCtrl.hasError('required')) {
             <mat-error>This field is required.</mat-error>
           } @else if (verificationCodeCtrl.hasError('minlength') || verificationCodeCtrl.hasError('maxlength')) {
             <mat-error>6 digits only.</mat-error>
           }
         </mat-form-field>
-        <button [disabled]="verificationCodeCtrl.invalid || !(recaptchaCtrl.value && recaptchaToken)"
+        <button [disabled]="verificationCodeCtrl.invalid"
                 mat-raised-button
                 type="submit" color="primary">
           Verify
         </button>
       </div>
-      <a (click)="requestAnotherCode()">Need another code?</a>
+      <button type="button" (click)="requestAnotherCode()" mat-button>Need another code?</button>
     </form>
   } @else {
     <form class="resend-code">
-      <div class="buttons">
-        <button (click)="cancelRequestAnotherCode()" type="button" mat-icon-button>
-          <mat-icon>reply</mat-icon>
-        </button>
-        <button (click)="resendVerifyCode()" type="button"
-                [disabled]="!(recaptchaCtrl.value && recaptchaToken)"
-                mat-raised-button color="accent">Resend Code
-        </button>
-      </div>
       <mat-slide-toggle (change)="validateRecaptcha()" class="recaptcha" color="primary"
                         [formControl]="recaptchaCtrl">
         @if (!recaptchaCtrl.value) {
@@ -50,6 +47,15 @@
           <span style="color: #ba005c;">Validated</span>
         }
       </mat-slide-toggle>
+      <div class="buttons">
+        <button (click)="cancelRequestAnotherCode()" type="button" mat-icon-button>
+          <mat-icon>reply</mat-icon>
+        </button>
+        <button (click)="resendVerifyCode()" type="button"
+                [disabled]="!(recaptchaCtrl.value && recaptchaToken)"
+                mat-raised-button color="accent">Resend Code
+        </button>
+      </div>
     </form>
   }
 </main>

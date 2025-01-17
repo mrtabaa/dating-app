@@ -8,14 +8,14 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
 {
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<string>> Register(RegisterDto userIn, CancellationToken cancellationToken)
+    public async Task<ActionResult<bool>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
         RegisteredDto registeredDto = await accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return !string.IsNullOrEmpty(registeredDto.UserName) // success
-            ? registeredDto.UserName
+        return registeredDto.IsSuccess
+            ? registeredDto.IsSuccess
             : registeredDto.IsRecaptchaTokenInvalid
                 ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
                 : !string.IsNullOrEmpty(registeredDto.ErrorMessage)

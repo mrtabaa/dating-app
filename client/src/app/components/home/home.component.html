@@ -2,7 +2,11 @@
   <!-- Mobile only  -->
   @if (isMobileSig()) {
     @if (!isWelcomeCompSig()) {
-      <app-login-register/>
+      @if (isVerifyingAccount()) {
+        <app-verify/>
+      } @else {
+        <app-login-register/>
+      }
     } @else {
       <app-welcome/>
     }
@@ -11,7 +15,13 @@
     <img class="main-bg-image" ngSrc="/assets/images/components/home/bg.webp" fill priority alt="Loading...">
     <section class="row1">
       <h2>Find Your Perfect Match!</h2>
-      <app-login-register/>
+      <div class="account">
+        @if (isVerifyingAccount()) {
+          <app-verify/>
+        } @else {
+          <app-login-register/>
+        }
+      </div>
     </section>
     <section class="row2">
       <h3 class="banner">
