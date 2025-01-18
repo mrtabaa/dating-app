@@ -1,4 +1,6 @@
+using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using System.Web;
 using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace api.Repositories;
@@ -21,6 +23,22 @@ public class AccountRepository : IAccountRepository
         string verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
         return await _emailService.SendVerificationCode(appUser, verificationCode, cancellationToken);
+    }
+
+    private static string GeneratePasswordResetLink(string baseUrl, string email, string token)
+    {
+        if (string.IsNullOrWhiteSpace(baseUrl)) throw new ArgumentException("Base URL cannot be null or empty.", nameof(baseUrl));
+        if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+        if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token cannot be null or empty.", nameof(token));
+
+        var builder = new UriBuilder(baseUrl);
+        NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
+
+        query.Add("email", email);
+        query.Add("token", token);
+        builder.Query = query.ToString();
+
+        return builder.Uri.ToString();
     }
 
     #region Db and Token Settings
@@ -179,6 +197,20 @@ public class AccountRepository : IAccountRepository
         return appUser is null
             ? null
             : Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser));
+    }
+
+    public async Task ResetPasswordAsync(string email, CancellationToken cancellationToken)
+    {
+        AppUser? appUser = await _userManager.FindByEmailAsync(email);
+        if (appUser is not null)
+        {
+            string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+
+            string resetLink = GeneratePasswordResetLink("https://www.hallboard.com", email, resetToken);
+
+            if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
+                throw new ArgumentException("Failed to send reset password link. Check email provider working.", nameof(email));
+        }
     }
 
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)

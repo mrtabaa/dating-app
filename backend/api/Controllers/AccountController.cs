@@ -87,6 +87,18 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         return loggedInDto is null ? Unauthorized("User is logged out or unauthorized. Login again.") : loggedInDto;
     }
 
+    [AllowAnonymous]
+    [HttpPost("request-reset-password/{email}")]
+    public async Task<ActionResult<Response>> RequestResetPassword(
+        [MaxLength(PropLength.EmailManLength)] [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Please enter a valid email address.")]
+        string email,
+        CancellationToken cancellationToken)
+    {
+        await accountRepository.ResetPasswordAsync(email, cancellationToken);
+
+        return new Response("If the email is registered and verified, a reset link will be sent to your email.");
+    }
+
     [HttpDelete("delete-account")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {

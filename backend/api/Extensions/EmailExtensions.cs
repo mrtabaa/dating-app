@@ -20,13 +20,13 @@ internal static class EmailExtensions
          """;
 
     //TODO: Improve layout
-    internal static string GetRecoveryTemplate(string verificationCode, string userName) =>
+    internal static string GetResetPasswordTemplate(string resetLink, string userName) =>
         $"""
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
                         <h5>Dear {userName},</h5>
-                        <h5>You can reset your password using this verification code:</h5>
-                        <h2>{verificationCode}</h2>
+                        <h5>You are about to reset your password:</h5>
+                        <a href="{resetLink}" style="width: fit-content;">Reset your password</a>
                     </body>
                 </html>
          """;

@@ -25,7 +25,7 @@ public class EmailService(IConfiguration config) : IEmailService
         return await SendEmailAsync(request, cancellationToken);
     }
 
-    public async Task<bool> SendRecoveryCode(AppUser appUser, string verificationCode, CancellationToken cancellationToken)
+    public async Task<bool> SendPasswordResetLink(AppUser appUser, string resetLink, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(appUser.Email))
             throw new ArgumentNullException(nameof(appUser.Email));
@@ -33,9 +33,9 @@ public class EmailService(IConfiguration config) : IEmailService
         var request = new EmailRequest(
             appUser.Email.ToLower(),
             EmailExtensions.RecoverySubject,
-            EmailExtensions.GetRecoveryTemplate(verificationCode, appUser.UserName
-                                                                  ?? throw new ArgumentNullException(
-                                                                      nameof(appUser.UserName), "cannot be null."))
+            EmailExtensions.GetResetPasswordTemplate(resetLink, appUser.UserName
+                                                                ?? throw new ArgumentNullException(
+                                                                    nameof(appUser.UserName), "cannot be null."))
         );
 
         return await SendEmailAsync(request, cancellationToken);
