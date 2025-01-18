@@ -31,7 +31,7 @@ public record RegisterDto(
 public record RegisteredDto(
     [Optional] bool IsSuccess,
     [Optional] bool IsRecaptchaTokenInvalid,
-    [Optional] string ErrorMessage
+    [Optional] string? ErrorMessage
 );
 
 public record VerifyDto(

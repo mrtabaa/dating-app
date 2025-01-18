@@ -65,7 +65,7 @@ public class AccountRepository : IAccountRepository
         if (!userCreatedResult.Succeeded)
         {
             return new RegisteredDto(
-                ErrorMessage: userCreatedResult.Errors.ToArray()[0].Description
+                ErrorMessage: userCreatedResult.Errors.Select(e => e.Description).FirstOrDefault()
             ); // failed to create the user
         }
 
