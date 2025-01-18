@@ -59,13 +59,14 @@ export class RequestResetPasswordComponent implements OnDestroy {
     this.isRecaptchaValidating = true;
 
     if (this.RecaptchaCtrl.value)
-      this._subscribedRecaptcha = this._recaptchaService.execute('login').subscribe(
-        (token: string) => {
-          if (token) {
-            this.recaptchaToken = token;
-            this.isRecaptchaValidating = false;
-          }
-        });
+      this._subscribedRecaptcha = this._recaptchaService.execute('login')
+        .subscribe(
+          (token: string) => {
+            if (token) {
+              this.recaptchaToken = token;
+              this.isRecaptchaValidating = false;
+            }
+          });
   }
 
   requestPasswordReset(): void {
