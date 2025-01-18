@@ -8,6 +8,7 @@ import {WelcomeComponent} from './welcome/welcome.component';
 import {ResponsiveService} from '../../services/responsive.service';
 import {CommonService} from "../../services/common.service";
 import {VerifyComponent} from "../account/verify/verify.component";
+import {RequestResetPasswordComponent} from "../account/request-reset-password/request-reset-password.component";
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ import {VerifyComponent} from "../account/verify/verify.component";
     CommonModule,
     LoginRegisterComponent, WelcomeComponent, VerifyComponent,
     NgOptimizedImage, MatIconModule,
-    MatButtonModule, MatTabsModule
+    MatButtonModule, MatTabsModule, RequestResetPasswordComponent
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -23,5 +24,6 @@ import {VerifyComponent} from "../account/verify/verify.component";
 export class HomeComponent {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
-  isVerifyingAccount = inject(CommonService).isVerifyingAccount;
+  isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
+  isResettingPasswordSig = inject(CommonService).isResettingPasswordSig;
 }

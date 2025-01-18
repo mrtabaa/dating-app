@@ -9,5 +9,6 @@ export class CommonService {
   isMemberMessageCompSig = signal<boolean>(false);
   isCreatingMessageSig = signal<boolean>(false);
   isNavMobileBrandClickedSig = signal<boolean>(false);
-  isVerifyingAccount = signal<boolean>(false);
+  isVerifyingAccountSig = signal<boolean>(false);
+  isResettingPasswordSig = signal<boolean>(false);
 }

@@ -88,15 +88,14 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     }
 
     [AllowAnonymous]
-    [HttpPost("request-reset-password/{email}")]
-    public async Task<ActionResult<Response>> RequestResetPassword(
-        [MaxLength(PropLength.EmailManLength)] [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Please enter a valid email address.")]
-        string email,
-        CancellationToken cancellationToken)
+    [HttpPost("request-reset-password")]
+    public async Task<ActionResult<Response>> RequestResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        await accountRepository.ResetPasswordAsync(email, cancellationToken);
+        bool isRecaptchaValid = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
 
-        return new Response("If the email is registered and verified, a reset link will be sent to your email.");
+        return !isRecaptchaValid
+            ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
+            : new Response("If the email is registered and verified, a reset link will be sent to your email.");
     }
 
     [HttpDelete("delete-account")]

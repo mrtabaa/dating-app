@@ -1,4 +1,4 @@
-export interface ResendCodeRequest {
+export interface RecoveryValidationRequest {
   email: string;
   recaptchaToken: string;
 }

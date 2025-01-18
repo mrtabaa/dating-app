@@ -13,12 +13,12 @@ import {preventUnsavedChangesGuard} from './guards/prevent-unsaved-changes.guard
 import {FollowsComponent} from './components/follows/follows.component';
 import {AdminPanelComponent} from './components/admin/admin-panel/admin-panel.component';
 import {adminGuard} from './guards/admin.guard';
-import {RecoverComponent} from './components/account/recover/recover.component';
 import {CompleteProfileComponent} from './components/account/complete-profile/complete-profile.component';
 import {completeProfileGuard} from './guards/complete-profile.guard';
 import {profileIsCompletedGuard} from './guards/profile-is-completed.guard';
 import {MainComponent} from './components/main/main.component';
 import {mobileGuard} from './guards/mobile.guard';
+import {ResetPasswordComponent} from "./components/account/reset-password/reset-password.component";
 
 export const routes: Routes = [
   {
@@ -29,7 +29,7 @@ export const routes: Routes = [
       {path: '', component: HomeComponent},
       {path: 'account/register', component: HomeComponent},
       {path: 'account/login', component: HomeComponent},
-      {path: 'account/recover', component: RecoverComponent},
+      {path: 'account/reset-password', component: ResetPasswordComponent},
       {path: 'demo', component: HomeComponent}, // DEMO
     ]
   },

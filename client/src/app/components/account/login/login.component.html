@@ -1,75 +1,70 @@
-<form [formGroup]="loginFg" (ngSubmit)="loginEmailUsername()">
-    <div class="container">
-        @if(router.url === '/demo' && !hasLoginCreds) {
-        <div class="demo">
-            <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
-                @if(!RecaptchaCtrl.value) {
-                <span style="color: palevioletred;">Not a robot? Slide me!</span>
-                }
-                @else {
-                <span style="color: #ba005c;">Validated</span>
-                }
-            </mat-slide-toggle>
-            <button type="button" (click)="generateMemberCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
-                Generate demo member
-            </button>
-            <button type="button" (click)="enterAdminCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
-                Admin creds
-            </button>
-            <button type="button" (click)="hasLoginCreds = true" mat-button>
-                Already have login creds?
-            </button>
-        </div>
-        }
-        @else {
-        <div class="inputs">
-            @if(
-            router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com"
-            && PasswordCtrl.valid && EmailUsernameCtrl.valid) {
-            <p class="demo-text">
-                NOTE: Keep the generated username & password to login again with it! <br />
-                <span>Username/Email:</span> {{EmailUsernameCtrl.value}}
-                <br />
-                <span>Password:</span> {{PasswordCtrl.value}}
-            </p>
-            }
-            <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
-                [placeHolder]="'Email or Username'" [isFocused]="!isMobileSig()"
-                [hint]="'Your registered email or username'">
-            </app-input-cva>
-            <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
-                [placeHolder]="'Your password'"
-                [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
-                [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
-            </app-input-cva>
-        </div>
-        <mat-slide-toggle class="recaptcha" formControlName="recaptchaCtrl" (change)="validateRecaptcha()"
-            color="primary">
-            @if(!RecaptchaCtrl.value) {
-            <p>Not a robot? Slide me!</p>
-            }
-            @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
-            <div class="validating-recaptcha">
-                <p>Validating</p>
-                <mat-spinner></mat-spinner>
-            </div>
-            }
-            @else {
+<form (ngSubmit)="loginEmailUsername()" [formGroup]="loginFg">
+  <div class="container">
+    @if (router.url === '/demo' && !hasLoginCreds) {
+      <div class="demo">
+        <mat-slide-toggle formControlName="recaptchaCtrl" (change)="validateRecaptcha()" color="primary">
+          @if (!RecaptchaCtrl.value) {
+            <span style="color: palevioletred;">Not a robot? Slide me!</span>
+          } @else {
             <span style="color: #ba005c;">Validated</span>
-            }
+          }
         </mat-slide-toggle>
-        <div class="buttons">
-            <div class="signin">
-                <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
-                <button type="submit" [disabled]="loginFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)"
-                    class="submitBtn" mat-raised-button color="primary">
-                    Sign in
-                </button>
-            </div>
-            <div class="recovery">
-                <button mat-button [routerLink]="['/account/recover']">Forgot your password?</button>
-            </div>
-        </div>
+        <button type="button" (click)="generateMemberCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
+          Generate demo member
+        </button>
+        <button type="button" (click)="enterAdminCreds()" [disabled]="!RecaptchaCtrl.value" mat-stroked-button>
+          Admin creds
+        </button>
+        <button type="button" (click)="hasLoginCreds = true" mat-button>
+          Already have login creds?
+        </button>
+      </div>
+    } @else {
+      <div class="inputs">
+        @if (router.url === '/demo' && PasswordCtrl.value && EmailUsernameCtrl.value !== "admin@a.com"
+        && PasswordCtrl.valid && EmailUsernameCtrl.valid) {
+          <p class="demo-text">
+            NOTE: Keep the generated username & password to login again with it! <br/>
+            <span>Username/Email:</span> {{ EmailUsernameCtrl.value }}
+            <br/>
+            <span>Password:</span> {{ PasswordCtrl.value }}
+          </p>
         }
-    </div>
+        <app-input-cva [formControl]="EmailUsernameCtrl" [label]="'Email or Username'"
+                       [placeHolder]="'Email or Username'" [isFocused]="!isMobileSig()"
+                       [hint]="'Your registered email or username'">
+        </app-input-cva>
+        <app-input-cva [formControl]="PasswordCtrl" [type]="'password'" [label]="'Password'"
+                       [placeHolder]="'Your password'"
+                       [hint]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'"
+                       [error]="'Needs: 8 to 50 characters. An uppercase character(ABC). A number(123)'">
+        </app-input-cva>
+      </div>
+      <mat-slide-toggle class="recaptcha" formControlName="recaptchaCtrl" (change)="validateRecaptcha()"
+                        color="primary">
+        @if (!RecaptchaCtrl.value) {
+          <p>Not a robot? Slide me!</p>
+        } @else if (RecaptchaCtrl.value && isRecaptchaValidating) {
+          <div class="validating-recaptcha">
+            <p>Validating</p>
+            <mat-spinner></mat-spinner>
+          </div>
+        } @else {
+          <span style="color: #ba005c;">Validated</span>
+        }
+      </mat-slide-toggle>
+      <div class="buttons">
+        <div class="signin">
+          <mat-checkbox formControlName="rememberMeCtrl">Remember me</mat-checkbox>
+          <button type="submit" [disabled]="loginFg.invalid || !(RecaptchaCtrl.value && recaptchaToken)"
+                  class="submitBtn" mat-raised-button color="primary">
+            Sign in
+          </button>
+        </div>
+        <div class="recovery">
+          <button mat-button (click)="forgotPasswordRequest()">Forgot your password?</button>
+        </div>
+      </div>
+    }
+  </div>
 </form>

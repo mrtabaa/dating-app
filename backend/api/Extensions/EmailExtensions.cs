@@ -25,8 +25,8 @@ internal static class EmailExtensions
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
                         <h5>Dear {userName},</h5>
-                        <h5>You are about to reset your password:</h5>
-                        <a href="{resetLink}" style="width: fit-content;">Reset your password</a>
+                        <h5>You may reset your password from the page below:</h5>
+                        <a href="{resetLink}" style="width: fit-content;">Reset password page</a>
                     </body>
                 </html>
          """;

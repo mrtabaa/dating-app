@@ -1,6 +1,5 @@
 import {Component, inject, OnDestroy, Renderer2} from '@angular/core';
 import {FormBuilder, FormControl, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {Observable, Subscription, take} from 'rxjs';
 import {UserLogin} from '../../../models/account/user-login.model';
 import {LoggedInUser} from '../../../models/logged-in-user.model';
@@ -9,18 +8,18 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatInputModule} from '@angular/material/input';
 import {InputCvaComponent} from '../../_helpers/input-cva/input-cva.component';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import {Router, RouterLink} from '@angular/router';
+import {Router} from '@angular/router';
 import {UserRegister} from '../../../models/account/user-register.model';
 import {ResponsiveService} from '../../../services/responsive.service';
 import {RecaptchaV3Module, ReCaptchaV3Service} from "ng-recaptcha";
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {CommonService} from "../../../services/common.service";
 
 @Component({
   selector: 'app-login',
   imports: [
-    InputCvaComponent, RouterLink,
-    FormsModule, ReactiveFormsModule,
+    InputCvaComponent, FormsModule, ReactiveFormsModule,
     RecaptchaV3Module,
     MatButtonModule, MatInputModule, MatCheckboxModule, MatSlideToggleModule, MatProgressSpinnerModule
   ],
@@ -35,15 +34,15 @@ export class LoginComponent implements OnDestroy {
   isRecaptchaValidating = false;
   user$: Observable<LoggedInUser | null> | undefined;
   hasLoginCreds = false;
+  private _isResettingPassword = inject(CommonService).isResettingPasswordSig;
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   loginFg = this.fb.group({
-    emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(50)]],
+    emailUsernameCtrl: ['', [Validators.required, Validators.maxLength(100)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     recaptchaCtrl: [false, [Validators.required]],
     rememberMeCtrl: [false, []]
   });
-  private snackBar = inject(MatSnackBar);
   private _recaptchaService = inject(ReCaptchaV3Service);
   private _subscribedLogin: Subscription | undefined;
   private _subscribedRecaptcha: Subscription | undefined;
@@ -89,7 +88,7 @@ export class LoginComponent implements OnDestroy {
   loginEmailUsername(): void {
     if (this.recaptchaToken) {
       const userLoginInput: UserLogin = {
-        emailUsername: this.EmailUsernameCtrl.value,
+        emailUsername: this.EmailUsernameCtrl.value.trim(),
         password: this.PasswordCtrl.value,
         recaptchaToken: this.recaptchaToken
       };
@@ -139,6 +138,10 @@ export class LoginComponent implements OnDestroy {
         }
       });
     }
+  }
+
+  forgotPasswordRequest(): void {
+    this._isResettingPassword.set(true);
   }
 
   private generateRandomText(length: number): string {

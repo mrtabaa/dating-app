@@ -47,7 +47,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
+    emailCtrl: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
@@ -127,8 +127,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
       const dob = this.getDateOnly(this.DateOfBirthCtrl.value);
 
       const userRegisterInput: UserRegister = {
-        email: this.EmailCtrl.value,
-        username: this.UsernameCtrl.value,
+        email: this.EmailCtrl.value.trim(),
+        username: this.UsernameCtrl.value.trim(),
         password: this.PasswordCtrl.value,
         confirmPassword: this.ConfirmPasswordCtrl.value,
         dateOfBirth: dob,

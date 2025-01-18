@@ -25,17 +25,17 @@ public class AccountRepository : IAccountRepository
         return await _emailService.SendVerificationCode(appUser, verificationCode, cancellationToken);
     }
 
-    private static string GeneratePasswordResetLink(string baseUrl, string email, string token)
+    private static string GenerateResetPasswordLink(string baseUrl, string email, string resetToken)
     {
         if (string.IsNullOrWhiteSpace(baseUrl)) throw new ArgumentException("Base URL cannot be null or empty.", nameof(baseUrl));
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email cannot be null or empty.", nameof(email));
-        if (string.IsNullOrWhiteSpace(token)) throw new ArgumentException("Token cannot be null or empty.", nameof(token));
+        if (string.IsNullOrWhiteSpace(resetToken)) throw new ArgumentException("Token cannot be null or empty.", nameof(resetToken));
 
         var builder = new UriBuilder(baseUrl);
         NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
 
         query.Add("email", email);
-        query.Add("token", token);
+        query.Add("resetToken", resetToken);
         builder.Query = query.ToString();
 
         return builder.Uri.ToString();
@@ -199,18 +199,25 @@ public class AccountRepository : IAccountRepository
             : Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser));
     }
 
-    public async Task ResetPasswordAsync(string email, CancellationToken cancellationToken)
+    public async Task<bool> RequestResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        AppUser? appUser = await _userManager.FindByEmailAsync(email);
-        if (appUser is not null)
-        {
-            string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+        // if (!await ValidateRecaptcha(request.RecaptchaToken, cancellationToken))
+        //     return false; // For invalid recaptcha ? false : true 
 
-            string resetLink = GeneratePasswordResetLink("https://www.hallboard.com", email, resetToken);
+        AppUser? appUser = await _userManager.FindByEmailAsync(request.Email.Trim());
+        if (appUser is null || string.IsNullOrEmpty(appUser.Email)) return true;
 
-            if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
-                throw new ArgumentException("Failed to send reset password link. Check email provider working.", nameof(email));
-        }
+        string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+
+        string resetLink = GenerateResetPasswordLink(
+            "http://localhost:4300/account/reset-password",
+            // "https://www.hallboard.com/account/reset-password",
+            appUser.Email, resetToken);
+
+        if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
+            throw new ArgumentException("Failed to send reset password link. Check if email provider is working.", nameof(appUser.Email));
+
+        return true;
     }
 
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)

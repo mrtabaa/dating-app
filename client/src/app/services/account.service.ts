@@ -11,8 +11,10 @@ import {ResponsiveService} from './responsive.service';
 import {PresenceService} from './hubs/presence.service';
 import {Verify} from "../models/account/verify.model";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {ResendCodeRequest} from "../models/account/ResendCodeRequest";
 import {CommonService} from "./common.service";
+import {ApiResponseMessage} from "../models/helpers/api-response-message";
+import {RecoveryValidationRequest} from "../models/account/recovery-validation-request.model";
+import {ResetPassword} from "../models/account/reset-password.model";
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +28,7 @@ export class AccountService {
   private _presenceService = inject(PresenceService);
   private baseUrl = environment.apiUrl + "account/";
   private _snackBar = inject(MatSnackBar);
-  private _isVerifyingAccount = inject(CommonService).isVerifyingAccount;
+  private _isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
 
 
   register(userInput: UserRegister): Observable<void> {
@@ -60,7 +62,7 @@ export class AccountService {
       );
   }
 
-  resendVerifyCode(resendRequest: ResendCodeRequest): Observable<void> {
+  resendVerifyCode(resendRequest: RecoveryValidationRequest): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'resend-verify-code', resendRequest)
       .pipe(
         map((res: boolean) => {
@@ -117,6 +119,39 @@ export class AccountService {
         next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
         error: () => this.logout()
       });
+  }
+
+  requestResetPassword(request: RecoveryValidationRequest): Observable<ApiResponseMessage> {
+    return this._http.post<ApiResponseMessage>(this.baseUrl + 'request-reset-password', request)
+      .pipe(
+        map(res => {
+          this._snackBar.open(res.message, 'Close', {
+            verticalPosition: 'top',
+            horizontalPosition: 'center',
+            duration: 10000
+          });
+
+          this._router.navigate(['/']);
+
+          return res;
+        })
+      );
+  }
+
+  resetPassword(resetPassword: ResetPassword): Observable<ApiResponseMessage> {
+    return this._http.post<ApiResponseMessage>(this.baseUrl + 'reset-password', resetPassword)
+      .pipe(
+        map(res => {
+          if (res)
+            this._snackBar.open(res.message, 'Close', {
+              verticalPosition: 'bottom',
+              horizontalPosition: 'center',
+              duration: 7000
+            });
+
+          return res;
+        })
+      );
   }
 
   logout(): void {

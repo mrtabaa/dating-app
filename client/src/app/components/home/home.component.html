@@ -4,6 +4,8 @@
     @if (!isWelcomeCompSig()) {
       @if (isVerifyingAccount()) {
         <app-verify/>
+      } @else if (isResettingPasswordSig()) {
+        <app-request-reset-password/>
       } @else {
         <app-login-register/>
       }
@@ -18,6 +20,8 @@
       <div class="account">
         @if (isVerifyingAccount()) {
           <app-verify/>
+        } @else if (isResettingPasswordSig()) {
+          <app-request-reset-password/>
         } @else {
           <app-login-register/>
         }
