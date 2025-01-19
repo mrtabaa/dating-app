@@ -98,6 +98,19 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             : new Response("If the email is registered and verified, a reset link will be sent to your email.");
     }
 
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<Response>> ResetPassword(ResetPassword resetPassword, CancellationToken cancellationToken)
+    {
+        if (resetPassword.Password != resetPassword.ConfirmPassword) return BadRequest("Password entries don't match!");
+
+        bool isSuccess = await accountRepository.ResetPasswordAsync(resetPassword, cancellationToken);
+
+        return isSuccess
+            ? new Response("Your new password is saved successfully.")
+            : BadRequest("""Reset password token is expired. Try "Forgot your password" again.""");
+    }
+
     [HttpDelete("delete-account")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {

@@ -1,10 +1,10 @@
 <mat-toolbar [ngStyle]="{
-    'background-color': loggedInUserSig() ? '#ffd9e1' : 'transparent'
+    'background-color': loggedInUserSig() || isResetPasswordCompSig() ? '#ffd9e1' : 'transparent'
     }">
   <!--#region LEFT -->
   <section class="left">
     <a [ngStyle]="{
-            'color': !loggedInUserSig() ? 'white' : 'palevioletred',
+            'color': !(loggedInUserSig() || isResetPasswordCompSig()) ? 'white' : 'palevioletred',
         }" [routerLink]="['/main']" class="brand">
       <mat-icon>eco</mat-icon>
       Hallboard

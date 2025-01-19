@@ -220,6 +220,22 @@ public class AccountRepository : IAccountRepository
         return true;
     }
 
+    public async Task<bool> ResetPasswordAsync(ResetPassword resetPassword, CancellationToken cancellationToken)
+    {
+        AppUser? appUser = await _userManager.FindByEmailAsync(resetPassword.Email.Trim());
+        if (appUser is null) return false;
+
+        IdentityResult passwordResetResult = await _userManager
+            .ResetPasswordAsync(appUser, resetPassword.ResetToken, resetPassword.Password);
+
+        if (passwordResetResult.Succeeded)
+        {
+            // TODO: Email the password change warning/confirmation.
+        }
+
+        return passwordResetResult.Succeeded;
+    }
+
     public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
