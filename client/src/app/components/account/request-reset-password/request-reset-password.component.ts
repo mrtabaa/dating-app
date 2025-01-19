@@ -15,75 +15,82 @@ import {RecoveryValidationRequest} from "../../../models/account/recovery-valida
 import {CommonService} from "../../../services/common.service";
 
 @Component({
-  selector: 'app-request-reset-password',
-  imports: [
-    FormsModule, ReactiveFormsModule, InputCvaComponent,
-    MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,
-    MatSlideToggle, MatProgressSpinner,
-    RecaptchaV3Module
-  ],
-  templateUrl: './request-reset-password.component.html',
-  styleUrl: './request-reset-password.component.scss'
+    selector: 'app-request-reset-password',
+    imports: [
+        FormsModule, ReactiveFormsModule, InputCvaComponent,
+        MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,
+        MatSlideToggle, MatProgressSpinner,
+        RecaptchaV3Module
+    ],
+    templateUrl: './request-reset-password.component.html',
+    styleUrl: './request-reset-password.component.scss'
 })
 export class RequestResetPasswordComponent implements OnDestroy {
-  isMobileSig = inject(ResponsiveService).isMobileSig;
-  recaptchaToken: string | undefined;
-  isRecaptchaValidating = false;
-  private _accountService = inject(AccountService);
-  private _fb = inject(FormBuilder);
-  requestResetFg = this._fb.group({
-    emailCtrl: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
-    recaptchaCtrl: [false, [Validators.required]],
-  });
-  private _isResettingPassword = inject(CommonService).isResettingPasswordSig;
-  private _recaptchaService = inject(ReCaptchaV3Service);
-  private _subscribedRecaptcha: Subscription | undefined;
+    isMobileSig = inject(ResponsiveService).isMobileSig;
+    recaptchaToken: string | undefined;
+    isRecaptchaValidating = false;
+    isEmailSent = false;
+    apiMessage: string | undefined;
+    private _isWelcomeSig = inject(ResponsiveService).isWelcomeCompSig;
+    private _accountService = inject(AccountService);
+    private _fb = inject(FormBuilder);
+    requestResetFg = this._fb.group({
+        emailCtrl: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
+        recaptchaCtrl: [false, [Validators.required]],
+    });
+    private _isResettingPassword = inject(CommonService).isResetPasswordRequestCompSig;
+    private _recaptchaService = inject(ReCaptchaV3Service);
+    private _subscribedRecaptcha: Subscription | undefined;
 
-  constructor() {
-  }
-
-  get EmailCtrl(): FormControl {
-    return this.requestResetFg.get('emailCtrl') as FormControl;
-  }
-
-  get RecaptchaCtrl(): FormControl {
-    return this.requestResetFg.get('recaptchaCtrl') as FormControl;
-  }
-
-  ngOnDestroy(): void {
-    this._subscribedRecaptcha?.unsubscribe();
-  }
-
-  validateRecaptcha(): void {
-    this.recaptchaToken = undefined; // reset
-    this.isRecaptchaValidating = true;
-
-    if (this.RecaptchaCtrl.value)
-      this._subscribedRecaptcha = this._recaptchaService.execute('login')
-        .subscribe(
-          (token: string) => {
-            if (token) {
-              this.recaptchaToken = token;
-              this.isRecaptchaValidating = false;
-            }
-          });
-  }
-
-  requestPasswordReset(): void {
-    if (this.recaptchaToken) {
-      const request: RecoveryValidationRequest = {
-        email: this.EmailCtrl.value.trim(),
-        recaptchaToken: this.recaptchaToken,
-      }
-
-      this._accountService.requestResetPassword(request)
-        .pipe(
-          take(1)
-        ).subscribe();
+    get EmailCtrl(): FormControl {
+        return this.requestResetFg.get('emailCtrl') as FormControl;
     }
-  }
 
-  cancelRequest(): void {
-    this._isResettingPassword.set(false);
-  }
+    get RecaptchaCtrl(): FormControl {
+        return this.requestResetFg.get('recaptchaCtrl') as FormControl;
+    }
+
+    ngOnDestroy(): void {
+        this._subscribedRecaptcha?.unsubscribe();
+    }
+
+    validateRecaptcha(): void {
+        this.recaptchaToken = undefined; // reset
+        this.isRecaptchaValidating = true;
+
+        if (this.RecaptchaCtrl.value)
+            this._subscribedRecaptcha = this._recaptchaService.execute('login')
+                .subscribe(
+                    (token: string) => {
+                        if (token) {
+                            this.recaptchaToken = token;
+                            this.isRecaptchaValidating = false;
+                        }
+                    });
+    }
+
+    requestPasswordReset(): void {
+        if (this.recaptchaToken) {
+            const request: RecoveryValidationRequest = {
+                email: this.EmailCtrl.value.trim(),
+                recaptchaToken: this.recaptchaToken,
+            }
+
+            this._accountService.requestResetPassword(request)
+                .pipe(
+                    take(1)
+                ).subscribe({
+                next: (res) => {
+                    if (res) {
+                        this.apiMessage = res.message;
+                        this.isEmailSent = true;
+                    }
+                }
+            });
+        }
+    }
+
+    cancelRequest(): void {
+        this._isResettingPassword.set(false);
+    }
 }

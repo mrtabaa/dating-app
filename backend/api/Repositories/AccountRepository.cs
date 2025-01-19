@@ -201,17 +201,18 @@ public class AccountRepository : IAccountRepository
 
     public async Task<bool> RequestResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        // if (!await ValidateRecaptcha(request.RecaptchaToken, cancellationToken))
-        //     return false; // For invalid recaptcha ? false : true 
+        if (!await ValidateRecaptcha(request.RecaptchaToken, cancellationToken))
+            return false; // For invalid recaptcha ? false : true 
 
         AppUser? appUser = await _userManager.FindByEmailAsync(request.Email.Trim());
+
         if (appUser is null || string.IsNullOrEmpty(appUser.Email)) return true;
 
         string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
 
         string resetLink = GenerateResetPasswordLink(
-            "http://localhost:4300/account/reset-password",
-            // "https://www.hallboard.com/account/reset-password",
+            // "http://localhost:4300/account/reset-password",
+            "https://www.hallboard.com/account/reset-password",
             appUser.Email, resetToken);
 
         if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
