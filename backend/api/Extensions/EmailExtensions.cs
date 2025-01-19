@@ -12,9 +12,9 @@ internal static class EmailExtensions
         $"""
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
-                        <h5>Dear {userName},</h5>
-                        <h5>Please verify your account using this verification code:</h5>
-                        <h2>{verificationCode}</h2>
+                        <p>Dear {userName},</p>
+                        <p>Please verify your account using this verification code:</p>
+                        <h3>{verificationCode}</h3>
                     </body>
                 </html>
          """;
@@ -24,8 +24,8 @@ internal static class EmailExtensions
         $"""
                 <html>
                     <body style="display: flex; flex-direction= column; align-items=center">
-                        <h5>Dear {userName},</h5>
-                        <h5>You may reset your password from the page below:</h5>
+                        <p>Dear {userName},</p>
+                        <p>You may reset your password from the page below:</p>
                         <a href="{resetLink}" style="width: fit-content;">Reset password page</a>
                     </body>
                 </html>
