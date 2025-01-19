@@ -4,7 +4,7 @@
     @if (!isWelcomeCompSig()) {
       @if (isVerifyingAccount()) {
         <app-verify/>
-      } @else if (isResettingPasswordSig()) {
+      } @else if (isResetPasswordRequestCompSig()) {
         <app-request-reset-password/>
       } @else {
         <app-login-register/>
@@ -20,7 +20,7 @@
       <div class="account">
         @if (isVerifyingAccount()) {
           <app-verify/>
-        } @else if (isResettingPasswordSig()) {
+        } @else if (isResetPasswordRequestCompSig()) {
           <app-request-reset-password/>
         } @else {
           <app-login-register/>

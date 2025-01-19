@@ -34,7 +34,7 @@ export class LoginComponent implements OnDestroy {
   isRecaptchaValidating = false;
   user$: Observable<LoggedInUser | null> | undefined;
   hasLoginCreds = false;
-  private _isResettingPassword = inject(CommonService).isResettingPasswordSig;
+  private _isResetPasswordRequestCompSig = inject(CommonService).isResetPasswordRequestCompSig;
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   loginFg = this.fb.group({
@@ -141,7 +141,7 @@ export class LoginComponent implements OnDestroy {
   }
 
   forgotPasswordRequest(): void {
-    this._isResettingPassword.set(true);
+    this._isResetPasswordRequestCompSig.set(true);
   }
 
   private generateRandomText(length: number): string {

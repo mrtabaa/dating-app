@@ -25,5 +25,5 @@ export class HomeComponent {
   isMobileSig = inject(ResponsiveService).isMobileSig;
   isWelcomeCompSig = inject(ResponsiveService).isWelcomeCompSig;
   isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
-  isResettingPasswordSig = inject(CommonService).isResettingPasswordSig;
+  isResetPasswordRequestCompSig = inject(CommonService).isResetPasswordRequestCompSig;
 }
