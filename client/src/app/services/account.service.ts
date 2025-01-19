@@ -122,20 +122,7 @@ export class AccountService {
   }
 
   requestResetPassword(request: RecoveryValidationRequest): Observable<ApiResponseMessage> {
-    return this._http.post<ApiResponseMessage>(this.baseUrl + 'request-reset-password', request)
-      .pipe(
-        map(res => {
-          this._snackBar.open(res.message, 'Close', {
-            verticalPosition: 'top',
-            horizontalPosition: 'center',
-            duration: 10000
-          });
-
-          this._router.navigate(['/']);
-
-          return res;
-        })
-      );
+    return this._http.post<ApiResponseMessage>(this.baseUrl + 'request-reset-password', request);
   }
 
   resetPassword(resetPassword: ResetPassword): Observable<ApiResponseMessage> {
