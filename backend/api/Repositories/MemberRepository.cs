@@ -21,21 +21,6 @@ public class MemberRepository : IMemberRepository
 
     #region Helpers
 
-    private AppUser? ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
-    {
-        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos)?.ToList();
-        if (blobConvertedPhotos is null)
-            return null;
-
-        appUser.Photos = blobConvertedPhotos;
-
-        return appUser;
-    }
-
-    #endregion
-
-    #region Helpers
-
     private IMongoQueryable<AppUser> CreateQuery(MemberParams memberParams)
     {
         // calculate DOB based on user's selected Age
@@ -46,6 +31,7 @@ public class MemberRepository : IMemberRepository
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
         query = query.Where(appUser => appUser.Id != memberParams.UserId); // Don't request/show the currentUser in the list
+        query = query.Where(appUser => appUser.EmailConfirmed);
         query = query.Where(appUser => !(appUser.NormalizedUserName == "ADMIN" || appUser.UserName == "MODERATOR")); // Don't show admin/moderator
         query = query.Where(appUser => !(string.IsNullOrEmpty(appUser.NormalizedUserName) || appUser.NormalizedUserName.StartsWith("DEMO"))); // don't show demo users
         if (!string.IsNullOrEmpty(memberParams.UserNameOrKnownAs))
@@ -71,6 +57,17 @@ public class MemberRepository : IMemberRepository
         };
 
         return query;
+    }
+
+    private AppUser? ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
+    {
+        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos)?.ToList();
+        if (blobConvertedPhotos is null)
+            return null;
+
+        appUser.Photos = blobConvertedPhotos;
+
+        return appUser;
     }
 
     #endregion Helpers
@@ -121,7 +118,10 @@ public class MemberRepository : IMemberRepository
 
     public async Task<MemberDto?> GetByUserNameAsync(ObjectId userId, string userName, CancellationToken cancellationToken)
     {
-        AppUser? appUser = await _collection.Find(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+        AppUser? appUser = await _collection.Find(appUser =>
+            appUser.NormalizedUserName == userName.ToUpper().Trim() &&
+            appUser.EmailConfirmed
+        ).FirstOrDefaultAsync(cancellationToken);
 
         appUser = ConvertAppUserPhotosToBlobPhotos(appUser);
 
