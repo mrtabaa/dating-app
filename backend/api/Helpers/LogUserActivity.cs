@@ -19,9 +19,9 @@ public class LogUserActivity(ILogger<LogUserActivity> logger) : IAsyncActionFilt
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
 
-        UpdateResult? updateResult = await accountRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
+        OperationResult<UpdateResult> result = await accountRepository.UpdateLastActive(loggedInUserIdHashed, cancellationToken);
 
-        if (updateResult?.ModifiedCount == 0)
+        if (!result.IsSuccess || result.Result.ModifiedCount == 0)
             logger.LogError("Update lastActive in db failed. Check LogUserActivity.cs");
     }
 }

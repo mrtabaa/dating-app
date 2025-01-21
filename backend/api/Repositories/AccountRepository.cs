@@ -7,15 +7,30 @@ namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
-    #region  Helpers
+    #region ErrorMessages
 
-    private async Task<RegisteredDto> RegisterIfEmailAlreadyExists(
+    private const string RecaptchaErrorMessage = "Recaptcha token is invalid. 'Slide me!' again.";
+    private const string WrongCredsErrorMessage = "Wrong username or password.";
+    private const string EmailNotConfrimedErrorMessage = "Please confirm your email using the code sent to your email.";
+
+    private const string EmailAlreadyConfirmedErrorMessage = "This email is already registered and verified. " +
+                                                             "You can login or recover your password if the owner.";
+
+    #endregion
+
+    #region Helpers
+
+    private async Task<OperationResult<bool>> RegisterIfEmailAlreadyExists(
         AppUser existingUser, RegisterDto registerDto, CancellationToken cancellationToken)
     {
         if (await _userManager.IsEmailConfirmedAsync(existingUser))
         {
-            return new RegisteredDto(ErrorMessage: "This email is already registered and verified. " +
-                                                   "You can login or recover your password if the owner.");
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.IsEmailAlreadyConfirmed,
+                    EmailAlreadyConfirmedErrorMessage
+                )
+            );
         }
 
         // Update the unverified user's details for the real owner
@@ -27,20 +42,27 @@ public class AccountRepository : IAccountRepository
 
         IdentityResult updateResult = await _userManager.UpdateAsync(existingUser);
         if (!updateResult.Succeeded)
-            return new RegisteredDto(ErrorMessage: updateResult.Errors.FirstOrDefault()?.Description);
+        {
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.NetIdentity,
+                    updateResult.Errors.FirstOrDefault()?.Description
+                )
+            );
+        }
 
         IdentityResult roleResult = await _userManager.AddToRoleAsync(existingUser, Roles.Member.ToString());
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(existingUser);
-            return new RegisteredDto();
+            return new OperationResult<bool>();
         }
 
         // Resend the verification email
         if (!await SendVerificationCode(existingUser, cancellationToken))
             throw new ArgumentException(nameof(existingUser.Email) + ": Failed to email verification code.");
 
-        return new RegisteredDto(true); // Account created successfully.
+        return new OperationResult<bool>(true); // Account created successfully.
     }
 
     /// <summary>
@@ -113,10 +135,17 @@ public class AccountRepository : IAccountRepository
 
     #region CRUD
 
-    public async Task<RegisteredDto> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
+    public async Task<OperationResult<bool>> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         if (!await ValidateRecaptcha(registerDto.RecaptchaToken, cancellationToken))
-            return new RegisteredDto(IsRecaptchaTokenInvalid: true);
+        {
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.IsRecaptchaTokenInvalid,
+                    RecaptchaErrorMessage
+                )
+            );
+        }
 
         AppUser? existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
         if (existingUser != null)
@@ -128,57 +157,98 @@ public class AccountRepository : IAccountRepository
         IdentityResult userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
         if (!userCreatedResult.Succeeded)
         {
-            return new RegisteredDto(
-                ErrorMessage: userCreatedResult.Errors.Select(e => e.Description).FirstOrDefault()
-            ); // failed to create the user
+            // failed to create the user
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.NetIdentity,
+                    userCreatedResult.Errors.Select(e => e.Description).FirstOrDefault()
+                )
+            );
         }
 
         IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(appUser);
-            return new RegisteredDto();
+            return new OperationResult<bool>();
         }
 
         if (!await SendVerificationCode(appUser, cancellationToken))
             throw new ArgumentException(nameof(appUser.Email) + ": Failed to email verification code.");
 
-        return new RegisteredDto(true); // Account created successfully.
+        return new OperationResult<bool>(true); // Account created successfully.
     }
 
-    public async Task<LoggedInDto> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoggedInDto>> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
-            return new LoggedInDto(IsEmailNotConfirmed: true);
+            return new OperationResult<LoggedInDto>();
+
+        if (await _userManager.IsEmailConfirmedAsync(appUser))
+        {
+            return new OperationResult<LoggedInDto>(
+                Error: new CustomError(
+                    ErrorCode.IsEmailAlreadyConfirmed,
+                    EmailAlreadyConfirmedErrorMessage
+                )
+            );
+        }
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verifyDto.Code);
         if (!result.Succeeded)
-            return new LoggedInDto(IsEmailNotConfirmed: true);
+            return new OperationResult<LoggedInDto>();
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        return !string.IsNullOrEmpty(token)
-            ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser))
-            : new LoggedInDto();
+        return string.IsNullOrEmpty(token)
+            ? new OperationResult<LoggedInDto>()
+            : new OperationResult<LoggedInDto>(
+                true,
+                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)
+                )
+            );
     }
 
-    public async Task<ResendCodeResult> ResendVerifyCodeAsync(ResendCodeRequest resendCRequest, CancellationToken cancellationToken)
+    public async Task<OperationResult<bool>> ResendVerifyCodeAsync(ResendCodeRequest resendCRequest, CancellationToken cancellationToken)
     {
         if (!await ValidateRecaptcha(resendCRequest.RecaptchaToken, cancellationToken))
-            return new ResendCodeResult(true);
+        {
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.IsRecaptchaTokenInvalid,
+                    RecaptchaErrorMessage
+                )
+            );
+        }
 
         AppUser? appUser = await _userManager.FindByEmailAsync(resendCRequest.Email);
+        if (appUser is null) return new OperationResult<bool>();
 
-        return appUser is null
-            ? new ResendCodeResult()
-            : new ResendCodeResult(IsSuccessful: await SendVerificationCode(appUser, cancellationToken));
+        if (await _userManager.IsEmailConfirmedAsync(appUser))
+        {
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.IsEmailAlreadyConfirmed,
+                    EmailAlreadyConfirmedErrorMessage
+                )
+            );
+        }
+
+        return new OperationResult<bool>(await SendVerificationCode(appUser, cancellationToken)); // Success depends on the email sent success
     }
 
-    public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoggedInDto>> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
         if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
-            return new LoggedInDto(true);
+        {
+            return new OperationResult<LoggedInDto>(
+                Error: new CustomError(
+                    ErrorCode.IsRecaptchaTokenInvalid,
+                    RecaptchaErrorMessage
+                )
+            );
+        }
 
         AppUser? appUser;
 
@@ -189,50 +259,82 @@ public class AccountRepository : IAccountRepository
             appUser = await _userManager.FindByNameAsync(userInput.EmailUsername);
 
         if (appUser is null)
-            return new LoggedInDto(IsWrongCreds: true);
+        {
+            return new OperationResult<LoggedInDto>(
+                Error: new CustomError(
+                    ErrorCode.IsWrongCreds,
+                    WrongCredsErrorMessage
+                )
+            );
+        }
 
         if (!await _userManager.CheckPasswordAsync(appUser, userInput.Password))
-            return new LoggedInDto(IsWrongCreds: true);
+        {
+            return new OperationResult<LoggedInDto>(
+                Error: new CustomError(
+                    ErrorCode.IsWrongCreds,
+                    WrongCredsErrorMessage
+                )
+            );
+        }
 
         if (!await _userManager.IsEmailConfirmedAsync(appUser))
         {
             if (!await SendVerificationCode(appUser, cancellationToken))
                 throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
-            return new LoggedInDto(
-                Email: appUser.Email,
-                IsEmailNotConfirmed: true
+            return new OperationResult<LoggedInDto>(
+                Error: new CustomError(
+                    ErrorCode.IsEmailNotConfirmed,
+                    EmailNotConfrimedErrorMessage
+                )
             );
         }
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
-        return !string.IsNullOrEmpty(token)
-            ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.RecaptchaToken)
-            : new LoggedInDto();
+        return string.IsNullOrEmpty(token)
+            ? new OperationResult<LoggedInDto>()
+            : new OperationResult<LoggedInDto>(
+                true,
+                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)
+                )
+            );
     }
 
-    public async Task<LoggedInDto?> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
-        if (userId is null) return null;
+        if (userId is null)
+            return new OperationResult<LoggedInDto>();
 
         AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
-            ? null
-            : Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser));
+            ? new OperationResult<LoggedInDto>()
+            : new OperationResult<LoggedInDto>(
+                true,
+                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser))
+            );
     }
 
-    public async Task<bool> RequestResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
+    public async Task<OperationResult<bool>> RequestResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
         if (!await ValidateRecaptcha(request.RecaptchaToken, cancellationToken))
-            return false; // For invalid recaptcha ? false : true 
+        {
+            return new OperationResult<bool>(
+                Error: new CustomError(
+                    ErrorCode.IsRecaptchaTokenInvalid,
+                    RecaptchaErrorMessage
+                )
+            );
+        }
 
         AppUser? appUser = await _userManager.FindByEmailAsync(request.Email.Trim());
 
-        if (appUser is null || string.IsNullOrEmpty(appUser.Email)) return true;
+        if (appUser is null || string.IsNullOrEmpty(appUser.Email))
+            return new OperationResult<bool>();
 
         string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
 
@@ -244,13 +346,14 @@ public class AccountRepository : IAccountRepository
         if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
             throw new ArgumentException("Failed to send reset password link. Check if email provider is working.", nameof(appUser.Email));
 
-        return true;
+        return new OperationResult<bool>();
     }
 
-    public async Task<bool> ResetPasswordAsync(ResetPassword resetPassword, CancellationToken cancellationToken)
+    public async Task<OperationResult<bool>> ResetPasswordAsync(ResetPassword resetPassword, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(resetPassword.Email.Trim());
-        if (appUser is null) return false;
+        if (appUser is null)
+            return new OperationResult<bool>();
 
         IdentityResult passwordResetResult = await _userManager
             .ResetPasswordAsync(appUser, resetPassword.ResetToken, resetPassword.Password);
@@ -260,23 +363,30 @@ public class AccountRepository : IAccountRepository
             // TODO: Email the password change warning/confirmation.
         }
 
-        return passwordResetResult.Succeeded;
+        return new OperationResult<bool>(passwordResetResult.Succeeded);
     }
 
-    public async Task<UpdateResult?> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
+    public async Task<OperationResult<DeleteResult>> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
+        new(
+            true,
+            await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken)
+        );
+
+    public async Task<OperationResult<UpdateResult>> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
-        if (userId is null) return null;
+        if (userId is null)
+            return new OperationResult<UpdateResult>();
 
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
             .Set(appUser => appUser.LastActive, DateTime.UtcNow);
 
-        return await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken);
+        return new OperationResult<UpdateResult>(
+            true,
+            await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken)
+        );
     }
-
-    public async Task<DeleteResult?> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
-        await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken);
 
     #endregion CRUD
 }

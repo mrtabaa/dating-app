@@ -12,90 +12,101 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        RegisteredDto registeredDto = await accountRepository.CreateAsync(userIn, cancellationToken);
+        OperationResult<bool> operationResult = await accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return registeredDto.IsSuccess
-            ? registeredDto.IsSuccess
-            : registeredDto.IsRecaptchaTokenInvalid
-                ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-                : !string.IsNullOrEmpty(registeredDto.ErrorMessage)
-                    ? BadRequest(registeredDto.ErrorMessage)
-                    : BadRequest("Registration has failed. Try again or contact the support.");
+        return operationResult.IsSuccess
+            ? true
+            : operationResult.Error?.Code switch // Make sure to use null-conditional operator ? to avoid exceptions 
+            {
+                ErrorCode.IsRecaptchaTokenInvalid => BadRequest(operationResult.Error.Message),
+                ErrorCode.IsEmailAlreadyConfirmed => Conflict(operationResult.Error.Message),
+                ErrorCode.NetIdentity => BadRequest(operationResult.Error.Message),
+                _ => BadRequest("Registration has failed. Try again or contact the support.")
+            };
     }
 
     [AllowAnonymous]
     [HttpPost("verify")]
     public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
+        OperationResult<LoggedInDto> result = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
 
-        return !string.IsNullOrEmpty(loggedInDto.Token) // success
-            ? Ok(loggedInDto)
-            : BadRequest("Failed to verify your account. Check the code and try again.");
+        return result.IsSuccess
+            ? Ok(result.Result)
+            : result.Error?.Code switch
+            {
+                ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
+                _ => BadRequest("Failed to verify your account. Check the code and try again.")
+            };
     }
 
     [AllowAnonymous]
     [HttpPost("resend-verify-code")]
     public async Task<ActionResult<bool>> ResendVerifyCode(ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken)
     {
-        ResendCodeResult result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
+        OperationResult<bool> result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
 
-        return result.IsSuccessful
+        return result.IsSuccess
             ? true
-            : result.IsRecaptchaTokenInvalid
-                ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-                : BadRequest("Failed to resend code. Try again or contact the support.");
+            : result.Error?.Code switch
+            {
+                ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
+                ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
+                _ => BadRequest("Failed to resend code. Try again or contact the support.")
+            };
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userIn, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = await accountRepository.LoginAsync(userIn, cancellationToken);
+        OperationResult<LoggedInDto> result = await accountRepository.LoginAsync(userIn, cancellationToken);
 
-        return !string.IsNullOrEmpty(loggedInDto.Token) // success
-            ? Ok(loggedInDto)
-            : loggedInDto.IsRecaptchaTokenInvalid
-                ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-                : loggedInDto.IsWrongCreds
-                    ? Unauthorized("Wrong username or password.")
-                    : loggedInDto.IsEmailNotConfirmed
-                        ? loggedInDto
-                        : loggedInDto.Errors.Count != 0
-                            ? BadRequest(loggedInDto.Errors)
-                            : Unauthorized("Login has failed. Try again or contact the support.");
+        return result.IsSuccess
+            ? result.Result
+            : result.Error?.Code switch
+            {
+                ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
+                ErrorCode.IsWrongCreds => Unauthorized(result.Error.Message),
+                ErrorCode.IsEmailNotConfirmed => BadRequest(result.Error.Message),
+                _ => Unauthorized("Login has failed. Try again or contact the support.")
+            };
     }
 
     [HttpGet]
     public async Task<ActionResult<LoggedInDto>> ReloadLoggedInUser(CancellationToken cancellationToken)
     {
-        // obtain token value
+        // Obtain token value
         string? token = null;
 
         if (HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues authHeader))
             token = authHeader.ToString().Split(' ').Last();
 
         if (string.IsNullOrEmpty(token))
-            return BadRequest("Token is expired or invalid. Login again.");
+            return Unauthorized("Token is expired or invalid. Login again.");
 
         string? userIdHashed = User.GetUserIdHashed();
         if (string.IsNullOrEmpty(userIdHashed))
-            return BadRequest("No user was found with this user Id.");
+            return Unauthorized("No user was found with this user Id.");
 
-        LoggedInDto? loggedInDto = await accountRepository.ReloadLoggedInUserAsync(userIdHashed, token, cancellationToken);
+        OperationResult<LoggedInDto> result = await accountRepository.ReloadLoggedInUserAsync(userIdHashed, token, cancellationToken);
 
-        return loggedInDto is null ? Unauthorized("User is logged out or unauthorized. Login again.") : loggedInDto;
+        return result.IsSuccess
+            ? result.Result
+            : Unauthorized("User is logged out or unauthorized. Login again.");
     }
 
     [AllowAnonymous]
     [HttpPost("request-reset-password")]
     public async Task<ActionResult<Response>> RequestResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        bool isRecaptchaValid = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
+        OperationResult<bool> result = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
 
-        return !isRecaptchaValid
-            ? BadRequest("Recaptcha token is invalid. 'Slide me!' again.")
-            : new Response("If the email is registered and verified, a reset link will be sent to your email.");
+        return result.Error?.Code switch
+        {
+            ErrorCode.IsRecaptchaTokenInvalid => BadRequest("Recaptcha token is invalid. 'Slide me!' again."),
+            _ => new Response("If the email is registered and verified, a reset link will be sent to your email.")
+        };
     }
 
     [AllowAnonymous]
@@ -104,9 +115,9 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     {
         if (resetPassword.Password != resetPassword.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        bool isSuccess = await accountRepository.ResetPasswordAsync(resetPassword, cancellationToken);
+        OperationResult<bool> result = await accountRepository.ResetPasswordAsync(resetPassword, cancellationToken);
 
-        return isSuccess
+        return result.IsSuccess
             ? new Response("Your new password is saved successfully.")
             : BadRequest("""Reset password token is expired. Try "Forgot your password" again.""");
     }
@@ -114,7 +125,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpDelete("delete-account")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
-        DeleteResult? result = await accountRepository.DeleteUserAsync(User.GetUserIdHashed(), cancellationToken);
-        return result is null ? BadRequest("Delete user failed!") : result;
+        OperationResult<DeleteResult> result = await accountRepository.DeleteUserAsync(User.GetUserIdHashed(), cancellationToken);
+        return result is { IsSuccess: true, Result.DeletedCount: > 0 } ? result.Result : BadRequest("Delete user failed!");
     }
 }

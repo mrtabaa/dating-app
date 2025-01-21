@@ -28,12 +28,6 @@ public record RegisterDto(
     string RecaptchaToken
 );
 
-public record RegisteredDto(
-    [Optional] bool IsSuccess,
-    [Optional] bool IsRecaptchaTokenInvalid,
-    [Optional] string? ErrorMessage
-);
-
 public record VerifyDto(
     [MaxLength(PropLength.EmailManLength)]
     [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format.")]
@@ -48,11 +42,6 @@ public record ResendCodeRequest(
     [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format.")]
     string Email,
     string RecaptchaToken
-);
-
-public record ResendCodeResult(
-    [Optional] bool IsRecaptchaTokenInvalid,
-    [Optional] bool IsSuccessful
 );
 
 public record LoginDto(
@@ -79,6 +68,18 @@ public record LoggedInDto(
     [Optional] bool IsEmailNotConfirmed
 );
 
+// TODO: Implement it
+public record OperationResult<T>(
+    [Optional] bool IsSuccess,
+    [Optional] T Result,
+    [Optional] CustomError Error
+);
+
+public record CustomError(
+    Enum Code,
+    string? Message
+);
+
 public record ResetPasswordRequest(
     [MaxLength(PropLength.EmailManLength)]
     [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$", ErrorMessage = "Bad Email Format.")]
@@ -98,3 +99,12 @@ public record ResetPassword(
     string ConfirmPassword,
     string ResetToken
 );
+
+public enum ErrorCode
+{
+    IsRecaptchaTokenInvalid,
+    IsEmailAlreadyConfirmed,
+    IsWrongCreds,
+    NetIdentity,
+    IsEmailNotConfirmed
+}
