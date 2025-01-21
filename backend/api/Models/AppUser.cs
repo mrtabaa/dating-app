@@ -9,10 +9,10 @@ public class AppUser : MongoIdentityUser<ObjectId>
     public string? IdentifierHash { get; init; }
     public string? JtiValue { get; init; }
     public string Schema { get; init; } = string.Empty;
-    public DateOnly DateOfBirth { get; init; }
+    public DateOnly DateOfBirth { get; set; }
     public string KnownAs { get; init; } = string.Empty;
     public DateTime LastActive { get; init; }
-    public string Gender { get; init; } = string.Empty;
+    public string Gender { get; set; } = string.Empty;
     public string? Introduction { get; init; }
     public string? LookingFor { get; init; }
     public string? Interests { get; init; }

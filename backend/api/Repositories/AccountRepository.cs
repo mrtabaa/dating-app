@@ -7,6 +7,40 @@ namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
+    private async Task<RegisteredDto> RegisterIfEmailAlreadyExists(
+        AppUser existingUser, RegisterDto registerDto, CancellationToken cancellationToken)
+    {
+        if (await _userManager.IsEmailConfirmedAsync(existingUser))
+        {
+            return new RegisteredDto(ErrorMessage: "This email is already registered and verified. " +
+                                                   "You can login or recover your password if the owner.");
+        }
+
+        // Update the unverified user's details for the real owner
+        existingUser.Gender = registerDto.Gender;
+        existingUser.UserName = registerDto.UserName;
+        existingUser.DateOfBirth = registerDto.DateOfBirth;
+        existingUser.PasswordHash = _userManager.PasswordHasher.HashPassword(existingUser, registerDto.Password);
+        existingUser.Roles = [];
+
+        IdentityResult updateResult = await _userManager.UpdateAsync(existingUser);
+        if (!updateResult.Succeeded)
+            return new RegisteredDto(ErrorMessage: updateResult.Errors.FirstOrDefault()?.Description);
+        
+        IdentityResult roleResult = await _userManager.AddToRoleAsync(existingUser, Roles.Member.ToString());
+        if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
+        {
+            await _userManager.DeleteAsync(existingUser);
+            return new RegisteredDto();
+        }
+
+        // Resend the verification email
+        if (!await SendVerificationCode(existingUser, cancellationToken))
+            throw new ArgumentException(nameof(existingUser.Email) + ": Failed to email verification code.");
+
+        return new RegisteredDto(true); // Account created successfully.
+    }
+
     /// <summary>
     ///     This function gets appUser's main photo's Url_165 and convert it to blobUriWithSas
     /// </summary>
@@ -77,7 +111,12 @@ public class AccountRepository : IAccountRepository
         if (!await ValidateRecaptcha(registerDto.RecaptchaToken, cancellationToken))
             return new RegisteredDto(IsRecaptchaTokenInvalid: true);
 
-        AppUser appUser = Mappers.ConvertUserRegisterDtoToAppUser(registerDto);
+        AppUser? existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
+        if (existingUser != null)
+            return await RegisterIfEmailAlreadyExists(existingUser, registerDto, cancellationToken);
+
+        // Proceed with creating a new user if no existing user was found
+        AppUser appUser = Mappers.ConvertRegisterDtoToAppUser(registerDto);
 
         IdentityResult userCreatedResult = await _userManager.CreateAsync(appUser, registerDto.Password);
         if (!userCreatedResult.Succeeded)
@@ -97,9 +136,7 @@ public class AccountRepository : IAccountRepository
         if (!await SendVerificationCode(appUser, cancellationToken))
             throw new ArgumentException(nameof(appUser.Email) + ": Failed to email verification code.");
 
-        return new RegisteredDto(
-            true
-        ); // Account created successfully.
+        return new RegisteredDto(true); // Account created successfully.
     }
 
     public async Task<LoggedInDto> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
@@ -143,11 +180,11 @@ public class AccountRepository : IAccountRepository
     {
         LoggedInDto loggedInDto = new();
 
-        if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
-        {
-            loggedInDto.IsRecaptchaTokenInvalid = true;
-            return loggedInDto;
-        }
+        // if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
+        // {
+        //     loggedInDto.IsRecaptchaTokenInvalid = true;
+        //     return loggedInDto;
+        // }
 
         AppUser? appUser;
 
