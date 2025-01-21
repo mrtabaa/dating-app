@@ -64,21 +64,20 @@ public record LoginDto(
     string RecaptchaToken
 );
 
-public class LoggedInDto
-{
-    public bool IsRecaptchaTokenInvalid { get; set; }
-    public string? RecaptchaToken { get; set; }
-    public string? Email { get; set; } // Used only to verify account. Will always return null if account is verified.
-    public string? Token { get; init; }
-    public string? KnownAs { get; init; }
-    public string? UserName { get; set; }
-    public string? Gender { get; init; }
-    public string? ProfilePhotoUrl { get; init; }
-    public bool IsWrongCreds { get; set; }
-    public List<string> Errors { get; init; } = [];
-    public bool IsProfileCompleted { get; init; }
-    public bool IsEmailNotConfirmed { get; set; }
-}
+public record LoggedInDto(
+    [Optional] bool IsRecaptchaTokenInvalid,
+    [Optional] string? RecaptchaToken,
+    [Optional] string? Email, // Used only to verify account. Will always return null if account is verified.
+    [Optional] string? Token,
+    [Optional] string? KnownAs,
+    [Optional] string? UserName,
+    [Optional] string? Gender,
+    [Optional] string? ProfilePhotoUrl,
+    [Optional] bool IsWrongCreds,
+    [Optional] List<string> Errors,
+    [Optional] bool IsProfileCompleted,
+    [Optional] bool IsEmailNotConfirmed
+);
 
 public record ResetPasswordRequest(
     [MaxLength(PropLength.EmailManLength)]

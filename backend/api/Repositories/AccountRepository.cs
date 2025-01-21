@@ -26,7 +26,7 @@ public class AccountRepository : IAccountRepository
         IdentityResult updateResult = await _userManager.UpdateAsync(existingUser);
         if (!updateResult.Succeeded)
             return new RegisteredDto(ErrorMessage: updateResult.Errors.FirstOrDefault()?.Description);
-        
+
         IdentityResult roleResult = await _userManager.AddToRoleAsync(existingUser, Roles.Member.ToString());
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
@@ -141,27 +141,19 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoggedInDto> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = new();
-
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
-        {
-            loggedInDto.IsEmailNotConfirmed = true;
-            return loggedInDto;
-        }
+            return new LoggedInDto(IsEmailNotConfirmed: true);
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verifyDto.Code);
         if (!result.Succeeded)
-        {
-            loggedInDto.IsEmailNotConfirmed = true;
-            return loggedInDto;
-        }
+            return new LoggedInDto(IsEmailNotConfirmed: true);
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
         return !string.IsNullOrEmpty(token)
             ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser))
-            : loggedInDto;
+            : new LoggedInDto();
     }
 
     public async Task<ResendCodeResult> ResendVerifyCodeAsync(ResendCodeRequest resendCRequest, CancellationToken cancellationToken)
@@ -178,13 +170,8 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
-        LoggedInDto loggedInDto = new();
-
         // if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
-        // {
-        //     loggedInDto.IsRecaptchaTokenInvalid = true;
-        //     return loggedInDto;
-        // }
+        //     return new LoggedInDto(true);
 
         AppUser? appUser;
 
@@ -195,32 +182,27 @@ public class AccountRepository : IAccountRepository
             appUser = await _userManager.FindByNameAsync(userInput.EmailUsername);
 
         if (appUser is null)
-        {
-            loggedInDto.IsWrongCreds = true;
-            return loggedInDto;
-        }
+            return new LoggedInDto(IsWrongCreds: true);
 
         if (!await _userManager.CheckPasswordAsync(appUser, userInput.Password))
-        {
-            loggedInDto.IsWrongCreds = true;
-            return loggedInDto;
-        }
+            return new LoggedInDto(IsWrongCreds: true);
 
         if (!await _userManager.IsEmailConfirmedAsync(appUser))
         {
             if (!await SendVerificationCode(appUser, cancellationToken))
                 throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
-            loggedInDto.Email = appUser.Email;
-            loggedInDto.IsEmailNotConfirmed = true;
-            return loggedInDto;
+            return new LoggedInDto(
+                Email: appUser.Email,
+                IsEmailNotConfirmed: true
+            );
         }
 
         string? token = await _tokenService.CreateToken(appUser, cancellationToken);
 
         return !string.IsNullOrEmpty(token)
             ? Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser), userInput.RecaptchaToken)
-            : loggedInDto;
+            : new LoggedInDto();
     }
 
     public async Task<LoggedInDto?> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
