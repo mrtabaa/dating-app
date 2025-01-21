@@ -7,6 +7,8 @@ namespace api.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
+    #region  Helpers
+
     private async Task<RegisteredDto> RegisterIfEmailAlreadyExists(
         AppUser existingUser, RegisterDto registerDto, CancellationToken cancellationToken)
     {
@@ -50,6 +52,7 @@ public class AccountRepository : IAccountRepository
         _photoService.ConvertPhotoToBlobLinkWithSas(appUser.Photos.FirstOrDefault(photo => photo.IsMain))?.Url165;
 
     private async Task<bool> ValidateRecaptcha(string recaptchaToken, CancellationToken cancellationToken) =>
+        _hostEnvironment.IsDevelopment() || // Validate in Development
         await _recaptchaService.ValidateTokenAsync(recaptchaToken, cancellationToken);
 
     private async Task<bool> SendVerificationCode(AppUser appUser, CancellationToken cancellationToken)
@@ -75,6 +78,8 @@ public class AccountRepository : IAccountRepository
         return builder.Uri.ToString();
     }
 
+    #endregion
+
     #region Db and Token Settings
 
     private readonly IMongoCollection<AppUser> _collection;
@@ -83,13 +88,14 @@ public class AccountRepository : IAccountRepository
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
+    private readonly IHostEnvironment _hostEnvironment;
 
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
         IRecaptchaService recaptchaValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
-        IEmailService emailService, IPhotoService photoService
+        IEmailService emailService, IPhotoService photoService, IHostEnvironment hostEnvironment
     )
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
@@ -100,6 +106,7 @@ public class AccountRepository : IAccountRepository
         _tokenService = tokenService;
         _emailService = emailService;
         _photoService = photoService;
+        _hostEnvironment = hostEnvironment;
     }
 
     #endregion
@@ -170,8 +177,8 @@ public class AccountRepository : IAccountRepository
 
     public async Task<LoggedInDto> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
     {
-        // if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
-        //     return new LoggedInDto(true);
+        if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
+            return new LoggedInDto(true);
 
         AppUser? appUser;
 
