@@ -37,7 +37,7 @@ public class TokenService : ITokenService
 
             // Get user's roles and add them all into claims
             IList<string> roles = await _userManager.GetRolesAsync(user);
-            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 

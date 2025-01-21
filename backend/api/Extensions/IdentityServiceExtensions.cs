@@ -87,9 +87,9 @@ public static class IdentityServiceExtensions
 
         services.AddAuthorizationBuilder()
             .AddPolicy(AppVariablesExtensions.RequiredAdminRole, policy =>
-                policy.RequireRole(Roles.Admin.ToString().ToLower()))
+                policy.RequireRole(Roles.Admin.ToString().ToUpper()))
             .AddPolicy(AppVariablesExtensions.RequiredModeratorRole, policy =>
-                policy.RequireRole(Roles.Admin.ToString().ToLower(), Roles.Moderator.ToString().ToLower()));
+                policy.RequireRole(Roles.Admin.ToString().ToUpper(), Roles.Moderator.ToString().ToUpper()));
 
         #endregion
 

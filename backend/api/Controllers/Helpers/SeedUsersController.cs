@@ -74,7 +74,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         };
 
         await userManager.CreateAsync(admin, "Aaaaaaa/1");
-        await userManager.AddToRolesAsync(admin, [Roles.Admin.ToString(), Roles.Moderator.ToString()]);
+        await userManager.AddToRolesAsync(admin, [Roles.Admin.ToString().ToUpper(), Roles.Moderator.ToString().ToUpper()]);
         string verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(admin);
         await userManager.ConfirmEmailAsync(admin, verifyToken);
 
@@ -86,7 +86,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         };
 
         await userManager.CreateAsync(moderator, "Aaaaaaa/1");
-        await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString()]);
+        await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString().ToUpper()]);
         verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(moderator);
         await userManager.ConfirmEmailAsync(moderator, verifyToken);
         
