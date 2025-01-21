@@ -27,8 +27,7 @@ export const routes: Routes = [
     canActivate: [authLoggedInGuard],
     children: [
       {path: '', component: HomeComponent},
-      {path: 'account/register', component: HomeComponent},
-      {path: 'account/login', component: HomeComponent},
+      {path: 'account', component: HomeComponent},
       {path: 'account/reset-password', component: ResetPasswordComponent},
       {path: 'demo', component: HomeComponent}, // DEMO
     ]

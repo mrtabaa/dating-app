@@ -43,7 +43,7 @@ export class TestErrorComponent {
   }
 
   get400RegisterValidationErrors(): void {
-    this.http.post(this.baseUrl + 'account/register', {}).pipe(take(1)).subscribe({
+    this.http.post(this.baseUrl + 'account', {}).pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => {
         this.validationErrors = err;
@@ -52,7 +52,7 @@ export class TestErrorComponent {
   }
 
   get400LoginValidationErrors(): void {
-    this.http.post(this.baseUrl + 'account/login', {}).pipe(take(1)).subscribe({
+    this.http.post(this.baseUrl + 'account', {}).pipe(take(1)).subscribe({
       next: res => console.log(res),
       error: err => {
         this.validationErrors = err;
