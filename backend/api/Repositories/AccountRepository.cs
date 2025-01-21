@@ -1,6 +1,8 @@
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Web;
+using api.DTOs.Account;
+using api.DTOs.Helpers;
 using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace api.Repositories;

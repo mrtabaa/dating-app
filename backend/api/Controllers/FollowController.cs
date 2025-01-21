@@ -1,3 +1,5 @@
+using api.DTOs.Helpers;
+
 namespace api.Controllers;
 
 [Authorize]

@@ -1,3 +1,6 @@
+using api.DTOs.Account;
+using api.DTOs.Helpers;
+
 namespace api.Interfaces;
 
 public interface IAccountRepository
