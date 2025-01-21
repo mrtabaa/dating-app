@@ -30,7 +30,6 @@ export class AccountService {
   private _snackBar = inject(MatSnackBar);
   private _isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
 
-
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
       .pipe(
