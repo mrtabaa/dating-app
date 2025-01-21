@@ -64,6 +64,8 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
             appUsers.Add(appUser);
         }
 
+        #region Admin & Moderator
+        
         AppUser admin = new()
         {
             Email = "admin@a.com",
@@ -73,6 +75,8 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
 
         await userManager.CreateAsync(admin, "Aaaaaaa/1");
         await userManager.AddToRolesAsync(admin, [Roles.Admin.ToString(), Roles.Moderator.ToString()]);
+        string verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(admin);
+        await userManager.ConfirmEmailAsync(admin, verifyToken);
 
         AppUser moderator = new()
         {
@@ -83,6 +87,10 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
 
         await userManager.CreateAsync(moderator, "Aaaaaaa/1");
         await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString()]);
+        verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(moderator);
+        await userManager.ConfirmEmailAsync(moderator, verifyToken);
+        
+        #endregion
 
         #endregion Roles Management
 
