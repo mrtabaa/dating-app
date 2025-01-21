@@ -26,7 +26,7 @@ public static class Mappers
             FollowersCount = 0
         };
 
-    public static AppUser ConvertUserRegisterDtoToAppUser(RegisterDto userInput) => //, int likedCount, int likedByCount
+    public static AppUser ConvertRegisterDtoToAppUser(RegisterDto userInput) => //, int likedCount, int likedByCount
         new()
         {
             Schema = AppVariablesExtensions.AppVersions.Last(),
