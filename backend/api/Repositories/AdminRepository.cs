@@ -57,6 +57,17 @@ public class AdminRepository : IAdminRepository
         return await _userManager.GetRolesAsync(appUser);
     }
 
+    public async Task<bool> VerifyByUsernameAsync(string username, CancellationToken cancellationToken)
+    {
+        AppUser? appUser = await _userManager.FindByNameAsync(username);
+        if (appUser is null || string.IsNullOrEmpty(appUser.Email)) return false;
+        
+        string verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+        IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verificationCode);
+        return result.Succeeded;
+    }
+
     public async Task<AppUser?> DeleteMemberAsync(string userName) =>
         await _collection.FindOneAndDeleteAsync(user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
 

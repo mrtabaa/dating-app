@@ -46,6 +46,16 @@ public class AdminController(IAdminRepository adminRepository, UserManager<AppUs
         return result is null ? BadRequest("Edit roles failed. Contact the admin if persists.") : Ok(result);
     }
 
+    [HttpPut("verify-by-username/{username}")]
+    public async Task<ActionResult<MemberDto>> VerifyByUsername(string username, CancellationToken cancellationToken)
+    {
+        bool isSuccess = await adminRepository.VerifyByUsernameAsync(username, cancellationToken);
+
+        return isSuccess
+            ? Ok("Email is verified.")
+            : BadRequest("Email verification failed.");
+    }
+
     [HttpDelete("delete-member/{userName}")]
     public async Task<ActionResult> DeleteMember(string userName)
     {
