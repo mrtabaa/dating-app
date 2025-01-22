@@ -30,10 +30,10 @@ public class MessageRepository : IMessageRepository
         AppUser? loggedInUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (loggedInUser is null) return null;
 
-        ObjectId? receiverId = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
-        if (receiverId is null) return null;
+        OperationResult<ObjectId> receiverIdResult = await _userRepository.GetIdByUserNameAsync(messageInDto.ReceiverUserName, cancellationToken);
+        if (!receiverIdResult.IsSuccess) return null;
 
-        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, receiverId.Value);
+        Message message = Mappers.ConvertMessageInDtoToMessage(messageInDto.Content, userId, receiverIdResult.Result);
 
         string? profilePhotoUrl = await _userRepository.GetProfilePhotoUrlBlobAsync(userId, cancellationToken);
 

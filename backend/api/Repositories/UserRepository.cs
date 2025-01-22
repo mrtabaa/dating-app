@@ -4,6 +4,20 @@ namespace api.Repositories;
 
 public class UserRepository : IUserRepository
 {
+    #region ErrorMessages
+
+    private const string UpdateFailedErrorMessage =
+        "Update failed. Try again later or if the issue persists contact the support.";
+
+    private const string InfoAlreadySavedErrorMessage = "This info is already saved or left empty.";
+
+    private const int MaxPhotosLimit = 100;
+
+    private readonly string _maxPhotosLimitErrorMessage =
+        $"You've reach the limit of {MaxPhotosLimit} photos. Delete some photos to add more.";
+
+    #endregion
+
     #region Db and Token Settings
 
     private readonly IMongoCollection<AppUser> _collection;
@@ -36,7 +50,8 @@ public class UserRepository : IUserRepository
         await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-        await _collection.Find(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).FirstOrDefaultAsync(cancellationToken);
+        await _collection.Find(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).
+            FirstOrDefaultAsync(cancellationToken);
 
     /// <summary>
     ///     Obtain userId using userName. Check if ObjectId.HasValue and is NOT ObjectId.Empty.
@@ -44,79 +59,104 @@ public class UserRepository : IUserRepository
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>userId / null if !HasValue or Empty</returns>
-    public async Task<OperationResult<ObjectId>> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<OperationResult<ObjectId>> GetIdByUserNameAsync(
+        string userName, CancellationToken cancellationToken
+    )
     {
-        ObjectId? userId = await _collection.AsQueryable()
-            .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
-            .Select(appUser => appUser.Id)
-            .SingleOrDefaultAsync(cancellationToken);
+        ObjectId? objectId = await _collection.AsQueryable().
+            Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).
+            Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
 
-        return ValidationsExtension.ValidateObjectId(userId).IsSuccess
-            ? new OperationResult<ObjectId>(true, userId.Value)
+        return ValidationsExtension.ValidateObjectId(objectId).IsSuccess
+            ? new OperationResult<ObjectId>(true, objectId.Value)
             : new OperationResult<ObjectId>(false);
     }
 
-    public async Task<string?> GetUserNameByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken) =>
-        await _collection.AsQueryable()
-            .Where(appUser => appUser.IdentifierHash == identifierHash)
-            .Select(appUser => appUser.NormalizedUserName)
-            .SingleOrDefaultAsync(cancellationToken);
+    public async Task<string?> GetUserNameByIdentifierHashAsync(
+        string identifierHash, CancellationToken cancellationToken
+    ) =>
+        await _collection.AsQueryable().Where(appUser => appUser.IdentifierHash == identifierHash).
+            Select(appUser => appUser.NormalizedUserName).SingleOrDefaultAsync(cancellationToken);
 
     public async Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken) =>
-        await _collection.AsQueryable()
-            .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
-            .Select(appUser => appUser.KnownAs)
-            .SingleOrDefaultAsync(cancellationToken);
+        await _collection.AsQueryable().Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).
+            Select(appUser => appUser.KnownAs).SingleOrDefaultAsync(cancellationToken);
 
     public async Task<string?> GetGenderByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
-        await _collection.AsQueryable()
-            .Where(appUser => appUser.Id == userId)
-            .Select(appUser => appUser.Gender)
-            .SingleOrDefaultAsync(cancellationToken);
+        await _collection.AsQueryable().Where(appUser => appUser.Id == userId).Select(appUser => appUser.Gender).
+            SingleOrDefaultAsync(cancellationToken);
 
-    public async Task<UpdateResult?> UpdateUserAsync(UserUpdateDto userUpdateDto, ObjectId userId, CancellationToken cancellationToken)
+    public async Task<OperationResult> UpdateUserAsync(
+        UserUpdateDto userUpdateDto, ObjectId userId, CancellationToken cancellationToken
+    )
     {
-        UpdateDefinition<AppUser>? updatedUser = Builders<AppUser>.Update
-            .Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last())
-            .Set(appUser => appUser.KnownAs, userUpdateDto.KnownAs?.Trim())
-            .Set(appUser => appUser.Introduction, userUpdateDto.Introduction?.Trim())
-            .Set(appUser => appUser.LookingFor, userUpdateDto.LookingFor?.Trim())
-            .Set(appUser => appUser.Interests, userUpdateDto.Interests?.Trim())
-            .Set(appUser => appUser.CountryAcr, userUpdateDto.CountryAcr.Trim())
-            .Set(appUser => appUser.Country, userUpdateDto.Country.Trim())
-            .Set(appUser => appUser.State, userUpdateDto.State.Trim())
-            .Set(appUser => appUser.City, userUpdateDto.City.Trim())
-            .Set(appUser => appUser.IsProfileCompleted, userUpdateDto.IsProfileCompleted);
+        UpdateDefinition<AppUser>? updatedUser = Builders<AppUser>.Update.
+            Set(appUser => appUser.Schema, AppVariablesExtensions.AppVersions.Last()).
+            Set(appUser => appUser.KnownAs, userUpdateDto.KnownAs?.Trim()).
+            Set(appUser => appUser.Introduction, userUpdateDto.Introduction?.Trim()).
+            Set(appUser => appUser.LookingFor, userUpdateDto.LookingFor?.Trim()).
+            Set(appUser => appUser.Interests, userUpdateDto.Interests?.Trim()).
+            Set(appUser => appUser.CountryAcr, userUpdateDto.CountryAcr.Trim()).
+            Set(appUser => appUser.Country, userUpdateDto.Country.Trim()).
+            Set(appUser => appUser.State, userUpdateDto.State.Trim()).
+            Set(appUser => appUser.City, userUpdateDto.City.Trim()).Set(
+                appUser => appUser.IsProfileCompleted, userUpdateDto.IsProfileCompleted
+            );
 
-        return await _collection.UpdateOneAsync<AppUser>(appUser => appUser.Id == userId, updatedUser, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateOneAsync(
+            appUser => appUser.Id == userId, updatedUser, null, cancellationToken
+        );
+
+        return updateResult.MatchedCount == 0
+            ? new OperationResult(
+                false,
+                new CustomError(
+                    UserErrorType.UpdateFailed,
+                    UpdateFailedErrorMessage
+                )
+            )
+            : !userUpdateDto.IsProfileCompleted && updateResult is { MatchedCount: 1, ModifiedCount: 0 }
+                ? new OperationResult(
+                    false,
+                    new CustomError(
+                        UserErrorType.InfoAlreadySaved,
+                        InfoAlreadySavedErrorMessage
+                    )
+                )
+                : new OperationResult(true);
     }
 
     #endregion User Management
 
     #region Photo Management
 
-    public async Task<PhotoUploadStatus> UploadPhotoAsync(IFormFile file, ObjectId userId, CancellationToken cancellationToken)
+    public async Task<OperationResult<Photo>> UploadPhotoAsync(
+        IFormFile file, ObjectId userId, CancellationToken cancellationToken
+    )
     {
-        PhotoUploadStatus photoUploadResponse = new();
-
         AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
         if (appUser is null)
         {
             _logger.LogError("appUser is Null / not found");
-            return photoUploadResponse;
+            return new OperationResult<Photo>(false);
         }
 
-        if (appUser.Photos.Count >= PhotoUploadStatus.MaxPhotosLimit)
+        if (appUser.Photos.Count >= MaxPhotosLimit)
         {
-            photoUploadResponse.IsMaxPhotoReached = true;
-            return photoUploadResponse;
+            return new OperationResult<Photo>(
+                false,
+                Error: new CustomError(
+                    UserErrorType.MaxPhotosLimitReached,
+                    _maxPhotosLimitErrorMessage
+                )
+            );
         }
 
         // save file in Storage using PhotoService / userId makes the folder name
         string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
 
         if (photoUrls is null)
-            return photoUploadResponse;
+            return new OperationResult<Photo>(false);
 
         Photo? photo;
         if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
@@ -135,11 +175,12 @@ public class UserRepository : IUserRepository
 
         try
         {
-            UpdateDefinition<AppUser>? updatedUser = Builders<AppUser>.Update
-                .Set(aU => aU.Schema, AppVariablesExtensions.AppVersions.Last())
-                .AddToSet(doc => doc.Photos, photo);
+            UpdateDefinition<AppUser>? updatedUser = Builders<AppUser>.Update.
+                Set(aU => aU.Schema, AppVariablesExtensions.AppVersions.Last()).AddToSet(doc => doc.Photos, photo);
 
-            UpdateResult result = await _collection.UpdateOneAsync<AppUser>(aU => aU.Id == userId, updatedUser, null, cancellationToken);
+            UpdateResult result = await _collection.UpdateOneAsync(
+                aU => aU.Id == userId, updatedUser, null, cancellationToken
+            );
 
             // If db is not updated and cancellation is requested, delete the photo from Azure Blob Storage and stop proceeding.
             // Consider using "Full Optimistic Locking / appUser Version comparison" if data integrity is required. 
@@ -156,7 +197,7 @@ public class UserRepository : IUserRepository
 
             // Delete the uploaded blobs
             await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
-            return photoUploadResponse;
+            return new OperationResult<Photo>(false);
         }
 
         #endregion MongoDb Session
@@ -164,25 +205,30 @@ public class UserRepository : IUserRepository
         photo = _photoService.ConvertPhotoToBlobLinkWithSas(photo);
 
         // return the saved photo if save on Azure and DB
-        photoUploadResponse.Photo = photo;
-        return photoUploadResponse;
+        return photo is null
+            ? new OperationResult<Photo>(false)
+            : new OperationResult<Photo>(true, photo);
     }
 
-    public async Task<UpdateResult?> SetMainPhotoAsync(ObjectId userId, string blobUrl165In, CancellationToken cancellationToken)
+    public async Task<OperationResult> SetMainPhotoAsync(
+        ObjectId userId, string blobUrl165In, CancellationToken cancellationToken
+    )
     {
         // Convert blobUri to dbUri
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blobUrl165In, "photos");
-        if (string.IsNullOrEmpty(dbUri)) return null;
+        if (string.IsNullOrEmpty(dbUri))
+            return new OperationResult(false);
 
         #region UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
 
         // set query
-        FilterDefinition<AppUser> filterOld = Builders<AppUser>.Filter
-            .Where(appUser =>
-                appUser.Id == userId && appUser.Photos.Any(photo => photo.IsMain == true));
+        FilterDefinition<AppUser> filterOld = Builders<AppUser>.Filter.Where(
+            appUser => appUser.Id == userId && appUser.Photos.Any(photo => photo.IsMain == true)
+        );
 
-        UpdateDefinition<AppUser> updateOld = Builders<AppUser>.Update
-            .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, false);
+        UpdateDefinition<AppUser> updateOld = Builders<AppUser>.Update.Set(
+            appUser => appUser.Photos.FirstMatchingElement().IsMain, false
+        );
 
         await _collection.UpdateOneAsync(filterOld, updateOld, null, cancellationToken);
 
@@ -190,39 +236,41 @@ public class UserRepository : IUserRepository
 
         #region SET the new main photo: find new photo by its Url_128; update IsMain to True
 
-        FilterDefinition<AppUser> filterNew = Builders<AppUser>.Filter
-            .Where(appUser =>
-                appUser.Id == userId && appUser.Photos.Any<Photo>(photo => photo.Url165 == dbUri));
+        FilterDefinition<AppUser> filterNew = Builders<AppUser>.Filter.Where(
+            appUser => appUser.Id == userId && appUser.Photos.Any(photo => photo.Url165 == dbUri)
+        );
 
-        UpdateDefinition<AppUser> updateNew = Builders<AppUser>.Update
-            .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true);
+        UpdateDefinition<AppUser> updateNew = Builders<AppUser>.Update.Set(
+            appUser => appUser.Photos.FirstMatchingElement().IsMain, true
+        );
 
         #endregion
 
-        return await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
+        UpdateResult result = await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
+
+        return new OperationResult(result.ModifiedCount > 0);
     }
 
     public async Task<string?> GetProfilePhotoUrlBlobAsync(ObjectId userId, CancellationToken cancellationToken)
     {
-        string? profilePhotoUrl = await _collection.AsQueryable()
-            .Where(appUser => appUser.Id == userId)
-            .SelectMany(appUser => appUser.Photos)
-            .Where(photo => photo.IsMain)
-            .Select(photo => photo.Url165)
-            .FirstOrDefaultAsync(cancellationToken);
+        string? profilePhotoUrl = await _collection.AsQueryable().Where(appUser => appUser.Id == userId).
+            SelectMany(appUser => appUser.Photos).Where(photo => photo.IsMain).Select(photo => photo.Url165).
+            FirstOrDefaultAsync(cancellationToken);
 
         return _photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
     }
 
-    public async Task<PhotoDeleteResponse> DeletePhotoAsync(ObjectId userId, string? blobUrl165In, CancellationToken cancellationToken)
+    public async Task<PhotoDeleteResponse> DeletePhotoAsync(
+        ObjectId userId, string? blobUrl165In, CancellationToken cancellationToken
+    )
     {
         PhotoDeleteResponse photoDeleteResponse = new();
 
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blobUrl165In, "photos");
 
         // Find the photo to delete
-        Photo photoToDelete = await _collection.AsQueryable()
-            .Where(appUser => appUser.Id == userId) // filter by user id
+        Photo photoToDelete = await _collection.AsQueryable().
+            Where(appUser => appUser.Id == userId) // filter by user id
             .SelectMany(appUser => appUser.Photos) // flatten the Photos array
             .Where(photo => photo.Url165 == dbUri) // filter by photo url
             .FirstOrDefaultAsync(cancellationToken); // return the photo or null
@@ -245,19 +293,23 @@ public class UserRepository : IUserRepository
         try
         {
             // Create Filter of the matching ID
-            FilterDefinition<AppUser> filterDef = Builders<AppUser>.Filter
-                .Eq(appUser => appUser.Id, userId);
+            FilterDefinition<AppUser> filterDef = Builders<AppUser>.Filter.Eq(appUser => appUser.Id, userId);
 
             // Make updateDef to Delete the photo
-            UpdateDefinition<AppUser>? updateDef = Builders<AppUser>.Update
-                .PullFilter(appUser => appUser.Photos, photo => photo.Url165 == dbUri);
+            UpdateDefinition<AppUser>? updateDef = Builders<AppUser>.Update.PullFilter(
+                appUser => appUser.Photos, photo => photo.Url165 == dbUri
+            );
 
             // Execute updating the AppUser
             await _collection.UpdateOneAsync(session, filterDef, updateDef, null, cancellationToken);
 
             // SET the next photo to main (if any)
             if (photoToDelete.IsMain)
-                photoDeleteResponse.NewMainUrl = await SetNextPhotoAsMain(session, filterDef, userId, cancellationToken);
+            {
+                photoDeleteResponse.NewMainUrl = await SetNextPhotoAsMain(
+                    session, filterDef, userId, cancellationToken
+                );
+            }
 
             // Delete blob
             bool isDeleteSuccess = await _photoService.DeletePhotoFromBlob(photoToDelete, cancellationToken);
@@ -290,29 +342,36 @@ public class UserRepository : IUserRepository
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<string?> SetNextPhotoAsMain(IClientSessionHandle session, FilterDefinition<AppUser> filterDef, ObjectId userId, CancellationToken cancellationToken)
+    private async Task<string?> SetNextPhotoAsMain(
+        IClientSessionHandle session, FilterDefinition<AppUser> filterDef, ObjectId userId,
+        CancellationToken cancellationToken
+    )
     {
         if (filterDef == null) throw new ArgumentNullException(nameof(filterDef), "filterDef is null.");
 
         // Add this filter to filterDef which already includes userId. Check if there's a photo with IsMain == false
-        filterDef = Builders<AppUser>.Filter
-            .Where(appUser => appUser.Photos.Any(photo => photo.IsMain == false));
+        filterDef = Builders<AppUser>.Filter.Where(appUser => appUser.Photos.Any(photo => photo.IsMain == false));
 
         // Create the updateDef
-        UpdateDefinition<AppUser> updateDef = Builders<AppUser>.Update
-            .Set(appUser => appUser.Photos.FirstMatchingElement().IsMain, true); // Find the next 'false' and make it 'true'
+        UpdateDefinition<AppUser> updateDef = Builders<AppUser>.Update.Set(
+            appUser => appUser.Photos.FirstMatchingElement().IsMain, true
+        ); // Find the next 'false' and make it 'true'
 
-        UpdateResult updateResult = await _collection.UpdateOneAsync(session, filterDef, updateDef, null, cancellationToken);
+        UpdateResult updateResult = await _collection.UpdateOneAsync(
+            session, filterDef, updateDef, null, cancellationToken
+        );
 
         if (updateResult.ModifiedCount == 0) return null;
 
         // Do NOT use the previous filter. Will give error if checking IsMain == false. 
-        AppUser? updatedAppUser = await _collection.Find<AppUser>(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        AppUser? updatedAppUser = await _collection.Find(appUser => appUser.Id == userId).
+            FirstOrDefaultAsync(cancellationToken);
 
         if (updatedAppUser is not null)
         {
             return _photoService.ConvertPhotoToBlobLinkWithSas(
-                updatedAppUser.Photos.ElementAtOrDefault(1))?.Url165;
+                updatedAppUser.Photos.ElementAtOrDefault(1)
+            )?.Url165;
         }
 
         const string message = "AppUser cannot be null at this point. See the exception-logs in db.";
