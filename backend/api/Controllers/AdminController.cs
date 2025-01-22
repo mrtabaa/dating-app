@@ -4,18 +4,23 @@ namespace api.Controllers;
 public class AdminController(IAdminRepository adminRepository, UserManager<AppUser> userManager) : BaseApiController
 {
     [HttpGet("users-with-roles")]
-    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles([FromQuery] AdminParams adminParams, CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles(
+        [FromQuery] AdminParams adminParams, CancellationToken cancellationToken
+    )
     {
-        OperationResult<PagedList<AppUser>> result = await adminRepository.GetUsersWithRolesAsync(adminParams, cancellationToken);
+        PagedList<AppUser> pagedListAppUser =
+            await adminRepository.GetUsersWithRolesAsync(adminParams, cancellationToken);
 
-        if (!result.IsSuccess) return BadRequest("GetUsersWithRoles failed");
-        if (result.Result.Count == 0) return NoContent();
+        if (pagedListAppUser.Count == 0) return NoContent();
 
         /*  1- Response only exists in the Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
                     If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
             */
-        Response.AddPaginationHeader(new PaginationHeader(
-            result.Result.CurrentPage, result.Result.PageSize, result.Result.TotalItemsCount, result.Result.TotalPages)
+        Response.AddPaginationHeader(
+            new PaginationHeader(
+                pagedListAppUser.CurrentPage, pagedListAppUser.PageSize, pagedListAppUser.TotalItemsCount,
+                pagedListAppUser.TotalPages
+            )
         );
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values.
@@ -23,7 +28,7 @@ public class AdminController(IAdminRepository adminRepository, UserManager<AppUs
 
         List<UserWithRoleDto> usersWithRoles = [];
 
-        foreach (AppUser appUser in result.Result)
+        foreach (AppUser appUser in pagedListAppUser)
         {
             IEnumerable<string> roles = await userManager.GetRolesAsync(appUser);
 

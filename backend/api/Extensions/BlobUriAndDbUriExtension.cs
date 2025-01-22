@@ -21,7 +21,9 @@ public static class BlobUriAndDbUriExtension
     {
         if (blobUri is null) return null;
 
-        string imagePath = blobUri.Substring(blobUri.IndexOf($"{containerName}/", StringComparison.Ordinal) + $"{containerName}/".Length);
+        string imagePath = blobUri.Substring(
+            blobUri.IndexOf($"{containerName}/", StringComparison.Ordinal) + $"{containerName}/".Length
+        );
         return imagePath.Substring(0, imagePath.IndexOf("?sv=", StringComparison.Ordinal));
     }
 
@@ -33,7 +35,9 @@ public static class BlobUriAndDbUriExtension
     /// <param name="configuration"></param>
     /// <param name="blobContainerClient"></param>
     /// <returns>A blob full link</returns>
-    public static string? ConvertDbUriToBlobUriWithSas(string blobName, IConfiguration configuration, BlobContainerClient blobContainerClient)
+    public static string ConvertDbUriToBlobUriWithSas(
+        string blobName, IConfiguration configuration, BlobContainerClient blobContainerClient
+    )
     {
         #region Get the StorageConnectionString value
 

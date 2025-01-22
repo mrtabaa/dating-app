@@ -21,21 +21,28 @@ public class AdminRepository : IAdminRepository
 
     #region CRUD
 
-    public async Task<OperationResult<PagedList<AppUser>>> GetUsersWithRolesAsync(AdminParams adminParams, CancellationToken cancellationToken)
+    public async Task<PagedList<AppUser>> GetUsersWithRolesAsync(
+        AdminParams adminParams, CancellationToken cancellationToken
+    )
     {
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
         if (!string.IsNullOrEmpty(adminParams.Search))
         {
-            query = query.Where(user =>
-                (user.NormalizedUserName != null && user.NormalizedUserName.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase))
-                || (user.NormalizedEmail != null && user.NormalizedEmail.Contains(adminParams.Search, StringComparison.CurrentCultureIgnoreCase)));
+            query = query.Where(
+                user =>
+                    (user.NormalizedUserName != null && user.NormalizedUserName.Contains(
+                        adminParams.Search, StringComparison.CurrentCultureIgnoreCase
+                    ))
+                    || (user.NormalizedEmail != null && user.NormalizedEmail.Contains(
+                        adminParams.Search, StringComparison.CurrentCultureIgnoreCase
+                    ))
+            );
         }
 
         // set no filter in AsQueryable(). Send a plain query
-        return new OperationResult<PagedList<AppUser>>(
-            true,
-            await PagedList<AppUser>.CreatePagedListAsync(query, adminParams.PageNumber, adminParams.PageSize, cancellationToken)
+        return await PagedList<AppUser>.CreatePagedListAsync(
+            query, adminParams.PageNumber, adminParams.PageSize, cancellationToken
         );
     }
 
@@ -79,7 +86,8 @@ public class AdminRepository : IAdminRepository
 
     public async Task<AppUser?> DeleteMemberAsync(string userName) =>
         await _collection.FindOneAndDeleteAsync(
-            user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
+            user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper()
+        );
 
     public async Task<UpdateResult> ResetConnectionsPresenceAsync(CancellationToken cancellationToken)
     {
@@ -87,7 +95,8 @@ public class AdminRepository : IAdminRepository
             .Set(appUser => appUser.ConnectionsPresence, []);
 
         return await _collection.UpdateManyAsync(
-            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
+            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken
+        );
     }
 
     public async Task<UpdateResult> ResetGroupNamesAsync(CancellationToken cancellationToken)
@@ -96,7 +105,8 @@ public class AdminRepository : IAdminRepository
             .Set(appUser => appUser.MessageGroups, []);
 
         return await _collection.UpdateManyAsync(
-            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
+            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken
+        );
     }
 
     #endregion

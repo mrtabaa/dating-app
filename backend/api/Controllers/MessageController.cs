@@ -25,8 +25,10 @@ public class MessageController(
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<MessageDto>>> Get([FromQuery] MessageParams messageParams,
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<MessageDto>>> Get(
+        [FromQuery] MessageParams messageParams,
+        CancellationToken cancellationToken
+    )
     {
         List<MessageDto> messageDtos = [];
 
@@ -44,8 +46,12 @@ public class MessageController(
         else
             pagedMessages = await messageRepository.GetAsync(userId.Value, messageParams, cancellationToken);
 
-        Response.AddPaginationHeader(new PaginationHeader(
-            pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount, pagedMessages.TotalPages));
+        Response.AddPaginationHeader(
+            new PaginationHeader(
+                pagedMessages.CurrentPage, pagedMessages.PageSize, pagedMessages.TotalItemsCount,
+                pagedMessages.TotalPages
+            )
+        );
 
         if (pagedMessages.Count == 0) return NoContent();
 
@@ -54,7 +60,9 @@ public class MessageController(
         foreach (Message message in pagedMessages)
         {
             AppUser? userOrTarget = messageParams.Predicate == MessagePredicate.Sent
-                ? userOrTargets.FirstOrDefault(member => member.Id == message.ReceiverId) // To set receiver photo instead of sender's photo 
+                ? userOrTargets.FirstOrDefault(
+                    member => member.Id == message.ReceiverId
+                ) // To set a receiver photo instead of sender's photo 
                 : userOrTargets.FirstOrDefault(member => member.Id == message.SenderId);
 
             if (userOrTarget is null) continue;
@@ -64,17 +72,23 @@ public class MessageController(
 
             string? profilePhotoSasUrl = photoService.ConvertPhotoUrlToBlobLinkWithSas(profilePhotoUrl);
 
-            messageDtos.Add(Mappers.ConvertMessageToMessageDto(message, userOrTarget, profilePhotoSasUrl));
+            messageDtos.Add(
+                Mappers.ConvertMessageToMessageDto(message, userOrTarget, profilePhotoSasUrl)
+            );
         }
 
         return messageDtos;
     }
 
-    private async Task<IEnumerable<AppUser>> GetAllMembers(PagedList<Message> pagedMessages, CancellationToken cancellationToken)
+    private async Task<IEnumerable<AppUser>> GetAllMembers(
+        PagedList<Message> pagedMessages, CancellationToken cancellationToken
+    )
     {
         // Get all Ids in the messages (sender & receiver)
         IEnumerable<ObjectId> allIds = pagedMessages.Select(message => message.SenderId) // Get senders' Ids
-            .Concat(pagedMessages.Select(message => message.ReceiverId)) // Get receivers' Ids and merge with senders' Ids
+            .Concat(
+                pagedMessages.Select(message => message.ReceiverId)
+            ) // Get receivers' Ids and merge with senders' Ids
             .Distinct(); // Eliminates duplicate Ids
 
         return await memberRepository.GetAppUsersByIdsAsync(allIds, cancellationToken);
