@@ -44,14 +44,16 @@ public class UserRepository : IUserRepository
     /// <param name="userName"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>userId / null if !HasValue or Empty</returns>
-    public async Task<ObjectId?> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken)
+    public async Task<OperationResult<ObjectId>> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken)
     {
         ObjectId? userId = await _collection.AsQueryable()
             .Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim())
             .Select(appUser => appUser.Id)
             .SingleOrDefaultAsync(cancellationToken);
 
-        return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
+        return ValidationsExtension.ValidateObjectId(userId).IsSuccess
+            ? new OperationResult<ObjectId>(true, userId.Value)
+            : new OperationResult<ObjectId>(false);
     }
 
     public async Task<string?> GetUserNameByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken) =>
