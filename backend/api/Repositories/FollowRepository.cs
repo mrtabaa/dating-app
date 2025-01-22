@@ -9,82 +9,13 @@ public class FollowRepository : IFollowRepository
     /// <param name="followParams"></param>
     /// <param name="cancellationToken"></param>
     /// <returns AppUser="?. Return null if userId is invalid">PagedList</returns>
-    public async Task<PagedList<AppUser>?> GetFollowMembersAsync(ObjectId userId, FollowParams followParams, CancellationToken cancellationToken)
+    public async Task<OperationResult<PagedList<AppUser>>> GetFollowMembersAsync(
+        ObjectId userId, FollowParams followParams, CancellationToken cancellationToken
+    )
     {
         followParams.UserId = userId;
 
         return await GetAllFollowsFromDbAsync(followParams, cancellationToken);
-    }
-
-    /// <summary>
-    ///     /// Gets a member UserName and follows the member. A Follow doc is added to the db "follows" collection.
-    ///     The UpdateFollowingsCount() UpdateFollowersCount() are called to increment 1 in their AppUsers.
-    ///     MongoDb Session/Transaction is used.
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="followedMemberUserName"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>FollowStatus</returns>
-    public async Task<FollowStatus> AddFollowAsync(ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken)
-    {
-        FollowStatus followStatus = new();
-
-        ObjectId? followedMemberId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
-
-        if (followedMemberId is null)
-        {
-            followStatus.IsTargetMemberNotFound = true;
-            return followStatus;
-        }
-
-        if (userId == followedMemberId)
-        {
-            followStatus.IsFollowingThemself = true;
-            return followStatus;
-        }
-
-        bool isAlreadyFollowed = await _collection.Find(follow =>
-                follow.FollowerId == userId && follow.FollowedMemberId == followedMemberId)
-            .AnyAsync(cancellationToken);
-
-        if (isAlreadyFollowed)
-        {
-            followStatus.IsAlreadyFollowed = true;
-            return followStatus;
-        }
-
-        Follow follow = Mappers.ConvertAppUserToFollow(userId, followedMemberId.Value);
-
-        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAction.IsAdded, cancellationToken, follow);
-
-        return followStatus; // Failed for any other reason
-    }
-
-    /// <summary>
-    ///     Gets the followed member UserName and unfollows the member. A Follow doc is removed from the db "follows"
-    ///     collection.
-    ///     The UpdateFollowingsCount() UpdateFollowersCount() are called to decrement 1 from their AppUsers.
-    ///     MongoDb Session/Transaction is used.
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="followedMemberUserName"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>true: success. false: fail</returns>
-    public async Task<FollowStatus> RemoveFollowAsync(ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken)
-    {
-        FollowStatus followStatus = new();
-
-        ObjectId? followedMemberId = await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
-
-        if (followedMemberId is null)
-        {
-            followStatus.IsTargetMemberNotFound = true;
-            return followStatus;
-        }
-
-        followStatus.IsSuccess = await SaveInDbWithSessionAsync(userId, followedMemberId.Value, FollowAction.IsRemoved, cancellationToken);
-
-        return followStatus;
     }
 
     /// <summary>
@@ -98,6 +29,103 @@ public class FollowRepository : IFollowRepository
         await _collection.AsQueryable()
             .Where(follow => follow.FollowerId == userId && appUser.Id == follow.FollowedMemberId)
             .AnyAsync(cancellationToken);
+
+    /// <summary>
+    ///     /// Gets a member UserName and follows the member. A Follow doc is added to the db "follows" collection.
+    ///     The UpdateFollowingsCount() UpdateFollowersCount() are called to increment 1 in their AppUsers.
+    ///     MongoDb Session/Transaction is used.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="followedMemberUserName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>FollowStatus</returns>
+    public async Task<OperationResult> AddFollowAsync(
+        ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken
+    )
+    {
+        OperationResult<ObjectId> followedMemberIdResult =
+            await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
+
+        if (!followedMemberIdResult.IsSuccess)
+        {
+            return new OperationResult(
+                false,
+                new CustomError(
+                    FollowErrorType.TargetMemberNotFound,
+                    $"'{followedMemberUserName}' is not found."
+                )
+            );
+        }
+
+        if (userId == followedMemberIdResult.Result)
+        {
+            return new OperationResult(
+                false,
+                new CustomError(
+                    FollowErrorType.FollowingThemself,
+                    "Following yourself is great but is not stored!"
+                )
+            );
+        }
+
+        bool isAlreadyFollowed = await _collection.Find(
+            follow => follow.FollowerId == userId && follow.FollowedMemberId == followedMemberIdResult.Result
+        ).AnyAsync(cancellationToken);
+
+        if (isAlreadyFollowed)
+        {
+            return new OperationResult(
+                false,
+                new CustomError(
+                    FollowErrorType.AlreadyFollowed,
+                    $"{followedMemberUserName} is already followed."
+                )
+            );
+        }
+
+        Follow follow = Mappers.ConvertAppUserToFollow(userId, followedMemberIdResult.Result);
+
+        return new OperationResult(
+            await SaveInDbWithSessionAsync(
+                userId, followedMemberIdResult.Result, FollowAction.IsAdded, cancellationToken, follow
+            )
+        );
+    }
+
+    /// <summary>
+    ///     Gets the followed member UserName and unfollows the member. A Follow doc is removed from the db "follows"
+    ///     collection.
+    ///     The UpdateFollowingsCount() UpdateFollowersCount() are called to decrement 1 from their AppUsers.
+    ///     MongoDb Session/Transaction is used.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="followedMemberUserName"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>true: success. false: fail</returns>
+    public async Task<OperationResult> RemoveFollowAsync(
+        ObjectId userId, string followedMemberUserName, CancellationToken cancellationToken
+    )
+    {
+        OperationResult<ObjectId> followedMemberIdResult =
+            await _userRepository.GetIdByUserNameAsync(followedMemberUserName, cancellationToken);
+
+        if (!followedMemberIdResult.IsSuccess)
+        {
+            return new OperationResult(
+                false,
+                new CustomError(
+                    FollowErrorType.TargetMemberNotFound,
+                    $"'{followedMemberUserName}' is not found."
+                )
+            );
+        }
+
+        return new OperationResult(
+            await SaveInDbWithSessionAsync(
+                userId, followedMemberIdResult.Result, FollowAction.IsRemoved, cancellationToken
+            )
+        );
+    }
 
     /// <summary>
     ///     InsertOneAsync the 'follow'.
@@ -119,7 +147,7 @@ public class FollowRepository : IFollowRepository
     )
     {
         //// Session is NOT supported in MongoDb Standalone servers!
-        // Create a session object that is used when leveraging transactions
+        // Create a session object used when leveraging transactions
         using IClientSessionHandle? session = await _client.StartSessionAsync(null, cancellationToken);
 
         // Begin transaction
@@ -132,7 +160,9 @@ public class FollowRepository : IFollowRepository
                 await _collection.InsertOneAsync(session, follow, null, cancellationToken);
             else // if (FollowAddOrRemove.IsRemoved == followAddOrRemove) // Remove follow
             {
-                FilterDefinition<Follow>? filter = Builders<Follow>.Filter.Where(fol => fol.FollowerId == userId && fol.FollowedMemberId == followedId);
+                FilterDefinition<Follow>? filter = Builders<Follow>.Filter.Where(
+                    fol => fol.FollowerId == userId && fol.FollowedMemberId == followedId
+                );
 
                 // follow doc doesn't exist. May be already deleted. 
                 if (!await _collection.Find(filter).AnyAsync(cancellationToken))
@@ -165,38 +195,52 @@ public class FollowRepository : IFollowRepository
     /// <param name="followParams"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>appUsers</returns>
-    private async Task<PagedList<AppUser>?> GetAllFollowsFromDbAsync(FollowParams followParams, CancellationToken cancellationToken)
+    private async Task<OperationResult<PagedList<AppUser>>> GetAllFollowsFromDbAsync(
+        FollowParams followParams, CancellationToken cancellationToken
+    )
     {
         if (followParams.Predicate == FollowPredicate.Followings)
         {
             IMongoQueryable<AppUser>? query = _collection.AsQueryable()
                 .Where(follow => follow.FollowerId == followParams.UserId) // filter by Lisa's id
-                .Join(_collectionUsers.AsQueryable<AppUser>(), // get follows list which are followed by the followerId/loggedInUserId
+                .Join(
+                    _collectionUsers
+                        .AsQueryable(), // get follows list which are followed by the followerId/loggedInUserId
                     follow => follow.FollowedMemberId, // map each followedId user with their AppUser Id bellow
                     appUser => appUser.Id,
-                    (follow, appUser) => appUser); // project the AppUser
+                    (follow, appUser) => appUser
+                ); // project the AppUser
 
-            PagedList<AppUser>? appUsers = await PagedList<AppUser>.CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
+            PagedList<AppUser> appUsers = await PagedList<AppUser>.CreatePagedListAsync(
+                query, followParams.PageNumber, followParams.PageSize, cancellationToken
+            );
 
-            appUsers = GetAppUsersWithBlobPhotos(appUsers);
+            if (!GetAppUsersWithBlobPhotos(appUsers).IsSuccess)
+                return new OperationResult<PagedList<AppUser>>(false);
 
-            return appUsers;
+            appUsers = GetAppUsersWithBlobPhotos(appUsers).Result;
+
+            return new OperationResult<PagedList<AppUser>>(true, appUsers);
         }
         else // (followParams.Predicate == FollowPredicate.Followers)
         {
-            IMongoQueryable<AppUser>? query = _collection.AsQueryable<Follow>()
+            IMongoQueryable<AppUser>? query = _collection.AsQueryable()
                 .Where(follow => follow.FollowedMemberId == followParams.UserId)
-                .Join(_collectionUsers.AsQueryable<AppUser>(),
+                .Join(
+                    _collectionUsers.AsQueryable(),
                     follow => follow.FollowerId,
                     appUser => appUser.Id,
-                    (follow, appUser) => appUser);
+                    (follow, appUser) => appUser
+                );
 
-            PagedList<AppUser>? appUsers = await PagedList<AppUser>
+            PagedList<AppUser> appUsers = await PagedList<AppUser>
                 .CreatePagedListAsync(query, followParams.PageNumber, followParams.PageSize, cancellationToken);
 
-            appUsers = GetAppUsersWithBlobPhotos(appUsers);
+            OperationResult<PagedList<AppUser>> appUsersResult = GetAppUsersWithBlobPhotos(appUsers);
 
-            return appUsers;
+            return appUsersResult.IsSuccess
+                ? new OperationResult<PagedList<AppUser>>(true, appUsersResult.Result)
+                : new OperationResult<PagedList<AppUser>>(false);
         }
     }
 
@@ -210,7 +254,10 @@ public class FollowRepository : IFollowRepository
     /// <param name="followAddOrRemove"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowingsCount(IClientSessionHandle session, ObjectId followerId, FollowAction followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowingsCount(
+        IClientSessionHandle session, ObjectId followerId, FollowAction followAddOrRemove,
+        CancellationToken cancellationToken
+    )
     {
         UpdateDefinition<AppUser> updateFollowedByCount;
 
@@ -225,8 +272,10 @@ public class FollowRepository : IFollowRepository
                 .Inc(appUser => appUser.FollowingsCount, -1); // Decrement by 1 for each unfollow
         }
 
-        await _collectionUsers.UpdateOneAsync(session, appUser =>
-            appUser.Id == followerId, updateFollowedByCount, null, cancellationToken);
+        await _collectionUsers.UpdateOneAsync(
+            session, appUser =>
+                appUser.Id == followerId, updateFollowedByCount, null, cancellationToken
+        );
     }
 
     /// <summary>
@@ -239,7 +288,10 @@ public class FollowRepository : IFollowRepository
     /// <param name="followAddOrRemove"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task UpdateFollowersCount(IClientSessionHandle session, ObjectId followedId, FollowAction followAddOrRemove, CancellationToken cancellationToken)
+    private async Task UpdateFollowersCount(
+        IClientSessionHandle session, ObjectId followedId, FollowAction followAddOrRemove,
+        CancellationToken cancellationToken
+    )
     {
         UpdateDefinition<AppUser> updateFollowerCount;
 
@@ -254,36 +306,40 @@ public class FollowRepository : IFollowRepository
                 .Inc(appUser => appUser.FollowersCount, -1); // Decrement by 1 for each unfollow
         }
 
-        await _collectionUsers.UpdateOneAsync(session, appUser =>
-            appUser.Id == followedId, updateFollowerCount, null, cancellationToken);
+        await _collectionUsers.UpdateOneAsync(
+            session, appUser =>
+                appUser.Id == followedId, updateFollowerCount, null, cancellationToken
+        );
     }
 
     /// Convert all members' appUser.Photos to BlobLinkFormat
-    private PagedList<AppUser>? GetAppUsersWithBlobPhotos(PagedList<AppUser> appUsers)
+    private OperationResult<PagedList<AppUser>> GetAppUsersWithBlobPhotos(PagedList<AppUser> appUsers)
     {
         for (var i = 0; i < appUsers.Count; i++)
         {
-            if (appUsers[i].Photos.Count <= 0) continue; // continue only if appUser has a photo
+            if (appUsers[i].Photos.Count <= 0) continue; // skip to the next user if appUser has no photo
 
-            AppUser? appUser = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
+            OperationResult<AppUser> appUserResult = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
 
-            if (appUser is null) return null;
+            if (!appUserResult.IsSuccess)
+                return new OperationResult<PagedList<AppUser>>(false);
 
-            appUsers[i] = appUser;
+            appUsers[i] = appUserResult.Result;
         }
 
-        return appUsers;
+        return new OperationResult<PagedList<AppUser>>(true, appUsers);
     }
 
-    private AppUser? ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
+    private OperationResult<AppUser> ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
     {
-        List<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos)?.ToList();
+        IEnumerable<Photo>? blobConvertedPhotos =
+            _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos);
         if (blobConvertedPhotos is null)
-            return null;
+            return new OperationResult<AppUser>(false);
 
-        appUser.Photos = blobConvertedPhotos;
+        appUser.Photos = blobConvertedPhotos.ToList();
 
-        return appUser;
+        return new OperationResult<AppUser>(true, appUser);
     }
 
     #region Db and vars
@@ -302,7 +358,8 @@ public class FollowRepository : IFollowRepository
     )
     {
         _client = client; // used for Session
-        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ??
+                                throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<Follow>(AppVariablesExtensions.CollectionFollows);
         _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
 
