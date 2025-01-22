@@ -14,15 +14,15 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     {
         if (userIn.Password != userIn.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        OperationResult<bool> operationResult = await accountRepository.CreateAsync(userIn, cancellationToken);
+        OperationResult result = await accountRepository.CreateAsync(userIn, cancellationToken);
 
-        return operationResult.IsSuccess
+        return result.IsSuccess
             ? true
-            : operationResult.Error?.Code switch // Make sure to use null-conditional operator ? to avoid exceptions 
+            : result.Error?.Code switch // Make sure to use null-conditional operator ? to avoid exceptions 
             {
-                ErrorCode.IsRecaptchaTokenInvalid => BadRequest(operationResult.Error.Message),
-                ErrorCode.IsEmailAlreadyConfirmed => Conflict(operationResult.Error.Message),
-                ErrorCode.NetIdentity => BadRequest(operationResult.Error.Message),
+                ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
+                ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
+                ErrorCode.NetIdentity => BadRequest(result.Error.Message),
                 _ => BadRequest("Registration has failed. Try again or contact the support.")
             };
     }
@@ -46,7 +46,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpPost("resend-verify-code")]
     public async Task<ActionResult<bool>> ResendVerifyCode(ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken)
     {
-        OperationResult<bool> result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
+        OperationResult result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
 
         return result.IsSuccess
             ? true
@@ -102,7 +102,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpPost("request-reset-password")]
     public async Task<ActionResult<Response>> RequestResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        OperationResult<bool> result = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
+        OperationResult result = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
 
         return result.Error?.Code switch
         {
@@ -117,7 +117,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     {
         if (resetPassword.Password != resetPassword.ConfirmPassword) return BadRequest("Password entries don't match!");
 
-        OperationResult<bool> result = await accountRepository.ResetPasswordAsync(resetPassword, cancellationToken);
+        OperationResult result = await accountRepository.ResetPasswordAsync(resetPassword, cancellationToken);
 
         return result.IsSuccess
             ? new Response("Your new password is saved successfully.")
