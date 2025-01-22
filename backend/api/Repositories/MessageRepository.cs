@@ -13,7 +13,8 @@ public class MessageRepository : IMessageRepository
         IUserRepository userRepository
     )
     {
-        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ??
+                                throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<Message>(AppVariablesExtensions.CollectionMessages);
         _userRepository = userRepository;
     }
@@ -22,7 +23,9 @@ public class MessageRepository : IMessageRepository
 
     #region CRUD
 
-    public async Task<MessageDto?> CreateAsync(ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken)
+    public async Task<MessageDto?> CreateAsync(
+        ObjectId userId, MessageInDto messageInDto, CancellationToken cancellationToken
+    )
     {
         AppUser? loggedInUser = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (loggedInUser is null) return null;
@@ -39,7 +42,9 @@ public class MessageRepository : IMessageRepository
         return Mappers.ConvertMessageToMessageDto(message, loggedInUser, profilePhotoUrl);
     }
 
-    public async Task<PagedList<Message>> GetAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
+    public async Task<PagedList<Message>> GetAsync(
+        ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken
+    )
     {
         IMongoQueryable<Message> query = _collection.AsQueryable();
 
@@ -69,39 +74,50 @@ public class MessageRepository : IMessageRepository
             _ => query
         };
 
-        return await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+        return await PagedList<Message>.CreatePagedListAsync(
+            query, messageParams.PageNumber, messageParams.PageSize, cancellationToken
+        );
     }
 
-    public async Task<PagedList<Message>?> GetThreadAsync(ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken)
+    public async Task<PagedList<Message>?> GetThreadAsync(
+        ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken
+    )
     {
-        ObjectId? targetUserId = await _userRepository.GetIdByUserNameAsync(messageParams.TargetUserName, cancellationToken);
+        OperationResult<ObjectId> targetUserIdResult =
+            await _userRepository.GetIdByUserNameAsync(messageParams.TargetUserName, cancellationToken);
 
-        if (targetUserId == null)
+        if (!targetUserIdResult.IsSuccess)
             return null;
 
         IMongoQueryable<Message> query = _collection.AsQueryable()
-            .Where(doc =>
-                (doc.SenderId == userId && doc.ReceiverId == targetUserId) ||
-                (doc.ReceiverId == userId && doc.SenderId == targetUserId)
+            .Where(
+                doc =>
+                    (doc.SenderId == userId && doc.ReceiverId == targetUserIdResult.Result) ||
+                    (doc.ReceiverId == userId && doc.SenderId == targetUserIdResult.Result)
             ).OrderByDescending(doc => doc.SentOn);
 
-        PagedList<Message> pagedMessages = await PagedList<Message>.CreatePagedListAsync(query, messageParams.PageNumber, messageParams.PageSize, cancellationToken);
+        PagedList<Message> pagedMessages = await PagedList<Message>.CreatePagedListAsync(
+            query, messageParams.PageNumber, messageParams.PageSize, cancellationToken
+        );
 
         // update ReadOn
         if (pagedMessages.Count > 0)
-            await UpdateReadOnAsync(userId, targetUserId.Value, cancellationToken);
+            await UpdateReadOnAsync(userId, targetUserIdResult.Result, cancellationToken);
 
         return pagedMessages;
     }
 
-    public async Task<DateTime> UpdateReadOnAsync(ObjectId partyOneId, ObjectId partyTwoId, CancellationToken cancellationToken)
+    public async Task<DateTime> UpdateReadOnAsync(
+        ObjectId partyOneId, ObjectId partyTwoId, CancellationToken cancellationToken
+    )
     {
         DateTime readOnTimestamp = DateTime.UtcNow;
 
         FilterDefinition<Message>? filter = Builders<Message>.Filter
-            .Where(doc =>
-                doc.SenderId == partyOneId && doc.ReceiverId == partyTwoId
-                                           && doc.ReadOn == null
+            .Where(
+                doc =>
+                    doc.SenderId == partyOneId && doc.ReceiverId == partyTwoId
+                                               && doc.ReadOn == null
             );
 
         UpdateDefinition<Message> updateDefReadOn = Builders<Message>.Update
