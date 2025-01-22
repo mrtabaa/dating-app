@@ -44,7 +44,7 @@ public class AdminRepository : IAdminRepository
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());
 
         if (appUser is null)
-            return new OperationResult<IEnumerable<string>>();
+            return new OperationResult<IEnumerable<string>>(false);
 
         IEnumerable<string> userRoles = _userManager.GetRolesAsync(appUser).Result;
 
@@ -52,13 +52,13 @@ public class AdminRepository : IAdminRepository
         IdentityResult? result = await _userManager.AddToRolesAsync(appUser, memberWithRoleDto.Roles.Except(userRoles));
 
         if (!result.Succeeded)
-            return new OperationResult<IEnumerable<string>>();
+            return new OperationResult<IEnumerable<string>>(false);
 
         // Delete non-selected roles
         result = await _userManager.RemoveFromRolesAsync(appUser, userRoles.Except(memberWithRoleDto.Roles));
 
         if (!result.Succeeded)
-            return new OperationResult<IEnumerable<string>>();
+            return new OperationResult<IEnumerable<string>>(false);
 
         return new OperationResult<IEnumerable<string>>(
             true,
