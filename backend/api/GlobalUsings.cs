@@ -4,6 +4,8 @@ global using System.Security.Claims;
 global using System.Text;
 global using api.DTOs;
 global using api.Helpers;
+global using api.DTOs.Account;
+global using api.DTOs.Helpers;
 global using api.Extensions;
 global using api.Interfaces;
 global using api.Models;

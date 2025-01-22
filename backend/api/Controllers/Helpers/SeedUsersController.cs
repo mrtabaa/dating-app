@@ -1,5 +1,3 @@
-using api.DTOs.helpers;
-
 namespace api.Controllers.Helpers;
 
 public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
@@ -65,7 +63,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         }
 
         #region Admin & Moderator
-        
+
         AppUser admin = new()
         {
             Email = "admin@a.com",
@@ -89,7 +87,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString().ToUpper()]);
         verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(moderator);
         await userManager.ConfirmEmailAsync(moderator, verifyToken);
-        
+
         #endregion
 
         #endregion Roles Management

@@ -1,4 +1,4 @@
-namespace api.DTOs.helpers;
+namespace api.DTOs.Helpers;
 
 public record EmailRequest(
     string ToEmail,
