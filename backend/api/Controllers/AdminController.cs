@@ -1,5 +1,3 @@
-using api.DTOs.Helpers;
-
 namespace api.Controllers;
 
 [Authorize(Policy = AppVariablesExtensions.RequiredAdminRole)]
@@ -8,21 +6,24 @@ public class AdminController(IAdminRepository adminRepository, UserManager<AppUs
     [HttpGet("users-with-roles")]
     public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetUsersWithRoles([FromQuery] AdminParams adminParams, CancellationToken cancellationToken)
     {
-        PagedList<AppUser> pagedAppUsers = await adminRepository.GetUsersWithRolesAsync(adminParams, cancellationToken);
+        OperationResult<PagedList<AppUser>> result = await adminRepository.GetUsersWithRolesAsync(adminParams, cancellationToken);
 
-        if (pagedAppUsers.Count == 0) return NoContent();
+        if (!result.IsSuccess) return BadRequest("GetUsersWithRoles failed");
+        if (result.Result.Count == 0) return NoContent();
 
         /*  1- Response only exists in the Controller. So we have to set PaginationHeader here before converting AppUser to UserDto.
-                If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
-        */
-        Response.AddPaginationHeader(new PaginationHeader(pagedAppUsers.CurrentPage, pagedAppUsers.PageSize, pagedAppUsers.TotalItemsCount, pagedAppUsers.TotalPages));
+                    If we convert AppUser before here, we'll lose PagedList's pagination values, e.g. CurrentPage, PageSize, etc.
+            */
+        Response.AddPaginationHeader(new PaginationHeader(
+            result.Result.CurrentPage, result.Result.PageSize, result.Result.TotalItemsCount, result.Result.TotalPages)
+        );
 
         /*  2- PagedList<T> has to be AppUser first to retrieve data from DB and set pagination values.
-                After that step we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
+                    After that step, we can convert AppUser to MemberDto in here (NOT in the UserRepository) */
 
         List<UserWithRoleDto> usersWithRoles = [];
 
-        foreach (AppUser appUser in pagedAppUsers)
+        foreach (AppUser appUser in result.Result)
         {
             IEnumerable<string> roles = await userManager.GetRolesAsync(appUser);
 
@@ -43,9 +44,11 @@ public class AdminController(IAdminRepository adminRepository, UserManager<AppUs
         if (!memberWithRoleDto.Roles.Contains("member"))
             return BadRequest("Cannot remove member role!");
 
-        IEnumerable<string>? result = await adminRepository.EditMemberRole(memberWithRoleDto);
+        OperationResult<IEnumerable<string>> result = await adminRepository.EditMemberRole(memberWithRoleDto);
 
-        return result is null ? BadRequest("Edit roles failed. Contact the admin if persists.") : Ok(result);
+        return result.IsSuccess
+            ? Ok(result)
+            : BadRequest("Edit roles failed. Contact the admin if persists.");
     }
 
     [HttpPut("verify-by-username/{username}")]

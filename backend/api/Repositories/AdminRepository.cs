@@ -21,7 +21,7 @@ public class AdminRepository : IAdminRepository
 
     #region CRUD
 
-    public async Task<PagedList<AppUser>> GetUsersWithRolesAsync(AdminParams adminParams, CancellationToken cancellationToken)
+    public async Task<OperationResult<PagedList<AppUser>>> GetUsersWithRolesAsync(AdminParams adminParams, CancellationToken cancellationToken)
     {
         IMongoQueryable<AppUser> query = _collection.AsQueryable();
 
@@ -33,35 +33,44 @@ public class AdminRepository : IAdminRepository
         }
 
         // set no filter in AsQueryable(). Send a plain query
-        return await PagedList<AppUser>.CreatePagedListAsync(query, adminParams.PageNumber, adminParams.PageSize, cancellationToken);
+        return new OperationResult<PagedList<AppUser>>(
+            true,
+            await PagedList<AppUser>.CreatePagedListAsync(query, adminParams.PageNumber, adminParams.PageSize, cancellationToken)
+        );
     }
 
-    public async Task<IEnumerable<string>?> EditMemberRole(UserWithRoleDto memberWithRoleDto)
+    public async Task<OperationResult<IEnumerable<string>>> EditMemberRole(UserWithRoleDto memberWithRoleDto)
     {
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());
 
-        if (appUser is null) return null;
+        if (appUser is null)
+            return new OperationResult<IEnumerable<string>>();
 
         IEnumerable<string> userRoles = _userManager.GetRolesAsync(appUser).Result;
 
         // Add selected roles
         IdentityResult? result = await _userManager.AddToRolesAsync(appUser, memberWithRoleDto.Roles.Except(userRoles));
 
-        if (!result.Succeeded) return null;
+        if (!result.Succeeded)
+            return new OperationResult<IEnumerable<string>>();
 
         // Delete non-selected roles
         result = await _userManager.RemoveFromRolesAsync(appUser, userRoles.Except(memberWithRoleDto.Roles));
 
-        if (!result.Succeeded) return null;
+        if (!result.Succeeded)
+            return new OperationResult<IEnumerable<string>>();
 
-        return await _userManager.GetRolesAsync(appUser);
+        return new OperationResult<IEnumerable<string>>(
+            true,
+            await _userManager.GetRolesAsync(appUser)
+        );
     }
 
     public async Task<bool> VerifyByUsernameAsync(string username, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _userManager.FindByNameAsync(username);
         if (appUser is null || string.IsNullOrEmpty(appUser.Email)) return false;
-        
+
         string verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verificationCode);
@@ -69,14 +78,16 @@ public class AdminRepository : IAdminRepository
     }
 
     public async Task<AppUser?> DeleteMemberAsync(string userName) =>
-        await _collection.FindOneAndDeleteAsync(user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
+        await _collection.FindOneAndDeleteAsync(
+            user => user.NormalizedUserName != "ADMIN" && user.NormalizedUserName == userName.ToUpper());
 
     public async Task<UpdateResult> ResetConnectionsPresenceAsync(CancellationToken cancellationToken)
     {
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .Set(appUser => appUser.ConnectionsPresence, []);
 
-        return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
+        return await _collection.UpdateManyAsync(
+            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
     }
 
     public async Task<UpdateResult> ResetGroupNamesAsync(CancellationToken cancellationToken)
@@ -84,7 +95,8 @@ public class AdminRepository : IAdminRepository
         UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
             .Set(appUser => appUser.MessageGroups, []);
 
-        return await _collection.UpdateManyAsync<AppUser>(appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
+        return await _collection.UpdateManyAsync(
+            appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken);
     }
 
     #endregion
