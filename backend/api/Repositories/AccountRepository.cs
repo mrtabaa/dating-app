@@ -1,8 +1,6 @@
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Web;
-using api.DTOs.Account;
-using api.DTOs.Helpers;
 using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace api.Repositories;
@@ -13,7 +11,7 @@ public class AccountRepository : IAccountRepository
 
     private const string RecaptchaErrorMessage = "Recaptcha token is invalid. 'Slide me!' again.";
     private const string WrongCredsErrorMessage = "Wrong username or password.";
-    private const string EmailNotConfrimedErrorMessage = "Please confirm your email using the code sent to your email.";
+    private const string EmailNotConfirmedErrorMessage = "Please confirm your email using the code sent to your email.";
 
     private const string EmailAlreadyConfirmedErrorMessage = "This email is already registered and verified. " +
                                                              "You can login or recover your password if the owner.";
@@ -23,13 +21,14 @@ public class AccountRepository : IAccountRepository
     #region Helpers
 
     private async Task<OperationResult> RegisterIfEmailAlreadyExists(
-        AppUser existingUser, RegisterDto registerDto, CancellationToken cancellationToken)
+        AppUser existingUser, RegisterDto registerDto, CancellationToken cancellationToken
+    )
     {
         if (await _userManager.IsEmailConfirmedAsync(existingUser))
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.IsEmailAlreadyConfirmed,
                     EmailAlreadyConfirmedErrorMessage
                 )
@@ -48,7 +47,7 @@ public class AccountRepository : IAccountRepository
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.NetIdentity,
                     updateResult.Errors.FirstOrDefault()?.Description
                 )
@@ -90,9 +89,12 @@ public class AccountRepository : IAccountRepository
 
     private static string GenerateResetPasswordLink(string baseUrl, string email, string resetToken)
     {
-        if (string.IsNullOrWhiteSpace(baseUrl)) throw new ArgumentException("Base URL cannot be null or empty.", nameof(baseUrl));
-        if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Email cannot be null or empty.", nameof(email));
-        if (string.IsNullOrWhiteSpace(resetToken)) throw new ArgumentException("Token cannot be null or empty.", nameof(resetToken));
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new ArgumentException("Base URL cannot be null or empty.", nameof(baseUrl));
+        if (string.IsNullOrWhiteSpace(email))
+            throw new ArgumentException("Email cannot be null or empty.", nameof(email));
+        if (string.IsNullOrWhiteSpace(resetToken))
+            throw new ArgumentException("Token cannot be null or empty.", nameof(resetToken));
 
         var builder = new UriBuilder(baseUrl);
         NameValueCollection query = HttpUtility.ParseQueryString(string.Empty);
@@ -145,7 +147,7 @@ public class AccountRepository : IAccountRepository
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.IsRecaptchaTokenInvalid,
                     RecaptchaErrorMessage
                 )
@@ -165,7 +167,7 @@ public class AccountRepository : IAccountRepository
             // failed to create the user
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.NetIdentity,
                     userCreatedResult.Errors.Select(e => e.Description).FirstOrDefault()
                 )
@@ -185,7 +187,9 @@ public class AccountRepository : IAccountRepository
         return new OperationResult(true); // Account created successfully.
     }
 
-    public async Task<OperationResult<LoggedInDto>> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoggedInDto>> VerifyAsync(
+        VerifyDto verifyDto, CancellationToken cancellationToken
+    )
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
@@ -212,18 +216,21 @@ public class AccountRepository : IAccountRepository
             ? new OperationResult<LoggedInDto>(false)
             : new OperationResult<LoggedInDto>(
                 true,
-                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)
+                Mappers.ConvertAppUserToLoggedInDto(
+                    appUser, token, GetMainPhoto(appUser)
                 )
             );
     }
 
-    public async Task<OperationResult> ResendVerifyCodeAsync(ResendCodeRequest resendCRequest, CancellationToken cancellationToken)
+    public async Task<OperationResult> ResendVerifyCodeAsync(
+        ResendCodeRequest resendCRequest, CancellationToken cancellationToken
+    )
     {
         if (!await ValidateRecaptcha(resendCRequest.RecaptchaToken, cancellationToken))
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.IsRecaptchaTokenInvalid,
                     RecaptchaErrorMessage
                 )
@@ -237,14 +244,16 @@ public class AccountRepository : IAccountRepository
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.IsEmailAlreadyConfirmed,
                     EmailAlreadyConfirmedErrorMessage
                 )
             );
         }
 
-        return new OperationResult(await SendVerificationCode(appUser, cancellationToken)); // Success depends on the email sent success
+        return new OperationResult(
+            await SendVerificationCode(appUser, cancellationToken)
+        ); // Success depends on the email sent success
     }
 
     public async Task<OperationResult<LoggedInDto>> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
@@ -299,7 +308,7 @@ public class AccountRepository : IAccountRepository
                 false,
                 Error: new CustomError(
                     ErrorCode.IsEmailNotConfirmed,
-                    EmailNotConfrimedErrorMessage
+                    EmailNotConfirmedErrorMessage
                 )
             );
         }
@@ -310,19 +319,23 @@ public class AccountRepository : IAccountRepository
             ? new OperationResult<LoggedInDto>(false)
             : new OperationResult<LoggedInDto>(
                 true,
-                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser)
+                Mappers.ConvertAppUserToLoggedInDto(
+                    appUser, token, GetMainPhoto(appUser)
                 )
             );
     }
 
-    public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(string userIdHashed, string token, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(
+        string userIdHashed, string token, CancellationToken cancellationToken
+    )
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
         if (userId is null)
             return new OperationResult<LoggedInDto>(false);
 
-        AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser =
+            await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
             ? new OperationResult<LoggedInDto>(false)
@@ -332,13 +345,15 @@ public class AccountRepository : IAccountRepository
             );
     }
 
-    public async Task<OperationResult> RequestResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
+    public async Task<OperationResult> RequestResetPasswordAsync(
+        ResetPasswordRequest request, CancellationToken cancellationToken
+    )
     {
         if (!await ValidateRecaptcha(request.RecaptchaToken, cancellationToken))
         {
             return new OperationResult(
                 false,
-                Error: new CustomError(
+                new CustomError(
                     ErrorCode.IsRecaptchaTokenInvalid,
                     RecaptchaErrorMessage
                 )
@@ -355,15 +370,22 @@ public class AccountRepository : IAccountRepository
         string resetLink = GenerateResetPasswordLink(
             // "http://localhost:4300/account/reset-password",
             "https://www.hallboard.com/account/reset-password",
-            appUser.Email, resetToken);
+            appUser.Email, resetToken
+        );
 
         if (!await _emailService.SendPasswordResetLink(appUser, resetLink, cancellationToken))
-            throw new ArgumentException("Failed to send reset password link. Check if email provider is working.", nameof(appUser.Email));
+        {
+            throw new ArgumentException(
+                "Failed to send reset password link. Check if email provider is working.", nameof(appUser.Email)
+            );
+        }
 
         return new OperationResult(false);
     }
 
-    public async Task<OperationResult> ResetPasswordAsync(ResetPassword resetPassword, CancellationToken cancellationToken)
+    public async Task<OperationResult> ResetPasswordAsync(
+        ResetPassword resetPassword, CancellationToken cancellationToken
+    )
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(resetPassword.Email.Trim());
         if (appUser is null)
@@ -380,13 +402,17 @@ public class AccountRepository : IAccountRepository
         return new OperationResult(passwordResetResult.Succeeded);
     }
 
-    public async Task<OperationResult<DeleteResult>> DeleteUserAsync(string? userEmail, CancellationToken cancellationToken) =>
+    public async Task<OperationResult<DeleteResult>> DeleteUserAsync(
+        string? userEmail, CancellationToken cancellationToken
+    ) =>
         new(
             true,
             await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken)
         );
 
-    public async Task<OperationResult<UpdateResult>> UpdateLastActive(string userIdHashed, CancellationToken cancellationToken)
+    public async Task<OperationResult<UpdateResult>> UpdateLastActive(
+        string userIdHashed, CancellationToken cancellationToken
+    )
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
@@ -398,7 +424,9 @@ public class AccountRepository : IAccountRepository
 
         return new OperationResult<UpdateResult>(
             true,
-            await _collection.UpdateOneAsync(appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken)
+            await _collection.UpdateOneAsync(
+                appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken
+            )
         );
     }
 
