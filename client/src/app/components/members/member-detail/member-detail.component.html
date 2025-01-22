@@ -78,27 +78,33 @@
         </mat-tab>
         <mat-tab label="About {{member.knownAs}}">
           <div class="tab-contents">
-            @if (!(member.introduction || member.lookingFor || member.interests)) {
+            @if (!(member.introduction || member.lookingFor)) {
               <p>There is no information provided.</p>
             } @else {
               @if (member.introduction) {
-                <h6>Introduction</h6>
-                <p>{{ member.introduction }}</p>
+                <div class="content">
+                  <h3>Introduction</h3>
+                  <p>{{ member.introduction }}</p>
+                </div>
               }
               @if (member.lookingFor) {
-                <h6>Looking For</h6>
-                <p>{{ member.lookingFor }}</p>
+                <div class="content">
+                  <h3>Looking For</h3>
+                  <p>{{ member.lookingFor }}</p>
+                </div>
               }
             }
           </div>
         </mat-tab>
         <mat-tab label="Interests">
           <div class="tab-contents">
-            @if (member.interests.length > 0) {
-              <h6>Interests</h6>
-              <p>{{ member.interests }}</p>
-            } @else {
+            @if (!member.interests) {
               <p>There is no information provided.</p>
+            } @else {
+              <div class="content">
+                <h3>Interests</h3>
+                <p>{{ member.interests }}</p>
+              </div>
             }
           </div>
         </mat-tab>
