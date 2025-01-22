@@ -41,8 +41,8 @@ public static class BlobUriAndDbUriExtension
     {
         #region Get the StorageConnectionString value
 
-        var connectionString = configuration.GetValue<string>("StorageConnectionString");
-        if (string.IsNullOrEmpty(connectionString)) return null;
+        string connectionString = configuration.GetValue<string>("StorageConnectionString")
+                                  ?? throw new ArgumentNullException("StorageConnectionString cannot be null");
 
         // Parse the connection string
         var connectionStringParts = new Dictionary<string, string>();
@@ -57,6 +57,10 @@ public static class BlobUriAndDbUriExtension
         // Extract the account name and key
         connectionStringParts.TryGetValue("AccountName", out string? accountName);
         connectionStringParts.TryGetValue("AccountKey", out string? accountKey);
+        if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey))
+        {
+            throw new ArgumentNullException(nameof(accountName), nameof(accountKey));
+        }
 
         #endregion Get the StorageConnectionString value
 
@@ -71,10 +75,9 @@ public static class BlobUriAndDbUriExtension
         };
         blobSasBuilder.SetPermissions(BlobSasPermissions.Read | BlobSasPermissions.List);
 
-        if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(accountKey)) return null;
-
         // Generate the SAS token using the BlobServiceClient's key
-        var sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey)).ToString();
+        var sasToken = blobSasBuilder.ToSasQueryParameters(new StorageSharedKeyCredential(accountName, accountKey))
+            .ToString();
 
         return $"https://{accountName}.blob.core.windows.net/{blobContainerClient.Name}/{blobName}?{sasToken}";
     }

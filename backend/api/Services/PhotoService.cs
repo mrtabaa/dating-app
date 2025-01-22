@@ -130,19 +130,15 @@ public class PhotoService(
     /// </summary>
     /// <param name="photos"></param>
     /// <returns Photo="photos on success OR &apos;null&apos; on fail">'IEnumerable</returns>
-    public IEnumerable<Photo>? ConvertAllPhotosToBlobLinkWithSas(IEnumerable<Photo> photos)
+    public IEnumerable<Photo> ConvertAllPhotosToBlobLinkWithSas(IEnumerable<Photo> photos)
     {
         List<Photo> blobPhotos = [];
 
         foreach (Photo photo in photos)
         {
-            string? url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url165, configuration, _blobContainerClient);
-            string? url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url256, configuration, _blobContainerClient);
-            string? urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.UrlEnlarged, configuration, _blobContainerClient);
-
-            // Link conversion failed
-            if (string.IsNullOrEmpty(url165) || string.IsNullOrEmpty(url256) || string.IsNullOrEmpty(urlEnlarged))
-                return null;
+            string url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url165, configuration, _blobContainerClient);
+            string url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url256, configuration, _blobContainerClient);
+            string urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.UrlEnlarged, configuration, _blobContainerClient);
 
             // Create Photo on link conversion success
             blobPhotos.Add(
