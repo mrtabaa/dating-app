@@ -1,4 +1,4 @@
-namespace api.enums;
+namespace api.Enums;
 
 public enum Roles
 {

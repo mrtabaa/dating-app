@@ -18,8 +18,8 @@ public static class AppVariablesExtensions
 
     public static readonly AppRole[] Roles =
     [
-        new() { Name = enums.Roles.Admin.ToString() },
-        new() { Name = enums.Roles.Moderator.ToString() },
-        new() { Name = enums.Roles.Member.ToString() }
+        new() { Name = Enums.Roles.Admin.ToString() },
+        new() { Name = Enums.Roles.Moderator.ToString() },
+        new() { Name = Enums.Roles.Member.ToString() }
     ];
 }
