@@ -58,11 +58,12 @@ public static class Mappers
             isFollowing
         );
 
-    public static LoggedInDto ConvertAppUserToLoggedInDto(AppUser appUser, string token, string? blobPhotoUrl,
-        string? turnstileToken = null) =>
+    public static LoggedInDto ConvertAppUserToLoggedInDto(
+        AppUser appUser, string? blobPhotoUrl,
+        string? turnstileToken = null
+    ) =>
         new()
         {
-            Token = token,
             KnownAs = appUser.KnownAs,
             UserName = appUser.UserName,
             Gender = appUser.Gender,

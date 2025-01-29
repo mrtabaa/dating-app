@@ -6,5 +6,6 @@ public enum ErrorCode
     IsEmailAlreadyConfirmed,
     IsWrongCreds,
     NetIdentity,
-    IsEmailNotConfirmed
+    IsEmailNotConfirmed,
+    IsRefreshTokenExpired
 }

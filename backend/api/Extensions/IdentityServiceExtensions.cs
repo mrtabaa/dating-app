@@ -41,6 +41,10 @@ public static class IdentityServiceExtensions
         #region MongoIdentity & Role
 
         var mongoDbSettings = config.GetSection(nameof(MyMongoDbSettings)).Get<MyMongoDbSettings>();
+        string tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey)
+                            ?? throw new ArgumentNullException(
+                                nameof(AppVariablesExtensions.TokenKey), "Token cannot be null here."
+                            );
 
         if (mongoDbSettings is not null)
         {
@@ -59,13 +63,17 @@ public static class IdentityServiceExtensions
                     // Verify confirmed email. No account confirmation
                     options.SignIn.RequireConfirmedEmail = true;
                     options.SignIn.RequireConfirmedAccount = false;
-                    options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider; // shorten code to 6 digits
+                    options.Tokens.EmailConfirmationTokenProvider =
+                        TokenOptions.DefaultEmailProvider; // shorten code to 6 digits
+
+                    // Token handling
+                    options.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
 
                     // Password requirements
                     options.Password.RequireDigit = true;
-                    options.Password.RequiredLength = 8;
+                    options.Password.RequireUppercase = true;
                     options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredLength = 8;
 
                     // Lockout
                     options.Lockout.AllowedForNewUsers = true;
@@ -74,22 +82,49 @@ public static class IdentityServiceExtensions
                 }
             };
 
-            services.ConfigureMongoDbIdentity<AppUser, AppRole, ObjectId>(mongoDbIdentityConfig)
-                .AddUserManager<UserManager<AppUser>>()
-                .AddSignInManager<SignInManager<AppUser>>()
-                .AddRoleManager<RoleManager<AppRole>>()
-                .AddDefaultTokenProviders();
+            services.ConfigureMongoDbIdentity<AppUser, AppRole, ObjectId>(mongoDbIdentityConfig).
+                AddUserManager<UserManager<AppUser>>().AddSignInManager<SignInManager<AppUser>>().
+                AddRoleManager<RoleManager<AppRole>>().AddDefaultTokenProviders();
+
+            services.AddAuthentication(
+                options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+            ).AddJwtBearer(
+                options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = config["Jwt:Issuer"], // TODO: Convert them to options
+                        ValidAudience = config["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context => HandleOnMessageReceived(context) // see the private method bellow
+                    };
+                }
+            );
         }
 
         #endregion
 
         #region Policy
 
-        services.AddAuthorizationBuilder()
-            .AddPolicy(AppVariablesExtensions.RequiredAdminRole, policy =>
-                policy.RequireRole(Roles.Admin.ToString().ToUpper()))
-            .AddPolicy(AppVariablesExtensions.RequiredModeratorRole, policy =>
-                policy.RequireRole(Roles.Admin.ToString().ToUpper(), Roles.Moderator.ToString().ToUpper()));
+        services.AddAuthorizationBuilder().
+            AddPolicy(
+                AppVariablesExtensions.RequiredAdminRole, policy => policy.RequireRole(Roles.Admin.ToString().ToUpper())
+            ).AddPolicy(
+                AppVariablesExtensions.RequiredModeratorRole,
+                policy => policy.RequireRole(Roles.Admin.ToString().ToUpper(), Roles.Moderator.ToString().ToUpper())
+            );
 
         #endregion
 

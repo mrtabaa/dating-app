@@ -15,6 +15,8 @@ public class AccountRepository : IAccountRepository
     private const string EmailAlreadyConfirmedErrorMessage = "This email is already registered and verified. " +
                                                              "You can login or recover your password if the owner.";
 
+    private const string RefreshTokenExpiredErrorMessage = "Your login sesssion has expired. Login again.";
+
     #endregion
 
     #region Helpers
@@ -111,6 +113,7 @@ public class AccountRepository : IAccountRepository
 
     private readonly IMongoCollection<AppUser> _collection;
     private readonly IRecaptchaService _recaptchaService;
+    private readonly IUserRepository _userRepository;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IEmailService _emailService;
@@ -120,7 +123,7 @@ public class AccountRepository : IAccountRepository
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        IRecaptchaService recaptchaValidatorService,
+        IRecaptchaService recaptchaValidatorService, IUserRepository userRepository,
         UserManager<AppUser> userManager, ITokenService tokenService,
         IEmailService emailService, IPhotoService photoService, IHostEnvironment hostEnvironment
     )
@@ -129,6 +132,7 @@ public class AccountRepository : IAccountRepository
                                 ?? throw new ArgumentNullException(nameof(dbName), "The database name cannot be null.");
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
         _recaptchaService = recaptchaValidatorService;
+        _userRepository = userRepository;
         _userManager = userManager;
         _tokenService = tokenService;
         _emailService = emailService;
@@ -209,16 +213,10 @@ public class AccountRepository : IAccountRepository
         if (!result.Succeeded)
             return new OperationResult<LoggedInDto>(false);
 
-        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
-
-        return string.IsNullOrEmpty(token)
-            ? new OperationResult<LoggedInDto>(false)
-            : new OperationResult<LoggedInDto>(
-                true,
-                Mappers.ConvertAppUserToLoggedInDto(
-                    appUser, token, GetMainPhoto(appUser)
-                )
-            );
+        return new OperationResult<LoggedInDto>(
+            true,
+            Mappers.ConvertAppUserToLoggedInDto(appUser, GetMainPhoto(appUser))
+        );
     }
 
     public async Task<OperationResult> ResendVerifyCodeAsync(
@@ -255,11 +253,13 @@ public class AccountRepository : IAccountRepository
         ); // Success depends on the email sent success
     }
 
-    public async Task<OperationResult<LoggedInDto>> LoginAsync(LoginDto userInput, CancellationToken cancellationToken)
+    public async Task<OperationResult<LoginResult>> LoginAsync(
+        LoginDto userInput, CancellationToken cancellationToken
+    )
     {
         if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
         {
-            return new OperationResult<LoggedInDto>(
+            return new OperationResult<LoginResult>(
                 false,
                 Error: new CustomError(
                     ErrorCode.IsRecaptchaTokenInvalid,
@@ -278,7 +278,7 @@ public class AccountRepository : IAccountRepository
 
         if (appUser is null)
         {
-            return new OperationResult<LoggedInDto>(
+            return new OperationResult<LoginResult>(
                 false,
                 Error: new CustomError(
                     ErrorCode.IsWrongCreds,
@@ -289,7 +289,7 @@ public class AccountRepository : IAccountRepository
 
         if (!await _userManager.CheckPasswordAsync(appUser, userInput.Password))
         {
-            return new OperationResult<LoggedInDto>(
+            return new OperationResult<LoginResult>(
                 false,
                 Error: new CustomError(
                     ErrorCode.IsWrongCreds,
@@ -303,25 +303,56 @@ public class AccountRepository : IAccountRepository
             if (!await SendVerificationCode(appUser, cancellationToken))
                 throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
 
-            return new OperationResult<LoggedInDto>(
+            return new OperationResult<LoginResult>(
                 false,
-                new LoggedInDto(Email: appUser.Email?.ToLower(), IsEmailNotConfirmed: true),
+                new LoginResult(
+                    new LoggedInDto(Email: appUser.Email?.ToLower(), IsEmailNotConfirmed: true)
+                ),
                 new CustomError(
                     ErrorCode.IsEmailNotConfirmed
                 )
             );
         }
 
-        string? token = await _tokenService.CreateToken(appUser, cancellationToken);
+        var tokenDto = new TokenDto(
+            await _tokenService.GenerateAccessTokenAsync(appUser, cancellationToken),
+            await _tokenService.GenerateRefreshTokenAsync(appUser)
+        );
 
-        return string.IsNullOrEmpty(token)
-            ? new OperationResult<LoggedInDto>(false)
-            : new OperationResult<LoggedInDto>(
-                true,
-                Mappers.ConvertAppUserToLoggedInDto(
-                    appUser, token, GetMainPhoto(appUser)
+        return new OperationResult<LoginResult>(
+            true,
+            new LoginResult(
+                Mappers.ConvertAppUserToLoggedInDto(appUser, GetMainPhoto(appUser)),
+                tokenDto
+            )
+        );
+    }
+
+    public async Task<OperationResult<TokenDto>> RefreshTokensAsync(
+        string refreshToken, CancellationToken cancellationToken
+    )
+    {
+        OperationResult<AppUser> result = await _userRepository.GetByRefreshTokenAsync(refreshToken, cancellationToken);
+
+        if (!result.IsSuccess || result.Result.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        {
+            return new OperationResult<TokenDto>(
+                false,
+                Error: new CustomError(
+                    ErrorCode.IsRefreshTokenExpired,
+                    RefreshTokenExpiredErrorMessage
                 )
             );
+        }
+
+        var tokenDto = new TokenDto(
+            await _tokenService.GenerateAccessTokenAsync(result.Result, cancellationToken),
+            await _tokenService.GenerateRefreshTokenAsync(result.Result)
+        );
+
+        return result.IsSuccess
+            ? new OperationResult<TokenDto>(true, tokenDto)
+            : new OperationResult<TokenDto>(false);
     }
 
     public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(

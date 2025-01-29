@@ -25,6 +25,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             };
     }
 
+    // TODO: Check if it works with Cookie token
     [AllowAnonymous]
     [HttpPost("verify")]
     public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
@@ -62,10 +63,13 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userIn, CancellationToken cancellationToken)
     {
-        OperationResult<LoggedInDto> result = await accountRepository.LoginAsync(userIn, cancellationToken);
+        OperationResult<LoginResult> result = await accountRepository.LoginAsync(userIn, cancellationToken);
+
+        if (result.IsSuccess)
+            AddTokensToResponseCookies(result.Result.TokenDto);
 
         return result.IsSuccess
-            ? result.Result
+            ? result.Result.LoggedInDto
             : result.Error?.Code switch
             {
                 ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
@@ -75,6 +79,28 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             };
     }
 
+    [HttpPost("refresh-tokens/{refreshToken}")]
+    public async Task<ActionResult<bool>> RefreshTokens(string refreshToken, CancellationToken cancellationToken)
+    {
+        if(string.IsNullOrEmpty(refreshToken))   
+            Unauthorized("You are logged out. Login again.");
+
+        OperationResult<TokenDto> result = await accountRepository.RefreshTokensAsync(refreshToken, cancellationToken);
+
+        if (!result.IsSuccess)
+        {
+            return result.Error?.Code switch
+            {
+                ErrorCode.IsRefreshTokenExpired => Unauthorized(result.Error.Message),
+                _ => BadRequest("Failed to refresh token. Try again or contact the support.")
+            };
+        }
+
+        AddTokensToResponseCookies(result.Result);
+        return true;
+    }
+
+    // TODO: Check if it works with Cookie token
     [HttpGet]
     public async Task<ActionResult<LoggedInDto>> ReloadLoggedInUser(CancellationToken cancellationToken)
     {
@@ -139,5 +165,31 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         return result is { IsSuccess: true, Result.DeletedCount: > 0 }
             ? result.Result
             : BadRequest("Delete user failed!");
+    }
+
+    private void AddTokensToResponseCookies(TokenDto tokenDto)
+    {
+        Response.Cookies.Append(
+            "access-token", tokenDto.AccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                // TODO: Create an obsidian document for token management
+                // Use 'SameSiteMode.lax' if using OAuth, payments sites, etc.
+                // Also implement CSRF Tokens to prevent CSRF attacks
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            }
+        );
+
+        Response.Cookies.Append(
+            "refresh-token", tokenDto.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            }
+        );
     }
 }

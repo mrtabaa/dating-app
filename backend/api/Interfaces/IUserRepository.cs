@@ -4,6 +4,11 @@ public interface IUserRepository
 {
     public Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken);
     public Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken);
+
+    public Task<OperationResult<AppUser>> GetByRefreshTokenAsync(
+        string refreshToken, CancellationToken cancellationToken
+    );
+
     public Task<OperationResult<ObjectId>> GetIdByUserNameAsync(string userName, CancellationToken cancellationToken);
     public Task<string?> GetUserNameByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken);
     public Task<string?> GetKnownAsByUserNameAsync(string userName, CancellationToken cancellationToken);
