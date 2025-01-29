@@ -305,8 +305,8 @@ public class AccountRepository : IAccountRepository
 
             return new OperationResult<LoggedInDto>(
                 false,
-                Result: new LoggedInDto(Email: appUser.Email?.ToLower(), IsEmailNotConfirmed: true),
-                Error: new CustomError(
+                new LoggedInDto(Email: appUser.Email?.ToLower(), IsEmailNotConfirmed: true),
+                new CustomError(
                     ErrorCode.IsEmailNotConfirmed
                 )
             );
@@ -333,8 +333,8 @@ public class AccountRepository : IAccountRepository
         if (userId is null)
             return new OperationResult<LoggedInDto>(false);
 
-        AppUser appUser =
-            await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).
+            FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
             ? new OperationResult<LoggedInDto>(false)
@@ -390,12 +390,16 @@ public class AccountRepository : IAccountRepository
         if (appUser is null)
             return new OperationResult(false);
 
-        IdentityResult passwordResetResult = await _userManager
-            .ResetPasswordAsync(appUser, resetPassword.ResetToken, resetPassword.Password);
+        IdentityResult passwordResetResult = await _userManager.ResetPasswordAsync(
+            appUser, resetPassword.ResetToken, resetPassword.Password
+        );
 
-        if (passwordResetResult.Succeeded)
+        if (!passwordResetResult.Succeeded) return new OperationResult(false);
+        if (!await _emailService.SendResetPasswordConfirmation(appUser))
         {
-            // TODO: Email the password change warning/confirmation.
+            throw new ArgumentException(
+                "Failed to send reset password confirmation. Check if email provider is working.", nameof(appUser.Email)
+            );
         }
 
         return new OperationResult(passwordResetResult.Succeeded);
@@ -418,8 +422,9 @@ public class AccountRepository : IAccountRepository
         if (userId is null)
             return new OperationResult<UpdateResult>(false);
 
-        UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update
-            .Set(appUser => appUser.LastActive, DateTime.UtcNow);
+        UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update.Set(
+            appUser => appUser.LastActive, DateTime.UtcNow
+        );
 
         return new OperationResult<UpdateResult>(
             true,
