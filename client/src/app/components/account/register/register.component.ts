@@ -47,7 +47,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   //#region Forms Group/controler
   registerFg = this.fb.group({
-    emailCtrl: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^([\w.-]+)@([\w-]+)((\.(\w){2,5})+)$/)]],
+    emailCtrl: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/^\s*([\w.-]+)@([\w-]+)((\.(\w){2,5})+)\s*$/)]],
     usernameCtrl: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
     passwordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]],
     confirmPasswordCtrl: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]],
