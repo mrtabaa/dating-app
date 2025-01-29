@@ -13,5 +13,5 @@ public record OperationResult(
 
 public record CustomError(
     Enum Code,
-    string? Message
+    [Optional] string? Message
 );

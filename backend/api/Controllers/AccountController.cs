@@ -1,5 +1,3 @@
-using api.DTOs.Account;
-using api.DTOs.Helpers;
 using Microsoft.Extensions.Primitives;
 
 namespace api.Controllers;
@@ -44,7 +42,9 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
 
     [AllowAnonymous]
     [HttpPost("resend-verify-code")]
-    public async Task<ActionResult<bool>> ResendVerifyCode(ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken)
+    public async Task<ActionResult<bool>> ResendVerifyCode(
+        ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken
+    )
     {
         OperationResult result = await accountRepository.ResendVerifyCodeAsync(resendCodeRequest, cancellationToken);
 
@@ -70,7 +70,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             {
                 ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
                 ErrorCode.IsWrongCreds => Unauthorized(result.Error.Message),
-                ErrorCode.IsEmailNotConfirmed => BadRequest(result.Error.Message),
+                ErrorCode.IsEmailNotConfirmed => Accepted(result.Result),
                 _ => Unauthorized("Login has failed. Try again or contact the support.")
             };
     }
@@ -91,7 +91,9 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         if (string.IsNullOrEmpty(userIdHashed))
             return Unauthorized("No user was found with this user Id.");
 
-        OperationResult<LoggedInDto> result = await accountRepository.ReloadLoggedInUserAsync(userIdHashed, token, cancellationToken);
+        OperationResult<LoggedInDto> result = await accountRepository.ReloadLoggedInUserAsync(
+            userIdHashed, token, cancellationToken
+        );
 
         return result.IsSuccess
             ? result.Result
@@ -100,7 +102,9 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
 
     [AllowAnonymous]
     [HttpPost("request-reset-password")]
-    public async Task<ActionResult<Response>> RequestResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<Response>> RequestResetPassword(
+        ResetPasswordRequest request, CancellationToken cancellationToken
+    )
     {
         OperationResult result = await accountRepository.RequestResetPasswordAsync(request, cancellationToken);
 
@@ -113,7 +117,9 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
 
     [AllowAnonymous]
     [HttpPost("reset-password")]
-    public async Task<ActionResult<Response>> ResetPassword(ResetPassword resetPassword, CancellationToken cancellationToken)
+    public async Task<ActionResult<Response>> ResetPassword(
+        ResetPassword resetPassword, CancellationToken cancellationToken
+    )
     {
         if (resetPassword.Password != resetPassword.ConfirmPassword) return BadRequest("Password entries don't match!");
 
@@ -127,7 +133,11 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpDelete("delete-account")]
     public async Task<ActionResult<DeleteResult>> DeleteUser(CancellationToken cancellationToken)
     {
-        OperationResult<DeleteResult> result = await accountRepository.DeleteUserAsync(User.GetUserIdHashed(), cancellationToken);
-        return result is { IsSuccess: true, Result.DeletedCount: > 0 } ? result.Result : BadRequest("Delete user failed!");
+        OperationResult<DeleteResult> result = await accountRepository.DeleteUserAsync(
+            User.GetUserIdHashed(), cancellationToken
+        );
+        return result is { IsSuccess: true, Result.DeletedCount: > 0 }
+            ? result.Result
+            : BadRequest("Delete user failed!");
     }
 }

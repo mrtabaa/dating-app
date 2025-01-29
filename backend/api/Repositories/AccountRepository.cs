@@ -11,7 +11,6 @@ public class AccountRepository : IAccountRepository
 
     private const string RecaptchaErrorMessage = "Recaptcha token is invalid. 'Slide me!' again.";
     private const string WrongCredsErrorMessage = "Wrong username or password.";
-    private const string EmailNotConfirmedErrorMessage = "Please confirm your email using the code sent to your email.";
 
     private const string EmailAlreadyConfirmedErrorMessage = "This email is already registered and verified. " +
                                                              "You can login or recover your password if the owner.";
@@ -306,9 +305,9 @@ public class AccountRepository : IAccountRepository
 
             return new OperationResult<LoggedInDto>(
                 false,
+                Result: new LoggedInDto(Email: appUser.Email?.ToLower(), IsEmailNotConfirmed: true),
                 Error: new CustomError(
-                    ErrorCode.IsEmailNotConfirmed,
-                    EmailNotConfirmedErrorMessage
+                    ErrorCode.IsEmailNotConfirmed
                 )
             );
         }
