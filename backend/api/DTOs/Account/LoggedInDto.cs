@@ -3,7 +3,7 @@ namespace api.DTOs.Account;
 public record LoggedInDto(
     [Optional] bool IsRecaptchaTokenInvalid,
     [Optional] string? RecaptchaToken,
-    [Optional] string? Email, // Used only to verify account. Will always return null if account is verified.
+    [Optional] string? Email, // Used only to verify the account. Will always return null if the account is verified.
     [Optional] string? Token,
     [Optional] string? KnownAs,
     [Optional] string? UserName,

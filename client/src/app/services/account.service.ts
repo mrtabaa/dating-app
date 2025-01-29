@@ -33,9 +33,9 @@ export class AccountService {
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
       .pipe(
-        map((isRegistered: boolean) => {
-          if (isRegistered) {
-            localStorage.setItem('email', userInput.email);
+        map((isRegisterSuccess: boolean) => {
+          if (isRegisterSuccess) {
+            sessionStorage.setItem('email', userInput.email);
             this._isVerifyingAccount.set(true);
           }
         })
