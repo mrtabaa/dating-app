@@ -48,7 +48,7 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             this.setCurrentUser(user);
-            localStorage.removeItem('email');
+            sessionStorage.removeItem('email');
             this._router.navigate(['/main']);
             this._isVerifyingAccount.set(false);
             this._snackBar.open("You are logged in as: " + user?.userName, "Close", {
@@ -78,7 +78,7 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             if (user.isEmailNotConfirmed) {
-              localStorage.setItem('email', user.email);
+              sessionStorage.setItem('email', user.email);
               this._isVerifyingAccount.set(true);
             } else {
               this._isVerifyingAccount.set(false);

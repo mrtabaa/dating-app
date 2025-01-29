@@ -64,7 +64,7 @@ export class VerifyComponent implements OnDestroy {
   }
 
   setEmail() {
-    const email = localStorage.getItem('email');
+    const email = sessionStorage.getItem('email');
 
     if (email)
       this.email = email;
