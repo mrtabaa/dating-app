@@ -3,7 +3,6 @@ using api.Validations;
 namespace api.Controllers;
 
 [Authorize]
-// [Produces("application/json")]
 public class UserController(IUserRepository userRepository, ITokenService tokenService) : BaseApiController
 {
     #region User Management
@@ -11,7 +10,6 @@ public class UserController(IUserRepository userRepository, ITokenService tokenS
     [HttpPut]
     public async Task<ActionResult> UpdateUser(UserUpdateDto userUpdateDto, CancellationToken cancellationToken)
     {
-        // TODO: Replace all with OperationResult
         ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
