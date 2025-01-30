@@ -46,27 +46,28 @@ public static class ApplicationServiceExtensions
 
         #region CORS
 
-        services.AddCors(options =>
-        {
-            if (env.IsDevelopment())
+        services.AddCors(
+            options =>
             {
-                options.AddDefaultPolicy(policy => policy
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                    .WithOrigins("http://localhost:4300")
-                );
+                if (env.IsDevelopment())
+                {
+                    options.AddDefaultPolicy(
+                        policy => policy.WithOrigins("http://localhost:4300").AllowAnyHeader().AllowAnyMethod().
+                            AllowCredentials()
+                    );
+                }
+                else
+                {
+                    options.AddDefaultPolicy(
+                        policy => policy.WithOrigins(
+                            "https://da-client-mr.azurewebsites.net",
+                            "https://hallboard.com",
+                            "https://www.hallboard.com"
+                        ).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+                    );
+                }
             }
-            else if (env.IsProduction())
-            {
-                options.AddDefaultPolicy(policy => policy
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials()
-                        .WithOrigins("http://localhost:4300", "https://da-client-mr.azurewebsites.net", "https://hallboard.com", "https://www.hallboard.com") // Nginx, Azure
-                );
-            }
-        });
+        );
 
         #endregion CORS
 
