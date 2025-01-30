@@ -9,6 +9,9 @@ public static class IdentityServiceExtensions
     {
         #region Token
 
+        JwtSettings jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
+                                  ?? throw new ArgumentNullException(nameof(JwtSettings));
+
         services.AddAuthentication(
             options =>
             {
@@ -23,11 +26,11 @@ public static class IdentityServiceExtensions
                     RoleClaimType = ClaimTypes.Role, // Ensure it matches how roles are stored in the token
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidIssuer = config["Jwt:Issuer"], // TODO: Convert them to options
-                    ValidAudience = config["Jwt:Audience"]
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience
                 };
 
                 options.Events = new JwtBearerEvents
@@ -46,10 +49,6 @@ public static class IdentityServiceExtensions
         #region MongoIdentity & Role
 
         var mongoDbSettings = config.GetSection(nameof(MyMongoDbSettings)).Get<MyMongoDbSettings>();
-        string tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey)
-                            ?? throw new ArgumentNullException(
-                                nameof(AppVariablesExtensions.TokenKey), "Token cannot be null here."
-                            );
 
         if (mongoDbSettings is not null)
         {

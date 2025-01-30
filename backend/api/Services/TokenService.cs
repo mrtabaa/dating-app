@@ -3,9 +3,7 @@ namespace api.Services;
 public class TokenService : ITokenService
 {
     private readonly IMongoCollection<AppUser> _collection;
-
-    // private readonly SymmetricSecurityKey? _key; // set it as nullable by ? mark
-    private readonly IConfiguration _config;
+    private readonly JwtSettings _jwtSettings;
     private readonly UserManager<AppUser> _userManager;
 
     public TokenService(
@@ -14,13 +12,12 @@ public class TokenService : ITokenService
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ??
                                 throw new ArgumentNullException(nameof(dbName));
+
         _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
 
-        string tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey)
-                            ?? throw new ArgumentNullException(nameof(tokenValue), "tokenValue cannot be null");
-        ;
+        _jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
+                       ?? throw new ArgumentNullException(nameof(JwtSettings));
 
-        _config = config;
         _userManager = userManager;
     }
 
@@ -49,15 +46,12 @@ public class TokenService : ITokenService
         IList<string> roles = await _userManager.GetRolesAsync(appUser);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
 
-        string jwtKey = _config["Jwt:Key"]
-                        ?? throw new ArgumentNullException(null, "Jwt:Key");
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
         var token = new JwtSecurityToken(
-            _config["Jwt:Issuer"],
-            _config["Jwt:Audience"],
+            _jwtSettings.Issuer,
+            _jwtSettings.Audience,
             claims,
             expires: DateTime.UtcNow.AddMinutes(15), // Short lifespan
             signingCredentials: creds
