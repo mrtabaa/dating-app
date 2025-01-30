@@ -1,6 +1,5 @@
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
-using Microsoft.Extensions.Primitives;
 
 namespace api.Extensions;
 
@@ -10,31 +9,37 @@ public static class IdentityServiceExtensions
     {
         #region Token
 
-        var tokenValue = config.GetValue<string>(AppVariablesExtensions.TokenKey);
-
-        if (tokenValue is not null)
-        {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+        services.AddAuthentication(
+            options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }
+        ).AddJwtBearer(
+            options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        RoleClaimType = ClaimTypes.Role, // Ensure it matches how roles are stored in the token
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenValue)),
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateLifetime = true
-                        // ValidIssuer = "https://localhost:5101", // TODO: Apply these
-                        // ValidAudience = "https://localhost:5101",
-                    };
+                    RoleClaimType = ClaimTypes.Role, // Ensure it matches how roles are stored in the token
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = config["Jwt:Issuer"], // TODO: Convert them to options
+                    ValidAudience = config["Jwt:Audience"]
+                };
 
-                    options.Events = new JwtBearerEvents
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
                     {
-                        OnMessageReceived = context => HandleOnMessageReceived(context) // see the private method bellow
-                    };
-                });
-        }
+                        context.Token = context.Request.Cookies["access-token"];
+                        return Task.CompletedTask;
+                    }
+                };
+            }
+        );
 
         #endregion
 
@@ -85,33 +90,6 @@ public static class IdentityServiceExtensions
             services.ConfigureMongoDbIdentity<AppUser, AppRole, ObjectId>(mongoDbIdentityConfig).
                 AddUserManager<UserManager<AppUser>>().AddSignInManager<SignInManager<AppUser>>().
                 AddRoleManager<RoleManager<AppRole>>().AddDefaultTokenProviders();
-
-            services.AddAuthentication(
-                options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                }
-            ).AddJwtBearer(
-                options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = config["Jwt:Issuer"], // TODO: Convert them to options
-                        ValidAudience = config["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
-                    };
-
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context => HandleOnMessageReceived(context) // see the private method bellow
-                    };
-                }
-            );
         }
 
         #endregion
@@ -129,26 +107,5 @@ public static class IdentityServiceExtensions
         #endregion
 
         return services;
-    }
-
-    /// <summary>
-    ///     Enable/Customize the JwtBearer authentication middleware to extract the JWT token from the query string for
-    ///     requests made to SignalR hubs. This is particularly useful in scenarios where the token cannot be sent in the
-    ///     Authorization header (which is the standard way of sending tokens) due to WebSocket or other constraints.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    private static Task HandleOnMessageReceived(MessageReceivedContext context)
-    {
-        const string accessTokenQueryParameter = "access_token";
-        const string hubsPathSegment = "/hubs";
-
-        StringValues accessToken = context.Request.Query[accessTokenQueryParameter];
-        PathString path = context.HttpContext.Request.Path;
-
-        if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments(hubsPathSegment))
-            context.Token = accessToken;
-
-        return Task.CompletedTask;
     }
 }

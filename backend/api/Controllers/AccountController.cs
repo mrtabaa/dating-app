@@ -82,7 +82,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     [HttpPost("refresh-tokens/{refreshToken}")]
     public async Task<ActionResult<bool>> RefreshTokens(string refreshToken, CancellationToken cancellationToken)
     {
-        if(string.IsNullOrEmpty(refreshToken))   
+        if (string.IsNullOrEmpty(refreshToken))
             Unauthorized("You are logged out. Login again.");
 
         OperationResult<TokenDto> result = await accountRepository.RefreshTokensAsync(refreshToken, cancellationToken);
@@ -173,12 +173,13 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             "access-token", tokenDto.AccessToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
+                Secure = true,
                 // TODO: Create an obsidian document for token management
                 // Use 'SameSiteMode.lax' if using OAuth, payments sites, etc.
                 // Also implement CSRF Tokens to prevent CSRF attacks
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(15)
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                Path = "/"
             }
         );
 
@@ -186,9 +187,10 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             "refresh-token", tokenDto.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
+                Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(7),
+                Path = "/api/account/refresh-tokens"
             }
         );
     }
