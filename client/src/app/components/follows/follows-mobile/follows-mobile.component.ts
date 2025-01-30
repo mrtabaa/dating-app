@@ -86,10 +86,10 @@ export class FollowsMobileComponent implements OnInit, OnDestroy {
   onTabChange(event: MatTabChangeEvent) { // called on tab change
     if (event.tab.textLabel === "Following") {
       if (this.followParams)
-        this.followParams.predicate = FollowPredicate.followings;
+        this.followParams.predicate = FollowPredicate.FOLLOWINGS;
     } else {
       if (this.followParams)
-        this.followParams.predicate = FollowPredicate.followers;
+        this.followParams.predicate = FollowPredicate.FOLLOWERS;
     }
 
     this.getFollows()
