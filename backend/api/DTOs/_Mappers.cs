@@ -4,7 +4,8 @@ public static class Mappers
 {
     #region Generator Methods
 
-    public static AppUser ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) => //, int likedCount, int likedByCount
+    public static AppUser
+        ConvertDummyRegisterDtoToAppUser(DummyRegisterDto userInput) => //, int likedCount, int likedByCount
         new()
         {
             Schema = AppVariablesExtensions.AppVersions.Last(),
@@ -100,8 +101,10 @@ public static class Mappers
             ReceiverDeleted: false
         );
 
-    public static MessageDto ConvertMessageToMessageDto(Message message, AppUser userOrTarget,
-        string? profilePhotoSasUrl) =>
+    public static MessageDto ConvertMessageToMessageDto(
+        Message message, AppUser userOrTarget,
+        string? profilePhotoSasUrl
+    ) =>
         new()
         {
             Id = message.Id.ToString(), // To delete/update
@@ -116,7 +119,9 @@ public static class Mappers
     public static OnlineUsersDto ConvertAppUserToOnlineStatusDto(AppUser appUser) =>
         new(
             appUser.NormalizedUserName
-            ?? throw new ArgumentNullException(nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null but it is."),
+            ?? throw new ArgumentNullException(
+                nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null but it is."
+            ),
             appUser.LastActive
         );
 

@@ -13,16 +13,20 @@ public static class ApplicationServiceExtensions
         services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
 
         // get values
-        services.AddSingleton<IMyMongoDbSettings>(serviceProvider =>
-            serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value);
+        services.AddSingleton<IMyMongoDbSettings>(
+            serviceProvider => serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value
+        );
 
         // get connectionString to the db
-        services.AddSingleton<IMongoClient>(serviceProvider =>
-        {
-            MyMongoDbSettings uri = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().Value;
+        services.AddSingleton<IMongoClient>(
+            serviceProvider =>
+            {
+                MyMongoDbSettings myMongoDbSettings = serviceProvider.GetRequiredService<IOptions<MyMongoDbSettings>>().
+                    Value;
 
-            return new MongoClient(uri.ConnectionString);
-        });
+                return new MongoClient(myMongoDbSettings.ConnectionString);
+            }
+        );
 
         #endregion MongoDbSettings
 
@@ -35,7 +39,7 @@ public static class ApplicationServiceExtensions
             var blobServiceClient = new BlobServiceClient(storageConnectionString);
 
             // Add the BlobServiceClient to the services collection
-            services.AddSingleton<BlobServiceClient>(blobServiceClient);
+            services.AddSingleton(blobServiceClient);
         }
 
         #endregion Azure storage
