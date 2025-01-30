@@ -314,16 +314,11 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        var tokenDto = new TokenDto(
-            await _tokenService.GenerateAccessTokenAsync(appUser, cancellationToken),
-            await _tokenService.GenerateRefreshTokenAsync(appUser)
-        );
-
         return new OperationResult<LoginResult>(
             true,
             new LoginResult(
                 Mappers.ConvertAppUserToLoggedInDto(appUser, GetMainPhoto(appUser)),
-                tokenDto
+                await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
             )
         );
     }
@@ -345,13 +340,11 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        var tokenDto = new TokenDto(
-            await _tokenService.GenerateAccessTokenAsync(result.Result, cancellationToken),
-            await _tokenService.GenerateRefreshTokenAsync(result.Result)
-        );
-
         return result.IsSuccess
-            ? new OperationResult<TokenDto>(true, tokenDto)
+            ? new OperationResult<TokenDto>(
+                true,
+                await _tokenService.GenerateTokensAsync(result.Result, cancellationToken)
+            )
             : new OperationResult<TokenDto>(false);
     }
 

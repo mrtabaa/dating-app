@@ -21,11 +21,11 @@ public class TokenService : ITokenService
         _userManager = userManager;
     }
 
-    public async Task<string> GenerateAccessTokenAsync(AppUser appUser, CancellationToken cancellationToken)
+    public async Task<TokenDto> GenerateTokensAsync(AppUser appUser, CancellationToken cancellationToken)
     {
         var jtiValue = Guid.CreateVersion7().ToString();
 
-        string? identifierHash = await InsertHashedUserId(
+        string identifierHash = await InsertHashedUserId(
             appUser.Id, jtiValue, cancellationToken
         ); // this securedId is stored in users collection to associate with the AppUser.
 
@@ -36,6 +36,31 @@ public class TokenService : ITokenService
             );
         }
 
+        return new TokenDto(
+            await GenerateAccessTokenAsync(appUser, identifierHash, jtiValue),
+            await GenerateRefreshTokenAsync(appUser.Id, cancellationToken)
+        );
+    }
+
+    /// <summary>
+    ///     Gets a userIdHashed of the AppUser and returns the user's actual ObjectId from DB.
+    ///     It returns null if ObjectId or userIdHashed is invalid, Empty or null.
+    /// </summary>
+    /// <param name="userIdHashed"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Decrypted AppUser ObjectId OR null</returns>
+    public async Task<ObjectId?> GetActualUserIdAsync(string? userIdHashed, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(userIdHashed)) return null;
+
+        ObjectId? userId = await _collection.AsQueryable().Where(appUser => appUser.IdentifierHash == userIdHashed).
+            Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
+
+        return ValidationsExtension.ValidateObjectId(userId).IsSuccess ? userId : null;
+    }
+
+    private async Task<string> GenerateAccessTokenAsync(AppUser appUser, string identifierHash, string jtiValue)
+    {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, identifierHash),
@@ -60,37 +85,27 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<string> GenerateRefreshTokenAsync(AppUser appUser)
+    private async Task<string> GenerateRefreshTokenAsync(ObjectId userId, CancellationToken cancellationToken)
     {
-        appUser.RefreshToken = Guid.CreateVersion7().ToString();
-        appUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Long lifespan
+        var refreshToken = Guid.CreateVersion7().ToString();
+        DateTime refreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Long lifespan
 
-        IdentityResult result = await _userManager.UpdateAsync(appUser);
+        UpdateDefinition<AppUser> updateDef = Builders<AppUser>.Update.
+            Set(appUser => appUser.RefreshToken, refreshToken).Set(
+                appUser => appUser.RefreshTokenExpiryTime, refreshTokenExpiryTime
+            );
 
-        if (!result.Succeeded)
+        UpdateResult? updateResult = await _collection.UpdateOneAsync(
+            appUser => appUser.Id == userId, updateDef, null, cancellationToken
+        );
+
+        if (updateResult.ModifiedCount < 1)
             throw new ArgumentException("Failed to generate refresh token.");
 
-        return appUser.RefreshToken;
+        return refreshToken;
     }
 
-    /// <summary>
-    ///     Gets a userIdHashed of the AppUser and returns the user's actual ObjectId from DB.
-    ///     It returns null if ObjectId or userIdHashed is invalid, Empty or null.
-    /// </summary>
-    /// <param name="userIdHashed"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Decrypted AppUser ObjectId OR null</returns>
-    public async Task<ObjectId?> GetActualUserIdAsync(string? userIdHashed, CancellationToken cancellationToken)
-    {
-        if (string.IsNullOrEmpty(userIdHashed)) return null;
-
-        ObjectId? userId = await _collection.AsQueryable().Where(appUser => appUser.IdentifierHash == userIdHashed).
-            Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
-
-        return ValidationsExtension.ValidateObjectId(userId).IsSuccess ? userId : null;
-    }
-
-    private async Task<string?> InsertHashedUserId(
+    private async Task<string> InsertHashedUserId(
         ObjectId userId, string jtiValue, CancellationToken cancellationToken
     )
     {
@@ -105,9 +120,8 @@ public class TokenService : ITokenService
             appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken
         );
 
-        if (updateResult.ModifiedCount == 1)
-            return identifierHash;
-
-        return null;
+        return updateResult.ModifiedCount == 1
+            ? identifierHash
+            : throw new ApplicationException("Update IdentifierHash to DB failed.");
     }
 }
