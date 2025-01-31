@@ -23,21 +23,19 @@ public class TokenService : ITokenService
 
     public async Task<TokenDto> GenerateTokensAsync(AppUser appUser, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(appUser.NormalizedUserName))
+            throw new ArgumentNullException(
+                nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null."
+            );
+        
         var jtiValue = Guid.CreateVersion7().ToString();
 
         string identifierHash = await InsertHashedUserId(
             appUser.Id, jtiValue, cancellationToken
         ); // this securedId is stored in users collection to associate with the AppUser.
 
-        if (string.IsNullOrEmpty(identifierHash) || string.IsNullOrEmpty(appUser.NormalizedUserName))
-        {
-            throw new ArgumentNullException(
-                nameof(identifierHash), "identifierHash or normalizedUserName cannot be null."
-            );
-        }
-
         return new TokenDto(
-            await GenerateAccessTokenAsync(appUser, identifierHash, jtiValue),
+            GenerateAccessTokenAsync(identifierHash, jtiValue),
             await GenerateRefreshTokenAsync(appUser.Id, cancellationToken)
         );
     }
@@ -59,7 +57,7 @@ public class TokenService : ITokenService
         return ValidationsExtension.ValidateObjectId(userId).IsSuccess ? userId : null;
     }
 
-    private async Task<string> GenerateAccessTokenAsync(AppUser appUser, string identifierHash, string jtiValue)
+    private string GenerateAccessTokenAsync(string identifierHash, string jtiValue)
     {
         var claims = new List<Claim>
         {
