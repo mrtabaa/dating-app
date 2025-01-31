@@ -13,4 +13,21 @@ public static class DateTimeExtensions
 
         return age;
     }
+
+    public static DateTime? GetTokenExpirationDate(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+
+        if (!handler.CanReadToken(token))
+            return null;
+
+        JwtSecurityToken? jwtToken = handler.ReadJwtToken(token);
+        Claim? expClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "exp");
+
+        if (expClaim == null) return null;
+
+        // Convert the expiration from Unix epoch to DateTime
+        long expSeconds = long.Parse(expClaim.Value);
+        return DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+    }
 }

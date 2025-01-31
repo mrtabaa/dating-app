@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Primitives;
-
 namespace api.Controllers;
 
 [Authorize]
@@ -178,18 +176,18 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
                 // Use 'SameSiteMode.lax' if using OAuth, payments sites, etc.
                 // Also implement CSRF Tokens to prevent CSRF attacks
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.AccessToken), // e.g. 15 min
                 Path = "/"
             }
         );
 
         Response.Cookies.Append(
-            "refresh-token", tokenDto.RefreshToken, new CookieOptions
+            "refresh-token", tokenDto.RefreshTokenDto.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = tokenDto.RefreshTokenDto.ExpiresAt, // e.g. 7 days
                 Path = "/api/account/refresh-tokens"
             }
         );

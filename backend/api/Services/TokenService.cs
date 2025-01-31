@@ -67,10 +67,6 @@ public class TokenService : ITokenService
             new(JwtRegisteredClaimNames.Jti, jtiValue)
         };
 
-        // Get user's roles and add them all into claims
-        IList<string> roles = await _userManager.GetRolesAsync(appUser);
-        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
-
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -85,7 +81,7 @@ public class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private async Task<string> GenerateRefreshTokenAsync(ObjectId userId, CancellationToken cancellationToken)
+    private async Task<RefreshTokenDto> GenerateRefreshTokenAsync(ObjectId userId, CancellationToken cancellationToken)
     {
         var refreshToken = Guid.CreateVersion7().ToString();
         DateTime refreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Long lifespan
@@ -102,7 +98,7 @@ public class TokenService : ITokenService
         if (updateResult.ModifiedCount < 1)
             throw new ArgumentException("Failed to generate refresh token.");
 
-        return refreshToken;
+        return new RefreshTokenDto(refreshToken, refreshTokenExpiryTime);
     }
 
     private async Task<string> InsertHashedUserId(
