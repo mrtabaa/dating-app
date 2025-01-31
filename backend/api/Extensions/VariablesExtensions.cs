@@ -2,7 +2,6 @@ namespace api.Extensions;
 
 public static class AppVariablesExtensions
 {
-    public const string TokenKey = "TokenKey";
     public const string RecaptchaSecretKey = "RecaptchaSecretKey";
 
     public const string CollectionUsers = "users";
@@ -13,7 +12,6 @@ public static class AppVariablesExtensions
 
     public const string RequiredAdminRole = "RequiredAdminRole";
     public const string RequiredModeratorRole = "RequiredModeratorRole";
-
     public static readonly string[] AppVersions = ["1", "1.0.2"];
 
     public static readonly AppRole[] AppRoles =

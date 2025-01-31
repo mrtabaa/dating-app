@@ -48,15 +48,11 @@ export class AccountService {
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
-            this.setCurrentUser(user);
             sessionStorage.removeItem('email');
-            this._router.navigate(['/main']);
             this._isVerifyingAccount.set(false);
-            this._snackBar.open("You are logged in as: " + user?.userName, "Close", {
-              verticalPosition: 'bottom',
-              horizontalPosition: 'center',
-              duration: 7000
-            })
+            this.setCurrentUser(user);
+            this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
+            this.showLoginSuccessMessage(user);
           }
         })
       );
@@ -83,13 +79,9 @@ export class AccountService {
               this._isVerifyingAccount.set(true);
             } else {
               this._isVerifyingAccount.set(false);
-              this._snackBar.open('You logged in as: ' + user?.userName, 'Close', {
-                verticalPosition: 'bottom',
-                horizontalPosition: 'center',
-                duration: 7000
-              })
               this.setCurrentUser(user);
-              this.setGetReturnUrl(); // Never put it setCurrentUser() or all pages refreshes land on members only.
+              this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
+              this.showLoginSuccessMessage(user);
               return user;
             }
           }
@@ -168,12 +160,20 @@ export class AccountService {
   setGetReturnUrl(): void {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
 
-    this.loggedInUserSig()?.roles.includes(Roles.ADMIN)
+    this.loggedInUserSig()?.rolesStr?.includes(Roles.ADMIN)
       ? this._router.navigate(['/admin'])
       : returnUrl
         ? this._router.navigate([returnUrl])
         : this._router.navigate(['/main']);
 
     localStorage.removeItem('returnUrl');
+  }
+
+  private showLoginSuccessMessage(loggedInUser: LoggedInUser): void {
+    this._snackBar.open("You are logged in as: " + loggedInUser?.userName, "Close", {
+      verticalPosition: 'bottom',
+      horizontalPosition: 'center',
+      duration: 7000
+    })
   }
 }

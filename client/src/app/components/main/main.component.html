@@ -1,46 +1,45 @@
 <!-- #region Mobile -->
-@if(isMobileSig()) {
-<mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
-    disablePagination="true">
-    @if(loggedInUserSig()?.roles?.includes("admin")) {
-    <mat-tab #admin>
+@if (isMobileSig()) {
+  <mat-tab-group #tabGroup (selectedIndexChange)="setSelectTabIndex($event)" mat-stretch-tabs="true"
+                 disablePagination="true">
+    @if (loggedInUserSig()?.rolesStr?.includes("admin")) {
+      <mat-tab #admin>
         <div class="tab-container">
-            <ng-template mat-tab-label>
-                <mat-icon [color]="admin.isActive ? 'primary' : ''">admin_panel_settings</mat-icon>
-            </ng-template>
-            <app-admin-panel />
+          <ng-template mat-tab-label>
+            <mat-icon [color]="admin.isActive ? 'primary' : ''">admin_panel_settings</mat-icon>
+          </ng-template>
+          <app-admin-panel/>
         </div>
-    </mat-tab>
+      </mat-tab>
     }
     <mat-tab #members>
-        <div class="tab-container">
-            <ng-template mat-tab-label>
-                <mat-icon [color]="members.isActive ? 'primary' : ''">diversity_3</mat-icon>
-            </ng-template>
-            <app-member-list-mobile />
-        </div>
-    </mat-tab>
-    @if(!loggedInUserSig()?.roles?.includes("admin")) {
-    <mat-tab #follows>
-        <div class="tab-container">
-            <ng-template mat-tab-label>
-                <mat-icon [color]="follows.isActive ? 'primary' : ''">group_add</mat-icon>
-            </ng-template>
-            <app-follows />
-        </div>
-    </mat-tab>
-    <mat-tab #message>
+      <div class="tab-container">
         <ng-template mat-tab-label>
-            <mat-icon [color]="message.isActive ? 'primary' : ''">mail</mat-icon>
+          <mat-icon [color]="members.isActive ? 'primary' : ''">diversity_3</mat-icon>
         </ng-template>
-        <app-messages />
+        <app-member-list-mobile/>
+      </div>
     </mat-tab>
+    @if (!loggedInUserSig()?.rolesStr?.includes("admin")) {
+      <mat-tab #follows>
+        <div class="tab-container">
+          <ng-template mat-tab-label>
+            <mat-icon [color]="follows.isActive ? 'primary' : ''">group_add</mat-icon>
+          </ng-template>
+          <app-follows/>
+        </div>
+      </mat-tab>
+      <mat-tab #message>
+        <ng-template mat-tab-label>
+          <mat-icon [color]="message.isActive ? 'primary' : ''">mail</mat-icon>
+        </ng-template>
+        <app-messages/>
+      </mat-tab>
     }
-</mat-tab-group>
-<!-- #endregion -->
-}
-@else {
-<!-- #region Desktop -->
-<app-member-list />
+  </mat-tab-group>
+  <!-- #endregion -->
+} @else {
+  <!-- #region Desktop -->
+  <app-member-list/>
 }
 <!-- #endregion -->

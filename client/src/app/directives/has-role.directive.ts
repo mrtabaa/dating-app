@@ -1,5 +1,5 @@
-import { Directive, Input, OnInit, TemplateRef, ViewContainerRef, inject } from '@angular/core';
-import { LoggedInUser } from '../models/logged-in-user.model';
+import {Directive, inject, Input, OnInit, TemplateRef, ViewContainerRef} from '@angular/core';
+import {LoggedInUser} from '../models/logged-in-user.model';
 
 @Directive({
   selector: '[appHasRoleDir]',
@@ -17,7 +17,7 @@ export class HasRoleDirective implements OnInit {
     if (loggedInUserStr) {
       const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
 
-      if (loggedInUser.roles.some((role: string) => this.appHasRoleDir.includes(role)))
+      if (loggedInUser.rolesStr.some((role: string) => this.appHasRoleDir.includes(role)))
         this.viewcontainerRef.createEmbeddedView(this.templateRef);
       else
         this.viewcontainerRef.clear();
