@@ -194,17 +194,17 @@ public class AccountRepository : IAccountRepository
         return new OperationResult(true); // Account created successfully.
     }
 
-    public async Task<OperationResult<LoggedInDto>> VerifyAsync(
+    public async Task<OperationResult<LoginResult>> VerifyAsync(
         VerifyDto verifyDto, CancellationToken cancellationToken
     )
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
-            return new OperationResult<LoggedInDto>(false);
+            return new OperationResult<LoginResult>(false);
 
         if (await _userManager.IsEmailConfirmedAsync(appUser))
         {
-            return new OperationResult<LoggedInDto>(
+            return new OperationResult<LoginResult>(
                 false,
                 Error: new CustomError(
                     ErrorCode.IsEmailAlreadyConfirmed,
@@ -215,12 +215,15 @@ public class AccountRepository : IAccountRepository
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verifyDto.Code);
         if (!result.Succeeded)
-            return new OperationResult<LoggedInDto>(false);
+            return new OperationResult<LoginResult>(false);
 
-        return new OperationResult<LoggedInDto>(
+        return new OperationResult<LoginResult>(
             true,
-            Mappers.ConvertAppUserToLoggedInDto(
-                appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
+            new LoginResult(
+                Mappers.ConvertAppUserToLoggedInDto(
+                    appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
+                ),
+                await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
             )
         );
     }
@@ -276,6 +279,8 @@ public class AccountRepository : IAccountRepository
 
         AppUser? appUser;
 
+        #region Check credentials
+
         // Find appUser by Email or UserName
         if (Regex.IsMatch(userInput.EmailUsername, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,5})+)$")) // If input is email
             appUser = await _userManager.FindByEmailAsync(userInput.EmailUsername);
@@ -303,6 +308,8 @@ public class AccountRepository : IAccountRepository
                 )
             );
         }
+
+        #endregion
 
         if (!await _userManager.IsEmailConfirmedAsync(appUser))
         {
@@ -357,7 +364,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(
-        string userIdHashed, string token, CancellationToken cancellationToken
+        string userIdHashed, CancellationToken cancellationToken
     )
     {
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);

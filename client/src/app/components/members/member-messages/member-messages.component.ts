@@ -78,9 +78,8 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
   }
 
   async createMessageHubConnectionAsync(): Promise<void> {
-    const token = this.loggedInUserSig()?.token;
-    if (token && this.memberIn?.userName) {
-      await this._messageService.createHubConnectionAsync(token, this.memberIn?.userName);
+    if (this.memberIn?.userName) {
+      await this._messageService.createHubConnectionAsync(this.memberIn?.userName);
     }
   }
 

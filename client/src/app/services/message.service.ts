@@ -36,12 +36,12 @@ export class MessageService {
     return this._paginationHandler.getPaginatedResult<Message[]>(this._baseUrl, params);
   }
 
-  async createHubConnectionAsync(token: string, targetUsername: string): Promise<void> {
+  async createHubConnectionAsync(targetUsername: string): Promise<void> {
     this.targetUserName = targetUsername;
 
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
-        accessTokenFactory: () => token
+        withCredentials: true
       })
       .withAutomaticReconnect()
       .build();

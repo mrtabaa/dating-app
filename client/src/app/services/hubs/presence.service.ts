@@ -1,26 +1,25 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
-import { LoggedInUser } from '../../models/logged-in-user.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { OnlineUser } from '../../models/online-users.model';
+import {inject, Injectable, signal} from '@angular/core';
+import {environment} from '../../../environments/environment';
+import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {OnlineUser} from '../../models/online-users.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PresenceService {
+  onlineUsersSig = signal<OnlineUser[]>([]);
   private _hubUrl = environment.hubUrl;
   private _hubConnection: HubConnection | undefined;
   private _matSnack = inject(MatSnackBar);
   private _isConnectionOnClose = false;
   private _isConnectionStopped = false;
-  onlineUsersSig = signal<OnlineUser[]>([]);
   private readonly _GetOnlineUsers = "GetOnlineUsers";
 
-  createHubConnection(loggedInUser: LoggedInUser): void {
+  createHubConnection(): void {
     this._hubConnection = new HubConnectionBuilder()
-      .withUrl(this._hubUrl + 'presence', { // 'presence' has to match the route set in Program.cs 
-        accessTokenFactory: () => loggedInUser.token
+      .withUrl(this._hubUrl + 'presence', { // 'presence' has to match the route set in Program.cs
+        withCredentials: true
       })
       // .withAutomaticReconnect() // To make onclose() work. Also it only tries 4 times which is not enough.
       .build();
@@ -29,12 +28,20 @@ export class PresenceService {
     this.getOnlineUsers();
   }
 
+  async stopHubConnection(): Promise<void> {
+    this._isConnectionStopped = true;
+    await this._hubConnection?.stop().catch(err => console.log(err));
+  }
+
   private getOnlineUsers(): void {
     this._hubConnection?.on(this._GetOnlineUsers, onlineUsers => {
       if (onlineUsers)
         this.onlineUsersSig.set(onlineUsers);
       else
-        this._matSnack.open('Checking user status failed. Refresh the page or login again.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top' });
+        this._matSnack.open('Checking user status failed. Refresh the page or login again.', 'Close', {
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
     })
   }
 
@@ -45,7 +52,10 @@ export class PresenceService {
       this._hubConnection.onclose(() => {
         if (!this._isConnectionStopped) {
           this._isConnectionOnClose = true;
-          this._matSnack.open('You are offline. Check your internet connection.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top' });
+          this._matSnack.open('You are offline. Check your internet connection.', 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
           this.startConnection();
         }
       });
@@ -60,17 +70,16 @@ export class PresenceService {
         console.log('PresenceHub connection started.');
         if (this._isConnectionOnClose && !this._isConnectionStopped) {
           this._isConnectionOnClose = false;
-          this._matSnack.open('You are back online.', 'Close', { horizontalPosition: 'center', verticalPosition: 'bottom', duration: 7000 });
+          this._matSnack.open('You are back online.', 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            duration: 7000
+          });
         }
       })
       .catch(() => {
         console.error('Failed start connection. Retrying every 1 seconds.');
         setTimeout(() => this.startConnection(), 1000);
       });
-  }
-
-  async stopHubConnection(): Promise<void> {
-    this._isConnectionStopped = true;
-    await this._hubConnection?.stop().catch(err => console.log(err));
   }
 }

@@ -57,7 +57,7 @@ export class PhotoEditorMobileComponent implements OnInit {
     if (this.loggedInUser) {
       this.uploader = new FileUploader({
         url: this.baseApiUrl + 'user/add-photo',
-        authToken: 'Bearer ' + this.loggedInUser.token,
+        // authToken: 'Bearer ' + this.loggedInUser.token,
         isHTML5: true,
         allowedFileType: ['image'],
         removeAfterUpload: true,

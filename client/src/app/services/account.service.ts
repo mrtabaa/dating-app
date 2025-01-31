@@ -44,7 +44,7 @@ export class AccountService {
   }
 
   verify(verify: Verify): Observable<void> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify)
+    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify, {withCredentials: true})
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
@@ -70,7 +70,7 @@ export class AccountService {
   }
 
   login(userInput: UserLogin): Observable<LoggedInUser | null> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput)
+    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput, {withCredentials: true})
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
@@ -151,7 +151,7 @@ export class AccountService {
 
     this.loggedInUserSig.set(loggedInUser);
 
-    this._presenceService.createHubConnection(loggedInUser);
+    this._presenceService.createHubConnection();
 
     // Set it to false to show Hallboard in color to the loggedInUser. Default was true
     this._responsiveService.isWelcomeCompSig.set(false);

@@ -3,7 +3,7 @@ namespace api.Interfaces;
 public interface IAccountRepository
 {
     public Task<OperationResult> CreateAsync(RegisterDto registerDto, CancellationToken cancellationToken);
-    public Task<OperationResult<LoggedInDto>> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken);
+    public Task<OperationResult<LoginResult>> VerifyAsync(VerifyDto verifyDto, CancellationToken cancellationToken);
 
     public Task<OperationResult> ResendVerifyCodeAsync(
         ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken
@@ -13,7 +13,7 @@ public interface IAccountRepository
     public Task<OperationResult<TokenDto>> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken);
 
     public Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(
-        string userIdHashed, string token, CancellationToken cancellationToken
+        string userIdHashed, CancellationToken cancellationToken
     );
 
     public Task<OperationResult> RequestResetPasswordAsync(

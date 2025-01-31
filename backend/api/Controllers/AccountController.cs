@@ -23,15 +23,17 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             };
     }
 
-    // TODO: Check if it works with Cookie token
     [AllowAnonymous]
     [HttpPost("verify")]
     public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
-        OperationResult<LoggedInDto> result = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
+        OperationResult<LoginResult> result = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
+
+        if (result.IsSuccess)
+            AddTokensToResponseCookies(result.Result.TokenDto);
 
         return result.IsSuccess
-            ? Ok(result.Result)
+            ? result.Result.LoggedInDto
             : result.Error?.Code switch
             {
                 ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
@@ -98,25 +100,15 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         return true;
     }
 
-    // TODO: Check if it works with Cookie token
     [HttpGet]
     public async Task<ActionResult<LoggedInDto>> ReloadLoggedInUser(CancellationToken cancellationToken)
     {
-        // Obtain token value
-        string? token = null;
-
-        if (HttpContext.Request.Headers.TryGetValue("Authorization", out StringValues authHeader))
-            token = authHeader.ToString().Split(' ').Last();
-
-        if (string.IsNullOrEmpty(token))
-            return Unauthorized("Token is expired or invalid. Login again.");
-
         string? userIdHashed = User.GetUserIdHashed();
         if (string.IsNullOrEmpty(userIdHashed))
             return Unauthorized("No user was found with this user Id.");
 
         OperationResult<LoggedInDto> result = await accountRepository.ReloadLoggedInUserAsync(
-            userIdHashed, token, cancellationToken
+            userIdHashed, cancellationToken
         );
 
         return result.IsSuccess
