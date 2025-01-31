@@ -24,10 +24,12 @@ public class TokenService : ITokenService
     public async Task<TokenDto> GenerateTokensAsync(AppUser appUser, CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(appUser.NormalizedUserName))
+        {
             throw new ArgumentNullException(
                 nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null."
             );
-        
+        }
+
         var jtiValue = Guid.CreateVersion7().ToString();
 
         string identifierHash = await InsertHashedUserId(
@@ -35,7 +37,7 @@ public class TokenService : ITokenService
         ); // this securedId is stored in users collection to associate with the AppUser.
 
         return new TokenDto(
-            GenerateAccessTokenAsync(identifierHash, jtiValue),
+            await GenerateAccessTokenAsync(appUser, identifierHash, jtiValue),
             await GenerateRefreshTokenAsync(appUser.Id, cancellationToken)
         );
     }
@@ -57,13 +59,17 @@ public class TokenService : ITokenService
         return ValidationsExtension.ValidateObjectId(userId).IsSuccess ? userId : null;
     }
 
-    private string GenerateAccessTokenAsync(string identifierHash, string jtiValue)
+    private async Task<string> GenerateAccessTokenAsync(AppUser appUser, string identifierHash, string jtiValue)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, identifierHash),
             new(JwtRegisteredClaimNames.Jti, jtiValue)
         };
+
+        // Get user's roles and add them all into claims
+        IList<string> roles = await _userManager.GetRolesAsync(appUser);
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
