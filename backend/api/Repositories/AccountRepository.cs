@@ -55,7 +55,9 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        IdentityResult roleResult = await _userManager.AddToRoleAsync(existingUser, Roles.Member.ToString());
+        IdentityResult roleResult = await _userManager.AddToRoleAsync(
+            existingUser, EnumExtensions.GetRoleStrValue(Roles.Member)
+        );
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(existingUser);
@@ -177,7 +179,9 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        IdentityResult roleResult = await _userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
+        IdentityResult roleResult = await _userManager.AddToRoleAsync(
+            appUser, EnumExtensions.GetRoleStrValue(Roles.Member)
+        );
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(appUser);
@@ -215,7 +219,9 @@ public class AccountRepository : IAccountRepository
 
         return new OperationResult<LoggedInDto>(
             true,
-            Mappers.ConvertAppUserToLoggedInDto(appUser, GetMainPhoto(appUser))
+            Mappers.ConvertAppUserToLoggedInDto(
+                appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
+            )
         );
     }
 
@@ -317,7 +323,9 @@ public class AccountRepository : IAccountRepository
         return new OperationResult<LoginResult>(
             true,
             new LoginResult(
-                Mappers.ConvertAppUserToLoggedInDto(appUser, GetMainPhoto(appUser)),
+                Mappers.ConvertAppUserToLoggedInDto(
+                    appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
+                ),
                 await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
             )
         );
@@ -364,7 +372,9 @@ public class AccountRepository : IAccountRepository
             ? new OperationResult<LoggedInDto>(false)
             : new OperationResult<LoggedInDto>(
                 true,
-                Mappers.ConvertAppUserToLoggedInDto(appUser, token, GetMainPhoto(appUser))
+                Mappers.ConvertAppUserToLoggedInDto(
+                    appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
+                )
             );
     }
 

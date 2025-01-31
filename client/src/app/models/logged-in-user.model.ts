@@ -1,11 +1,10 @@
 export interface LoggedInUser {
   email: string; // Used only to verify account. Will always be null if account is verified.
+  roles: string[];
   userName: string;
   knownAs: string;
-  token: string; // Replace with ROLES
-  gender: string
+  gender: string; // TODO: Replace with enum
   profilePhotoUrl: string | undefined;
-  roles: string[];
   isProfileCompleted: boolean;
   recaptchaToken: string;
   isEmailNotConfirmed: boolean;

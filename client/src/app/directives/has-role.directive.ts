@@ -17,9 +17,7 @@ export class HasRoleDirective implements OnInit {
     if (loggedInUserStr) {
       const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
 
-      const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role;
-
-      if (roles.some((role: string) => this.appHasRoleDir.includes(role)))
+      if (loggedInUser.roles.some((role: string) => this.appHasRoleDir.includes(role)))
         this.viewcontainerRef.createEmbeddedView(this.templateRef);
       else
         this.viewcontainerRef.clear();

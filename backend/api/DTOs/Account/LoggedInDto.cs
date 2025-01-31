@@ -4,7 +4,7 @@ public record LoggedInDto(
     [Optional] bool IsRecaptchaTokenInvalid,
     [Optional] string? RecaptchaToken,
     [Optional] string? Email, // Used only to verify the account. Will always return null if the account is verified.
-    [Optional] IEnumerable<Roles>? Roles, // TODO: Implement it
+    [Optional] IEnumerable<string> RolesStr,
     [Optional] string? KnownAs,
     [Optional] string? UserName,
     [Optional] string? Gender,

@@ -15,6 +15,7 @@ import {CommonService} from "./common.service";
 import {ApiResponseMessage} from "../models/helpers/api-response-message";
 import {RecoveryValidationRequest} from "../models/account/recovery-validation-request.model";
 import {ResetPassword} from "../models/account/reset-password.model";
+import {Roles} from "../enums/Roles.enum";
 
 @Injectable({
   providedIn: 'root'
@@ -156,8 +157,6 @@ export class AccountService {
   setCurrentUser(loggedInUser: LoggedInUser): void {
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
-    this.setLoggedInUserRoles(loggedInUser);
-
     this.loggedInUserSig.set(loggedInUser);
 
     this._presenceService.createHubConnection(loggedInUser);
@@ -169,20 +168,12 @@ export class AccountService {
   setGetReturnUrl(): void {
     const returnUrl: string | null = localStorage.getItem('returnUrl');
 
-    this.loggedInUserSig()?.roles.includes('admin')
+    this.loggedInUserSig()?.roles.includes(Roles.ADMIN)
       ? this._router.navigate(['/admin'])
       : returnUrl
         ? this._router.navigate([returnUrl])
         : this._router.navigate(['/main']);
 
     localStorage.removeItem('returnUrl');
-  }
-
-  setLoggedInUserRoles(loggedInUser: LoggedInUser): void {
-    loggedInUser.roles = [];
-
-    const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role; // get the token's 2nd part then select role
-
-    Array.isArray(roles) ? loggedInUser.roles = roles : loggedInUser.roles.push(roles);
   }
 }

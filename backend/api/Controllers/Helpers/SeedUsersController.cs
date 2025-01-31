@@ -1,6 +1,11 @@
 namespace api.Controllers.Helpers;
 
-public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSettings, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+public class SeedUsersController(
+    IMongoClient client,
+    IMyMongoDbSettings dbSettings,
+    UserManager<AppUser> userManager,
+    RoleManager<AppRole> roleManager
+)
     : BaseApiController
 {
     #region Db Settings
@@ -12,7 +17,9 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
     #region Add Dummy users to DB
 
     [HttpPost]
-    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(IEnumerable<DummyRegisterDto> inputUsersDummy)
+    public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(
+        IEnumerable<DummyRegisterDto> inputUsersDummy
+    )
     {
         #region If databaseExists
 
@@ -47,7 +54,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
 
         #region Roles Management
 
-        AppRole[] roles = AppVariablesExtensions.Roles;
+        AppRole[] roles = AppVariablesExtensions.AppRoles;
 
         foreach (AppRole role in roles) await roleManager.CreateAsync(role);
 
@@ -57,7 +64,7 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
 
             await userManager.CreateAsync(appUser, userInput.Password);
 
-            await userManager.AddToRoleAsync(appUser, Roles.Member.ToString());
+            await userManager.AddToRoleAsync(appUser, EnumExtensions.GetRoleStrValue(Roles.Member));
 
             appUsers.Add(appUser);
         }
@@ -68,11 +75,14 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         {
             Email = "admin@a.com",
             UserName = "admin",
+            EmailConfirmed = true,
             IsProfileCompleted = true
         };
 
         await userManager.CreateAsync(admin, "Aaaaaaa/1");
-        await userManager.AddToRolesAsync(admin, [Roles.Admin.ToString().ToUpper(), Roles.Moderator.ToString().ToUpper()]);
+        await userManager.AddToRolesAsync(
+            admin, [EnumExtensions.GetRoleStrValue(Roles.Admin), EnumExtensions.GetRoleStrValue(Roles.Moderator)]
+        );
         string verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(admin);
         await userManager.ConfirmEmailAsync(admin, verifyToken);
 
@@ -80,11 +90,12 @@ public class SeedUsersController(IMongoClient client, IMyMongoDbSettings dbSetti
         {
             Email = "moderator@a.com",
             UserName = "moderator",
+            EmailConfirmed = true,
             IsProfileCompleted = true
         };
 
         await userManager.CreateAsync(moderator, "Aaaaaaa/1");
-        await userManager.AddToRolesAsync(moderator, [Roles.Moderator.ToString().ToUpper()]);
+        await userManager.AddToRolesAsync(moderator, [EnumExtensions.GetRoleStrValue(Roles.Moderator)]);
         verifyToken = await userManager.GenerateEmailConfirmationTokenAsync(moderator);
         await userManager.ConfirmEmailAsync(moderator, verifyToken);
 

@@ -16,10 +16,10 @@ public static class AppVariablesExtensions
 
     public static readonly string[] AppVersions = ["1", "1.0.2"];
 
-    public static readonly AppRole[] Roles =
+    public static readonly AppRole[] AppRoles =
     [
-        new() { Name = Enums.Roles.Admin.ToString() },
-        new() { Name = Enums.Roles.Moderator.ToString() },
-        new() { Name = Enums.Roles.Member.ToString() }
+        new() { Name = EnumExtensions.GetRoleStrValue(Roles.Admin) },
+        new() { Name = EnumExtensions.GetRoleStrValue(Roles.Moderator) },
+        new() { Name = EnumExtensions.GetRoleStrValue(Roles.Member) }
     ];
 }

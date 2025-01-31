@@ -12,9 +12,7 @@ export const adminGuard: CanActivateFn = () => {
 
   const loggedInUser: LoggedInUser = JSON.parse(loggedInUserStr);
 
-  const roles = JSON.parse(atob(loggedInUser.token.split('.')[1])).role;
-
-  if (roles?.some((role: string) => role === "admin" || role === 'moderator'))
+  if (loggedInUser.roles.some((role: string) => role === "admin" || role === 'moderator'))
     return true;
 
   snackBar.open("You're not allowed here. Only admins.", "Close", { verticalPosition: "top", horizontalPosition: "center", duration: 7000 });
