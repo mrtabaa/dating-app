@@ -65,6 +65,10 @@ export class PhotoEditorMobileComponent implements OnInit {
         maxFileSize: this.maxFileSize,
       });
 
+      this.uploader.onBeforeUploadItem = (fileItem) => {
+        fileItem.withCredentials = true; // Enable Cookies credentials manually
+      }
+
       this.uploader.onAfterAddingFile = (file) => {
         file.withCredentials = false;
 
