@@ -9,11 +9,11 @@ on:
       - feature/azure-storage
     paths:
       - 'backend/**'
-      
+  
   pull_request:
-      branches:
+    branches:
       - feature/azure-storage
-      paths:
+    paths:
       - 'backend/**'
 
   workflow_dispatch: # This line adds the manual trigger option
@@ -23,10 +23,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.x
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4.x
         with:
           dotnet-version: '9.x'
           include-prerelease: true
@@ -35,7 +35,7 @@ jobs:
         run: dotnet publish ./backend/dating-app.sln -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.x
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
@@ -49,13 +49,13 @@ jobs:
     
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4.x
         with:
           name: .net-app
-      
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3.x
         with:
           app-name: 'da-api-mr'
           slot-name: 'Production'
@@ -67,6 +67,6 @@ jobs:
     needs: deploy
     steps:
       - name: Clean up artifacts and publish directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.x
         with:
           clean: true
