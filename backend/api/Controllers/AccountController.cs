@@ -80,13 +80,14 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
     }
 
     [HttpPost("refresh-tokens")]
-    public async Task<ActionResult<bool>> RefreshTokens(CancellationToken cancellationToken)
+    public async Task<ActionResult> RefreshTokens(CancellationToken cancellationToken)
     {
         string? identifierHash = User.GetUserIdHashed();
         if (string.IsNullOrEmpty(identifierHash))
-            return Unauthorized("You are logged out. Login again.");
+            return Unauthorized("Your login session has expired. Please login again.");
 
-        OperationResult<TokenDto> result = await accountRepository.RefreshTokensAsync(identifierHash, cancellationToken);
+        OperationResult<TokenDto>
+            result = await accountRepository.RefreshTokensAsync(identifierHash, cancellationToken);
 
         if (!result.IsSuccess)
         {
@@ -98,7 +99,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
         }
 
         AddTokensToResponseCookies(result.Result);
-        return true;
+        return Ok("Tokens refreshed successfully.");
     }
 
     [HttpGet]

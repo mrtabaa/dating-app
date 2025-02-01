@@ -90,6 +90,10 @@ export class AccountService {
       );
   }
 
+  refreshTokens(): Observable<void> {
+    return this._http.post<void>(this.baseUrl + 'refresh-tokens', {});
+  }
+
   registerDemo(userInput: UserRegister): Observable<LoggedInUser | null> {
     return this._http.post<LoggedInUser>(this.baseUrl + 'register', userInput)
       .pipe(
