@@ -23,13 +23,6 @@ public class TokenService : ITokenService
 
     public async Task<TokenDto> GenerateTokensAsync(AppUser appUser, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(appUser.NormalizedUserName))
-        {
-            throw new ArgumentNullException(
-                nameof(appUser.NormalizedUserName), "NormalizedUserName cannot be null."
-            );
-        }
-
         var jtiValue = Guid.CreateVersion7().ToString();
 
         string identifierHash = await InsertHashedUserId(
@@ -38,7 +31,7 @@ public class TokenService : ITokenService
 
         return new TokenDto(
             await GenerateAccessTokenAsync(appUser, identifierHash, jtiValue),
-            await GenerateRefreshTokenAsync(appUser.Id, cancellationToken)
+            GenerateRefreshTokenAsync(identifierHash)
         );
     }
 
@@ -78,31 +71,32 @@ public class TokenService : ITokenService
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(15), // Short lifespan
+            expires: DateTime.UtcNow.AddMinutes(10), // Short lifespan
             signingCredentials: creds
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private async Task<RefreshTokenDto> GenerateRefreshTokenAsync(ObjectId userId, CancellationToken cancellationToken)
+    private string GenerateRefreshTokenAsync(string identifierHash)
     {
-        var refreshToken = Guid.CreateVersion7().ToString();
-        DateTime refreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); // Long lifespan
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, identifierHash)
+        };
 
-        UpdateDefinition<AppUser> updateDef = Builders<AppUser>.Update.
-            Set(appUser => appUser.RefreshToken, refreshToken).Set(
-                appUser => appUser.RefreshTokenExpiryTime, refreshTokenExpiryTime
-            );
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-        UpdateResult? updateResult = await _collection.UpdateOneAsync(
-            appUser => appUser.Id == userId, updateDef, null, cancellationToken
+        var token = new JwtSecurityToken(
+            _jwtSettings.Issuer,
+            _jwtSettings.Audience,
+            claims,
+            expires: DateTime.UtcNow.AddDays(7), // Long lifespan
+            signingCredentials: creds
         );
 
-        if (updateResult.ModifiedCount < 1)
-            throw new ArgumentException("Failed to generate refresh token.");
-
-        return new RefreshTokenDto(refreshToken, refreshTokenExpiryTime);
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     private async Task<string> InsertHashedUserId(

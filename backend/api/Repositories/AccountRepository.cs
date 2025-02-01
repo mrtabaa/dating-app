@@ -339,12 +339,12 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task<OperationResult<TokenDto>> RefreshTokensAsync(
-        string refreshToken, CancellationToken cancellationToken
+        string identifierHash, CancellationToken cancellationToken
     )
     {
-        OperationResult<AppUser> result = await _userRepository.GetByRefreshTokenAsync(refreshToken, cancellationToken);
+        AppUser? appUser = await _userRepository.GetByIdentifierHashAsync(identifierHash, cancellationToken);
 
-        if (!result.IsSuccess || result.Result.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (appUser is null)
         {
             return new OperationResult<TokenDto>(
                 false,
@@ -355,12 +355,10 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        return result.IsSuccess
-            ? new OperationResult<TokenDto>(
-                true,
-                await _tokenService.GenerateTokensAsync(result.Result, cancellationToken)
-            )
-            : new OperationResult<TokenDto>(false);
+        return new OperationResult<TokenDto>(
+            true,
+            await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
+        );
     }
 
     public async Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(

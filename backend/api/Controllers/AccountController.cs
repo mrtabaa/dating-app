@@ -79,13 +79,14 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             };
     }
 
-    [HttpPost("refresh-tokens/{refreshToken}")]
-    public async Task<ActionResult<bool>> RefreshTokens(string refreshToken, CancellationToken cancellationToken)
+    [HttpPost("refresh-tokens")]
+    public async Task<ActionResult<bool>> RefreshTokens(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(refreshToken))
-            Unauthorized("You are logged out. Login again.");
+        string? identifierHash = User.GetUserIdHashed();
+        if (string.IsNullOrEmpty(identifierHash))
+            return Unauthorized("You are logged out. Login again.");
 
-        OperationResult<TokenDto> result = await accountRepository.RefreshTokensAsync(refreshToken, cancellationToken);
+        OperationResult<TokenDto> result = await accountRepository.RefreshTokensAsync(identifierHash, cancellationToken);
 
         if (!result.IsSuccess)
         {
@@ -168,18 +169,18 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
                 // Use 'SameSiteMode.lax' if using OAuth, payments sites, etc.
                 // Also implement CSRF Tokens to prevent CSRF attacks
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.AccessToken), // e.g. 15 min
+                Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.AccessToken), // e.g. 15 min,
                 Path = "/"
             }
         );
 
         Response.Cookies.Append(
-            "refresh-token", tokenDto.RefreshTokenDto.RefreshToken, new CookieOptions
+            "refresh-token", tokenDto.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = tokenDto.RefreshTokenDto.ExpiresAt, // e.g. 7 days
+                Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.RefreshToken), // e.g. 7 days
                 Path = "/api/account/refresh-tokens"
             }
         );

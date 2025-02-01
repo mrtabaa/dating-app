@@ -10,7 +10,7 @@ public interface IAccountRepository
     );
 
     public Task<OperationResult<LoginResult>> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken);
-    public Task<OperationResult<TokenDto>> RefreshTokensAsync(string refreshToken, CancellationToken cancellationToken);
+    public Task<OperationResult<TokenDto>> RefreshTokensAsync(string identifierHash, CancellationToken cancellationToken);
 
     public Task<OperationResult<LoggedInDto>> ReloadLoggedInUserAsync(
         string userIdHashed, CancellationToken cancellationToken

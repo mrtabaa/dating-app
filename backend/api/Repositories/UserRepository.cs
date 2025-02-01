@@ -49,21 +49,13 @@ public class UserRepository : IUserRepository
     public async Task<AppUser?> GetByIdAsync(ObjectId userId, CancellationToken cancellationToken) =>
         await _collection.Find(appUser => appUser.Id == userId).FirstOrDefaultAsync(cancellationToken);
 
+    public async Task<AppUser?> GetByIdentifierHashAsync(string identifierHash, CancellationToken cancellationToken) =>
+        await _collection.Find(appUser => appUser.IdentifierHash == identifierHash).
+            FirstOrDefaultAsync(cancellationToken);
+
     public async Task<AppUser?> GetByUserNameAsync(string userName, CancellationToken cancellationToken) =>
         await _collection.Find(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).
             FirstOrDefaultAsync(cancellationToken);
-
-    public async Task<OperationResult<AppUser>> GetByRefreshTokenAsync(
-        string refreshToken, CancellationToken cancellationToken
-    )
-    {
-        AppUser? appUser = await _collection.Find(appUser => appUser.RefreshToken == refreshToken).
-            SingleOrDefaultAsync(cancellationToken);
-
-        return appUser == null
-            ? new OperationResult<AppUser>(false)
-            : new OperationResult<AppUser>(true, appUser);
-    }
 
     /// <summary>
     ///     Obtain userId using userName. Check if ObjectId.HasValue and is NOT ObjectId.Empty.

@@ -37,7 +37,11 @@ public static class IdentityServiceExtensions
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["access-token"];
+                        // Use refresh-token only for the refresh endpoint
+                        context.Token = context.HttpContext.Request.Path.StartsWithSegments("/api/account/refresh-tokens") 
+                            ? context.Request.Cookies["refresh-token"] 
+                            : context.Request.Cookies["access-token"];
+
                         return Task.CompletedTask;
                     }
                 };
