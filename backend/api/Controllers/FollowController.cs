@@ -11,7 +11,7 @@ public class FollowController(IFollowRepository followRepository, ITokenService 
         ObjectId? userId = await tokenService.GetActualUserIdAsync(User.GetUserIdHashed(), cancellationToken);
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
-        //
+        // CI/CD
 
         OperationResult<PagedList<AppUser>> pagedAppUsersResult =
             await followRepository.GetFollowMembersAsync(userId.Value, followParams, cancellationToken);
