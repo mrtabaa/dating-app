@@ -12,6 +12,8 @@ public static class AppVariablesExtensions
 
     public const string RequiredAdminRole = "RequiredAdminRole";
     public const string RequiredModeratorRole = "RequiredModeratorRole";
+
+    public const string SlidingWindowPolicy = "SlidingWindowPolicy";
     public static readonly string[] AppVersions = ["1", "1.0.2"];
 
     public static readonly AppRole[] AppRoles =

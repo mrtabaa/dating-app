@@ -1,3 +1,5 @@
+using api.Controllers.Helpers;
+
 namespace api.Controllers;
 
 [Authorize(Policy = AppVariablesExtensions.RequiredAdminRole)]
