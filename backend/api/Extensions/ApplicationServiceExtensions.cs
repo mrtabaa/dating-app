@@ -71,6 +71,26 @@ public static class ApplicationServiceExtensions
 
         #endregion CORS
 
+        #region Rate Limiting
+
+        services.AddRateLimiter(
+            options =>
+            {
+                options.AddSlidingWindowLimiter(
+                    AppVariablesExtensions.SlidingWindowPolicy, slidingOptions =>
+                    {
+                        slidingOptions.PermitLimit = 2; // Up to 100 requests allowed
+                        slidingOptions.Window = TimeSpan.FromSeconds(5); // Sliding window of 5 minutes
+                        slidingOptions.SegmentsPerWindow = 5; // Smooth enforcement (1 segment per minute)
+                        slidingOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                        slidingOptions.QueueLimit = 10; // Allow up to 10 queued requests
+                    }
+                ).RejectionStatusCode = 429; // Too many requests
+            }
+        );
+
+        #endregion
+
         #region Others
 
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity

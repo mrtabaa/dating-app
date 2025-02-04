@@ -38,5 +38,6 @@ global using Microsoft.AspNetCore.SignalR;
 global using api.SignalR.Interfaces;
 global using api.SignalR.Services;
 global using api.SignalR.Helpers;
-global using Microsoft.Extensions.Primitives;
 global using DateTimeExtensions = api.Extensions.DateTimeExtensions;
+global using System.Threading.RateLimiting;
+global using Microsoft.AspNetCore.RateLimiting;

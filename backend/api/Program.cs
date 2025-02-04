@@ -16,15 +16,19 @@ if (builder.Environment.IsProduction())
 {
     // Production Azure: If no WEBSITE_PORT exists set to 8080
     string port = Environment.GetEnvironmentVariable("WEBSITE_PORT") ?? "8080";
-    builder.WebHost.ConfigureKestrel(serverOptions =>
-    {
-        serverOptions.ListenAnyIP(int.Parse(port)); // TODO: set to an allowed ip only
-    });
+    builder.WebHost.ConfigureKestrel(
+        serverOptions =>
+        {
+            serverOptions.ListenAnyIP(int.Parse(port)); // TODO: set to an allowed ip only
+        }
+    );
 }
 
 #region Configure the HTTP request pipeline.
 
 WebApplication app = builder.Build();
+
+app.UseRateLimiter();
 
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
