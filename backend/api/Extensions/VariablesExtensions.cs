@@ -4,18 +4,25 @@ public static class AppVariablesExtensions
 {
     public const string RecaptchaSecretKey = "RecaptchaSecretKey";
 
+    // COLLECTIONS
     public const string CollectionUsers = "users";
     public const string CollectionFollows = "follows";
     public const string CollectionMessages = "messages";
     public const string CollectionOnlineTrackers = "online-trackers";
     public const string CollectionExceptionLogs = "exception-logs";
 
+    // ROLES
     public const string RequiredAdminRole = "RequiredAdminRole";
     public const string RequiredModeratorRole = "RequiredModeratorRole";
 
+    // RATE LIMIT
     public const string SlidingWindowPolicy = "SlidingWindowPolicy";
+    public const string UserConcurrentPolicy = "UserConcurrentPolicy";
+
+    // VERSION
     public static readonly string[] AppVersions = ["1", "1.0.2"];
 
+    // APPROLE
     public static readonly AppRole[] AppRoles =
     [
         new() { Name = EnumExtensions.GetRoleStrValue(Roles.Admin) },

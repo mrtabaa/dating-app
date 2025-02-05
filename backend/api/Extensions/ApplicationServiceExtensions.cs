@@ -76,16 +76,35 @@ public static class ApplicationServiceExtensions
         services.AddRateLimiter(
             options =>
             {
-                options.AddSlidingWindowLimiter(
-                    AppVariablesExtensions.SlidingWindowPolicy, slidingOptions =>
-                    {
-                        slidingOptions.PermitLimit = 2; // Up to 100 requests allowed
-                        slidingOptions.Window = TimeSpan.FromSeconds(5); // Sliding window of 5 minutes
-                        slidingOptions.SegmentsPerWindow = 5; // Smooth enforcement (1 segment per minute)
-                        slidingOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-                        slidingOptions.QueueLimit = 10; // Allow up to 10 queued requests
-                    }
-                ).RejectionStatusCode = 429; // Too many requests
+                options.AddPolicy(
+                    AppVariablesExtensions.SlidingWindowPolicy, httpContext =>
+                        RateLimitPartition.GetSlidingWindowLimiter(
+                            httpContext.User.GetUserIdHashed(),
+                            _ => new SlidingWindowRateLimiterOptions
+                            {
+                                PermitLimit = 4, // Up to 100 requests allowed
+                                Window = TimeSpan.FromSeconds(30), // Sliding window of 5 minutes
+                                SegmentsPerWindow = 5, // Smooth enforcement (1 segment per minute)
+                                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                                QueueLimit = 10 // Allow up to 10 queued requests
+                            }
+                        )
+                );
+
+                options.AddPolicy(
+                    AppVariablesExtensions.UserConcurrentPolicy, httpContext =>
+                        RateLimitPartition.GetConcurrencyLimiter(
+                            httpContext.User.GetUserIdHashed(),
+                            _ => new ConcurrencyLimiterOptions
+                            {
+                                PermitLimit = 5, // Up to 5 requests allowed
+                                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                                QueueLimit = 2 // Allow up to 2 queued requests        
+                            }
+                        )
+                );
+                
+                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // Too many requests
             }
         );
 
