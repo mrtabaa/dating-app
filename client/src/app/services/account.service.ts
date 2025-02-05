@@ -52,7 +52,7 @@ export class AccountService {
             this._isVerifyingAccount.set(false);
             this.setCurrentUser(user);
             this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
-            this.showLoginSuccessMessage(user);
+            this.showLoginSuccessMessage(user.userName);
           }
         })
       );
@@ -81,7 +81,7 @@ export class AccountService {
               this._isVerifyingAccount.set(false);
               this.setCurrentUser(user);
               this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
-              this.showLoginSuccessMessage(user);
+              this.showLoginSuccessMessage(user.userName);
               return user;
             }
           }
@@ -173,8 +173,8 @@ export class AccountService {
     localStorage.removeItem('returnUrl');
   }
 
-  private showLoginSuccessMessage(loggedInUser: LoggedInUser): void {
-    this._snackBar.open("You are logged in as: " + loggedInUser?.userName, "Close", {
+  private showLoginSuccessMessage(userName: string): void {
+    this._snackBar.open("You are logged in as: " + userName, "Close", {
       verticalPosition: 'bottom',
       horizontalPosition: 'center',
       duration: 7000

@@ -60,8 +60,7 @@ public static class Mappers
         );
 
     public static LoggedInDto ConvertAppUserToLoggedInDto(
-        AppUser appUser, IEnumerable<string> rolesStr, string? blobPhotoUrl,
-        string? turnstileToken = null
+        AppUser appUser, IEnumerable<string> rolesStr, string? blobPhotoUrl
     ) =>
         new()
         {
