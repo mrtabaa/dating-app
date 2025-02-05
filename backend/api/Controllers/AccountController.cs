@@ -76,7 +76,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             {
                 ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
                 ErrorCode.IsWrongCreds => Unauthorized(result.Error.Message),
-                ErrorCode.IsEmailNotConfirmed => Accepted(result.Result),
+                ErrorCode.IsEmailNotConfirmed => Accepted(result.Result.LoggedInDto),
                 _ => Unauthorized("Login has failed. Try again or contact the support.")
             };
     }
