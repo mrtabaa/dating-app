@@ -103,6 +103,8 @@ public class MemberRepository : IMemberRepository
     public async Task<MemberDto?> GetByIdAsync(ObjectId userId, ObjectId? memberId, CancellationToken cancellationToken)
     {
         AppUser? appUser = await _collection.Find(appUser => appUser.Id == memberId).FirstOrDefaultAsync(cancellationToken);
+        if (appUser is null)
+            return null;
 
         appUser = ConvertAppUserPhotosToBlobPhotos(appUser);
 
@@ -122,7 +124,9 @@ public class MemberRepository : IMemberRepository
             appUser.NormalizedUserName == userName.ToUpper().Trim() &&
             appUser.EmailConfirmed
         ).FirstOrDefaultAsync(cancellationToken);
-
+        if (appUser is null)
+            return null;
+        
         appUser = ConvertAppUserPhotosToBlobPhotos(appUser);
 
         return appUser is null
