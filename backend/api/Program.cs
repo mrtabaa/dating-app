@@ -28,8 +28,6 @@ if (builder.Environment.IsProduction())
 
 WebApplication app = builder.Build();
 
-app.UseRateLimiter();
-
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -38,9 +36,11 @@ if (app.Environment.IsProduction()) // https for production only
 
 app.UseCors();
 
-app.UseAuthentication();
+app.UseAuthentication(); // Validates and authenticates the request.
 
-app.UseAuthorization();
+app.UseAuthorization(); // Populates HttpContext.User with claims from the token.
+
+app.UseRateLimiter(); // Can now safely access the user's identity or claims for user-based rate limiting.
 
 app.MapControllers();
 

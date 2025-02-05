@@ -76,6 +76,7 @@ public static class ApplicationServiceExtensions
         services.AddRateLimiter(
             options =>
             {
+                // Sliding
                 options.AddPolicy(
                     AppVariablesExtensions.SlidingWindowPolicy, httpContext =>
                         RateLimitPartition.GetSlidingWindowLimiter(
@@ -91,6 +92,7 @@ public static class ApplicationServiceExtensions
                         )
                 );
 
+                // Concurrent
                 options.AddPolicy(
                     AppVariablesExtensions.UserConcurrentPolicy, httpContext =>
                         RateLimitPartition.GetConcurrencyLimiter(
