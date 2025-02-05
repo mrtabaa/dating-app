@@ -82,8 +82,8 @@ public static class ApplicationServiceExtensions
                             httpContext.User.GetUserIdHashed(),
                             _ => new SlidingWindowRateLimiterOptions
                             {
-                                PermitLimit = 4, // Up to 100 requests allowed
-                                Window = TimeSpan.FromSeconds(30), // Sliding window of 5 minutes
+                                PermitLimit = 100, // Up to 100 requests allowed
+                                Window = TimeSpan.FromMinutes(5), // Sliding window of 5 minutes
                                 SegmentsPerWindow = 5, // Smooth enforcement (1 segment per minute)
                                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                                 QueueLimit = 10 // Allow up to 10 queued requests
@@ -103,7 +103,7 @@ public static class ApplicationServiceExtensions
                             }
                         )
                 );
-                
+
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // Too many requests
             }
         );
