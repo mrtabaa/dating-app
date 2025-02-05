@@ -314,7 +314,7 @@ public class AccountRepository : IAccountRepository
         if (!await _userManager.IsEmailConfirmedAsync(appUser))
         {
             if (!await SendVerificationCode(appUser, cancellationToken))
-                throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email verification code.");
+                throw new ArgumentException(nameof(appUser.UserName) + ": Failed to email the verification code.");
 
             return new OperationResult<LoginResult>(
                 false,

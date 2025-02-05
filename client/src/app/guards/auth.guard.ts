@@ -1,6 +1,6 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {inject} from '@angular/core';
+import {CanActivateFn, Router} from '@angular/router';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
@@ -9,13 +9,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (localStorage.getItem('loggedInUser'))
     return true;
 
+  // Clear all if loggedInUser doesn't exist
   localStorage.clear();
 
   localStorage.setItem('returnUrl', state.url);
-  router.navigate([''], { queryParams: { 'returnUrl': state.url } })
+  router.navigate([''], {queryParams: {'returnUrl': state.url}})
 
   if (router.url === '/' || router.url === '/account')
-    snackbar.open('Please login first.', 'Close', { horizontalPosition: 'center', verticalPosition: 'top', duration: 7000 })
+    snackbar.open('Please login first.', 'Close', {
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      duration: 7000
+    })
 
   return false;
 };
