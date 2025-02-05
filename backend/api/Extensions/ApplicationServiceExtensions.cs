@@ -76,35 +76,56 @@ public static class ApplicationServiceExtensions
         services.AddRateLimiter(
             options =>
             {
+                #region Controllers
+
                 // Sliding
                 options.AddPolicy(
-                    AppVariablesExtensions.SlidingWindowPolicy, httpContext =>
-                        RateLimitPartition.GetSlidingWindowLimiter(
-                            httpContext.User.GetUserIdHashed(),
-                            _ => new SlidingWindowRateLimiterOptions
-                            {
-                                PermitLimit = 100, // Up to 100 requests allowed
-                                Window = TimeSpan.FromMinutes(5), // Sliding window of 5 minutes
-                                SegmentsPerWindow = 5, // Smooth enforcement (1 segment per minute)
-                                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                                QueueLimit = 10 // Allow up to 10 queued requests
-                            }
-                        )
+                    AppVariablesExtensions.SlidingPolicy, httpContext => RateLimitPartition.GetSlidingWindowLimiter(
+                        httpContext.User.GetUserIdHashed() ?? "anonymous",
+                        _ => new SlidingWindowRateLimiterOptions
+                        {
+                            PermitLimit = 100, // Up to 100 requests allowed
+                            Window = TimeSpan.FromMinutes(5), // Sliding window of 5 minutes
+                            SegmentsPerWindow = 5, // Smooth enforcement (1 segment per minute)
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 10 // Allow up to 10 queued requests
+                        }
+                    )
                 );
 
                 // Concurrent
                 options.AddPolicy(
-                    AppVariablesExtensions.UserConcurrentPolicy, httpContext =>
-                        RateLimitPartition.GetConcurrencyLimiter(
-                            httpContext.User.GetUserIdHashed(),
-                            _ => new ConcurrencyLimiterOptions
+                    AppVariablesExtensions.ConcurrentPolicy, httpContext => RateLimitPartition.GetConcurrencyLimiter(
+                        httpContext.User.GetUserIdHashed() ?? "anonymous",
+                        _ => new ConcurrencyLimiterOptions
+                        {
+                            PermitLimit = 5, // Up to 5 requests allowed
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 2 // Allow up to 2 queued requests        
+                        }
+                    )
+                );
+
+                #endregion
+
+                #region SignalR
+
+                options.AddPolicy(
+                    AppVariablesExtensions.MessageHubSlidingPolicy, httpContext =>
+                        RateLimitPartition.GetSlidingWindowLimiter(
+                            httpContext.User.GetUserIdHashed() ?? "anonymous",
+                            _ => new SlidingWindowRateLimiterOptions
                             {
-                                PermitLimit = 5, // Up to 5 requests allowed
+                                PermitLimit = 2, // Allow up to 30 messages in the window
+                                Window = TimeSpan.FromSeconds(60), // 1-minute window for smoother messaging
+                                SegmentsPerWindow = 6, // 10-second segments for better enforcement
                                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                                QueueLimit = 2 // Allow up to 2 queued requests        
+                                QueueLimit = 5 // Allow up to 5 queued messages
                             }
                         )
                 );
+
+                #endregion
 
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // Too many requests
             }
