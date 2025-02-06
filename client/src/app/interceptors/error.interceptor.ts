@@ -27,8 +27,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             }
             break;
           case 401:
-            snack.open(err.error, 'Close', {horizontalPosition: 'center', verticalPosition: 'top', duration: 7000});
-            accountService.logout();
             break;
           case 403:
             router.navigate(['/no-access']);
