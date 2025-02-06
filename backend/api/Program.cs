@@ -36,7 +36,7 @@ if (app.Environment.IsProduction()) // https for production only
 
 app.UseCors();
 
-app.UseRouting();
+// app.UseRouting();
 
 app.UseAuthentication(); // Validates and authenticates the request.
 
