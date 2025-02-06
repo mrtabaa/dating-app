@@ -36,7 +36,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       snack.open('Invalid credentials. Please login again.', 'Close', {horizontalPosition: 'center', verticalPosition: 'top', duration: 7000});
-      accountService.logout();
+      // accountService.logout();
       return throwError(() => err);
     })
   );
