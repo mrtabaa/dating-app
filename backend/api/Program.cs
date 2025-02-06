@@ -36,9 +36,9 @@ if (app.Environment.IsProduction()) // https for production only
 
 app.UseCors();
 
-app.UseAuthentication(); // Validates and authenticates the request.
-
 app.UseRouting();
+
+app.UseAuthentication(); // Validates and authenticates the request.
 
 app.UseAuthorization(); // Populates HttpContext.User with claims from the token.
 
