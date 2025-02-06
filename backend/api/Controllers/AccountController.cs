@@ -171,7 +171,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
                 // TODO: Create an obsidian document for token management
                 // Use 'SameSiteMode.lax' if using OAuth, payments sites, etc.
                 // Also implement CSRF Tokens to prevent CSRF attacks
-                SameSite = SameSiteMode.Lax,
+                SameSite = SameSiteMode.Strict,
                 Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.AccessToken), // e.g. 15 min,
                 Path = "/"
             }
@@ -182,7 +182,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Lax,
+                SameSite = SameSiteMode.Strict,
                 Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.RefreshToken), // e.g. 7 days
                 Path = "/api/account/refresh-tokens"
             }
