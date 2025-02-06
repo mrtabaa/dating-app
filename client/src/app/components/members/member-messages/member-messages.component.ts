@@ -117,7 +117,12 @@ export class MemberMessagesComponent implements OnInit, OnDestroy {
           this._canScrollInstantly = false; // scroll smoothly
         } else { // delete message for API BadRequest response.
           this._messageService.messagesSig.update(messages => messages.filter(msg => msg.tempId !== unsavedMessage.tempId));
-          this._snackBar.open('Sending failed. Try again, refresh the page or login again.', 'Close',
+
+          const sendingError = this._messageService.sendingError; // Too many messages RateLimiting
+          this._snackBar.open(sendingError
+              ? sendingError
+              : 'Sending failed. Try again, refresh the page or login again.'
+            , 'Close',
             {horizontalPosition: 'center', verticalPosition: 'top', duration: 10000});
         }
 

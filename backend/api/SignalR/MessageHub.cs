@@ -62,7 +62,30 @@ public class MessageHub(
 
     public async Task Create(MessageInDto messageInDto)
     {
-        messageInDto.Content = messageInDto.Content.Trim();
+        string? userIdHashed = Context.User?.GetUserIdHashed();
+        if (string.IsNullOrEmpty(userIdHashed))
+        {
+            await Clients.Caller.SendAsync(SignalRMessages.SendingError, "Unauthorized.", GetCancellationToken());
+            return;
+        }
+
+        #region RateLimiting
+
+        if (RateLimitingHubs.RateLimitSliding(userIdHashed, Clients, GetCancellationToken()))
+            return;
+
+        // Release semaphore after try{} in finally{}
+        SemaphoreSlim? semaphore = await RateLimitingHubs.RateLimitConcurrentAsync(
+            userIdHashed, Clients, GetCancellationToken()
+        );
+        if (semaphore is null)
+            return;
+
+        #endregion
+
+        try
+        {
+            messageInDto.Content = messageInDto.Content.Trim();
 
         if (ValidateContent(messageInDto.Content))
             return;

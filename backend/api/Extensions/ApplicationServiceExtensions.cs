@@ -108,25 +108,6 @@ public static class ApplicationServiceExtensions
 
                 #endregion
 
-                #region SignalR
-
-                options.AddPolicy(
-                    AppVariablesExtensions.MessageHubSlidingPolicy, httpContext =>
-                        RateLimitPartition.GetSlidingWindowLimiter(
-                            httpContext.User.GetUserIdHashed() ?? "anonymous",
-                            _ => new SlidingWindowRateLimiterOptions
-                            {
-                                PermitLimit = 2, // Allow up to 30 messages in the window
-                                Window = TimeSpan.FromSeconds(60), // 1-minute window for smoother messaging
-                                SegmentsPerWindow = 6, // 10-second segments for better enforcement
-                                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                                QueueLimit = 5 // Allow up to 5 queued messages
-                            }
-                        )
-                );
-
-                #endregion
-
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; // Too many requests
             }
         );

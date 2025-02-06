@@ -1,5 +1,4 @@
-export class SignalRMessages
-{
+export class SignalRMessages {
   // PresenceHub
   static readonly GetOnlineUsers = 'GetOnlineUsers';
 
@@ -9,5 +8,6 @@ export class SignalRMessages
   static readonly UpdatedReadOn = 'UpdatedReadOn';
   static readonly Create = 'Create';
   static readonly NewMessageRes = 'NewMessageRes';
+  static readonly SendingError = 'SendingError';
   static readonly LeaveGroup = 'LeaveGroup';
 }

@@ -18,7 +18,6 @@ public static class AppVariablesExtensions
     // RATE LIMIT
     public const string SlidingPolicy = "SlidingPolicy";
     public const string ConcurrentPolicy = "ConcurrentPolicy";
-    public const string MessageHubSlidingPolicy = "MessageHubSlidingPolicy";
 
     // VERSION
     public static readonly string[] AppVersions = ["1", "1.0.2"];

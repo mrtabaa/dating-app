@@ -17,6 +17,7 @@ import {SignalRMessages} from "../extensions/signalRMessages";
 export class MessageService {
   hubConnection: HubConnection | undefined;
   newMessageRes: Message | undefined;
+  sendingError: string | undefined;
   messagesSig = signal<Message[]>([]);
   targetUserName: string | undefined;
   private _loggedInUserSig = inject(AccountService).loggedInUserSig;
@@ -53,6 +54,7 @@ export class MessageService {
 
     this.getUpdatedReadOn();
     this.getNewMessageRes();
+    this.getSendingError();
   }
 
   async joinGroupAsync(): Promise<void> {
@@ -76,6 +78,7 @@ export class MessageService {
   }
 
   async createAsync(messageIn: MessageIn): Promise<void> {
+    this.sendingError = undefined;
     this.newMessageRes = undefined; // reset each time a new message is sent. Set value at this.hubConnection.on(this._sendMessage
     await this.hubConnection?.invoke(SignalRMessages.Create, messageIn);
   }
@@ -88,6 +91,13 @@ export class MessageService {
         this.newMessageRes = messageRes; // Use to update optimistic approach in MemberMessagesComponent. Delete the message if api failed.
         this.messagesSig.update(messages => [...messages, messageRes]); // implicit return
       }
+    });
+  }
+
+  getSendingError(): void {
+    this.hubConnection?.off(SignalRMessages.SendingError); // Remove existing listener to prevent memory leak
+    this.hubConnection?.on(SignalRMessages.SendingError, (errorMessage: string) => {
+      this.sendingError = errorMessage;
     });
   }
 
