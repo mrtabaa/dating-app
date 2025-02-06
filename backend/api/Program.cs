@@ -38,6 +38,8 @@ app.UseCors();
 
 app.UseAuthentication(); // Validates and authenticates the request.
 
+app.UseRouting();
+
 app.UseAuthorization(); // Populates HttpContext.User with claims from the token.
 
 app.UseRateLimiter(); // Can now safely access the user's identity or claims for user-based rate limiting.
