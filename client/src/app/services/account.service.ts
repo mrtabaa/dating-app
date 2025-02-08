@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {inject, Injectable, signal} from '@angular/core';
+import {effect, inject, Injectable, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {map, Observable, take} from 'rxjs';
 import {UserLogin} from '../models/account/user-login.model';
@@ -22,6 +22,7 @@ import {Roles} from "../enums/Roles.enum";
 })
 export class AccountService {
   loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
+  private _isAccountAuthenticated = signal<boolean>(false);
   private _googlePlacesService = inject(GooglePlacesService);
   private _responsiveService = inject(ResponsiveService);
   private _http = inject(HttpClient);
@@ -30,6 +31,13 @@ export class AccountService {
   private baseUrl = environment.apiUrl + "account/";
   private _snackBar = inject(MatSnackBar);
   private _isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
+
+  constructor() {
+    effect(() => {
+      if (this._isAccountAuthenticated())
+        this._presenceService.createHubConnection();
+    });
+  }
 
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
@@ -49,6 +57,7 @@ export class AccountService {
         map((user: LoggedInUser) => {
           if (user) {
             sessionStorage.removeItem('email');
+            this._isAccountAuthenticated.set(true);
             this._isVerifyingAccount.set(false);
             this.setCurrentUser(user);
             this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
@@ -79,6 +88,7 @@ export class AccountService {
               this._isVerifyingAccount.set(true);
             } else {
               this._isVerifyingAccount.set(false);
+              this._isAccountAuthenticated.set(true);
               this.setCurrentUser(user);
               this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
               this.showLoginSuccessMessage(user.userName);
@@ -138,6 +148,7 @@ export class AccountService {
   }
 
   logout(): void {
+    this._isAccountAuthenticated.set(false);
     localStorage.clear();
     this.loggedInUserSig.set(undefined);
     this._router.navigate(['account']);
@@ -154,8 +165,6 @@ export class AccountService {
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     this.loggedInUserSig.set(loggedInUser);
-
-    this._presenceService.createHubConnection();
 
     // Set it to false to show Hallboard in color to the loggedInUser. Default was true
     this._responsiveService.isWelcomeCompSig.set(false);
