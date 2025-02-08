@@ -30,14 +30,6 @@ export class AccountService {
   private _presenceService = inject(PresenceService);
   private baseUrl = environment.apiUrl + "account/";
   private _snackBar = inject(MatSnackBar);
-  private _isVerifyingAccount = inject(CommonService).isVerifyingAccountSig;
-
-  constructor() {
-    effect(() => {
-      if (this._isAccountAuthenticated())
-        this._presenceService.createHubConnection();
-    });
-  }
 
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
@@ -45,7 +37,6 @@ export class AccountService {
         map((isRegisterSuccess: boolean) => {
           if (isRegisterSuccess) {
             sessionStorage.setItem('email', userInput.email);
-            this._isVerifyingAccount.set(true);
           }
         })
       );
@@ -58,7 +49,6 @@ export class AccountService {
           if (user) {
             sessionStorage.removeItem('email');
             this._isAccountAuthenticated.set(true);
-            this._isVerifyingAccount.set(false);
             this.setCurrentUser(user);
             this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
             this.showLoginSuccessMessage(user.userName);
@@ -85,9 +75,7 @@ export class AccountService {
           if (user) {
             if (user.isEmailNotConfirmed) {
               sessionStorage.setItem('email', user.email);
-              this._isVerifyingAccount.set(true);
             } else {
-              this._isVerifyingAccount.set(false);
               this._isAccountAuthenticated.set(true);
               this.setCurrentUser(user);
               this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
@@ -148,7 +136,6 @@ export class AccountService {
   }
 
   logout(): void {
-    this._isAccountAuthenticated.set(false);
     localStorage.clear();
     this.loggedInUserSig.set(undefined);
     this._router.navigate(['account']);
@@ -163,9 +150,8 @@ export class AccountService {
    */
   setCurrentUser(loggedInUser: LoggedInUser): void {
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
     this.loggedInUserSig.set(loggedInUser);
-
+    this._presenceService.createHubConnection();
     // Set it to false to show Hallboard in color to the loggedInUser. Default was true
     this._responsiveService.isWelcomeCompSig.set(false);
   }
