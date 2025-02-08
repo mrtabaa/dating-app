@@ -1,21 +1,21 @@
-import {HttpClient} from '@angular/common/http';
-import {effect, inject, Injectable, signal} from '@angular/core';
-import {Router} from '@angular/router';
-import {map, Observable, take} from 'rxjs';
-import {UserLogin} from '../models/account/user-login.model';
-import {UserRegister} from '../models/account/user-register.model';
-import {environment} from '../../environments/environment';
-import {LoggedInUser} from '../models/logged-in-user.model';
-import {GooglePlacesService} from './google-places.service';
-import {ResponsiveService} from './responsive.service';
-import {PresenceService} from './hubs/presence.service';
-import {Verify} from "../models/account/verify.model";
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {CommonService} from "./common.service";
-import {ApiResponseMessage} from "../models/helpers/api-response-message";
-import {RecoveryValidationRequest} from "../models/account/recovery-validation-request.model";
-import {ResetPassword} from "../models/account/reset-password.model";
-import {Roles} from "../enums/Roles.enum";
+import { HttpClient } from '@angular/common/http';
+import { effect, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { map, Observable, take } from 'rxjs';
+import { UserLogin } from '../models/account/user-login.model';
+import { UserRegister } from '../models/account/user-register.model';
+import { environment } from '../../environments/environment';
+import { LoggedInUser } from '../models/logged-in-user.model';
+import { GooglePlacesService } from './google-places.service';
+import { ResponsiveService } from './responsive.service';
+import { PresenceService } from './hubs/presence.service';
+import { Verify } from "../models/account/verify.model";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { CommonService } from "./common.service";
+import { ApiResponseMessage } from "../models/helpers/api-response-message";
+import { RecoveryValidationRequest } from "../models/account/recovery-validation-request.model";
+import { ResetPassword } from "../models/account/reset-password.model";
+import { Roles } from "../enums/Roles.enum";
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +30,7 @@ export class AccountService {
   private _presenceService = inject(PresenceService);
   private baseUrl = environment.apiUrl + "account/";
   private _snackBar = inject(MatSnackBar);
+  private _isVerifyingAccountSig = inject(CommonService).isVerifyingAccountSig;
 
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
@@ -37,18 +38,19 @@ export class AccountService {
         map((isRegisterSuccess: boolean) => {
           if (isRegisterSuccess) {
             sessionStorage.setItem('email', userInput.email);
+            this._isVerifyingAccountSig.set(true);
           }
         })
       );
   }
 
   verify(verify: Verify): Observable<void> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify, {withCredentials: true})
+    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify, { withCredentials: true })
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
             sessionStorage.removeItem('email');
-            this._isAccountAuthenticated.set(true);
+            this._isVerifyingAccountSig.set(false);
             this.setCurrentUser(user);
             this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
             this.showLoginSuccessMessage(user.userName);
@@ -69,14 +71,15 @@ export class AccountService {
   }
 
   login(userInput: UserLogin): Observable<LoggedInUser | null> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput, {withCredentials: true})
+    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput, { withCredentials: true })
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
             if (user.isEmailNotConfirmed) {
               sessionStorage.setItem('email', user.email);
+              this._isVerifyingAccountSig.set(true);
             } else {
-              this._isAccountAuthenticated.set(true);
+              this._isVerifyingAccountSig.set(false);
               this.setCurrentUser(user);
               this.setGetReturnUrl(); // Never put it in the setCurrentUser() or all pages refreshes land on members only.
               this.showLoginSuccessMessage(user.userName);
@@ -110,9 +113,9 @@ export class AccountService {
     if (localStorage.getItem("loggedInUser"))
       this._http.get<LoggedInUser>(this.baseUrl)
         .pipe(take(1)).subscribe({
-        next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
-        error: () => this.logout()
-      });
+          next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
+          error: () => this.logout()
+        });
   }
 
   requestResetPassword(request: RecoveryValidationRequest): Observable<ApiResponseMessage> {
