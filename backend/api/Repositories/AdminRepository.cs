@@ -30,13 +30,12 @@ public class AdminRepository : IAdminRepository
         if (!string.IsNullOrEmpty(adminParams.Search))
         {
             query = query.Where(
-                user =>
-                    (user.NormalizedUserName != null && user.NormalizedUserName.Contains(
-                        adminParams.Search, StringComparison.CurrentCultureIgnoreCase
-                    ))
-                    || (user.NormalizedEmail != null && user.NormalizedEmail.Contains(
-                        adminParams.Search, StringComparison.CurrentCultureIgnoreCase
-                    ))
+                user => (user.NormalizedUserName != null && user.NormalizedUserName.Contains(
+                            adminParams.Search, StringComparison.CurrentCultureIgnoreCase
+                        ))
+                        || (user.NormalizedEmail != null && user.NormalizedEmail.Contains(
+                            adminParams.Search, StringComparison.CurrentCultureIgnoreCase
+                        ))
             );
         }
 
@@ -51,25 +50,26 @@ public class AdminRepository : IAdminRepository
         AppUser? appUser = await _userManager.FindByNameAsync(memberWithRoleDto.UserName.ToUpper());
 
         if (appUser is null)
-            return new OperationResult<IEnumerable<string>>(false);
+            return new OperationResult<IEnumerable<string>>(false, Error: null);
 
         IEnumerable<string> userRoles = _userManager.GetRolesAsync(appUser).Result;
 
         // Add selected roles
-        IdentityResult? result = await _userManager.AddToRolesAsync(appUser, memberWithRoleDto.Roles.Except(userRoles));
+        IdentityResult result = await _userManager.AddToRolesAsync(appUser, memberWithRoleDto.Roles.Except(userRoles));
 
         if (!result.Succeeded)
-            return new OperationResult<IEnumerable<string>>(false);
+            return new OperationResult<IEnumerable<string>>(false, Error: null);
 
         // Delete non-selected roles
         result = await _userManager.RemoveFromRolesAsync(appUser, userRoles.Except(memberWithRoleDto.Roles));
 
         if (!result.Succeeded)
-            return new OperationResult<IEnumerable<string>>(false);
+            return new OperationResult<IEnumerable<string>>(false, Error: null);
 
         return new OperationResult<IEnumerable<string>>(
             true,
-            await _userManager.GetRolesAsync(appUser)
+            await _userManager.GetRolesAsync(appUser),
+            null
         );
     }
 
@@ -91,8 +91,9 @@ public class AdminRepository : IAdminRepository
 
     public async Task<UpdateResult> ResetConnectionsPresenceAsync(CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .Set(appUser => appUser.ConnectionsPresence, []);
+        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update.Set(
+            appUser => appUser.ConnectionsPresence, []
+        );
 
         return await _collection.UpdateManyAsync(
             appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken
@@ -101,8 +102,7 @@ public class AdminRepository : IAdminRepository
 
     public async Task<UpdateResult> ResetGroupNamesAsync(CancellationToken cancellationToken)
     {
-        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update
-            .Set(appUser => appUser.MessageGroups, []);
+        UpdateDefinition<AppUser> updateDefinition = Builders<AppUser>.Update.Set(appUser => appUser.MessageGroups, []);
 
         return await _collection.UpdateManyAsync(
             appUser => !appUser.Id.Equals(ObjectId.Empty), updateDefinition, null, cancellationToken

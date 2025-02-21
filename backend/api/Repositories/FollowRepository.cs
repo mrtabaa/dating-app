@@ -34,8 +34,8 @@ public class FollowRepository : IFollowRepository
             OperationResult<PagedList<AppUser>> appUsersResult = GetAppUsersWithBlobPhotos(appUsers);
 
             return appUsersResult.IsSuccess
-                ? new OperationResult<PagedList<AppUser>>(true, appUsersResult.Result)
-                : new OperationResult<PagedList<AppUser>>(false);
+                ? new OperationResult<PagedList<AppUser>>(true, appUsersResult.Result, null)
+                : new OperationResult<PagedList<AppUser>>(false, Error: null);
         }
         else // (followParams.Predicate == FollowPredicate.Followers)
         {
@@ -54,8 +54,8 @@ public class FollowRepository : IFollowRepository
             OperationResult<PagedList<AppUser>> appUsersResult = GetAppUsersWithBlobPhotos(appUsers);
 
             return appUsersResult.IsSuccess
-                ? new OperationResult<PagedList<AppUser>>(true, appUsersResult.Result)
-                : new OperationResult<PagedList<AppUser>>(false);
+                ? new OperationResult<PagedList<AppUser>>(true, appUsersResult.Result, null)
+                : new OperationResult<PagedList<AppUser>>(false, Error: null);
         }
     }
 
@@ -130,7 +130,8 @@ public class FollowRepository : IFollowRepository
         return new OperationResult(
             await SaveInDbWithSessionAsync(
                 userId, followedMemberIdResult.Result, FollowAction.IsAdded, cancellationToken, follow
-            )
+            ),
+            null
         );
     }
 
@@ -166,7 +167,8 @@ public class FollowRepository : IFollowRepository
         return new OperationResult(
             await SaveInDbWithSessionAsync(
                 userId, followedMemberIdResult.Result, FollowAction.IsRemoved, cancellationToken
-            )
+            ),
+            null
         );
     }
 
@@ -312,23 +314,23 @@ public class FollowRepository : IFollowRepository
             OperationResult<AppUser> appUserResult = ConvertAppUserPhotosToBlobPhotos(appUsers[i]);
 
             if (!appUserResult.IsSuccess)
-                return new OperationResult<PagedList<AppUser>>(false);
+                return new OperationResult<PagedList<AppUser>>(false, Error: null);
 
             appUsers[i] = appUserResult.Result;
         }
 
-        return new OperationResult<PagedList<AppUser>>(true, appUsers);
+        return new OperationResult<PagedList<AppUser>>(true, appUsers, null);
     }
 
     private OperationResult<AppUser> ConvertAppUserPhotosToBlobPhotos(AppUser appUser)
     {
         IEnumerable<Photo>? blobConvertedPhotos = _photoService.ConvertAllPhotosToBlobLinkWithSas(appUser.Photos);
         if (blobConvertedPhotos is null)
-            return new OperationResult<AppUser>(false);
+            return new OperationResult<AppUser>(false, Error: null);
 
         appUser.Photos = blobConvertedPhotos.ToList();
 
-        return new OperationResult<AppUser>(true, appUser);
+        return new OperationResult<AppUser>(true, appUser, null);
     }
 
     #region Db and vars

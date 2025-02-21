@@ -61,14 +61,14 @@ public class AccountRepository : IAccountRepository
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(existingUser);
-            return new OperationResult(false);
+            return new OperationResult(false, null);
         }
 
         // Resend the verification email
         if (!await SendVerificationCode(existingUser, cancellationToken))
             throw new ArgumentException(nameof(existingUser.Email) + ": Failed to email verification code.");
 
-        return new OperationResult(true); // Account created successfully.
+        return new OperationResult(true, null); // Account created successfully.
     }
 
     /// <summary>
@@ -185,13 +185,13 @@ public class AccountRepository : IAccountRepository
         if (!roleResult.Succeeded) // Failed to add the role. Delete appUser from DB
         {
             await _userManager.DeleteAsync(appUser);
-            return new OperationResult(false);
+            return new OperationResult(false, null);
         }
 
         if (!await SendVerificationCode(appUser, cancellationToken))
             throw new ArgumentException(nameof(appUser.Email) + ": Failed to email verification code.");
 
-        return new OperationResult(true); // Account created successfully.
+        return new OperationResult(true, null); // Account created successfully.
     }
 
     public async Task<OperationResult<LoginResult>> VerifyAsync(
@@ -200,7 +200,7 @@ public class AccountRepository : IAccountRepository
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
         if (appUser is null)
-            return new OperationResult<LoginResult>(false);
+            return new OperationResult<LoginResult>(false, Error: null);
 
         if (await _userManager.IsEmailConfirmedAsync(appUser))
         {
@@ -215,7 +215,7 @@ public class AccountRepository : IAccountRepository
 
         IdentityResult result = await _userManager.ConfirmEmailAsync(appUser, verifyDto.Code);
         if (!result.Succeeded)
-            return new OperationResult<LoginResult>(false);
+            return new OperationResult<LoginResult>(false, Error: null);
 
         return new OperationResult<LoginResult>(
             true,
@@ -224,7 +224,8 @@ public class AccountRepository : IAccountRepository
                     appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
                 ),
                 await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
-            )
+            ),
+            null
         );
     }
 
@@ -244,7 +245,7 @@ public class AccountRepository : IAccountRepository
         }
 
         AppUser? appUser = await _userManager.FindByEmailAsync(resendCRequest.Email);
-        if (appUser is null) return new OperationResult(false);
+        if (appUser is null) return new OperationResult(false, null);
 
         if (await _userManager.IsEmailConfirmedAsync(appUser))
         {
@@ -258,7 +259,8 @@ public class AccountRepository : IAccountRepository
         }
 
         return new OperationResult(
-            await SendVerificationCode(appUser, cancellationToken)
+            await SendVerificationCode(appUser, cancellationToken),
+            null
         ); // Success depends on the email sent success
     }
 
@@ -334,7 +336,8 @@ public class AccountRepository : IAccountRepository
                     appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
                 ),
                 await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
-            )
+            ),
+            null
         );
     }
 
@@ -357,7 +360,8 @@ public class AccountRepository : IAccountRepository
 
         return new OperationResult<TokenDto>(
             true,
-            await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
+            await _tokenService.GenerateTokensAsync(appUser, cancellationToken),
+            null
         );
     }
 
@@ -368,18 +372,19 @@ public class AccountRepository : IAccountRepository
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
         if (userId is null)
-            return new OperationResult<LoggedInDto>(false);
+            return new OperationResult<LoggedInDto>(false, Error: null);
 
         AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).
             FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
-            ? new OperationResult<LoggedInDto>(false)
+            ? new OperationResult<LoggedInDto>(false, Error: null)
             : new OperationResult<LoggedInDto>(
                 true,
                 Mappers.ConvertAppUserToLoggedInDto(
                     appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
-                )
+                ),
+                null
             );
     }
 
@@ -401,7 +406,7 @@ public class AccountRepository : IAccountRepository
         AppUser? appUser = await _userManager.FindByEmailAsync(request.Email.Trim());
 
         if (appUser is null || string.IsNullOrEmpty(appUser.Email))
-            return new OperationResult(false);
+            return new OperationResult(false, null);
 
         string resetToken = await _userManager.GeneratePasswordResetTokenAsync(appUser);
 
@@ -418,7 +423,7 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        return new OperationResult(false);
+        return new OperationResult(false, null);
     }
 
     public async Task<OperationResult> ResetPasswordAsync(
@@ -427,13 +432,13 @@ public class AccountRepository : IAccountRepository
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(resetPassword.Email.Trim());
         if (appUser is null)
-            return new OperationResult(false);
+            return new OperationResult(false, null);
 
         IdentityResult passwordResetResult = await _userManager.ResetPasswordAsync(
             appUser, resetPassword.ResetToken, resetPassword.Password
         );
 
-        if (!passwordResetResult.Succeeded) return new OperationResult(false);
+        if (!passwordResetResult.Succeeded) return new OperationResult(false, null);
         if (!await _emailService.SendResetPasswordConfirmation(appUser))
         {
             throw new ArgumentException(
@@ -441,7 +446,7 @@ public class AccountRepository : IAccountRepository
             );
         }
 
-        return new OperationResult(passwordResetResult.Succeeded);
+        return new OperationResult(passwordResetResult.Succeeded, null);
     }
 
     public async Task<OperationResult<DeleteResult>> DeleteUserAsync(
@@ -449,7 +454,8 @@ public class AccountRepository : IAccountRepository
     ) =>
         new(
             true,
-            await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken)
+            await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken),
+            null
         );
 
     public async Task<OperationResult<UpdateResult>> UpdateLastActive(
@@ -459,7 +465,7 @@ public class AccountRepository : IAccountRepository
         ObjectId? userId = await _tokenService.GetActualUserIdAsync(userIdHashed, cancellationToken);
 
         if (userId is null)
-            return new OperationResult<UpdateResult>(false);
+            return new OperationResult<UpdateResult>(false, Error: null);
 
         UpdateDefinition<AppUser> updatedUserLastActive = Builders<AppUser>.Update.Set(
             appUser => appUser.LastActive, DateTime.UtcNow
@@ -469,7 +475,8 @@ public class AccountRepository : IAccountRepository
             true,
             await _collection.UpdateOneAsync(
                 appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken
-            )
+            ),
+            null
         );
     }
 

@@ -72,8 +72,8 @@ public class UserRepository : IUserRepository
             Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
 
         return ValidationsExtension.ValidateObjectId(objectId).IsSuccess
-            ? new OperationResult<ObjectId>(true, objectId.Value)
-            : new OperationResult<ObjectId>(false);
+            ? new OperationResult<ObjectId>(true, objectId.Value, null)
+            : new OperationResult<ObjectId>(false, Error: null);
     }
 
     public async Task<string?> GetUserNameByIdentifierHashAsync(
@@ -127,7 +127,7 @@ public class UserRepository : IUserRepository
                         InfoAlreadySavedErrorMessage
                     )
                 )
-                : new OperationResult(true);
+                : new OperationResult(true, null);
     }
 
     #endregion User Management
@@ -142,7 +142,7 @@ public class UserRepository : IUserRepository
         if (appUser is null)
         {
             _logger.LogError("appUser is Null / not found");
-            return new OperationResult<Photo>(false);
+            return new OperationResult<Photo>(false, Error: null);
         }
 
         if (appUser.Photos.Count >= MaxPhotosLimit)
@@ -160,7 +160,7 @@ public class UserRepository : IUserRepository
         string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
 
         if (photoUrls is null)
-            return new OperationResult<Photo>(false);
+            return new OperationResult<Photo>(false, Error: null);
 
         Photo? photo;
         if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
@@ -201,7 +201,7 @@ public class UserRepository : IUserRepository
 
             // Delete the uploaded blobs
             await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
-            return new OperationResult<Photo>(false);
+            return new OperationResult<Photo>(false, Error: null);
         }
 
         #endregion MongoDb Session
@@ -210,8 +210,8 @@ public class UserRepository : IUserRepository
 
         // return the saved photo if save on Azure and DB
         return photo is null
-            ? new OperationResult<Photo>(false)
-            : new OperationResult<Photo>(true, photo);
+            ? new OperationResult<Photo>(false, Error: null)
+            : new OperationResult<Photo>(true, photo, null);
     }
 
     public async Task<OperationResult> SetMainPhotoAsync(
@@ -221,7 +221,7 @@ public class UserRepository : IUserRepository
         // Convert blobUri to dbUri
         string? dbUri = BlobUriAndDbUriExtension.ConvertBlobUriToDbUri(blobUrl165In, "photos");
         if (string.IsNullOrEmpty(dbUri))
-            return new OperationResult(false);
+            return new OperationResult(false, null);
 
         #region UNSET the previous main photo: Find the photo with IsMain True; update IsMain to False
 
@@ -252,7 +252,7 @@ public class UserRepository : IUserRepository
 
         UpdateResult result = await _collection.UpdateOneAsync(filterNew, updateNew, null, cancellationToken);
 
-        return new OperationResult(result.ModifiedCount > 0);
+        return new OperationResult(result.ModifiedCount > 0, null);
     }
 
     public async Task<string?> GetProfilePhotoUrlBlobAsync(ObjectId userId, CancellationToken cancellationToken)
