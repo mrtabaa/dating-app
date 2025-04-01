@@ -20,7 +20,7 @@ public class AccountController(IAccountRepository accountRepository) : BaseApiCo
             {
                 ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
                 ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
-                ErrorCode.NetIdentity => BadRequest(result.Error.Message),
+                ErrorCode.NetIdentityFailed => BadRequest(result.Error.Message),
                 _ => BadRequest("Registration has failed. Try again or contact the support.")
             };
     }

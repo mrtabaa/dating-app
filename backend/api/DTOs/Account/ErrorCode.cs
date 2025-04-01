@@ -5,7 +5,7 @@ public enum ErrorCode
     IsRecaptchaTokenInvalid,
     IsEmailAlreadyConfirmed,
     IsWrongCreds,
-    NetIdentity,
+    NetIdentityFailed,
     IsEmailNotConfirmed,
     IsRefreshTokenExpired
 }

@@ -49,7 +49,7 @@ public class AccountRepository : IAccountRepository
             return new OperationResult(
                 false,
                 new CustomError(
-                    ErrorCode.NetIdentity,
+                    ErrorCode.NetIdentityFailed,
                     updateResult.Errors.FirstOrDefault()?.Description
                 )
             );
@@ -173,7 +173,7 @@ public class AccountRepository : IAccountRepository
             return new OperationResult(
                 false,
                 new CustomError(
-                    ErrorCode.NetIdentity,
+                    ErrorCode.NetIdentityFailed,
                     userCreatedResult.Errors.Select(e => e.Description).FirstOrDefault()
                 )
             );
