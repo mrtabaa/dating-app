@@ -14,8 +14,9 @@ public class FollowController(IFollowRepository followRepository, ITokenService 
         if (userId is null)
             return Unauthorized("User id is invalid. Login again.");
 
-        OperationResult<PagedList<AppUser>> pagedAppUsersResult =
-            await followRepository.GetFollowMembersAsync(userId.Value, followParams, cancellationToken);
+        OperationResult<PagedList<AppUser>> pagedAppUsersResult = await followRepository.GetFollowMembersAsync(
+            userId.Value, followParams, cancellationToken
+        );
 
         if (!pagedAppUsersResult.IsSuccess) return BadRequest("Getting members failed.");
 
@@ -57,7 +58,7 @@ public class FollowController(IFollowRepository followRepository, ITokenService 
 
         return result.IsSuccess
             ? Ok(new Response($"You are now following '{targetMemberUserName}'."))
-            : result?.Error.Code switch
+            : result.Error?.Code switch
             {
                 FollowErrorType.TargetMemberNotFound => NotFound($"'{targetMemberUserName}' is not found."),
                 FollowErrorType.FollowingThemself => BadRequest("Following yourself is great but is not stored!"),
