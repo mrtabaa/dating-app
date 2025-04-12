@@ -39,10 +39,9 @@ public class ExceptionMiddleware
 
             ApiException response = new()
             {
-                Id = ObjectId.Empty,
                 StatusCode = context.Response.StatusCode,
                 Message = ex.Message,
-                Details = ex.StackTrace,
+                Details = _env.IsProduction() ? "Internal Server Error." : ex.StackTrace,
                 Time = DateTime.Now
             };
 
