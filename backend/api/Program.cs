@@ -2,11 +2,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 #region Add services to the container.
 
-builder.Services.AddControllers();
-
 // From customized ServiceExtensions (Extensions folder) for a clean maintained code /
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
-builder.Services.AddIdentityServices(builder.Configuration);
+builder.Services.AddIdentityServices(builder.Configuration, builder.Environment);
 builder.Services.AddRepositoryServices();
 builder.Services.AddHubServices();
 

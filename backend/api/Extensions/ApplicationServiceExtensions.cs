@@ -132,7 +132,13 @@ public static class ApplicationServiceExtensions
 
         services.AddHttpClient();
 
-        services.AddSignalR(options => { options.AddFilter<SignalRExceptionHandler>(); });
+        services.AddSignalR(
+            options =>
+            {
+                options.AddFilter<SignalRExceptionHandler>();
+                options.AddFilter<CsrfHubFilter>();
+            }
+        );
 
         #endregion Others
 

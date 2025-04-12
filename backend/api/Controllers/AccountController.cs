@@ -4,8 +4,31 @@ namespace api.Controllers;
 
 [Authorize]
 [Produces("application/json")]
-public class AccountController(IAccountRepository accountRepository) : BaseApiController
+public class AccountController(
+    IAntiforgery antiforgery,
+    IAccountRepository accountRepository,
+    ITokenCookieService tokenCookieService,
+    ILogger<AccountController> logger
+)
+    : BaseApiController
 {
+    [AllowAnonymous]
+    [HttpGet("get-csrf-token")]
+    public IActionResult GetCsrfToken()
+    {
+        AntiforgeryTokenSet tokens = antiforgery.GetAndStoreTokens(HttpContext); // ✅ NOT GetAndStoreTokens()
+
+        if (tokens.RequestToken is null)
+        {
+            logger.LogError($"{nameof(tokens.RequestToken)}, anti-forgery token is null");
+            return StatusCode(
+                StatusCodes.Status500InternalServerError, $"{nameof(tokens.RequestToken)}, anti-forgery token is null"
+            );
+        }
+
+        return Ok(new { requestToken = tokens.RequestToken }); // Return the RequestToken in the JSON
+    }
+
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<bool>> Register(RegisterDto userIn, CancellationToken cancellationToken)

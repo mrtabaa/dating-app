@@ -41,3 +41,7 @@ global using api.SignalR.Helpers;
 global using DateTimeExtensions = api.Extensions.DateTimeExtensions;
 global using System.Threading.RateLimiting;
 global using Microsoft.AspNetCore.RateLimiting;
+global using api.Controllers.Helpers;
+global using Microsoft.AspNetCore.Antiforgery;
+global using UAParser;
+global using UAParser.Objects;

@@ -5,8 +5,36 @@ namespace api.Extensions;
 
 public static class IdentityServiceExtensions
 {
-    public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddIdentityServices(
+        this IServiceCollection services,
+        IConfiguration config,
+        IWebHostEnvironment environment
+    )
     {
+        #region CSRF Protection
+
+        // Setting defaults
+        services.AddAntiforgery(
+            options =>
+            {
+                options.HeaderName = "X-XSRF-TOKEN";
+                options.Cookie.Name = "XSRF-TOKEN";
+                options.Cookie.HttpOnly = false; // Must be false so Angular can access it
+                options.Cookie.SecurePolicy = environment.IsProduction()
+                    ? CookieSecurePolicy.Always
+                    : CookieSecurePolicy.None; // Development
+                options.Cookie.SameSite = SameSiteMode.Strict; // TODO: Change to Lax
+            }
+        );
+
+        // Apply protection to all non-Get requests
+        services.AddControllersWithViews(
+
+            options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); }
+        );
+
+        #endregion
+
         #region Token
 
         JwtSettings jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
