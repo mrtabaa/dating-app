@@ -251,7 +251,9 @@
           <div class="buttons">
             <button color="primary" mat-stroked-button matStepperPrevious>Back</button>
             <button (click)="submit()" color="primary" mat-raised-button type="submit">Submit</button>
-            <button (click)="stepper.reset(); resetCountry()" color="warn" mat-stroked-button>Reset</button>
+            <button (click)="stepper.reset(); resetCountry(); getMember();" color="warn" mat-stroked-button>
+              Reset
+            </button>
           </div>
         </form>
       </div>

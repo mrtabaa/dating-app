@@ -144,7 +144,16 @@ export class CompleteProfileComponent implements OnInit {
     updatedUser.isProfileCompleted = false;
 
     this.userService.updateUser(updatedUser)
-      .pipe(take(1)).subscribe();
+      .pipe(take(1))
+      .subscribe({
+        next: (response: ApiResponseMessage) => {
+          this.matSnack.open(response.message, 'Close', {
+            horizontalPosition: 'center',
+            verticalPosition: 'bottom',
+            duration: 10000
+          });
+        }
+      });
   }
 
   submit(): void {
