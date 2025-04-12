@@ -9,7 +9,7 @@ public static class ApplicationServiceExtensions
         #region MongoDbSettings
 
         ///// get values from this file: appsettings.Development.json /////
-        // get section
+        // get the section
         services.Configure<MyMongoDbSettings>(config.GetSection(nameof(MyMongoDbSettings)));
 
         // get values
@@ -83,7 +83,7 @@ public static class ApplicationServiceExtensions
                         {
                             string? userIdHashed = httpContext.User.Identity?.IsAuthenticated == true
                                 ? httpContext.User.GetUserIdHashed()
-                                : httpContext.Connection.RemoteIpAddress?.ToString() 
+                                : httpContext.Connection.RemoteIpAddress?.ToString()
                                   ?? Guid.NewGuid().ToString(); // Use a random fallback for anonymous
 
                             return RateLimitPartition.GetSlidingWindowLimiter(

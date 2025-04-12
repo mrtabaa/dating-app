@@ -71,7 +71,7 @@ public class UserRepository : IUserRepository
             Where(appUser => appUser.NormalizedUserName == userName.ToUpper().Trim()).
             Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
 
-        return ValidationsExtension.ValidateObjectId(objectId).IsSuccess
+        return ValidationsExtension.ValidateObjectId(objectId)
             ? new OperationResult<ObjectId>(true, objectId.Value, null)
             : new OperationResult<ObjectId>(false, Error: null);
     }
