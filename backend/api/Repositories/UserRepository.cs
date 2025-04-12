@@ -138,40 +138,12 @@ public class UserRepository : IUserRepository
         IFormFile file, ObjectId userId, CancellationToken cancellationToken
     )
     {
-        AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
-        if (appUser is null)
-        {
-            _logger.LogError("appUser is Null / not found");
-            return new OperationResult<Photo>(false, Error: null);
-        }
-
-        if (appUser.Photos.Count >= MaxPhotosLimit)
-        {
-            return new OperationResult<Photo>(
-                false,
-                Error: new CustomError(
-                    UserErrorType.MaxPhotosLimitReached,
-                    _maxPhotosLimitErrorMessage
-                )
-            );
-        }
-
-        // save file in Storage using PhotoService / userId makes the folder name
-        string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
-
-        if (photoUrls is null)
-            return new OperationResult<Photo>(false, Error: null);
-
-        Photo? photo;
-        if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
-            photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, true);
-        else // user's album is not empty
-            photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, false);
-
         #region MongoDb Session
 
+        Photo? photo = null;
+
         //// Session is NOT supported in MongoDb Standalone servers!
-        // Create a session object that is used when leveraging transactions
+        // Create a session object used when leveraging transactions
         using IClientSessionHandle session = await _client.StartSessionAsync(null, cancellationToken);
 
         // Begin transaction
@@ -179,6 +151,35 @@ public class UserRepository : IUserRepository
 
         try
         {
+            AppUser? appUser = await GetByIdAsync(userId, cancellationToken);
+            if (appUser is null)
+            {
+                _logger.LogError("appUser is Null / not found");
+                return new OperationResult<Photo>(false, Error: null);
+            }
+
+            if (appUser.Photos.Count >= MaxPhotosLimit)
+            {
+                return new OperationResult<Photo>(
+                    false,
+                    Error: new CustomError(
+                        UserErrorType.MaxPhotosLimitReached,
+                        _maxPhotosLimitErrorMessage
+                    )
+                );
+            }
+
+            // save the file in Storage using PhotoService / userId makes the folder name
+            string[]? photoUrls = await _photoService.AddPhotoToBlob(file, appUser.Id.ToString(), cancellationToken);
+
+            if (photoUrls is null)
+                return new OperationResult<Photo>(false, Error: null);
+
+            if (appUser.Photos.Count == 0) // if user's album is empty set IsMain: true
+                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, true);
+            else // user's album is not empty
+                photo = Mappers.ConvertPhotoUrlsToPhoto(photoUrls, false);
+
             UpdateDefinition<AppUser>? updatedUser = Builders<AppUser>.Update.
                 Set(aU => aU.Schema, AppVariablesExtensions.AppVersions.Last()).AddToSet(doc => doc.Photos, photo);
 
@@ -200,7 +201,8 @@ public class UserRepository : IUserRepository
             await session.AbortTransactionAsync(cancellationToken);
 
             // Delete the uploaded blobs
-            await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
+            if (photo is not null)
+                await _photoService.DeletePhotoFromBlob(photo, CancellationToken.None);
             return new OperationResult<Photo>(false, Error: null);
         }
 
