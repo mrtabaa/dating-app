@@ -32,6 +32,21 @@ app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsProduction()) // https for production only
     app.UseHttpsRedirection();
 
+// ✅ Add this logging middleware early
+// app.Use(
+//     async (context, next) =>
+//     {
+//         string? cookie = context.Request.Cookies["XSRF-TOKEN"];
+//         string? header = context.Request.Headers["X-XSRF-TOKEN"].FirstOrDefault();
+//
+//         Console.WriteLine("🚀 Incoming request:");
+//         Console.WriteLine($"  🔐 Cookie [XSRF-TOKEN]: {cookie}");
+//         Console.WriteLine($"  📩 Header [X-XSRF-TOKEN]: {header}");
+//
+//         await next();
+//     }
+// );
+
 app.UseCors();
 
 app.UseRouting();
