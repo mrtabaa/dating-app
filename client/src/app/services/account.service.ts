@@ -1,28 +1,27 @@
-import { HttpClient } from '@angular/common/http';
-import { effect, inject, Injectable, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { map, Observable, take } from 'rxjs';
-import { UserLogin } from '../models/account/user-login.model';
-import { UserRegister } from '../models/account/user-register.model';
-import { environment } from '../../environments/environment';
-import { LoggedInUser } from '../models/logged-in-user.model';
-import { GooglePlacesService } from './google-places.service';
-import { ResponsiveService } from './responsive.service';
-import { PresenceService } from './hubs/presence.service';
-import { Verify } from "../models/account/verify.model";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { CommonService } from "./common.service";
-import { ApiResponseMessage } from "../models/helpers/api-response-message";
-import { RecoveryValidationRequest } from "../models/account/recovery-validation-request.model";
-import { ResetPassword } from "../models/account/reset-password.model";
-import { Roles } from "../enums/Roles.enum";
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable, signal} from '@angular/core';
+import {Router} from '@angular/router';
+import {map, Observable, take} from 'rxjs';
+import {UserLogin} from '../models/account/user-login.model';
+import {UserRegister} from '../models/account/user-register.model';
+import {environment} from '../../environments/environment';
+import {LoggedInUser} from '../models/logged-in-user.model';
+import {GooglePlacesService} from './google-places.service';
+import {ResponsiveService} from './responsive.service';
+import {PresenceService} from './hubs/presence.service';
+import {Verify} from "../models/account/verify.model";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {CommonService} from "./common.service";
+import {ApiResponseMessage} from "../models/helpers/api-response-message";
+import {RecoveryValidationRequest} from "../models/account/recovery-validation-request.model";
+import {ResetPassword} from "../models/account/reset-password.model";
+import {Roles} from "../enums/Roles.enum";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   loggedInUserSig = signal<LoggedInUser | undefined>(undefined);
-  private _isAccountAuthenticated = signal<boolean>(false);
   private _googlePlacesService = inject(GooglePlacesService);
   private _responsiveService = inject(ResponsiveService);
   private _http = inject(HttpClient);
@@ -119,9 +118,9 @@ export class AccountService {
     if (localStorage.getItem("loggedInUser"))
       this._http.get<LoggedInUser>(this.baseUrl)
         .pipe(take(1)).subscribe({
-          next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
-          error: () => this.logout()
-        });
+        next: (loggedInUser: LoggedInUser) => this.setCurrentUser(loggedInUser), // set loggedInUser
+        error: () => this.logout()
+      });
   }
 
   requestResetPassword(request: RecoveryValidationRequest): Observable<ApiResponseMessage> {
