@@ -11,11 +11,10 @@ public class AccountRepository : IAccountRepository
 
     private const string RecaptchaErrorMessage = "Recaptcha token is invalid. 'Slide me!' again.";
     private const string WrongCredsErrorMessage = "Wrong username or password.";
+    private const string SessionExpiredMessage = "Your session has expired. Login again.";
 
     private const string EmailAlreadyConfirmedErrorMessage = "This email is already registered and verified. " +
                                                              "You can login or recover your password if the owner.";
-
-    private const string RefreshTokenExpiredErrorMessage = "Your login sesssion has expired. Login again.";
 
     #endregion
 
@@ -109,37 +108,62 @@ public class AccountRepository : IAccountRepository
         return builder.Uri.ToString();
     }
 
+    private static bool ValidateSession(RefreshTokenRequest refreshTokenRequest1, RefreshToken refreshToken)
+        =>
+            ValidationsExtension.ValidateObjectId(refreshToken.UserId)
+            && !(refreshToken.SessionMetadata is null || refreshTokenRequest1.SessionMetadata is null)
+            && refreshToken.SessionMetadata.DeviceType == refreshTokenRequest1.SessionMetadata.DeviceType
+            && refreshToken.SessionMetadata.DeviceName == refreshTokenRequest1.SessionMetadata.DeviceName
+            && refreshToken.SessionMetadata.UserAgent == refreshTokenRequest1.SessionMetadata.UserAgent
+            && refreshToken.SessionMetadata.IpAddress == refreshTokenRequest1.SessionMetadata.IpAddress;
+
+
+    private async Task RevokeAllRefreshTokensAsync(ObjectId userId, CancellationToken cancellationToken)
+    {
+        // TODO: Record and warn as hacked / Token stolen and used again.
+        UpdateDefinition<RefreshToken> updateDefinition = Builders<RefreshToken>.Update.Set(
+            token => token.IsRevoked, true
+        );
+
+        await _collectionRefreshTokens.UpdateManyAsync(
+            token => token.UserId == userId, updateDefinition, null, cancellationToken
+        );
+    }
+
     #endregion
 
     #region Db and Token Settings
 
-    private readonly IMongoCollection<AppUser> _collection;
+    private readonly IMongoCollection<AppUser> _collectionUsers;
+    private readonly IMongoCollection<RefreshToken> _collectionRefreshTokens;
     private readonly IRecaptchaService _recaptchaService;
-    private readonly IUserRepository _userRepository;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
     private readonly IEmailService _emailService;
     private readonly IPhotoService _photoService;
     private readonly IHostEnvironment _hostEnvironment;
+    private readonly IUserRepository _userRepository;
 
     // constructor - dependency injection
     public AccountRepository(
         IMongoClient client, IMyMongoDbSettings dbSettings,
-        IRecaptchaService recaptchaValidatorService, IUserRepository userRepository,
+        IRecaptchaService recaptchaValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
-        IEmailService emailService, IPhotoService photoService, IHostEnvironment hostEnvironment
+        IEmailService emailService, IPhotoService photoService, IHostEnvironment hostEnvironment,
+        IUserRepository userRepository
     )
     {
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
                                 ?? throw new ArgumentNullException(nameof(dbName), "The database name cannot be null.");
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
+        _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
+        _collectionRefreshTokens = dbName.GetCollection<RefreshToken>(AppVariablesExtensions.CollectionRefreshTokens);
         _recaptchaService = recaptchaValidatorService;
-        _userRepository = userRepository;
         _userManager = userManager;
         _tokenService = tokenService;
         _emailService = emailService;
         _photoService = photoService;
         _hostEnvironment = hostEnvironment;
+        _userRepository = userRepository;
     }
 
     #endregion
@@ -195,7 +219,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task<OperationResult<LoginResult>> VerifyAsync(
-        VerifyDto verifyDto, CancellationToken cancellationToken
+        VerifyDto verifyDto, SessionMetadata sessionMetadata, CancellationToken cancellationToken
     )
     {
         AppUser? appUser = await _userManager.FindByEmailAsync(verifyDto.Email);
@@ -217,13 +241,19 @@ public class AccountRepository : IAccountRepository
         if (!result.Succeeded)
             return new OperationResult<LoginResult>(false, Error: null);
 
+        RefreshTokenRequest refreshTokenRequest = new()
+        {
+            JtiValue = Guid.CreateVersion7().ToString(),
+            SessionMetadata = sessionMetadata
+        };
+
         return new OperationResult<LoginResult>(
             true,
             new LoginResult(
                 Mappers.ConvertAppUserToLoggedInDto(
                     appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
                 ),
-                await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
+                await _tokenService.GenerateTokensAsync(refreshTokenRequest, appUser, cancellationToken)
             ),
             null
         );
@@ -265,7 +295,7 @@ public class AccountRepository : IAccountRepository
     }
 
     public async Task<OperationResult<LoginResult>> LoginAsync(
-        LoginDto userInput, CancellationToken cancellationToken
+        LoginDto userInput, SessionMetadata sessionMetadata, CancellationToken cancellationToken
     )
     {
         if (!await ValidateRecaptcha(userInput.RecaptchaToken, cancellationToken))
@@ -329,38 +359,92 @@ public class AccountRepository : IAccountRepository
             );
         }
 
+        RefreshTokenRequest refreshTokenRequest = new()
+        {
+            JtiValue = Guid.CreateVersion7().ToString(),
+            SessionMetadata = sessionMetadata
+        };
+
         return new OperationResult<LoginResult>(
             true,
             new LoginResult(
                 Mappers.ConvertAppUserToLoggedInDto(
                     appUser, await _userManager.GetRolesAsync(appUser), GetMainPhoto(appUser)
                 ),
-                await _tokenService.GenerateTokensAsync(appUser, cancellationToken)
+                await _tokenService.GenerateTokensAsync(refreshTokenRequest, appUser, cancellationToken)
             ),
             null
         );
     }
 
     public async Task<OperationResult<TokenDto>> RefreshTokensAsync(
-        string identifierHash, CancellationToken cancellationToken
+        RefreshTokenRequest refreshTokenRequest, CancellationToken cancellationToken
     )
     {
-        AppUser? appUser = await _userRepository.GetByIdentifierHashAsync(identifierHash, cancellationToken);
+        RefreshToken expectedTokenFromDb = await _collectionRefreshTokens.
+                                               Find(
+                                                   token => token.JtiValue == refreshTokenRequest.JtiValue
+                                               ).
+                                               SingleOrDefaultAsync(cancellationToken)
+                                           ?? throw new ArgumentNullException(
+                                               nameof(expectedTokenFromDb), "cannot be null."
+                                           );
 
+        if (!ValidateSession(refreshTokenRequest, expectedTokenFromDb))
+        {
+            //TODO: Logged in from new device/location. Perform 2FA.
+        }
+
+        if (expectedTokenFromDb.UsedAt is not null)
+        {
+            await RevokeAllRefreshTokensAsync(expectedTokenFromDb.UserId, cancellationToken);
+            // TODO: Hacked, force to change password.    
+        }
+
+        bool isInvalid = !TokenHasher.ValidateToken(
+            refreshTokenRequest.TokenValueRaw, expectedTokenFromDb.TokenValueHashed
+        );
+
+        // Check token expiration, revoked, and HMAC validation
+        if (
+            expectedTokenFromDb.ExpiresAt < DateTimeOffset.UtcNow
+            || expectedTokenFromDb.IsRevoked // e.g. revoked by admin or user logout
+            || isInvalid
+        )
+        {
+            return new OperationResult<TokenDto>(
+                false,
+                Error: new CustomError(
+                    ErrorCode.IsSessionExpired,
+                    SessionExpiredMessage
+                )
+            );
+        }
+
+        UpdateDefinition<RefreshToken>? revokeTokenUpdateDef = Builders<RefreshToken>.Update.
+            Set(token => token.UsedAt, DateTimeOffset.UtcNow).Set(t => t.IsRevoked, true);
+
+        await _collectionRefreshTokens.UpdateOneAsync(
+            token => token.Id == expectedTokenFromDb.Id, revokeTokenUpdateDef, null,
+            cancellationToken
+        );
+
+        AppUser? appUser = await _userRepository.GetByIdAsync(expectedTokenFromDb.UserId, cancellationToken);
         if (appUser is null)
         {
             return new OperationResult<TokenDto>(
                 false,
                 Error: new CustomError(
-                    ErrorCode.IsRefreshTokenExpired,
-                    RefreshTokenExpiredErrorMessage
+                    ErrorCode.IsSessionExpired,
+                    SessionExpiredMessage
                 )
             );
         }
 
+        // Token is valid
         return new OperationResult<TokenDto>(
             true,
-            await _tokenService.GenerateTokensAsync(appUser, cancellationToken),
+            await _tokenService.GenerateTokensAsync(refreshTokenRequest, appUser, cancellationToken),
             null
         );
     }
@@ -374,7 +458,7 @@ public class AccountRepository : IAccountRepository
         if (userId is null)
             return new OperationResult<LoggedInDto>(false, Error: null);
 
-        AppUser appUser = await _collection.Find(appUser => appUser.Id == userId).
+        AppUser appUser = await _collectionUsers.Find(appUser => appUser.Id == userId).
             FirstOrDefaultAsync(cancellationToken);
 
         return appUser is null
@@ -454,7 +538,7 @@ public class AccountRepository : IAccountRepository
     ) =>
         new(
             true,
-            await _collection.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken),
+            await _collectionUsers.DeleteOneAsync(appUser => appUser.Email == userEmail, cancellationToken),
             null
         );
 
@@ -473,7 +557,7 @@ public class AccountRepository : IAccountRepository
 
         return new OperationResult<UpdateResult>(
             true,
-            await _collection.UpdateOneAsync(
+            await _collectionUsers.UpdateOneAsync(
                 appUser => appUser.Id == userId, updatedUserLastActive, null, cancellationToken
             ),
             null

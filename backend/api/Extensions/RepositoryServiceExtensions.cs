@@ -6,6 +6,7 @@ public static class RepositoryServiceExtensions
     {
         services.AddScoped<IRecaptchaService, RecaptchaService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenCookieService, TokenCookieService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

@@ -2,7 +2,8 @@ namespace api.Services;
 
 public class TokenService : ITokenService
 {
-    private readonly IMongoCollection<AppUser> _collection;
+    private readonly IMongoCollection<AppUser> _collectionAppUser;
+    private readonly IMongoCollection<RefreshToken> _collectionRefreshTokens;
     private readonly JwtSettings _jwtSettings;
     private readonly UserManager<AppUser> _userManager;
 
@@ -13,26 +14,13 @@ public class TokenService : ITokenService
         IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ??
                                 throw new ArgumentNullException(nameof(dbName));
 
-        _collection = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
+        _collectionAppUser = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
+        _collectionRefreshTokens = dbName.GetCollection<RefreshToken>(AppVariablesExtensions.CollectionRefreshTokens);
 
         _jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
                        ?? throw new ArgumentNullException(nameof(JwtSettings));
 
         _userManager = userManager;
-    }
-
-    public async Task<TokenDto> GenerateTokensAsync(AppUser appUser, CancellationToken cancellationToken)
-    {
-        var jtiValue = Guid.CreateVersion7().ToString();
-
-        string identifierHash = await InsertHashedUserId(
-            appUser.Id, jtiValue, cancellationToken
-        ); // this securedId is stored in users collection to associate with the AppUser.
-
-        return new TokenDto(
-            await GenerateAccessTokenAsync(appUser, identifierHash, jtiValue),
-            GenerateRefreshTokenAsync(identifierHash)
-        );
     }
 
     /// <summary>
@@ -46,21 +34,35 @@ public class TokenService : ITokenService
     {
         if (string.IsNullOrEmpty(userIdHashed)) return null;
 
-        ObjectId? userId = await _collection.AsQueryable().Where(appUser => appUser.IdentifierHash == userIdHashed).
+        ObjectId? userId = await _collectionAppUser.AsQueryable().
+            Where(appUser => appUser.IdentifierHash == userIdHashed).
             Select(appUser => appUser.Id).SingleOrDefaultAsync(cancellationToken);
 
-        return ValidationsExtension.ValidateObjectId(userId).IsSuccess ? userId : null;
+        return ValidationsExtension.ValidateObjectId(userId) ? userId : null;
     }
 
-    private async Task<string> GenerateAccessTokenAsync(AppUser appUser, string identifierHash, string jtiValue)
+    public async Task<TokenDto> GenerateTokensAsync(
+        RefreshTokenRequest refreshTokenRequest, AppUser appUser, CancellationToken cancellationToken
+    )
+    {
+        string identifierHash = await StoreHashedUserId(
+            appUser.Id, cancellationToken
+        ); // this securedId is stored in user's collection to associate with the AppUser.
+
+        return new TokenDto(
+            await GenerateAccessTokenAsync(identifierHash, appUser),
+            await GenerateRefreshTokenAsync(refreshTokenRequest, appUser.Id, cancellationToken)
+        );
+    }
+
+    private async Task<string> GenerateAccessTokenAsync(string identifierHash, AppUser appUser)
     {
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.Sub, identifierHash),
-            new(JwtRegisteredClaimNames.Jti, jtiValue)
+            new(JwtRegisteredClaimNames.Sub, identifierHash)
         };
 
-        // Get user's roles and add them all into claims
+        // Get user's roles and add them all into claims. Admin/Moderator needs it
         IList<string> roles = await _userManager.GetRolesAsync(appUser);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
 
@@ -71,47 +73,49 @@ public class TokenService : ITokenService
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(10), // Short lifespan
+            expires: DateTime.UtcNow.AddSeconds(10), // Short lifespan
             signingCredentials: creds
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private string GenerateRefreshTokenAsync(string identifierHash)
-    {
-        var claims = new List<Claim>
-        {
-            new(JwtRegisteredClaimNames.Sub, identifierHash)
-        };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-        var token = new JwtSecurityToken(
-            _jwtSettings.Issuer,
-            _jwtSettings.Audience,
-            claims,
-            expires: DateTime.UtcNow.AddDays(7), // Long lifespan
-            signingCredentials: creds
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-
-    private async Task<string> InsertHashedUserId(
-        ObjectId userId, string jtiValue, CancellationToken cancellationToken
+    private async Task<RefreshTokenResponse> GenerateRefreshTokenAsync(
+        RefreshTokenRequest refreshTokenRequest, ObjectId userId, CancellationToken cancellationToken
     )
     {
-        var newObjectId = ObjectId.GenerateNewId().ToString();
+        var tokenValueRaw = Guid.CreateVersion7().ToString();
 
-        string identifierHash = BCrypt.Net.BCrypt.HashPassword(newObjectId);
+        var refreshToken = new RefreshToken
+        {
+            UserId = userId,
+            JtiValue = Guid.CreateVersion7().ToString(),
+            TokenValueHashed = TokenHasher.HashWithSecret(tokenValueRaw, _jwtSettings.Key),
+            CreatedAt = DateTimeOffset.UtcNow,
+            ExpiresAt = DateTimeOffset.UtcNow.AddDays(7),
+            SessionMetadata = refreshTokenRequest.SessionMetadata
+        };
 
-        UpdateDefinition<AppUser> updatedSecuredToken = Builders<AppUser>.Update.
-            Set(appUser => appUser.IdentifierHash, identifierHash).Set(appUser => appUser.JtiValue, jtiValue);
+        await _collectionRefreshTokens.InsertOneAsync(refreshToken, null, cancellationToken);
 
-        UpdateResult updateResult = await _collection.UpdateOneAsync(
-            appUser => appUser.Id == userId, updatedSecuredToken, null, cancellationToken
+        return new RefreshTokenResponse(
+            tokenValueRaw,
+            refreshToken.JtiValue,
+            refreshToken.ExpiresAt
+        );
+    }
+
+    private async Task<string> StoreHashedUserId(
+        ObjectId userId, CancellationToken cancellationToken
+    )
+    {
+        var identifierHash = Guid.CreateVersion7().ToString();
+
+        UpdateDefinition<AppUser> updatedIdentifierHash = Builders<AppUser>.Update.
+            Set(appUser => appUser.IdentifierHash, identifierHash);
+
+        UpdateResult updateResult = await _collectionAppUser.UpdateOneAsync(
+            appUser => appUser.Id == userId, updatedIdentifierHash, null, cancellationToken
         );
 
         return updateResult.ModifiedCount == 1

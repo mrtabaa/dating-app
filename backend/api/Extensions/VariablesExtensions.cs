@@ -6,6 +6,7 @@ public static class AppVariablesExtensions
 
     // COLLECTIONS
     public const string CollectionUsers = "users";
+    public const string CollectionRefreshTokens = "refresh-tokens";
     public const string CollectionFollows = "follows";
     public const string CollectionMessages = "messages";
     public const string CollectionOnlineTrackers = "online-trackers";

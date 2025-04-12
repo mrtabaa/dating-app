@@ -1,5 +1,3 @@
-using api.Controllers.Helpers;
-
 namespace api.Controllers;
 
 [Authorize]
@@ -52,18 +50,21 @@ public class AccountController(
     [HttpPost("verify")]
     public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
-        OperationResult<LoginResult> result = await accountRepository.VerifyAsync(verifyDto, cancellationToken);
+        OperationResult<LoginResult> result = await accountRepository.VerifyAsync(
+            verifyDto, ExtractSessionMetadata(), cancellationToken
+        );
 
-        if (result.IsSuccess)
-            AddTokensToResponseCookies(result.Result.TokenDto);
-
-        return result.IsSuccess
-            ? result.Result.LoggedInDto
-            : result.Error?.Code switch
+        if (!result.IsSuccess)
+        {
+            return result.Error?.Code switch
             {
                 ErrorCode.IsEmailAlreadyConfirmed => Conflict(result.Error.Message),
                 _ => BadRequest("Failed to verify your account. Check the code and try again.")
             };
+        }
+
+        AddTokensToResponseCookies(result.Result.TokenDto);
+        return result.Result.LoggedInDto;
     }
 
     [AllowAnonymous]
@@ -88,37 +89,46 @@ public class AccountController(
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userIn, CancellationToken cancellationToken)
     {
-        OperationResult<LoginResult> result = await accountRepository.LoginAsync(userIn, cancellationToken);
+        OperationResult<LoginResult> result = await accountRepository.LoginAsync(
+            userIn, ExtractSessionMetadata(), cancellationToken
+        );
 
-        if (result.IsSuccess)
-            AddTokensToResponseCookies(result.Result.TokenDto);
-
-        return result.IsSuccess
-            ? result.Result.LoggedInDto
-            : result.Error?.Code switch
+        if (!result.IsSuccess)
+        {
+            return result.Error?.Code switch
             {
                 ErrorCode.IsRecaptchaTokenInvalid => BadRequest(result.Error.Message),
                 ErrorCode.IsWrongCreds => Unauthorized(result.Error.Message),
                 ErrorCode.IsEmailNotConfirmed => Accepted(result.Result.LoggedInDto),
                 _ => Unauthorized("Login has failed. Try again or contact the support.")
             };
+        }
+
+        AddTokensToResponseCookies(result.Result.TokenDto);
+        return result.Result.LoggedInDto;
     }
 
-    [HttpPost("refresh-tokens")]
+    [AllowAnonymous]
+    [HttpGet("refresh-tokens")]
     public async Task<ActionResult> RefreshTokens(CancellationToken cancellationToken)
     {
-        string? identifierHash = User.GetUserIdHashed();
-        if (string.IsNullOrEmpty(identifierHash))
-            return Unauthorized("Your login session has expired. Please login again.");
+        bool isSuccess = Request.Cookies.TryGetValue("auth.refresh-token", out string? protectedRefreshToken);
+        if (!isSuccess || string.IsNullOrEmpty(protectedRefreshToken))
+            return Unauthorized("Your session has expired. Login again.");
+
+        // Decrypt RefreshTokenDto
+        RefreshTokenRequest refreshTokenRequest = tokenCookieService.DecryptRefreshTokenRequest(protectedRefreshToken);
+
+        refreshTokenRequest.SessionMetadata = ExtractSessionMetadata();
 
         OperationResult<TokenDto>
-            result = await accountRepository.RefreshTokensAsync(identifierHash, cancellationToken);
+            result = await accountRepository.RefreshTokensAsync(refreshTokenRequest, cancellationToken);
 
         if (!result.IsSuccess)
         {
             return result.Error?.Code switch
             {
-                ErrorCode.IsRefreshTokenExpired => Unauthorized(result.Error.Message),
+                ErrorCode.IsSessionExpired => Unauthorized(result.Error.Message),
                 _ => BadRequest("Failed to refresh token. Try again or contact the support.")
             };
         }
@@ -186,8 +196,28 @@ public class AccountController(
 
     private void AddTokensToResponseCookies(TokenDto tokenDto)
     {
+        #region Delete Tokens
+
+        Response.Cookies.Delete(
+            "auth.access-token", new CookieOptions
+            {
+                Path = "/"
+            }
+        );
+        Response.Cookies.Delete(
+            "auth.refresh-token", new CookieOptions
+            {
+                Path = "/api/account/refresh-tokens"
+            }
+        );
+
+        #endregion
+
+        #region Add Tokens
+
+        // Access Token
         Response.Cookies.Append(
-            "access-token", tokenDto.AccessToken, new CookieOptions
+            "auth.access-token", tokenDto.AccessToken, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -201,16 +231,48 @@ public class AccountController(
             }
         );
 
+        // Refresh Token
+        string encryptedCookie = tokenCookieService.EncryptRefreshTokenResponse(tokenDto.RefreshTokenResponse);
+
         Response.Cookies.Append(
-            "refresh-token", tokenDto.RefreshToken, new CookieOptions
+            "auth.refresh-token", encryptedCookie, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
                 // Domain = ".hallboard.com",
-                Expires = DateTimeExtensions.GetTokenExpirationDate(tokenDto.RefreshToken), // e.g. 7 days
+                Expires = tokenDto.RefreshTokenResponse.ExpiresAt.UtcDateTime,
                 Path = "/api/account/refresh-tokens"
             }
+        );
+
+        #endregion
+    }
+
+    private SessionMetadata ExtractSessionMetadata()
+    {
+        var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+        Parser? parser = Parser.GetDefault();
+        ClientInfo? client = parser.Parse(userAgent);
+
+        string deviceType = client.Device.IsSpider ? "Bot" :
+            string.IsNullOrWhiteSpace(client.Device.Family) ? "Unknown" : client.Device.Family;
+        var os = $"{client.OS.Family} {client.OS.Major}";
+        var browser = $"{client.Browser.Family} {client.Browser.Major}";
+
+        var deviceName = $"{os} - {browser}";
+
+        string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+        // Optionally get location from headers (e.g., behind Cloudflare)
+        string location = HttpContext.Request.Headers["CF-IPCountry"].FirstOrDefault() ?? "Unknown";
+
+        return new SessionMetadata(
+            deviceType,
+            deviceName,
+            string.IsNullOrWhiteSpace(userAgent) ? "Unknown" : userAgent,
+            ipAddress,
+            location
         );
     }
 }

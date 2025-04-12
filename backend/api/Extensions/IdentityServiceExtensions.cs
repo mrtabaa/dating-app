@@ -37,6 +37,9 @@ public static class IdentityServiceExtensions
 
         #region Token
 
+        services.AddDataProtection(); // To Encrypt/Decrypt cookies
+
+        // JWT
         JwtSettings jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
                                   ?? throw new ArgumentNullException(nameof(JwtSettings));
 
@@ -66,9 +69,10 @@ public static class IdentityServiceExtensions
                     OnMessageReceived = context =>
                     {
                         // Use refresh-token only for the refresh endpoint
-                        context.Token = context.HttpContext.Request.Path.StartsWithSegments("/api/account/refresh-tokens") 
-                            ? context.Request.Cookies["refresh-token"] 
-                            : context.Request.Cookies["access-token"];
+                        context.Token =
+                            context.HttpContext.Request.Path.StartsWithSegments("/api/account/refresh-tokens")
+                                ? context.Request.Cookies["auth.refresh-token"]
+                                : context.Request.Cookies["auth.access-token"];
 
                         return Task.CompletedTask;
                     }
