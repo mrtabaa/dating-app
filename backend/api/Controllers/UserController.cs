@@ -24,7 +24,9 @@ public class UserController(IUserRepository userRepository, ITokenService tokenS
             : result.Error?.Code switch
             {
                 UserErrorType.UpdateFailed => BadRequest(result.Error.Message),
-                UserErrorType.InfoAlreadySaved => BadRequest(result.Error.Message),
+                UserErrorType.InfoAlreadySaved => StatusCode(
+                    StatusCodes.Status208AlreadyReported, new Response(result.Error.Message!)
+                ),
                 _ => BadRequest("Update failed. Contact support.")
             };
     }
