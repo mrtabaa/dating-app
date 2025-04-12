@@ -11,8 +11,9 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const snack = inject(MatSnackBar);
 
   const loggedInUserStr = localStorage.getItem('loggedInUser');
-  if (loggedInUserStr) {
-    req = req.clone({withCredentials: true});
+  if (!loggedInUserStr) {
+    accountService.logout();
+    return next(req); // {withCredentials: true} applied in credentialsInterceptor
   }
 
   return next(req).pipe(
@@ -25,11 +26,12 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         return accountService.refreshTokens().pipe(
           switchMap(() => {
             refreshTokenInProgress = false;
-            return next(req.clone({withCredentials: true}));
+            return next(req);
           }),
           catchError((error) => {
             console.error(error);
             refreshTokenInProgress = false; // Reset flag if refresh fails
+            accountService.logout();
             return throwError(() => error);
           })
         );
@@ -40,7 +42,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
         verticalPosition: 'top',
         duration: 7000
       });
-      accountService.logout();
+
       return throwError(() => err);
     })
   );
