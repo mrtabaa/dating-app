@@ -8,14 +8,19 @@ public class ExceptionMiddleware
     private readonly RequestDelegate _next;
 
     public ExceptionMiddleware(
-        RequestDelegate next, IHostEnvironment env,
-        IMongoClient client, IMyMongoDbSettings dbSettings, ILogger<ExceptionMiddleware> logger)
+        RequestDelegate next,
+        IHostEnvironment env,
+        IMongoClient client,
+        IMyMongoDbSettings dbSettings,
+        ILogger<ExceptionMiddleware> logger
+    )
     {
         _next = next;
-        _logger = logger;
         _env = env;
+        _logger = logger;
 
-        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName) ?? throw new ArgumentNullException(nameof(dbName));
+        IMongoDatabase dbName = client.GetDatabase(dbSettings.DatabaseName)
+                                ?? throw new ArgumentNullException(nameof(dbName));
         _collection = dbName.GetCollection<ApiException>(AppVariablesExtensions.CollectionExceptionLogs);
     }
 
@@ -47,7 +52,6 @@ public class ExceptionMiddleware
                 response.Details = "Internal Server Error.";
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
             string json = JsonSerializer.Serialize(response, options);
 
             await context.Response.WriteAsync(json);
