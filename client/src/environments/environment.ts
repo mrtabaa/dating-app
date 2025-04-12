@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5100/api/',
-  hubUrl: 'http://localhost:5100/hubs/'
+  apiUrl: '//localhost:5100/api/', // Relative URL rather than Absolute with 'http:', Auto-adjust with browser
+  hubUrl: '//localhost:5100/hubs/'
 };
 
 /*

@@ -32,6 +32,10 @@ export class AccountService {
   private _snackBar = inject(MatSnackBar);
   private _isVerifyingAccountSig = inject(CommonService).isVerifyingAccountSig;
 
+  getCsrfToken$(): Observable<{ requestToken: string }> {
+    return this._http.get<{ requestToken: string }>(this.baseUrl + 'get-csrf-token');
+  }
+
   register(userInput: UserRegister): Observable<void> {
     return this._http.post<boolean>(this.baseUrl + 'register', userInput)
       .pipe(
@@ -45,7 +49,7 @@ export class AccountService {
   }
 
   verify(verify: Verify): Observable<void> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify, { withCredentials: true })
+    return this._http.post<LoggedInUser>(this.baseUrl + 'verify', verify)
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
@@ -71,10 +75,12 @@ export class AccountService {
   }
 
   login(userInput: UserLogin): Observable<LoggedInUser | null> {
-    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput, { withCredentials: true })
+    return this._http.post<LoggedInUser>(this.baseUrl + 'login', userInput)
       .pipe(
         map((user: LoggedInUser) => {
           if (user) {
+            sessionStorage.removeItem('csrfToken'); // Clean after login to generate new token using csrfInterceptor
+
             if (user.isEmailNotConfirmed) {
               sessionStorage.setItem('email', user.email);
               this._isVerifyingAccountSig.set(true);
@@ -92,7 +98,7 @@ export class AccountService {
   }
 
   refreshTokens(): Observable<void> {
-    return this._http.post<void>(this.baseUrl + 'refresh-tokens', {});
+    return this._http.get<void>(this.baseUrl + 'refresh-tokens');
   }
 
   registerDemo(userInput: UserRegister): Observable<LoggedInUser | null> {
@@ -140,6 +146,7 @@ export class AccountService {
 
   logout(): void {
     localStorage.clear();
+    sessionStorage.clear();
     this.loggedInUserSig.set(undefined);
     this._router.navigate(['account']);
     this._googlePlacesService.resetCountry();

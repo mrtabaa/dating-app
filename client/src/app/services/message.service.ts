@@ -38,11 +38,13 @@ export class MessageService {
   }
 
   async createHubConnectionAsync(targetUsername: string): Promise<void> {
+    const csrfToken = sessionStorage.getItem('csrfToken');
     this.targetUserName = targetUsername;
 
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl, {
-        withCredentials: true
+        withCredentials: true,
+        headers: csrfToken ? {'X-XSRF-TOKEN': csrfToken} : {}
       })
       .withAutomaticReconnect()
       .build();

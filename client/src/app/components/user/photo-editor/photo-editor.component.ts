@@ -49,6 +49,7 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setCsrfToken();
     this.initializeUploader();
   }
 
@@ -70,12 +71,13 @@ export class PhotoEditorComponent implements OnInit {
       });
 
       this.uploader.onBeforeUploadItem = (fileItem) => {
-        fileItem.withCredentials = true; // Enable Cookies credentials manually
-      }
+        fileItem.withCredentials = true;
+
+        fileItem.headers.push({name: 'X-XSRF-TOKEN', value: sessionStorage.getItem('csrfToken')});
+        return fileItem;
+      };
 
       this.uploader.onAfterAddingFile = (file) => {
-        file.withCredentials = false;
-
         if (file.file.size < this.minFileSize) {
           this.snackBar.open('Photo has to be Larger than ' + Math.floor(this.minFileSize / 1000) + 'KB', 'Close', {
             horizontalPosition: 'center',
@@ -141,8 +143,6 @@ export class PhotoEditorComponent implements OnInit {
     }
   }
 
-  //#endregion Photo Upload using `ng2-file-upload`
-
   /**
    * Set main photo for card and album
    * @param url_165In
@@ -179,6 +179,8 @@ export class PhotoEditorComponent implements OnInit {
       });
   }
 
+//#endregion Photo Upload using `ng2-file-upload`
+
   deletePhoto(url_165In: string, index: number): void {
     this.userService.deletePhoto(url_165In)
       .pipe(take(1))
@@ -205,6 +207,18 @@ export class PhotoEditorComponent implements OnInit {
           }
         }
       })
+  }
+
+  private setCsrfToken(): void {
+    let csrfToken = sessionStorage.getItem('csrfToken');
+    if (!csrfToken) {
+      this.accountService.getCsrfToken$().pipe(
+        take(1))
+        .subscribe(response => {
+          csrfToken = response.requestToken;
+          sessionStorage.setItem('csrfToken', csrfToken);
+        });
+    }
   }
 
   /**

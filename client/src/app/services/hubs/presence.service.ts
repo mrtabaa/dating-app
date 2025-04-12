@@ -17,9 +17,12 @@ export class PresenceService {
   private readonly _GetOnlineUsers = "GetOnlineUsers";
 
   createHubConnection(): void {
+    const csrfToken = localStorage.getItem('csrfToken'); // Get your stored CSRF token
+
     this._hubConnection = new HubConnectionBuilder()
       .withUrl(this._hubUrl + 'presence', { // 'presence' has to match the route set in Program.cs
-        withCredentials: true
+        withCredentials: true,
+        headers: csrfToken ? {'X-XSRF-TOKEN': csrfToken} : {}
       })
       // .withAutomaticReconnect() // To make onclose() work. Also it only tries 4 times which is not enough.
       .build();
