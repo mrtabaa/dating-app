@@ -136,6 +136,7 @@ public class AccountRepository : IAccountRepository
 
     private readonly IMongoCollection<AppUser> _collectionUsers;
     private readonly IMongoCollection<RefreshToken> _collectionRefreshTokens;
+    private readonly JwtSettings _jwtSettings;
     private readonly IRecaptchaService _recaptchaService;
     private readonly UserManager<AppUser> _userManager;
     private readonly ITokenService _tokenService; // save user credential as a token
@@ -146,10 +147,10 @@ public class AccountRepository : IAccountRepository
 
     // constructor - dependency injection
     public AccountRepository(
-        IMongoClient client, IMyMongoDbSettings dbSettings,
+        IMongoClient client, IMyMongoDbSettings dbSettings, IConfiguration config, IHostEnvironment hostEnvironment,
         IRecaptchaService recaptchaValidatorService,
         UserManager<AppUser> userManager, ITokenService tokenService,
-        IEmailService emailService, IPhotoService photoService, IHostEnvironment hostEnvironment,
+        IEmailService emailService, IPhotoService photoService,
         IUserRepository userRepository
     )
     {
@@ -157,6 +158,8 @@ public class AccountRepository : IAccountRepository
                                 ?? throw new ArgumentNullException(nameof(dbName), "The database name cannot be null.");
         _collectionUsers = dbName.GetCollection<AppUser>(AppVariablesExtensions.CollectionUsers);
         _collectionRefreshTokens = dbName.GetCollection<RefreshToken>(AppVariablesExtensions.CollectionRefreshTokens);
+        _jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
+                       ?? throw new ArgumentNullException(nameof(JwtSettings));
         _recaptchaService = recaptchaValidatorService;
         _userManager = userManager;
         _tokenService = tokenService;
@@ -406,7 +409,8 @@ public class AccountRepository : IAccountRepository
         #endregion
 
         bool isInvalid = !TokenHasher.ValidateToken(
-            refreshTokenRequest.TokenValueRaw, expectedTokenFromDb.TokenValueHashed
+            TokenHasher.HashWithSecret(refreshTokenRequest.TokenValueRaw, _jwtSettings.Key), 
+            expectedTokenFromDb.TokenValueHashed
         );
 
         // Check token expiration, revoked, and HMAC validation
