@@ -29,7 +29,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
             return next(req);
           }),
           catchError((error) => {
-            console.error(error);
             refreshTokenInProgress = false; // Reset flag if refresh fails
             accountService.logout();
 
@@ -43,12 +42,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
           })
         );
       }
-
-      snack.open('Invalid credentials. Please login again.', 'Close', {
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-        duration: 7000
-      });
 
       return throwError(() => err);
     })
