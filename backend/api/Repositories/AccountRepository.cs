@@ -108,14 +108,14 @@ public class AccountRepository : IAccountRepository
         return builder.Uri.ToString();
     }
 
-    private static bool ValidateSession(RefreshTokenRequest refreshTokenRequest1, RefreshToken refreshToken)
-        =>
-            ValidationsExtension.ValidateObjectId(refreshToken.UserId)
-            && !(refreshToken.SessionMetadata is null || refreshTokenRequest1.SessionMetadata is null)
-            && refreshToken.SessionMetadata.DeviceType == refreshTokenRequest1.SessionMetadata.DeviceType
-            && refreshToken.SessionMetadata.DeviceName == refreshTokenRequest1.SessionMetadata.DeviceName
-            && refreshToken.SessionMetadata.UserAgent == refreshTokenRequest1.SessionMetadata.UserAgent
-            && refreshToken.SessionMetadata.IpAddress == refreshTokenRequest1.SessionMetadata.IpAddress;
+    private static bool ValidateSessionMetadata(SessionMetadata? sessionMetadata, RefreshToken refreshToken) =>
+        (refreshToken.SessionMetadata is null || sessionMetadata is null)
+            ? throw new ArgumentNullException(nameof(sessionMetadata), "sessionMetadata cannot be null")
+            : ValidationsExtension.ValidateObjectId(refreshToken.UserId)
+              && refreshToken.SessionMetadata.DeviceType == sessionMetadata.DeviceType
+              && refreshToken.SessionMetadata.DeviceName == sessionMetadata.DeviceName
+              && refreshToken.SessionMetadata.UserAgent == sessionMetadata.UserAgent
+              && refreshToken.SessionMetadata.IpAddress == sessionMetadata.IpAddress;
 
 
     private async Task RevokeAllRefreshTokensAsync(ObjectId userId, CancellationToken cancellationToken)
@@ -390,7 +390,9 @@ public class AccountRepository : IAccountRepository
                                                nameof(expectedTokenFromDb), "cannot be null."
                                            );
 
-        if (!ValidateSession(refreshTokenRequest, expectedTokenFromDb))
+        #region Hacked
+
+        if (!ValidateSessionMetadata(refreshTokenRequest.SessionMetadata, expectedTokenFromDb))
         {
             //TODO: Logged in from new device/location. Perform 2FA.
         }
@@ -400,6 +402,8 @@ public class AccountRepository : IAccountRepository
             await RevokeAllRefreshTokensAsync(expectedTokenFromDb.UserId, cancellationToken);
             // TODO: Hacked, force to change password.    
         }
+
+        #endregion
 
         bool isInvalid = !TokenHasher.ValidateToken(
             refreshTokenRequest.TokenValueRaw, expectedTokenFromDb.TokenValueHashed
