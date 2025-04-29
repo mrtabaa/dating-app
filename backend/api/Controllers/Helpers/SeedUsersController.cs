@@ -16,6 +16,7 @@ public class SeedUsersController(
 
     #region Add Dummy users to DB
 
+        [IgnoreAntiforgeryToken]
     [HttpPost]
     public async Task<ActionResult<IEnumerable<MemberDto?>>> CreateDummyMembers(
         IEnumerable<DummyRegisterDto> inputUsersDummy
