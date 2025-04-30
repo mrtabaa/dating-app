@@ -73,7 +73,7 @@ public class TokenService : ITokenService
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddSeconds(1), // Short lifespan
+            expires: DateTime.UtcNow.AddMinutes(15), // Short lifespan
             signingCredentials: creds
         );
 
