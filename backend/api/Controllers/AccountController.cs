@@ -110,7 +110,7 @@ public class AccountController(
 
     [AllowAnonymous]
     [HttpGet("refresh-tokens")]
-    public async Task<ActionResult> RefreshTokens(CancellationToken cancellationToken)
+    public async Task<IActionResult> RefreshTokens(CancellationToken cancellationToken)
     {
         bool isSuccess = Request.Cookies.TryGetValue("auth.refresh-token", out string? protectedRefreshToken);
         if (!isSuccess || string.IsNullOrEmpty(protectedRefreshToken))
