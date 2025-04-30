@@ -14,8 +14,7 @@ public static class IdentityServiceExtensions
         #region CSRF Protection
 
         // Setting defaults
-        services.AddAntiforgery(
-            options =>
+        services.AddAntiforgery(options =>
             {
                 options.HeaderName = "X-XSRF-TOKEN";
                 options.Cookie.Name = "XSRF-TOKEN";
@@ -28,9 +27,10 @@ public static class IdentityServiceExtensions
         );
 
         // Apply protection to all non-Get requests
-        services.AddControllersWithViews(
-
-            options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); }
+        services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            }
         );
 
         #endregion
@@ -43,14 +43,12 @@ public static class IdentityServiceExtensions
         JwtSettings jwtSettings = config.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
                                   ?? throw new ArgumentNullException(nameof(JwtSettings));
 
-        services.AddAuthentication(
-            options =>
+        services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }
-        ).AddJwtBearer(
-            options =>
+        ).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
