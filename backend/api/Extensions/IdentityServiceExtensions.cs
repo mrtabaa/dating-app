@@ -22,7 +22,7 @@ public static class IdentityServiceExtensions
                 options.Cookie.SecurePolicy = environment.IsProduction()
                     ? CookieSecurePolicy.Always
                     : CookieSecurePolicy.None; // Development
-                options.Cookie.SameSite = SameSiteMode.Strict; // TODO: Change to Lax
+                options.Cookie.SameSite = SameSiteMode.None; // TODO: Change to Lax
             }
         );
 
