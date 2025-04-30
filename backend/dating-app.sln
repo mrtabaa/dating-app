@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Infrastructure", "da.Inf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Presentation", "da.Presentation\da.Presentation.csproj", "{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{C6B50D42-6801-4FDA-83CD-B756841E6F38}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +102,19 @@ Global
 		{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}.Release|x64.Build.0 = Release|Any CPU
 		{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}.Release|x86.ActiveCfg = Release|Any CPU
 		{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}.Release|x86.Build.0 = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|x64.Build.0 = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Debug|x86.Build.0 = Debug|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|x64.ActiveCfg = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|x64.Build.0 = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|x86.ActiveCfg = Release|Any CPU
+		{C6B50D42-6801-4FDA-83CD-B756841E6F38}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal

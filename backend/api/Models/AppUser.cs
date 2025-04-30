@@ -6,8 +6,8 @@ namespace api.Models;
 [CollectionName("users")]
 public class AppUser : MongoIdentityUser<ObjectId>
 {
-    public string? IdentifierHash { get; init; }
     public string Schema { get; init; } = string.Empty;
+    public string? IdentifierHash { get; init; }
     public DateOnly DateOfBirth { get; set; }
     public string KnownAs { get; init; } = string.Empty;
     public DateTimeOffset LastActive { get; init; }
