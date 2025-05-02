@@ -1,3 +1,4 @@
-global using Da.Application.DTOs;
+global using Da.Shared.Results;
 global using System.Security.Claims;
 global using Da.Presentation.Extensions;
+global using Da.Application.UseCaseInterfaces;

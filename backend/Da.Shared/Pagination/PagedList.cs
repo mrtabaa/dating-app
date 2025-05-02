@@ -1,4 +1,4 @@
-namespace Da.Shared;
+namespace Da.Shared.Pagination;
 
 public class PagedList<T> : List<T>
 {

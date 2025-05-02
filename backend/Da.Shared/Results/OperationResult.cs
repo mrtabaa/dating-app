@@ -1,4 +1,4 @@
-namespace Da.Application.DTOs;
+namespace Da.Shared.Results;
 
 public record OperationResult<T>(
     bool IsSuccess,
@@ -9,9 +9,4 @@ public record OperationResult<T>(
 public record OperationResult(
     bool IsSuccess,
     CustomError? Error
-);
-
-public record CustomError(
-    Enum Code,
-    [Optional] string? Message
 );

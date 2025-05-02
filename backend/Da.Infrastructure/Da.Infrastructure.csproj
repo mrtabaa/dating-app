@@ -13,12 +13,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Da.Domain\Da.Domain.csproj" />
-        <ProjectReference Include="..\Da.Shared\Da.Shared.csproj" />
+        <ProjectReference Include="..\Da.Domain\Da.Domain.csproj"/>
+        <ProjectReference Include="..\Da.Shared\Da.Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Mongo\Repositories\"/>
         <Folder Include="PostgreSql\"/>
     </ItemGroup>
 

@@ -18,11 +18,11 @@ public class LogUserActivity(ILogger<LogUserActivity> logger) : IAsyncActionFilt
                                           nameof(loggedInUserIdHashed), "Parameter cannot be null"
                                       );
 
-        var accountRepository = resultContext.HttpContext.RequestServices.GetRequiredService<IAccountRepository>();
+        var accountService = resultContext.HttpContext.RequestServices.GetRequiredService<IAccountService>();
 
         CancellationToken cancellationToken = resultContext.HttpContext.RequestAborted; // access cancellationToken
 
-        OperationResult result = await accountRepository.UpdateLastActive(
+        OperationResult result = await accountService.UpdateLastActive(
             loggedInUserIdHashed, cancellationToken
         );
 

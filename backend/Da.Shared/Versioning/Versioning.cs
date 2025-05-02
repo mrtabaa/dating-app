@@ -1,4 +1,4 @@
-namespace Da.Shared;
+namespace Da.Shared.Versioning;
 
 public static class Versioning
 {

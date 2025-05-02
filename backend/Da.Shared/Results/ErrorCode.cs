@@ -1,4 +1,4 @@
-namespace Da.Application.DTOs.Account;
+namespace Da.Shared.Results;
 
 public enum ErrorCode
 {

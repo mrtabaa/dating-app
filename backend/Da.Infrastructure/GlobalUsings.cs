@@ -6,5 +6,5 @@ global using Da.Domain.ValueObjects;
 global using System.Runtime.InteropServices;
 global using MongoDB.Driver.Linq;
 global using MongoDB.Driver;
-global using Da.Shared;
- 
+global using Da.Shared.Pagination;
+global using System.ComponentModel.DataAnnotations;
