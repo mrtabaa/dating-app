@@ -1,6 +1,6 @@
-namespace da.Application.Enums;
+namespace da.Domain.Enums;
 
-public enum UserErrorType
+public enum UserUpdateError
 {
     UpdateFailed,
     InfoAlreadySaved,

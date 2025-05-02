@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace da.Domain.Entities;
+namespace da.Domain.ValueObjects;
 
 public record SessionMetadata(
     [Length(1, 64)] string DeviceType,

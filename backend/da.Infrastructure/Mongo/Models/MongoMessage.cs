@@ -1,10 +1,6 @@
-using System.Runtime.InteropServices;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace da.Infrastructure.Mongo.Models;
 
-public record Message(
+public record MongoMessage(
     string? Schema,
     [Optional]
     [property: BsonId]

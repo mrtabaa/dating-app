@@ -1,12 +1,7 @@
-using AspNetCore.Identity.MongoDbCore.Models;
-using da.Domain.Entities;
-using MongoDB.Bson;
-using MongoDbGenericRepository.Attributes;
-
 namespace da.Infrastructure.Mongo.Models;
 
 [CollectionName("users")]
-public class AppUser : MongoIdentityUser<ObjectId>
+public class MongoAppUser : MongoIdentityUser<ObjectId>
 {
     public string Schema { get; init; } = string.Empty;
     public string? IdentifierHash { get; init; }

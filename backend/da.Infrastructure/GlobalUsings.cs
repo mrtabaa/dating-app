@@ -1,0 +1,9 @@
+global using AspNetCore.Identity.MongoDbCore.Models;
+global using MongoDB.Bson;
+global using MongoDbGenericRepository.Attributes;
+global using MongoDB.Bson.Serialization.Attributes;
+global using da.Domain.ValueObjects;
+global using System.Runtime.InteropServices;
+global using da.Application.Helpers;
+global using MongoDB.Driver.Linq;
+global using MongoDB.Driver;

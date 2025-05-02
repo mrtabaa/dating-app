@@ -14,18 +14,19 @@
 
     <ItemGroup>
         <ProjectReference Include="..\da.Domain\da.Domain.csproj"/>
+        <ProjectReference Include="..\Shared\Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Mongo\Repositories\" />
-      <Folder Include="PostgreSql\" />
+        <Folder Include="Mongo\Repositories\"/>
+        <Folder Include="PostgreSql\"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="6.0.0" />
-      <PackageReference Include="Azure.Communication.Email" Version="1.0.1" />
-      <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="6.0.0"/>
+        <PackageReference Include="Azure.Communication.Email" Version="1.0.1"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.30.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
     </ItemGroup>
 
 </Project>

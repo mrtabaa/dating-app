@@ -1,4 +1,4 @@
-namespace da.Domain.Entities;
+namespace da.Domain.ValueObjects;
 
 public record MessageGroup(
     string ConnectionId,
