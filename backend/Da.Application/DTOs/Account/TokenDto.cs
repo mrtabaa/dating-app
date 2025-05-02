@@ -1,0 +1,6 @@
+namespace Da.Application.DTOs.Account;
+
+public record TokenDto(
+    string AccessToken, // JWT
+    RefreshTokenResponse RefreshTokenResponse
+);

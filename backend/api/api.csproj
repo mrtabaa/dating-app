@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\image-processing\image-processing.csproj"/>
+        <ProjectReference Include="..\Image_Processing\Image_Processing.csproj" />
     </ItemGroup>
 
 </Project>

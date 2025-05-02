@@ -5,17 +5,17 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "api\api.csproj", "{937B9619-DC69-4F45-BC7C-C7A72D2FA708}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "image-processing", "image-processing\image-processing.csproj", "{9DFEC66F-A27E-443C-A35A-7E6177F1ED1F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image_Processing", "Image_Processing\Image_Processing.csproj", "{9DFEC66F-A27E-443C-A35A-7E6177F1ED1F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Application", "da.Application\da.Application.csproj", "{CB70B86C-1791-4D22-9152-4E607FB75DAC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Da.Application", "Da.Application\Da.Application.csproj", "{CB70B86C-1791-4D22-9152-4E607FB75DAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Domain", "da.Domain\da.Domain.csproj", "{9B1E93A1-D8CC-44C2-8203-84CC96C16403}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Da.Domain", "Da.Domain\Da.Domain.csproj", "{9B1E93A1-D8CC-44C2-8203-84CC96C16403}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Infrastructure", "da.Infrastructure\da.Infrastructure.csproj", "{AA0A77ED-D6D4-4601-B64C-FE4044D46295}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Da.Infrastructure", "Da.Infrastructure\Da.Infrastructure.csproj", "{AA0A77ED-D6D4-4601-B64C-FE4044D46295}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "da.Presentation", "da.Presentation\da.Presentation.csproj", "{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Da.Presentation", "Da.Presentation\Da.Presentation.csproj", "{D5E67A99-DB67-4BF2-ACE7-699B9DDC17DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{C6B50D42-6801-4FDA-83CD-B756841E6F38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Da.Shared", "Da.Shared\Da.Shared.csproj", "{C6B50D42-6801-4FDA-83CD-B756841E6F38}"
 EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
