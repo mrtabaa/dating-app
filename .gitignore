@@ -8,11 +8,35 @@ ssl/
 
 #wwwroot
 storage/
+obj/
+# Build results
+bin/
 
 #Temp files
 format.cs
 format.html
 format.ts
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+project.nuget.cache
+*.nuget.props
+*.nuget.targets
+*.csproj.nuget.g.props
+*.csproj.nuget.g.targets
+*.dg
+.nuget/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+
 
 # User-specific files
 *.rsuser
@@ -464,7 +488,7 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# appsettings.json
+appsettings.json
 
 ##########################################
 ##########################################
