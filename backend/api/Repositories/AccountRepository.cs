@@ -409,7 +409,7 @@ public class AccountRepository : IAccountRepository
         #endregion
 
         bool isInvalid = !TokenHasher.ValidateToken(
-            TokenHasher.HashWithSecret(refreshTokenRequest.TokenValueRaw, _jwtSettings.Key), 
+            TokenHasher.HashWithSecret(refreshTokenRequest.TokenValueRaw, _jwtSettings.TokenKey), 
             expectedTokenFromDb.TokenValueHashed
         );
 

@@ -55,7 +55,7 @@ public static class IdentityServiceExtensions
                     RoleClaimType = ClaimTypes.Role, // Ensure it matches how roles are stored in the token
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.TokenKey)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidIssuer = jwtSettings.Issuer,

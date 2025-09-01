@@ -66,8 +66,9 @@ public class TokenService : ITokenService
         IList<string> roles = await _userManager.GetRolesAsync(appUser);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role.ToUpper())));
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        byte[] keyBytes = Convert.FromBase64String(_jwtSettings.TokenKey);
+        var securityKey = new SymmetricSecurityKey(keyBytes);
+        var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
 
         var token = new JwtSecurityToken(
             _jwtSettings.Issuer,
@@ -90,7 +91,7 @@ public class TokenService : ITokenService
         {
             UserId = userId,
             JtiValue = Guid.CreateVersion7().ToString(),
-            TokenValueHashed = TokenHasher.HashWithSecret(tokenValueRaw, _jwtSettings.Key),
+            TokenValueHashed = TokenHasher.HashWithSecret(tokenValueRaw, _jwtSettings.TokenKey),
             CreatedAt = DateTimeOffset.UtcNow,
             ExpiresAt = DateTimeOffset.UtcNow.AddDays(7),
             SessionMetadata = refreshTokenRequest.SessionMetadata
