@@ -25,7 +25,7 @@ public class AdminRepository : IAdminRepository
         AdminParams adminParams, CancellationToken cancellationToken
     )
     {
-        IMongoQueryable<AppUser> query = _collection.AsQueryable();
+        IQueryable<AppUser> query = _collection.AsQueryable();
 
         if (!string.IsNullOrEmpty(adminParams.Search))
         {

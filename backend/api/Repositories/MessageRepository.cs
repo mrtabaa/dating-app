@@ -46,7 +46,7 @@ public class MessageRepository : IMessageRepository
         ObjectId userId, MessageParams messageParams, CancellationToken cancellationToken
     )
     {
-        IMongoQueryable<Message> query = _collection.AsQueryable();
+        IQueryable<Message> query = _collection.AsQueryable();
 
         query = messageParams.Predicate switch
         {
@@ -89,7 +89,7 @@ public class MessageRepository : IMessageRepository
         if (!targetUserIdResult.IsSuccess)
             return null;
 
-        IMongoQueryable<Message> query = _collection.AsQueryable()
+        IQueryable<Message> query = _collection.AsQueryable()
             .Where(
                 doc =>
                     (doc.SenderId == userId && doc.ReceiverId == targetUserIdResult.Result) ||

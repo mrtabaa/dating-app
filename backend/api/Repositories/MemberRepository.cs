@@ -21,14 +21,14 @@ public class MemberRepository : IMemberRepository
 
     #region Helpers
 
-    private IMongoQueryable<AppUser> CreateQuery(MemberParams memberParams)
+    private IQueryable<AppUser> CreateQuery(MemberParams memberParams)
     {
         // calculate DOB based on user's selected Age
         DateOnly minDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MaxAge - 1));
         DateOnly maxDob = DateOnly.FromDateTime(DateTime.Today.AddYears(-memberParams.MinAge));
 
         // set the query to AsQueryable to use it against MongoDB later
-        IMongoQueryable<AppUser> query = _collection.AsQueryable();
+        IQueryable<AppUser> query = _collection.AsQueryable();
 
         query = query.Where(appUser => appUser.Id != memberParams.UserId); // Don't request/show the currentUser in the list
         query = query.Where(appUser => appUser.EmailConfirmed);

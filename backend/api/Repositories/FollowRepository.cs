@@ -17,7 +17,7 @@ public class FollowRepository : IFollowRepository
 
         if (followParams.Predicate == FollowPredicate.Followings)
         {
-            IMongoQueryable<AppUser>? query = _collection.AsQueryable().
+            IQueryable<AppUser>? query = _collection.AsQueryable().
                 Where(follow => follow.FollowerId == followParams.UserId) // filter by Lisa's id
                 .Join(
                     _collectionUsers.
@@ -39,7 +39,7 @@ public class FollowRepository : IFollowRepository
         }
         else // (followParams.Predicate == FollowPredicate.Followers)
         {
-            IMongoQueryable<AppUser>? query = _collection.AsQueryable().
+            IQueryable<AppUser>? query = _collection.AsQueryable().
                 Where(follow => follow.FollowedMemberId == followParams.UserId).Join(
                     _collectionUsers.AsQueryable(),
                     follow => follow.FollowerId,
