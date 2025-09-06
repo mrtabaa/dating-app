@@ -1,4 +1,6 @@
 using Azure.Storage.Blobs.Models;
+using image_processing.Helpers;
+using image_processing.Interfaces;
 
 namespace api.Services;
 

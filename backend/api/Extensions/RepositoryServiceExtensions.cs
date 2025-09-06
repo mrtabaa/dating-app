@@ -1,3 +1,6 @@
+using image_processing.Interfaces;
+using image_processing.Services;
+
 namespace api.Extensions;
 
 public static class RepositoryServiceExtensions
