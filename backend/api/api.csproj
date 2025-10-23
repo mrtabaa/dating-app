@@ -9,17 +9,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="7.0.0" />
+        <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="7.0.0"/>
         <PackageReference Include="Azure.Communication.Email" Version="1.0.1"/>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.1"/>
-        <PackageReference Include="MongoDB.Driver" Version="3.4.3" />
+        <PackageReference Include="MongoDB.Driver" Version="3.4.3"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="UAParser.Core" Version="4.0.4"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\image_processing\image_processing.csproj" />
+        <ProjectReference Include="..\Image_Processing_Blob\Image_Processing_Blob.csproj"/>
     </ItemGroup>
 
 </Project>

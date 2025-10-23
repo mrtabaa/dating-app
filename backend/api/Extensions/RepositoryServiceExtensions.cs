@@ -1,5 +1,5 @@
-using image_processing.Interfaces;
-using image_processing.Services;
+using Image_Processing_Blob.Interfaces;
+using Image_Processing_Blob.Services;
 
 namespace api.Extensions;
 

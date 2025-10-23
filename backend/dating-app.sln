@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "api", "api\api.csproj", "{937B9619-DC69-4F45-BC7C-C7A72D2FA708}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "image_processing", "image_processing\image_processing.csproj", "{DE188617-0768-4761-87DE-51F58DC875F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Image_Processing_Blob", "Image_Processing_Blob\Image_Processing_Blob.csproj", "{DE188617-0768-4761-87DE-51F58DC875F9}"
 EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution

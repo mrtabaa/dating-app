@@ -1,6 +1,6 @@
 using Azure.Storage.Blobs.Models;
-using image_processing.Helpers;
-using image_processing.Interfaces;
+using Image_Processing_Blob.Helpers;
+using Image_Processing_Blob.Interfaces;
 
 namespace api.Services;
 
@@ -8,7 +8,8 @@ public class PhotoService(
     IPhotoModifySaveService photoModifyService,
     BlobServiceClient blobServiceClient,
     IConfiguration configuration,
-    ILogger<IPhotoModifySaveService> logger) : PhotoStandardSize, IPhotoService
+    ILogger<IPhotoModifySaveService> logger
+) : PhotoStandardSize, IPhotoService
 {
     private readonly BlobContainerClient _blobContainerClient = blobServiceClient.GetBlobContainerClient("photos");
 
@@ -34,11 +35,17 @@ public class PhotoService(
 
         #region return the result if success
 
-        string? filePath165Sq = await photoModifyService.ResizeByPixel_Square(formFile, userId, 165, cancellationToken); // navbar & thumbnail
+        string? filePath165Sq = await photoModifyService.ResizeByPixel_Square(
+            formFile, userId, side: 165, cancellationToken
+        ); // navbar & thumbnail
         // navbar & thumbnail
-        string? filePath256Sq = await photoModifyService.ResizeByPixel_Square(formFile, userId, 256, cancellationToken); // card
+        string? filePath256Sq = await photoModifyService.ResizeByPixel_Square(
+            formFile, userId, side: 256, cancellationToken
+        ); // card
         // card
-        string? filePathEnlarged = await photoModifyService.ResizeImageByScale(formFile, userId, (int)DimensionsEnum._4_3_800x600, cancellationToken); // enlarged photo
+        string? filePathEnlarged = await photoModifyService.ResizeImageByScale(
+            formFile, userId, (int)DimensionsEnum._4_3_800x600, cancellationToken
+        ); // enlarged photo
         // enlarged photo up to ~300kb
         // if image processing fails
         if (!(filePath165Sq is null || filePath256Sq is null || filePathEnlarged is null))
@@ -53,7 +60,9 @@ public class PhotoService(
 
         #endregion
 
-        logger.LogError("Photo addition failed. The returned filePath is null which is not allowed. Photo is not uploaded on Azure storage");
+        logger.LogError(
+            "Photo addition failed. The returned filePath is null which is not allowed. Photo is not uploaded on Azure storage"
+        );
         return null;
 
         #endregion Resize and Create Images to Blob
@@ -80,7 +89,9 @@ public class PhotoService(
             BlobClient blobClient = _blobContainerClient.GetBlobClient(photoPath);
 
             // Delete the blob and its snapshots if exists
-            if (!await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, null, cancellationToken))
+            if (!await blobClient.DeleteIfExistsAsync(
+                    DeleteSnapshotsOption.IncludeSnapshots, conditions: null, cancellationToken
+                ))
                 return false; // if blob doesn't exist or deletion fails
         }
 
@@ -108,9 +119,15 @@ public class PhotoService(
     {
         if (photo is null) return null;
 
-        string? url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url165, configuration, _blobContainerClient);
-        string? url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url256, configuration, _blobContainerClient);
-        string? urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.UrlEnlarged, configuration, _blobContainerClient);
+        string? url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+            photo.Url165, configuration, _blobContainerClient
+        );
+        string? url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+            photo.Url256, configuration, _blobContainerClient
+        );
+        string? urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+            photo.UrlEnlarged, configuration, _blobContainerClient
+        );
 
         // Link conversion failed
         if (string.IsNullOrEmpty(url165) || string.IsNullOrEmpty(url256) || string.IsNullOrEmpty(urlEnlarged))
@@ -138,9 +155,15 @@ public class PhotoService(
 
         foreach (Photo photo in photos)
         {
-            string url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url165, configuration, _blobContainerClient);
-            string url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.Url256, configuration, _blobContainerClient);
-            string urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(photo.UrlEnlarged, configuration, _blobContainerClient);
+            string url165 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+                photo.Url165, configuration, _blobContainerClient
+            );
+            string url256 = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+                photo.Url256, configuration, _blobContainerClient
+            );
+            string urlEnlarged = BlobUriAndDbUriExtension.ConvertDbUriToBlobUriWithSas(
+                photo.UrlEnlarged, configuration, _blobContainerClient
+            );
 
             // Create Photo on link conversion success
             blobPhotos.Add(

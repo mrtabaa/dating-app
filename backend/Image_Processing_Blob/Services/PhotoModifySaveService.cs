@@ -1,17 +1,17 @@
 using Azure.Storage.Blobs;
-using image_processing.Helpers;
-using image_processing.Interfaces;
+using Image_Processing_Blob.Helpers;
+using Image_Processing_Blob.Interfaces;
 using Microsoft.AspNetCore.Http;
 using SkiaSharp;
 
-namespace image_processing.Services;
+namespace Image_Processing_Blob.Services;
 
 public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : PhotoStandardSize, IPhotoModifySaveService
 {
     #region Helpers
 
     /// <summary>
-    ///     Get formFile.fileName and convert any extensions to webp. e.g. my-photo.jpeg => my-photo.webp
+    ///     Get formFile.fileName and convert any extensions to webp. E.g. my-photo.jpeg => my-photo.webp
     /// </summary>
     /// <param name="fileNameInput"></param>
     /// <returns>my-photo.webp</returns>
@@ -48,11 +48,15 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="standardSizeIndex"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>filePath</returns>
-    public async Task<string?> ResizeImageByScale(IFormFile formFile, string userId, int standardSizeIndex, CancellationToken cancellationToken)
+    public async Task<string?> ResizeImageByScale(
+        IFormFile formFile, string userId, int standardSizeIndex, CancellationToken cancellationToken
+    )
     {
         // performance
         if (formFile.Length < 300_000)
-            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original, cancellationToken); // return filePath
+            return await SaveImageAsIs(
+                formFile, userId, (int)OperationName.Original, cancellationToken
+            ); // return filePath
 
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
@@ -81,10 +85,11 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
             height = Dimensions[standardSizeIndex].Side2;
         }
 
-        using SKBitmap bitmapResized = bitmapSource.Resize(new SKImageInfo(width, height), SKFilterQuality.None);
+        var sampling = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+        using SKBitmap bitmapResized = bitmapSource.Resize(new SKImageInfo(width, height), sampling);
 
         using SKImage sKImageResized = SKImage.FromBitmap(bitmapResized);
-        using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = sKImageResized.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
         return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByScale, cancellationToken);
     }
@@ -93,7 +98,7 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     ///     Resize image based on the input sides.
     ///     It does NOT keep the original image's scale if proportional input sides are not given.
     ///     SaveImageAsIs if either input side is larger than the actual image's corresponding side.
-    ///     Save image to hard if successful.
+    ///     Save the image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
@@ -101,7 +106,9 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="heightIn"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string?> ResizeByPixel(IFormFile formFile, string userId, int widthIn, int heightIn, CancellationToken cancellationToken)
+    public async Task<string?> ResizeByPixel(
+        IFormFile formFile, string userId, int widthIn, int heightIn, CancellationToken cancellationToken
+    )
     {
         // do the job
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
@@ -127,28 +134,32 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
         using SKBitmap sourceBitmap = SKBitmap.FromImage(skImage);
 
         // resize
-        using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), SKFilterQuality.High);
+        var sampling = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+        using SKBitmap scaledBitmap = sourceBitmap.Resize(new SKImageInfo(widthIn, heightIn), sampling);
 
         using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
-        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn, cancellationToken);
+        return await SaveImage(
+            sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixel, widthIn, heightIn, cancellationToken
+        );
 
         #endregion
     }
 
     /// <summary>
     ///     Crop-square then resize a photo based on one given side.
-    ///     Skip operation if image is already square with original min 'side < sideIn'.
-    /// Save image to hard if successful.
-    /// 
+    ///     Skip operation if the image is already square with the original min 'side less than sideIn'.
+    ///     Save the image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
     /// <param name="sideIn"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>filePath</returns>
-    public async Task<string?> ResizeByPixel_Square(IFormFile formFile, string userId, int sideIn, CancellationToken cancellationToken)
+    public async Task<string?> ResizeByPixel_Square(
+        IFormFile formFile, string userId, int sideIn, CancellationToken cancellationToken
+    )
     {
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
@@ -163,8 +174,10 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
         // 3 in => 3 x 3
         // Already square with min side
         if (skImage.Width == skImage.Height && sideIn >= skImage.Width)
-            // save original file
-            return await SaveImageAsIs(formFile, userId, (int)OperationName.Original, cancellationToken); // return filePath
+            // save the original file
+            return await SaveImageAsIs(
+                formFile, userId, (int)OperationName.Original, cancellationToken
+            ); // return filePath
 
         #endregion
 
@@ -181,7 +194,7 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
         #region 3 x 5 original image sides
 
         // 2 in => 2 x 2
-        // sideIn < original min side of 3 (e.g. sideIn = 2)
+        // sideIn < original min side of 3 (e.g., sideIn = 2)
         // crop to square (3 x 3) first, then resize by 2
         int smallerSide = Math.Min(skImage.Width, skImage.Height);
 
@@ -190,12 +203,15 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
         // resize
         using SKBitmap croppedBitmap = SKBitmap.FromImage(croppedImage);
-        using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), SKFilterQuality.High);
+        var sampling = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+        using SKBitmap scaledBitmap = croppedBitmap.Resize(new SKImageInfo(sideIn, sideIn), sampling);
 
         using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
-        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = scaledImage.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
-        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn, cancellationToken);
+        return await SaveImage(
+            sKData, userId, formFile.FileName, (int)OperationName.ResizeByPixelSquare, sideIn, sideIn, cancellationToken
+        );
 
         #endregion
     }
@@ -206,11 +222,12 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
     /// <summary>
     ///     Crop image based on the input sides.
-    ///     Skip operation and save original image if both inputs are larger than the original image sides. Save the original
+    ///     Skip operation and save the original image if both inputs are larger than the original image sides. Save the
+    ///     original
     ///     image.
     ///     If either inputs are larger than the corresponding original image's width or height, keep the original side's size,
     ///     then apply cropping.
-    ///     Save image to hard if successful.
+    ///     Save the image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
@@ -218,7 +235,9 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="heightIn"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string?> Crop(IFormFile formFile, string userId, int widthIn, int heightIn, CancellationToken cancellationToken)
+    public async Task<string?> Crop(
+        IFormFile formFile, string userId, int widthIn, int heightIn, CancellationToken cancellationToken
+    )
     {
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
@@ -245,10 +264,12 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
         // 4 in 4 in => 3 x 4
         // 3 in 4 in => 3 x 4
-        if (widthIn >= skImage.Width && heightIn < skImage.Height) widthIn = skImage.Width; // apply the image's width instead
+        if (widthIn >= skImage.Width && heightIn < skImage.Height)
+            widthIn = skImage.Width; // apply the image's width instead
         // 2 in 6 in => 2 x 5
         // 2 in 5 in => 2 x 5
-        if (widthIn < skImage.Width && heightIn >= skImage.Height) heightIn = skImage.Height; // apply the image's height instead
+        if (widthIn < skImage.Width && heightIn >= skImage.Height)
+            heightIn = skImage.Height; // apply the image's height instead
 
         // find the center
         int centerX = skImage.Width / 2;
@@ -260,24 +281,28 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
         // crop image
         SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, widthIn, heightIn));
-        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
-        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn, cancellationToken);
+        return await SaveImage(
+            sKData, userId, formFile.FileName, (int)OperationName.Crop, widthIn, heightIn, cancellationToken
+        );
 
         #endregion
     }
 
     /// <summary>
     ///     Crop and square image based on one input side.
-    ///     Save image as-is and skip Crop if the given side is larger than the image size, and it's already square.
-    ///     Save image to hard if successful.
+    ///     Save the image as-is and skip Crop if the given side is larger than the image size, and it's already square.
+    ///     Save the image to hard if successful.
     /// </summary>
     /// <param name="formFile"></param>
     /// <param name="userId"></param>
     /// <param name="sideIn"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string?> Crop_Square(IFormFile formFile, string userId, int sideIn, CancellationToken cancellationToken)
+    public async Task<string?> Crop_Square(
+        IFormFile formFile, string userId, int sideIn, CancellationToken cancellationToken
+    )
     {
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
@@ -299,9 +324,11 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
         // crop image
         SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, sideIn, sideIn));
-        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
-        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, sideIn, sideIn, cancellationToken);
+        return await SaveImage(
+            sKData, userId, formFile.FileName, (int)OperationName.Crop, sideIn, sideIn, cancellationToken
+        );
     }
 
     /// <summary>
@@ -313,7 +340,9 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<string?> CropWithOriginalSide_Square(IFormFile formFile, string userId, CancellationToken cancellationToken)
+    public async Task<string?> CropWithOriginalSide_Square(
+        IFormFile formFile, string userId, CancellationToken cancellationToken
+    )
     {
         using var binaryReader = new BinaryReader(formFile.OpenReadStream());
         // get image from formFile
@@ -339,9 +368,11 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
 
         // crop image
         SKImage croppedImage = skImage.Subset(SKRectI.Create(startX, startY, side, side));
-        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, 90);
+        using SKData sKData = croppedImage.Encode(SKEncodedImageFormat.Webp, quality: 90);
 
-        return await SaveImage(sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side, cancellationToken);
+        return await SaveImage(
+            sKData, userId, formFile.FileName, (int)OperationName.Crop, side, side, cancellationToken
+        );
     }
 
     /// <summary>
@@ -380,15 +411,20 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>SUCCESS: string saved path on the blob. FAIL: null</returns>
-    private async Task<string?> SaveImage(SKData sKData, string userId, string fileName, int operation, int width, int height, CancellationToken cancellationToken)
+    /// <returns>SUCCESS: string saved the path on the blob. FAIL: null</returns>
+    private async Task<string?> SaveImage(
+        SKData sKData, string userId, string fileName, int operation, int width, int height,
+        CancellationToken cancellationToken
+    )
     {
         // Generate a unique file name for the image
         string uniqueFileName = Guid.NewGuid() + "_" + ChangeFileNameToWebp(fileName);
 
-        // Combine path and uniqueFileName
-        string blobPathName = Path.Combine(userId + "/" + _operations[operation] + "/" +
-                                           Convert.ToString(width) + "x" + Convert.ToString(height) + "/" + uniqueFileName);
+        // Combine the path and uniqueFileName
+        string blobPathName = Path.Combine(
+            userId + "/" + _operations[operation] + "/" +
+            Convert.ToString(width) + "x" + Convert.ToString(height) + "/" + uniqueFileName
+        );
 
         // Get a reference to a blob
         BlobClient blobClient = _blobContainerClient.GetBlobClient(blobPathName);
@@ -396,9 +432,9 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
         // Upload the file stream to the blob
         await using (Stream? fileStream = sKData.AsStream())
         {
-            sKData.AsStream().Seek(0, SeekOrigin.Begin);
+            sKData.AsStream().Seek(offset: 0, SeekOrigin.Begin);
 
-            await blobClient.UploadAsync(fileStream, true, cancellationToken);
+            await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
         }
 
         return await blobClient.ExistsAsync(cancellationToken) ? blobPathName : null;
@@ -414,13 +450,15 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="fileName"></param>
     /// <param name="operation"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>SUCCESS: string saved path on the blob. FAIL: null</returns>
-    private async Task<string?> SaveImage(SKData sKData, string userId, string fileName, int operation, CancellationToken cancellationToken)
+    /// <returns>SUCCESS: string saved the path on the blob. FAIL: null</returns>
+    private async Task<string?> SaveImage(
+        SKData sKData, string userId, string fileName, int operation, CancellationToken cancellationToken
+    )
     {
         // Generate a unique file name for the image
         string uniqueFileName = Guid.NewGuid() + "_" + ChangeFileNameToWebp(fileName);
 
-        // Construct path and uniqueFileName
+        // Construct the path and uniqueFileName
         string blobPathName = Path.Combine(userId + "/" + _operations[operation] + "/" + uniqueFileName);
 
         // Get a reference to a blob
@@ -429,9 +467,9 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
         // Upload the file stream to the blob
         await using (Stream? fileStream = sKData.AsStream())
         {
-            sKData.AsStream().Seek(0, SeekOrigin.Begin);
+            sKData.AsStream().Seek(offset: 0, SeekOrigin.Begin);
 
-            await blobClient.UploadAsync(fileStream, true, cancellationToken);
+            await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken);
         }
 
         return await blobClient.ExistsAsync(cancellationToken) ? blobPathName : null;
@@ -445,20 +483,22 @@ public class PhotoModifySaveService(BlobServiceClient blobServiceClient) : Photo
     /// <param name="userId"></param>
     /// <param name="operation"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>SUCCESS: string saved path on the blob. FAIL: null</returns>
-    public async Task<string?> SaveImageAsIs(IFormFile formFile, string userId, int operation, CancellationToken cancellationToken)
+    /// <returns>SUCCESS: string saved the path on the blob. FAIL: null</returns>
+    public async Task<string?> SaveImageAsIs(
+        IFormFile formFile, string userId, int operation, CancellationToken cancellationToken
+    )
     {
         // Generate a unique file name for the image
         string uniqueFileName = Guid.NewGuid() + "_" + ChangeFileNameToWebp(formFile.FileName);
 
-        // Construct path and uniqueFileName
+        // Construct the path and uniqueFileName
         string blobPathName = Path.Combine(userId + "/" + _operations[operation] + "/" + uniqueFileName);
 
         // Get a reference to a blob
         BlobClient blobClient = _blobContainerClient.GetBlobClient(blobPathName);
 
         // Upload the file stream to the blob
-        await blobClient.UploadAsync(formFile.OpenReadStream(), true, cancellationToken);
+        await blobClient.UploadAsync(formFile.OpenReadStream(), overwrite: true, cancellationToken);
 
         return await blobClient.ExistsAsync(cancellationToken) ? blobPathName : null;
     }
