@@ -71,61 +71,6 @@ public static class ApplicationServiceExtensions
 
         #endregion CORS
 
-        #region Rate Limiting
-
-        services.AddRateLimiter(
-            options =>
-            {
-                options.GlobalLimiter = PartitionedRateLimiter.CreateChained(
-                    // Sliding Window Policy
-                    PartitionedRateLimiter.Create<HttpContext, string>(
-                        httpContext =>
-                        {
-                            string? userIdHashed = httpContext.User.Identity?.IsAuthenticated == true
-                                ? httpContext.User.GetUserIdHashed()
-                                : httpContext.Connection.RemoteIpAddress?.ToString()
-                                  ?? Guid.NewGuid().ToString(); // Use a random fallback for anonymous
-
-                            return RateLimitPartition.GetSlidingWindowLimiter(
-                                userIdHashed ?? "anonymous",
-                                _ => new SlidingWindowRateLimiterOptions
-                                {
-                                    PermitLimit = 5, // Up to 100 requests allowed
-                                    Window = TimeSpan.FromSeconds(10), // Sliding window of 5 minutes
-                                    SegmentsPerWindow = 5, // Smooth enforcement (1 segment per minute)
-                                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                                    QueueLimit = 10 // Allow up to 10 queued requests
-                                }
-                            );
-                        }
-                    ),
-                    // Concurrent Policy
-                    PartitionedRateLimiter.Create<HttpContext, string>(
-                        httpContext =>
-                        {
-                            string? userIdHashed = httpContext.User.Identity?.IsAuthenticated == true
-                                ? httpContext.User.GetUserIdHashed()
-                                : httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
-
-                            return RateLimitPartition.GetConcurrencyLimiter(
-                                userIdHashed ?? "anonymous",
-                                _ => new ConcurrencyLimiterOptions
-                                {
-                                    PermitLimit = 5, // Up to 5 requests allowed
-                                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                                    QueueLimit = 2 // Allow up to 2 queued requests        
-                                }
-                            );
-                        }
-                    )
-                );
-
-                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-            }
-        );
-
-        #endregion
-
         #region Others
 
         services.AddScoped<LogUserActivity>(); // monitor/log userActivity
