@@ -11,6 +11,7 @@ public class AccountController(
     : BaseApiController
 {
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpGet("get-csrf-token")]
     public IActionResult GetCsrfToken()
     {
@@ -28,6 +29,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("register")]
     public async Task<ActionResult<bool>> Register(RegisterDto userIn, CancellationToken cancellationToken)
     {
@@ -47,6 +49,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("verify")]
     public async Task<ActionResult<LoggedInDto>> Verify(VerifyDto verifyDto, CancellationToken cancellationToken)
     {
@@ -68,6 +71,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("resend-verify-code")]
     public async Task<ActionResult<bool>> ResendVerifyCode(
         ResendCodeRequest resendCodeRequest, CancellationToken cancellationToken
@@ -86,6 +90,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("login")]
     public async Task<ActionResult<LoggedInDto>> Login(LoginDto userIn, CancellationToken cancellationToken)
     {
@@ -109,7 +114,8 @@ public class AccountController(
     }
 
     [AllowAnonymous]
-    [HttpGet("refresh-tokens")]
+    [EnableRateLimiting("auth")]
+    [HttpPost("refresh-tokens")]
     public async Task<IActionResult> RefreshTokens(CancellationToken cancellationToken)
     {
         bool isSuccess = Request.Cookies.TryGetValue("auth.refresh-token", out string? protectedRefreshToken);
@@ -154,6 +160,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("request-reset-password")]
     public async Task<ActionResult<Response>> RequestResetPassword(
         ResetPasswordRequest request, CancellationToken cancellationToken
@@ -169,6 +176,7 @@ public class AccountController(
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     [HttpPost("reset-password")]
     public async Task<ActionResult<Response>> ResetPassword(
         ResetPassword resetPassword, CancellationToken cancellationToken

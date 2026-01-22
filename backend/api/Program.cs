@@ -5,6 +5,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 // From customized ServiceExtensions (Extensions folder) for a clean maintained code /
 builder.Services.AddApplicationServices(builder.Configuration, builder.Environment);
 builder.Services.AddIdentityServices(builder.Configuration, builder.Environment);
+builder.Services.AddThrottlingServices(builder.Configuration);
 builder.Services.AddRepositoryServices();
 builder.Services.AddHubServices();
 
@@ -26,8 +27,11 @@ if (builder.Environment.IsProduction())
 
 WebApplication app = builder.Build();
 
+app.UseForwardedHeaders();
+
 // created a customized ExceptionMiddleware
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<AuthRateLimitIdentifierMiddleware>();
 
 if (app.Environment.IsProduction()) // https for production only
     app.UseHttpsRedirection();
@@ -52,12 +56,25 @@ app.UseCors();
 app.UseRouting();
 
 app.UseAuthentication(); // Validates and authenticates the request.
+app.UseMiddleware<AuthenticatedUserIdGuardMiddleware>();
 
 app.UseAuthorization(); // Populates HttpContext.User with claims from the token.
 
 app.UseRateLimiter(); // Can now safely access the user's identity or claims for user-based rate limiting.
 
-app.MapControllers();
+ControllerActionEndpointConventionBuilder controllerEndpoints = app.MapControllers();
+controllerEndpoints.Add(
+    endpointBuilder =>
+    {
+        if (endpointBuilder.Metadata.OfType<EnableRateLimitingAttribute>().Any())
+            return;
+
+        if (endpointBuilder.Metadata.OfType<AllowAnonymousAttribute>().Any())
+            endpointBuilder.Metadata.Add(new EnableRateLimitingAttribute("public"));
+        else if (endpointBuilder.Metadata.OfType<AuthorizeAttribute>().Any())
+            endpointBuilder.Metadata.Add(new EnableRateLimitingAttribute("dashboard"));
+    }
+);
 
 app.MapHubs();
 
