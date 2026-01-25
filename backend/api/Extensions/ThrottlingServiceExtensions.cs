@@ -34,10 +34,8 @@ public static class ThrottlingServiceExtensions
                 if (httpContext.User.Identity?.IsAuthenticated == true)
                 {
                     string? userIdHashed = httpContext.User.GetUserIdHashed();
-                    if (string.IsNullOrWhiteSpace(userIdHashed))
-                        return GetIpKey(httpContext);
-
-                    return userIdHashed;
+                    if (!string.IsNullOrWhiteSpace(userIdHashed))
+                        return $"u:{userIdHashed}";
                 }
 
                 return GetIpKey(httpContext);
@@ -46,14 +44,11 @@ public static class ThrottlingServiceExtensions
             {
                 string ipKey = GetIpKey(httpContext);
 
-                if (httpContext.Items.TryGetValue(AuthRateLimitIdentifierMiddleware.AuthIdentifierItemKey, out var value)
+                return httpContext.Items.TryGetValue(AuthRateLimitIdentifierMiddleware.AuthIdentifierItemKey, out var value)
                     && value is string idHash
-                    && !string.IsNullOrWhiteSpace(idHash))
-                {
-                    return $"{ipKey}|id:{idHash}";
-                }
-
-                return ipKey;
+                    && !string.IsNullOrWhiteSpace(idHash)
+                    ? $"{ipKey}|id:{idHash}"
+                    : ipKey;
             }
 
             static int GetConcurrencyLimit(HttpContext httpContext)
@@ -98,7 +93,7 @@ public static class ThrottlingServiceExtensions
                             ReplenishmentPeriod = TimeSpan.FromMinutes(1),
                             AutoReplenishment = true,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                            QueueLimit = 0
+                            QueueLimit = 0 // 0: avoid memory spikes, fail fast & protect server VS absorb pressure & increase latency
                         });
                 }),
 
@@ -123,14 +118,13 @@ public static class ThrottlingServiceExtensions
             {
                 string key = GetAuthPartitionKey(httpContext);
 
-                return RateLimitPartition.GetTokenBucketLimiter(
+                return RateLimitPartition.GetSlidingWindowLimiter(
                     key,
-                    _ => new TokenBucketRateLimiterOptions
+                    _ => new SlidingWindowRateLimiterOptions
                     {
-                        TokenLimit = 10,
-                        TokensPerPeriod = 10,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                        AutoReplenishment = true,
+                        PermitLimit = 10,
+                        Window = TimeSpan.FromMinutes(5),
+                        SegmentsPerWindow = 5,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 0
                     });
@@ -143,9 +137,10 @@ public static class ThrottlingServiceExtensions
                     key,
                     _ => new TokenBucketRateLimiterOptions
                     {
-                        TokenLimit = 120,
-                        TokensPerPeriod = 120,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        // This allows small bursts of 20 while keeping 2/sec average.
+                        TokenLimit = 20,
+                        TokensPerPeriod = 2,
+                        ReplenishmentPeriod = TimeSpan.FromSeconds(1),
                         AutoReplenishment = true,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 0
@@ -159,9 +154,10 @@ public static class ThrottlingServiceExtensions
                     key,
                     _ => new TokenBucketRateLimiterOptions
                     {
-                        TokenLimit = 600,
-                        TokensPerPeriod = 600,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        // (600/min)
+                        TokenLimit = 50,
+                        TokensPerPeriod = 10,
+                        ReplenishmentPeriod = TimeSpan.FromSeconds(1),
                         AutoReplenishment = true,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 0
@@ -170,15 +166,15 @@ public static class ThrottlingServiceExtensions
 
             options.AddPolicy("hubs", httpContext =>
             {
-                string key = GetPartitionKey(httpContext);
-                return RateLimitPartition.GetTokenBucketLimiter(
+                string key = GetPartitionKey(httpContext); // e.g. u:{userIdHashed} or ip:{ip}
+
+                return RateLimitPartition.GetSlidingWindowLimiter(
                     key,
-                    _ => new TokenBucketRateLimiterOptions
+                    _ => new SlidingWindowRateLimiterOptions
                     {
-                        TokenLimit = 30,
-                        TokensPerPeriod = 30,
-                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
-                        AutoReplenishment = true,
+                        PermitLimit = 30,
+                        Window = TimeSpan.FromMinutes(1),
+                        SegmentsPerWindow = 10,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                         QueueLimit = 0
                     });
