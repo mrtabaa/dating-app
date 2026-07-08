@@ -70,7 +70,7 @@ public class AllowedFileExtensionsAttribute : ValidationAttribute
         return ValidationResult.Success;
     }
 
-    private ValidationResult GetValidationResult()
+    private static ValidationResult GetValidationResult()
     {
         var allowedExtensions = string.Join(", ", _fileSignatures.Keys);
 
@@ -79,7 +79,7 @@ public class AllowedFileExtensionsAttribute : ValidationAttribute
 
     public static bool IsFileValid(IFormFile? file)
     {
-        if (file == null || file.Length == 0)
+        if (file is null || file.Length == 0)
             return false;
 
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
